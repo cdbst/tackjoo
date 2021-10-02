@@ -9,15 +9,7 @@ var evt = new MouseEvent("click", {
     /* whatever properties you want to give it */
 });
 
-// setInterval(()=>{
-//     bmak.hmd(evt, (sensor_data)=>{
-//         console.log(sensor_data);
-//     });
-// }, 1000);
-
-
 var onClickGenSensorData = function(e){
-    console.log('trigger event!!');
     bmak.hmd(evt, (sensor_data)=>{
         console.log(sensor_data);
     });
