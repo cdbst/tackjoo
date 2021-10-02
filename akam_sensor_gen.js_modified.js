@@ -1802,7 +1802,7 @@ var _cf = _cf || [],
             (n["onreadystatechange"] = function () {
               n["readyState"] > 3 && e && e(n);
             }),
-              n["send"](o),
+              //n["send"](o), // TODO : 나중에 살려야할 코드가 될 수 있음.
               cb != undefined ? cb(o) : o = o,
               (bmak["dcs"] = 0);
           },
