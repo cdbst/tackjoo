@@ -19,7 +19,6 @@ def get_string_list(line) :
 
         str = hex_to_ascii(_hex)
         str_set.append("\"{}\"".format(str) if has_quote else str)
-        print('test')
 
     return var_name, str_set
 
