@@ -1,3 +1,5 @@
+const orign_src_path = "https://www.nike.com/leXt7X/wY/pW/gPtI/XZ9SKFAGz3FVc/ik5JkfVwX3/Fht-GR0iXgM/Ujt4Kz4/LFm4B";
+
 var _cf = _cf || [],
   bmak =
     bmak && bmak["hasOwnProperty"]("ver") && bmak["hasOwnProperty"]("sed")
@@ -17,10 +19,9 @@ var _cf = _cf || [],
           doa_throttle: 0,
           dma_throttle: 0,
           session_id: "default_session",
-          js_post: 1, // orin code is js_post: !1, when this memory is changed??? TODO : TRACKING THIS MEMORY
+          js_post: !1, // orin code is js_post: !1, when this memory is changed??? TODO : TRACKING THIS MEMORY
           loc: "",
-          cf_url:
-            "https://www.nike.com/leXt7X/wY/pW/gPtI/XZ9SKFAGz3FVc/ik5JkfVwX3/Fht-GR0iXgM/Ujt4Kz4/LFm4B",
+          cf_url: orign_src_path,
           params_url:
             ("https:" === document["location"]["protocol"]
               ? "https://"
@@ -2701,6 +2702,9 @@ if (
       var scripts = document["getElementsByTagName"]("script");
       scripts["length"] && (bm_script = scripts[scripts["length"] - 1]);
     }
+
+    bm_script["src"] = orign_src_path;
+
     if (bm_script["src"]) {
       var bm_url = bm_script["src"],
         url_split = bm_url["split"]("/"),
