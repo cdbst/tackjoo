@@ -522,7 +522,7 @@ var _cf = _cf || [],
               [t, a, e, n, o, m, r]["join"](",")
             );
           },
-          cma: function (t, a) {
+          cma: function (t, a, cb) {
             try {
               if (
                 (1 == a && bmak["mme_cnt"] < bmak["mme_cnt_lmt"]) ||
@@ -564,7 +564,7 @@ var _cf = _cf || [],
                   3 == a &&
                   ((bmak["aj_type"] = 1),
                   bmak["bpd"](),
-                  bmak["pd"](!0),
+                  bmak["pd"](!0, cb),
                   (bmak["ce_js_post"] = 1));
             } catch (t) {}
           },
@@ -1260,8 +1260,8 @@ var _cf = _cf || [],
           hc: function (t) {
             bmak["cma"](t, 2);
           },
-          hmd: function (t) {
-            bmak["cma"](t, 3);
+          hmd: function (t, cb) {
+            bmak["cma"](t, 3, cb);
           },
           hmu: function (t) {
             bmak["cma"](t, 4);
@@ -1784,7 +1784,7 @@ var _cf = _cf || [],
               "}";
             e["send"](o);
           },
-          apicall_bm: function (t, a, e) {
+          apicall_bm: function (t, a, e, cb) {
             var n;
             void 0 !== window["XMLHttpRequest"]
               ? (n = new XMLHttpRequest())
@@ -1803,15 +1803,16 @@ var _cf = _cf || [],
               n["readyState"] > 3 && e && e(n);
             }),
               n["send"](o),
+              cb != undefined ? cb(o) : o = o,
               (bmak["dcs"] = 0);
           },
-          pd: function (t) {
+          pd: function (t, cb) {
             bmak["check_stop_protocol"]()
-              ? (bmak["apicall_bm"](bmak["cf_url"], t, bmak["patp"]),
+              ? (bmak["apicall_bm"](bmak["cf_url"], t, bmak["patp"], cb),
                 (bmak["aj_indx"] = bmak["aj_indx"] + 1))
               : bmak["loap"] &&
                 bmak["dcs"] &&
-                bmak["apicall_bm"](bmak["cf_url"], t, bmak["patp"]);
+                bmak["apicall_bm"](bmak["cf_url"], t, bmak["patp"], cb);
           },
           check_stop_protocol: function () {
             var t = bmak["get_stop_signals"](),

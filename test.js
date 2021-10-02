@@ -10,13 +10,17 @@ var evt = new MouseEvent("click", {
 });
 
 // setInterval(()=>{
-//     bmak.hmd(evt);
+//     bmak.hmd(evt, (sensor_data)=>{
+//         console.log(sensor_data);
+//     });
 // }, 1000);
 
 
 var onClickGenSensorData = function(e){
     console.log('trigger event!!');
-    bmak.hmd(evt);
+    bmak.hmd(evt, (sensor_data)=>{
+        console.log(sensor_data);
+    });
 }
 
 console.log('TEST END GEN Mouse Event');
