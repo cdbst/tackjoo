@@ -1,6 +1,3 @@
-
-console.log('GEN Mouse Event');
-
 var evt = new MouseEvent("click", {
     view: window,
     bubbles: true,
@@ -15,4 +12,3 @@ var onClickGenSensorData = function(e){
     });
 }
 
-console.log('TEST END GEN Mouse Event');
