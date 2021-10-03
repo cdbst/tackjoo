@@ -12,16 +12,22 @@ app.use(body_parser.urlencoded({ extended: true }));
 
 const root_cas = require('ssl-root-cas').create();
 const https = require('https');
-const http = require('http');
+const cookie = require('cookie');
+
+const cookie_mngr = require('./cookie_mngr.js');
 
 https.globalAgent.options.ca = root_cas;
 
 const port = 3000;
 
-let g_cookies = ['NikeCookie=ok;', 'social_type=comlogin;', 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB;'];
+//let g_cookies = ['NikeCookie=ok', 'social_type=comlogin;', 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB;'];
 let g_csrfToken = undefined;
 let g_customer_id = undefined;
 let g_ping_url = undefined;
+
+let g_cookie_storage = cookie_mngr.CookieManager();
+g_cookie_storage.add_cookie_data('NikeCookie=ok');
+
 
 app.get('/akam_sensor_gen.js_modified.js', (req, res) =>{
     res.sendFile(__dirname + '\\akam_sensor_gen.js_modified.js');
@@ -65,14 +71,13 @@ function get_akam_cookies(sensor_data){
     
 
     let data_len = JSON.stringify(sensor_data).length;
-    let _cookies = g_cookies.join(' ');
+    let _cookies = g_cookie_storage.get_cookie_data();
     var _test_cookies = 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB';
 
     let config = {
         headers: {
             "authority": 'www.nike.com',
-            // "path" : _path,
-            // "method": "POST",
+
             "accept": "*/*",
             "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
             "cache-control": "no-cache",
@@ -88,14 +93,11 @@ function get_akam_cookies(sensor_data){
             "referer": "https://www.nike.com/kr/ko_kr",
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36',
             'content-length': data_len
-            // 'connection' : 'keep-alive',
-            // 'dnt': '1'
         }
     }
 
     axios.post('https://www.nike.com' + g_ping_url, sensor_data, config)
     .then(res => {
-
         if(res.status == 201){
             console.log(res.data);
         }else{
@@ -122,7 +124,7 @@ function do_login(id, pwd, cb) {
     }
 
     let data_len = JSON.stringify(data).length;
-    let _cookies = g_cookies.join(' ');
+    let _cookies = g_cookie_storage.get_cookie_data();
 
     let config = {
         headers: {
@@ -169,8 +171,7 @@ function access_main_page(cb){
         if(res.status == 200){
             // g_cookies = [];
             res.headers['set-cookie'].forEach(cookie_data =>{
-                cookie = cookie_data.split(' ');
-                g_cookies.push(cookie[0]);
+                g_cookie_storage.add_cookie_data(cookie_data);
             });
 
             const $ = cheerio.load(res.data);
@@ -198,8 +199,7 @@ function access_main_page(cb){
 
             let setting_data = data_script.children[0].data;
             g_customer_id = setting_data.split('ID :')[1].split(',')[0].trim();
-            g_cookies.push('USERID=' + g_customer_id +';');
-
+            g_cookie_storage.add_cookie_data('USERID=' + g_customer_id);
 
             scripts = $('script').get();
 
