@@ -12,7 +12,6 @@ app.use(body_parser.urlencoded({ extended: true }));
 
 const root_cas = require('ssl-root-cas').create();
 const https = require('https');
-const cookie = require('cookie');
 
 const cookie_mngr = require('./cookie_mngr.js');
 
@@ -25,7 +24,7 @@ let g_csrfToken = undefined;
 let g_customer_id = undefined;
 let g_ping_url = undefined;
 
-let g_cookie_storage = cookie_mngr.CookieManager();
+let g_cookie_storage = new cookie_mngr.CookieManager();
 g_cookie_storage.add_cookie_data('NikeCookie=ok');
 
 
@@ -69,7 +68,6 @@ app.listen(port, ()=>{
 
 function get_akam_cookies(sensor_data){
     
-
     let data_len = JSON.stringify(sensor_data).length;
     let _cookies = g_cookie_storage.get_cookie_data();
     var _test_cookies = 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB';
@@ -100,6 +98,9 @@ function get_akam_cookies(sensor_data){
     .then(res => {
         if(res.status == 201){
             console.log(res.data);
+            res.headers['set-cookie'].forEach(cookie_data =>{
+                g_cookie_storage.add_cookie_data(cookie_data);
+            });
         }else{
             console.log('req fail - status code : ' + res.status);
         }

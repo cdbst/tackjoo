@@ -1,6 +1,6 @@
 const cookie = require('cookie');
 
-export class CookieManager{
+class CookieManager{
 
     constructor(){
 
@@ -9,6 +9,7 @@ export class CookieManager{
         this.get_cookie_data = this.get_cookie_data.bind(this);
 
         this.cookies = {};
+        this.num_of_cookies = 0;
     }
 
     add_cookie_data(cookie_data){
@@ -16,6 +17,7 @@ export class CookieManager{
 
         let cookie_keys = Object.keys(parsed_data);
         cookie_keys.forEach(cookie_name =>{
+            if(cookie_name in this.cookies == false) this.num_of_cookies++;
             let cookie_val = parsed_data[cookie_name];
             this.cookies[cookie_name] = cookie_val;
         });
@@ -23,9 +25,21 @@ export class CookieManager{
 
     remove_cookie_data(cookie_name){
         delete this.cookies[cookie_name];
+        this.num_of_cookies--;
     }
 
     get_cookie_data(){
-        return cookie.serialize(this.cookies);
+        let serialized = '';
+
+        let i = 0;
+        for (const [key, value] of Object.entries(this.cookies)) {
+            serialized += (key + '=' + value);
+            if(i < this.num_of_cookies - 1) serialized += '; ';
+            i++;
+        }
+
+        return serialized;
     }
 }
+
+module.exports.CookieManager = CookieManager;
