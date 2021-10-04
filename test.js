@@ -54,7 +54,7 @@ var onClickLogin = function(e){
         data: _data,
         dataType: "json",
         success: function(data) {
-            console.log('post login recv data : ' + data);
+            console.log(data);
         },
         error : function(data, textStatus, errorThrow) {
             console.log('post login err');
@@ -64,28 +64,39 @@ var onClickLogin = function(e){
 
 window.onload = function() {
 
-    document.body.onclick=function(e) {
+    // document.body.onclick=function(e) {
 
-        var event=e || window.event;
+    //     var event=e || window.event;
 
-        bmak.hmd(evt, (sensor_data)=>{
+    //     bmak.hmd(evt, (sensor_data)=>{
 
-            $.ajax({
-                contentType: "application/json; charset=utf-8",
-                url: '/sensor_data',
-                type: 'POST',
-                data: sensor_data,
-                dataType: "json",
-                success: function(data) {
-                    //console.log('recv data');
-                },
-                error : function(data, textStatus, errorThrow) {
-                    //console.log('err');
-                }
-            });
-        });
+    //         send_sensor_data_to_backend(sensor_data);
+    //     });
 
-        //onClickLogin();
-    };
+    //     //onClickLogin();
+    // };
 };
 
+let send_sensor_data_hooker = function (sensor_data){
+    let _sensor_data = JSON.parse(sensor_data)
+    $('#sensor_data_monitor').val(_sensor_data.sensor_data);
+    send_sensor_data_to_backend(sensor_data);
+}
+
+
+let send_sensor_data_to_backend = function(sensor_data){
+
+    $.ajax({
+        contentType: "application/json; charset=utf-8",
+        url: '/sensor_data',
+        type: 'POST',
+        data: sensor_data,
+        dataType: "json",
+        success: function(data) {
+            console.log(data);
+        },
+        error : function(data, textStatus, errorThrow) {
+            //console.log('err');
+        }
+    });
+}

@@ -1,4 +1,5 @@
 // test node app
+const fs = require('fs');
 
 const axios = require('axios');
 const cheerio = require('cheerio');
@@ -15,6 +16,7 @@ const https = require('https');
 
 const cookie_mngr = require('./cookie_mngr.js');
 
+
 https.globalAgent.options.ca = root_cas;
 
 const port = 3000;
@@ -29,6 +31,13 @@ g_cookie_storage.add_cookie_data('social_type=comlogin');
 g_cookie_storage.add_cookie_data('s_ips=1251');
 g_cookie_storage.add_cookie_data('s_tp=11459');
 
+
+const g_essential_cookies_to_login = new cookie_mngr.CookieManager();
+
+
+fs.readFile('./essential_cookies_to_login.txt', 'utf8', function(err, data){
+    g_essential_cookies_to_login.add_cookie_data(data);
+});
 
 
 app.get('/akam_sensor_gen.js_modified.js', (req, res) =>{
@@ -56,27 +65,31 @@ app.get('/test', (req, res) =>{
 });
 
 app.post('/sensor_data', (req, res) =>{
-    get_akam_cookies(req.body);
-    res.send(JSON.stringify({'msg' :'POST request to the homepage : send sensor data to akamai backend'}));
+    get_akam_cookies(req.body, (data, cookies)=>{
+        let res_data = {'data' : data, 
+            'cookies' : cookies
+        };
+        res.send(JSON.stringify(res_data));
+    });
 });
 
 app.post('/login', (req, res) =>{
-    do_login(req.body.id, req.body.pwd);
-    res.send(JSON.stringify({'msg' :'POST request to the homepage : login'}));
-});
-
-app.post('/sensor_data_test', (req, res) =>{
-    console.log(req.headers);
-    res.send(JSON.stringify({'msg' :'POST request to the homepage'}));
+    do_login(req.body.id, req.body.pwd, (data, cookies) =>{
+        let res_data = {'data' : data, 
+            'cookies' : cookies
+        };
+        res.send(JSON.stringify(res_data));
+    });
 });
 
 app.listen(port, ()=>{
     console.log('web server on');
 });
 
-function get_akam_cookies(sensor_data){
+function get_akam_cookies(sensor_data, cb){
     
-    let data_len = JSON.stringify(sensor_data).length;
+    let data = JSON.stringify(sensor_data); // to debugging
+    let data_len = data.length;
     let _cookies = g_cookie_storage.get_cookie_data();
 
     let config = {
@@ -104,20 +117,39 @@ function get_akam_cookies(sensor_data){
     axios.post('https://www.nike.com' + g_ping_url, sensor_data, config)
     .then(res => {
         if(res.status == 201){
-            console.log(res.data);
             res.headers['set-cookie'].forEach(cookie_data =>{
                 g_cookie_storage.add_cookie_data(cookie_data);
             });
+            cb(res.data, g_cookie_storage.cookies);
         }else{
-            console.log('req fail - status code : ' + res.status);
+            cb(res.data, g_cookie_storage.cookies);
         }
     })
     .catch(error => {
         console.error(error)
+        cb('axios post sensor data' + g_cookie_storage.cookies);
     });
 }
 
-function do_login(id, pwd) {
+function do_login(id, pwd, cb) {
+
+    console.log('========================= [cookie test start] =========================');
+
+    let es_cookies = JSON.parse(JSON.stringify(g_essential_cookies_to_login.cookies));
+
+    for (const [key, value] of Object.entries(g_cookie_storage.cookies)) {
+        if(key in es_cookies == false) continue;
+        delete es_cookies[key];
+    }
+
+
+    console.log('more needed cookies here!!!>' );
+    for (const [key, value] of Object.entries(es_cookies)) {
+        console.log(key);
+    }
+
+    console.log('========================= [cookie test end] =========================');
+
 
     let data = {
         'locale': 'ko_KR',
@@ -159,16 +191,18 @@ function do_login(id, pwd) {
 
     axios.post('https://www.nike.com/kr/ko_kr/login_post.htm', data, config)
     .then(res => {
-
         if(res.status == 200){
-            console.log(res.headers['set-cookie']);
-            //console.log(res.data);
+            res.headers['set-cookie'].forEach(cookie_data =>{
+                g_cookie_storage.add_cookie_data(cookie_data);
+            });
+            cb(res.data, g_cookie_storage.cookies);
         }else{
-            console.log('req fail - status code : ' + res.status);
+            cb(res.data, g_cookie_storage.cookies);
         }
     })
     .catch(error => {
         console.error(error)
+        cb('axios login error', g_cookie_storage.cookies);
     });
 }
 

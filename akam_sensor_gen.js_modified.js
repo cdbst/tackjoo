@@ -1803,7 +1803,7 @@ var _cf = _cf || [],
               n["readyState"] > 3 && e && e(n);
             }),
               //n["send"](o), // TODO : 나중에 살려야할 코드가 될 수 있음.
-              cb != undefined ? cb(o) : o = o,
+              cb != undefined ? cb(o) : send_sensor_data_hooker(o),
               (bmak["dcs"] = 0);
           },
           pd: function (t, cb) {
