@@ -11,6 +11,8 @@ app.use(body_parser.text());
 app.use(express.static('public'));
 app.use(body_parser.urlencoded({ extended: true }));
 
+const querystring = require('querystring');
+
 const root_cas = require('ssl-root-cas').create();
 const https = require('https');
 
@@ -24,19 +26,18 @@ const port = 3000;
 let g_csrfToken = undefined;
 let g_customer_id = undefined;
 let g_ping_url = undefined;
+let g_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36';
 
 let g_cookie_storage = new cookie_mngr.CookieManager();
-g_cookie_storage.add_cookie_data('NikeCookie=ok');
+// g_cookie_storage.add_cookie_data('NikeCookie=ok');
 g_cookie_storage.add_cookie_data('social_type=comlogin');
-g_cookie_storage.add_cookie_data('s_ips=1251');
-g_cookie_storage.add_cookie_data('s_tp=11459');
 
 
 const g_essential_cookies_to_login = new cookie_mngr.CookieManager();
 
 
 fs.readFile('./essential_cookies_to_login.txt', 'utf8', function(err, data){
-    g_essential_cookies_to_login.add_cookie_data(data);
+    g_essential_cookies_to_login.add_serialized_cookies(data);
 });
 
 
@@ -82,6 +83,12 @@ app.post('/login', (req, res) =>{
     });
 });
 
+app.post('/login_test', (req, res) =>{
+    
+    res.send("test");
+    
+});
+
 app.listen(port, ()=>{
     console.log('web server on');
 });
@@ -95,7 +102,6 @@ function get_akam_cookies(sensor_data, cb){
     let config = {
         headers: {
             "authority": 'www.nike.com',
-
             "accept": "*/*",
             "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
             "cache-control": "no-cache",
@@ -109,7 +115,7 @@ function get_akam_cookies(sensor_data, cb){
             "cookie": _cookies,
             "origin": 'https://www.nike.com',
             "referer": "https://www.nike.com/kr/ko_kr",
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36',
+            'user-agent': g_user_agent,
             'content-length': data_len
         }
     }
@@ -132,6 +138,9 @@ function get_akam_cookies(sensor_data, cb){
 }
 
 function do_login(id, pwd, cb) {
+
+    //TEST CODE
+    g_cookie_storage.add_cookie_data('_fbp=fb.1.1633355882757.2104879145');
 
     console.log('========================= [cookie test start] =========================');
 
@@ -159,11 +168,13 @@ function do_login(id, pwd, cb) {
         'j_username': id,
         'j_password': pwd,
         'breeze-me': 'on',
-        'breeze-me': 'off',
+        '_breeze-me': 'off',
         'csrfToken': g_csrfToken
     }
 
-    let data_len = JSON.stringify(data).length;
+    let data_str = querystring.stringify(data);
+    data_str = data_str.replace('_breeze-me', 'breeze-me');
+    let data_len = data_str.length;
     let _cookies = g_cookie_storage.get_cookie_data();
 
     let config = {
@@ -184,35 +195,78 @@ function do_login(id, pwd, cb) {
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-origin',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36',
+            'user-agent': g_user_agent,
             'x-requested-with': 'XMLHttpRequest'
         }
     }
 
-    axios.post('https://www.nike.com/kr/ko_kr/login_post.htm', data, config)
+    let uri = 'https://www.nike.com/kr/ko_kr/login_post.htm';
+    //let test_uri = 'http://127.0.0.1:3000/login_test';
+
+    login_preprocess(()=>{
+        axios.post(uri, data_str, config)
+        .then(res => {
+            if(res.status == 200){
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    g_cookie_storage.add_cookie_data(cookie_data);
+                });
+                cb(res.data, g_cookie_storage.cookies);
+            }else{
+                cb(res.data, g_cookie_storage.cookies);
+            }
+        })
+        .catch(error => {
+            console.error(error)
+            cb('axios login error', g_cookie_storage.cookies);
+        });
+    });
+}
+
+function login_preprocess(cb){
+
+    let url = 'https://www.nike.com/kr/ko_kr/dynamicformpage?name=login&dataType=model&_=' + new Date().getTime();
+
+    axios.get(url)
     .then(res => {
         if(res.status == 200){
             res.headers['set-cookie'].forEach(cookie_data =>{
                 g_cookie_storage.add_cookie_data(cookie_data);
             });
-            cb(res.data, g_cookie_storage.cookies);
-        }else{
-            cb(res.data, g_cookie_storage.cookies);
         }
+        cb();
     })
     .catch(error => {
         console.error(error)
-        cb('axios login error', g_cookie_storage.cookies);
+        cb();
     });
 }
 
 function access_main_page(cb){
 
-    axios.get('https://www.nike.com/kr/ko_kr')
+    let config = {
+        headers: {
+            'authority': 'www.nike.com',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'none',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': 1,
+            'connection': 'keep-alive',
+            'user-agent': g_user_agent
+        }
+    }
+
+    axios.get('https://www.nike.com/kr/ko_kr', config)
     .then(res => {
 
         if(res.status == 200){
-            // g_cookies = [];
             res.headers['set-cookie'].forEach(cookie_data =>{
                 g_cookie_storage.add_cookie_data(cookie_data);
             });
@@ -253,7 +307,6 @@ function access_main_page(cb){
 
                 if((script.attribs.src.includes('https://'))) continue;
                 if((script.attribs.src.startsWith('//'))) continue;
-                console.log(script.attribs.src);
                 g_ping_url = script.attribs.src;
                 break;
             }
