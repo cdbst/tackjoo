@@ -19,13 +19,16 @@ https.globalAgent.options.ca = root_cas;
 
 const port = 3000;
 
-//let g_cookies = ['NikeCookie=ok', 'social_type=comlogin;', 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB;'];
 let g_csrfToken = undefined;
 let g_customer_id = undefined;
 let g_ping_url = undefined;
 
 let g_cookie_storage = new cookie_mngr.CookieManager();
 g_cookie_storage.add_cookie_data('NikeCookie=ok');
+g_cookie_storage.add_cookie_data('social_type=comlogin');
+g_cookie_storage.add_cookie_data('s_ips=1251');
+g_cookie_storage.add_cookie_data('s_tp=11459');
+
 
 
 app.get('/akam_sensor_gen.js_modified.js', (req, res) =>{
@@ -54,7 +57,12 @@ app.get('/test', (req, res) =>{
 
 app.post('/sensor_data', (req, res) =>{
     get_akam_cookies(req.body);
-    res.send(JSON.stringify({'msg' :'POST request to the homepage'}));
+    res.send(JSON.stringify({'msg' :'POST request to the homepage : send sensor data to akamai backend'}));
+});
+
+app.post('/login', (req, res) =>{
+    do_login(req.body.id, req.body.pwd);
+    res.send(JSON.stringify({'msg' :'POST request to the homepage : login'}));
 });
 
 app.post('/sensor_data_test', (req, res) =>{
@@ -70,7 +78,6 @@ function get_akam_cookies(sensor_data){
     
     let data_len = JSON.stringify(sensor_data).length;
     let _cookies = g_cookie_storage.get_cookie_data();
-    var _test_cookies = 'anonymousId=9B4FE976FFE05E23E447162D70BED0AB';
 
     let config = {
         headers: {
@@ -110,7 +117,7 @@ function get_akam_cookies(sensor_data){
     });
 }
 
-function do_login(id, pwd, cb) {
+function do_login(id, pwd) {
 
     let data = {
         'locale': 'ko_KR',
@@ -129,24 +136,24 @@ function do_login(id, pwd, cb) {
 
     let config = {
         headers: {
-            'accept':'application/json, text/javascript, */*; q=0.01',
-            'accept-encoding':'gzip, deflate, br',
-            'accept-language':'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-            'cache-control':'no-cache',
-            // 'content-length': data_len,
-            'content-type':'application/x-www-form-urlencoded; charset=UTF-8',
+            'authority': 'www.nike.com',
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
             'content-length': data_len,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'cookie': _cookies,
-            'origin':'https://www.nike.com',
-            'pragma':'no-cache',
-            'referer':'https://www.nike.com/kr/ko_kr/',
-            'sec-ch-ua':"\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\"",
-            'sec-ch-ua-mobile':'?0',
-            'sec-fetch-dest':'empty',
-            'sec-fetch-mode':'cors',
-            'sec-fetch-site':'same-origin',
-            'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36',
-            'x-requested-with':'XMLHttpRequest',
+            'origin': 'https://www.nike.com',
+            'pragma': 'no-cache',
+            'referer': 'https://www.nike.com/kr/ko_kr/',
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36',
+            'x-requested-with': 'XMLHttpRequest'
         }
     }
 
@@ -154,7 +161,8 @@ function do_login(id, pwd, cb) {
     .then(res => {
 
         if(res.status == 200){
-            console.log(res.data);
+            console.log(res.headers['set-cookie']);
+            //console.log(res.data);
         }else{
             console.log('req fail - status code : ' + res.status);
         }
