@@ -5,23 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Test BackEnd",
-            "program": "${workspaceFolder}/tester/test_app.js",
-            "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "pwa-node"
-        },
-        {
-            "type": "pwa-chrome",
-            "request": "launch",
-            "name": "Launch Test FrontEnd",
-            "url": "http://127.0.0.1:3000/test",
-            "webRoot": "${workspaceFolder}"
-        },
-		{
-            "name": "<UI> Launch Chrome",
+            "name": "Launch Chrome - Electron UI",
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://127.0.0.1:5500/html/index.html",
@@ -34,7 +18,22 @@
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
             "program": "${workspaceRoot}/src/app.js"
+        },
+        {
+            "name": "Launch Tester BackEnd",
+            "program": "${workspaceFolder}/tester/test_app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
+            "type": "pwa-chrome",
+            "request": "launch",
+            "name": "Launch Tester FrontEnd",
+            "url": "http://127.0.0.1:3000/test",
+            "webRoot": "${workspaceFolder}"
         }
-		
     ]
 }
