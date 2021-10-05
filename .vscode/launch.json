@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch Test BackEnd",
-            "program": "${workspaceFolder}/tester/app.js",
+            "program": "${workspaceFolder}/tester/test_app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

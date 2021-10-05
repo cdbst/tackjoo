@@ -1,8 +1,8 @@
 {
-  "name": "snkrs_bot_kr",
+  "name": "snkrs_bot_kr_tester",
   "version": "1.0.0",
-  "description": "snkrs bot for nike korean site",
-  "main": "app.js",
+  "description": "snkrs bot for nike korean site (tester)",
+  "main": "test_app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
