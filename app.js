@@ -5,21 +5,16 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const express = require('express');
 const body_parser = require('body-parser');
+
 const app = express();
 app.use(body_parser.json());
 app.use(body_parser.text());
-app.use(express.static('public'));
 app.use(body_parser.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 const querystring = require('querystring');
 
-const root_cas = require('ssl-root-cas').create();
-const https = require('https');
-
 const cookie_mngr = require('./cookie_mngr.js');
-
-
-https.globalAgent.options.ca = root_cas;
 
 const port = 3000;
 
@@ -32,9 +27,7 @@ let g_cookie_storage = new cookie_mngr.CookieManager();
 // g_cookie_storage.add_cookie_data('NikeCookie=ok');
 g_cookie_storage.add_cookie_data('social_type=comlogin');
 
-
 const g_essential_cookies_to_login = new cookie_mngr.CookieManager();
-
 
 fs.readFile('./essential_cookies_to_login.txt', 'utf8', function(err, data){
     g_essential_cookies_to_login.add_serialized_cookies(data);
@@ -65,6 +58,16 @@ app.get('/test', (req, res) =>{
     res.sendFile(__dirname + '\\test.html');
 });
 
+app.get('/mypage', (req, res) =>{
+    get_my_page((data, cookies)=>{
+        let res_data = {
+            'data' : data, 
+            'cookies' : cookies
+        };
+        res.send(JSON.stringify(res_data));
+    });
+});
+
 app.post('/sensor_data', (req, res) =>{
     get_akam_cookies(req.body, (data, cookies)=>{
         let res_data = {'data' : data, 
@@ -84,14 +87,57 @@ app.post('/login', (req, res) =>{
 });
 
 app.post('/login_test', (req, res) =>{
-    
     res.send("test");
-    
 });
+
+
 
 app.listen(port, ()=>{
     console.log('web server on');
 });
+
+function get_my_page( cb){
+
+    let _cookies = g_cookie_storage.get_cookie_data();
+
+    let config = {
+        headers: {
+            'authority': 'www.nike.com',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'none',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': 1,
+            'connection': 'keep-alive',
+            'user-agent': g_user_agent,
+            "cookie": _cookies
+        }
+    }
+
+    axios.get('https://www.nike.com/kr/ko_kr/mypage', config)
+    .then(res => {
+        if(res.status == 200){
+            res.headers['set-cookie'].forEach(cookie_data =>{
+                g_cookie_storage.add_cookie_data(cookie_data);
+            });
+            cb(res.data, g_cookie_storage.cookies);
+        }else{
+            cb(res.data, g_cookie_storage.cookies);
+        }
+    })
+    .catch(error => {
+        console.error(error)
+        cb('axios get mypage error');
+    });
+}
+
 
 function get_akam_cookies(sensor_data, cb){
     
@@ -133,7 +179,7 @@ function get_akam_cookies(sensor_data, cb){
     })
     .catch(error => {
         console.error(error)
-        cb('axios post sensor data' + g_cookie_storage.cookies);
+        cb('axios post sensor data error', undefined);
     });
 }
 
@@ -217,7 +263,7 @@ function do_login(id, pwd, cb) {
         })
         .catch(error => {
             console.error(error)
-            cb('axios login error', g_cookie_storage.cookies);
+            cb('axios login error', undefined);
         });
     });
 }

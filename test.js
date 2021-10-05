@@ -6,7 +6,12 @@ var evt = new MouseEvent("click", {
     /* whatever properties you want to give it */
 });
 
-// example -- hmd > cma > bpd >  pd > apicall_bm (click event call stack )
+// example --> hmd > cma > bpd >  pd > apicall_bm > call below hook (example about click event call stack )
+let send_sensor_data_hooker = function (sensor_data){
+    let _sensor_data = JSON.parse(sensor_data)
+    $('#sensor_data_monitor').val(_sensor_data.sensor_data);
+    send_sensor_data_to_backend(sensor_data);
+}
 
 var onClickGenSensorData = function(e){
 
@@ -62,27 +67,20 @@ var onClickLogin = function(e){
     });
 }
 
-window.onload = function() {
+var onClickMyPage = function(e){
 
-    // document.body.onclick=function(e) {
-
-    //     var event=e || window.event;
-
-    //     bmak.hmd(evt, (sensor_data)=>{
-
-    //         send_sensor_data_to_backend(sensor_data);
-    //     });
-
-    //     //onClickLogin();
-    // };
-};
-
-let send_sensor_data_hooker = function (sensor_data){
-    let _sensor_data = JSON.parse(sensor_data)
-    $('#sensor_data_monitor').val(_sensor_data.sensor_data);
-    send_sensor_data_to_backend(sensor_data);
+    $.ajax({
+        contentType: "application/json; charset=utf-8",
+        url: '/mypage',
+        type: 'GET',
+        success: function(data) {
+            console.log(data);
+        },
+        error : function(data, textStatus, errorThrow) {
+            console.log('post login err');
+        }
+    });
 }
-
 
 let send_sensor_data_to_backend = function(sensor_data){
 
