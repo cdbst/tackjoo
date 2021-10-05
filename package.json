@@ -1,7 +1,7 @@
 {
-  "name": "snkr_bot_kr",
+  "name": "snkrs_bot_kr",
   "version": "1.0.0",
-  "description": "Nike SNKR BOT for korean",
+  "description": "Nike SNKRS BOT for korean",
   "main": "app.js",
   "scripts": {
     "build": "node build/build_view.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cdbst/spaceY.git"
+    "url": "git+https://github.com/cdbst/snkrs_bot_kr.git"
   },
   "keywords": [
     "electrion",
@@ -19,9 +19,9 @@
   "author": "cdbst",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/cdbst/spaceY/issues"
+    "url": "https://github.com/cdbst/snkrs_bot_kr/issues"
   },
-  "homepage": "https://github.com/cdbst/spaceY#readme",
+  "homepage": "https://github.com/cdbst/snkrs_bot_kr#readme",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
