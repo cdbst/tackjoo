@@ -27,12 +27,6 @@ let g_cookie_storage = new cookie_mngr.CookieManager();
 // g_cookie_storage.add_cookie_data('NikeCookie=ok');
 g_cookie_storage.add_cookie_data('social_type=comlogin');
 
-const g_essential_cookies_to_login = new cookie_mngr.CookieManager();
-
-fs.readFile('./essential_cookies_to_login.txt', 'utf8', function(err, data){
-    g_essential_cookies_to_login.add_serialized_cookies(data);
-});
-
 
 app.get('/akam_sensor_gen.js_modified.js', (req, res) =>{
     res.sendFile(__dirname + '\\akam_sensor_gen.js_modified.js');
@@ -184,27 +178,6 @@ function get_akam_cookies(sensor_data, cb){
 }
 
 function do_login(id, pwd, cb) {
-
-    //TEST CODE
-    g_cookie_storage.add_cookie_data('_fbp=fb.1.1633355882757.2104879145');
-
-    console.log('========================= [cookie test start] =========================');
-
-    let es_cookies = JSON.parse(JSON.stringify(g_essential_cookies_to_login.cookies));
-
-    for (const [key, value] of Object.entries(g_cookie_storage.cookies)) {
-        if(key in es_cookies == false) continue;
-        delete es_cookies[key];
-    }
-
-
-    console.log('more needed cookies here!!!>' );
-    for (const [key, value] of Object.entries(es_cookies)) {
-        console.log(key);
-    }
-
-    console.log('========================= [cookie test end] =========================');
-
 
     let data = {
         'locale': 'ko_KR',

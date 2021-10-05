@@ -5,8 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Test Node App",
-            "program": "${workspaceFolder}/app.js",
+            "name": "Launch Test BackEnd",
+            "program": "${workspaceFolder}/tester/app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -16,7 +16,7 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Launch Chrome",
+            "name": "Launch Test FrontEnd",
             "url": "http://127.0.0.1:3000/test",
             "webRoot": "${workspaceFolder}"
         }
