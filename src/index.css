@@ -76,3 +76,7 @@ tbody tr:hover td {
     -webkit-box-shadow: inset 0 0 6px rgba(90,90,90,0.7);
 }
 /* END to Scroll style */
+
+.button-wrapper{
+    padding-left: 8px;
+}
