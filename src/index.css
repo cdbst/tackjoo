@@ -1,3 +1,5 @@
+
+/* Start To Global */
 html * 
 {
     color: white !important;
@@ -7,7 +9,35 @@ body {
     height: 100% !important;
     background-color: #32353b !important;
 }
+/* End To Global */
 
+/* Start to Footer Div */
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;   /* Height of the footer */
+    background: #202225;
+}
+/* END to Footer Div */
+
+/* Start To contents tables */
+.table-wrapper{
+  height: calc(100vh - 120px);;  
+  overflow: auto;
+}
+thead tr:nth-child(1) th{
+    background-color: #202225;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+tbody tr:hover td {
+    background: #84F998;
+}
+/* END To contents tables */
+
+/* Start To Menu Bar */
 .nav-tabs .nav-link{
     background-color: #202225;
     border: 0px !important;
@@ -16,7 +46,6 @@ body {
 .nav-tabs{
     background-color: #202225;
     border: 0px !important;
-    
 }
 
 .nav-item{
@@ -25,7 +54,25 @@ body {
 
 .nav-link.active{
     border: 0px !important;
-    border-bottom: 1mm solid green !important;
+    border-bottom: 1mm solid #84F998 !important;
     background-color: inherit !important;
-    color: green !important;
+    color: #84F998 !important;
 }
+/* End To Menu Bar */
+
+/* Start to Scroll style */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(200,200,200,1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color:#fff;
+    -webkit-box-shadow: inset 0 0 6px rgba(90,90,90,0.7);
+}
+/* END to Scroll style */
