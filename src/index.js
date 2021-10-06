@@ -8,44 +8,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-
 var e = React.createElement;
 
-var LikeButton = function (_React$Component) {
-  _inherits(LikeButton, _React$Component);
+var Index = function (_React$Component) {
+    _inherits(Index, _React$Component);
 
-  function LikeButton(props) {
-    _classCallCheck(this, LikeButton);
+    function Index(props) {
+        _classCallCheck(this, Index);
 
-    var _this = _possibleConstructorReturn(this, (LikeButton.__proto__ || Object.getPrototypeOf(LikeButton)).call(this, props));
-
-    _this.state = { liked: false };
-    return _this;
-  }
-
-  _createClass(LikeButton, [{
-    key: 'render',
-    value: function render() {
-      var _this2 = this;
-
-      if (this.state.liked) {
-        return 'You liked this.';
-      }
-
-      return React.createElement(
-        'button',
-        { onClick: function onClick() {
-            return _this2.setState({ liked: true });
-          } },
-        'Like'
-      );
+        return _possibleConstructorReturn(this, (Index.__proto__ || Object.getPrototypeOf(Index)).call(this, props));
     }
-  }]);
 
-  return LikeButton;
+    _createClass(Index, [{
+        key: 'render',
+        value: function render() {
+            return React.createElement(MenuBar, null);
+        }
+    }]);
+
+    return Index;
 }(React.Component);
 
 var domContainer = document.querySelector('#index-container');
-ReactDOM.render(e(LikeButton), domContainer);
+ReactDOM.render(e(Index), domContainer);

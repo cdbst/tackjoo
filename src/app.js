@@ -5,13 +5,13 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
-        nodeIntegration: true,
-        frame: false,
+        // nodeIntegration: true,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
     });
     win.webContents.openDevTools();
+    win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, "index.html"));
 }
 

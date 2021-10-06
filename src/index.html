@@ -8,17 +8,21 @@
     
   <body>
 
-    <h2>Add React in One Minute</h2>
-    <p>This page demonstrates using React with no build tooling.</p>
-    <p>React is loaded as a script tag.</p>
-
     <!-- We will put our React component inside this div. -->
     <div id="index-container"></div>
 
     <!-- Load React. -->
     <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <link rel="stylesheet" href="./index.css" type="text/css">
+    <link rel="stylesheet" href="./lib/bootstrap-5.0.2-dist/css/bootstrap.css" type="text/css">
+    <script src="./lib/bootstrap-5.0.2-dist/js/bootstrap.js"></script>
+    <script src="./lib/react/umd/react.development.js" crossorigin></script>
+    <script src="./lib/react-dom/umd/react-dom.development.js" crossorigin></script>
 
+    <!-- React components-->
+    <script src="./components/menu_bar.js"></script>
     <script src="./index.js"></script>
-
+    
+    
   </body>
 </html>
