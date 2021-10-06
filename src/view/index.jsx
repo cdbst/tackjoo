@@ -9,7 +9,10 @@ class Index extends React.Component {
 
     render() {
         return (
-            <MenuBar></MenuBar>
+            <div>
+                <MenuBar></MenuBar>
+                <MainContents></MainContents>
+            </div>
         );
     }
 }
