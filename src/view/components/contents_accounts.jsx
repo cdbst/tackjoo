@@ -61,7 +61,7 @@ class ContentsAccounts extends React.Component {
         })
 
         if(_dup_accounts_info.length > 0){
-            
+
             return;
         }
          
@@ -84,6 +84,8 @@ class ContentsAccounts extends React.Component {
             account_table_list : _account_table_list,
             accounts_info : _accounts_info
         }));
+
+        this.props.sys_msg_q.enqueue('Add account', _email + 'has been added.', 'warn', 20000);
     }
 
     removeAccount(_email){
