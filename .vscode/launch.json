@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome - Electron UI",
+            "name": "Chrome - Electron UI",
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://127.0.0.1:5500/src/index.html",
             "webRoot": "${workspaceFolder}"
         },
         {
-            "name": "Debug Electron APP",
+            "name": "Electron - APP",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",
