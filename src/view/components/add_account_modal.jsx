@@ -11,19 +11,18 @@ class AddAccountModal extends React.Component {
 
     render(){
         return (
-            <div class="modal fade" id={this.props.id} data-bs-keyboard="false" tabindex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id={this.props.id + '-label'}>Modal title</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div className="modal fade" id={this.props.id} data-bs-keyboard="false" tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id={this.props.id + '-label'}>Add New Account</h5>
                     </div>
-                    <div class="modal-body">
+                    <div className="modal-body">
                         ...
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Understood</button>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" className="btn btn-primary">Add</button>
                     </div>
                     </div>
                 </div>

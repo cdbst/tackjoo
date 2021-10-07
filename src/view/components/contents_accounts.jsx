@@ -39,10 +39,10 @@ class ContentsAccounts extends React.Component {
                 </div>
                 <div className="row footer">
                     <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                        <button type="button" class="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target="#add-account-modal">
+                        <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target="#add-account-modal">
                             <img src="./res/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
                         </button>
-                        <button type="button" class="btn btn-warning btn-footer-inside">
+                        <button type="button" className="btn btn-warning btn-footer-inside">
                             <img src="./res/door-open-fill.svg" style={{width:24, height:24}}/> Login All
                         </button>
                     </div>

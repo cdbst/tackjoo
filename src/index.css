@@ -12,6 +12,11 @@ body {
 /* End To Global */
 
 /* Start To Buttons */
+.btn{
+    color: black !important;
+    font-weight: bold !important;
+}
+
 .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
     background-color: #83f195 !important;
 }
@@ -49,7 +54,8 @@ thead tr:nth-child(1) th{
     z-index: 10;
 }
 tbody tr:hover td {
-    background: #83f195;
+    background: #83f195 !important;
+    color: black !important;
 }
 
 .table > tbody > tr > td {
@@ -97,6 +103,32 @@ tbody tr:hover td {
 }
 /* END to Scroll style */
 
-.button-wrapper{
+/* Start To Innter table buttons */
+.button-wrapper-inner-table{
     padding-left: 8px;
 }
+/* End To Innter table buttons */
+
+
+
+/* Start To override bootstrap modal style */
+.modal-content{
+    background-color: #32353b !important;
+}
+
+.modal-header{
+    background-color: #83f195 !important;
+}
+
+.modal-title{
+    color: black !important;
+    font-weight: bold;
+}
+
+.modal-footer{
+    background-color: #202225 !important;
+}
+
+
+
+/* End To override bootstrap modal style */
