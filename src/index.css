@@ -11,6 +11,21 @@ body {
 }
 /* End To Global */
 
+/* Start To Buttons */
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: #83f195 !important;
+}
+.btn-primary:hover {
+    background-color: rgba(83, 235, 134, 0.6) !important;
+}
+
+.btn-footer-inside{
+    width : 160px !important;
+    height : 40px !important;
+    margin-left : 10px !important;
+}
+/* End To Buttons */
+
 /* Start to Footer Div */
 .footer {
     position: absolute;
@@ -26,6 +41,7 @@ body {
   height: calc(100vh - 120px);;  
   overflow: auto;
 }
+
 thead tr:nth-child(1) th{
     background-color: #202225;
     position: sticky;
@@ -33,7 +49,11 @@ thead tr:nth-child(1) th{
     z-index: 10;
 }
 tbody tr:hover td {
-    background: #84F998;
+    background: #83f195;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
 }
 /* END To contents tables */
 
@@ -54,9 +74,9 @@ tbody tr:hover td {
 
 .nav-link.active{
     border: 0px !important;
-    border-bottom: 1mm solid #84F998 !important;
+    border-bottom: 1mm solid #83f195 !important;
     background-color: inherit !important;
-    color: #84F998 !important;
+    color: #83f195 !important;
 }
 /* End To Menu Bar */
 
