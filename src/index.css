@@ -129,6 +129,12 @@ tbody tr:hover td {
     background-color: #202225 !important;
 }
 
-
-
+.btn-inner-modal{
+    width: 120px !important;
+}
 /* End To override bootstrap modal style */
+
+
+.form-control{
+    color: black !important;
+}
