@@ -70,7 +70,7 @@ class ToastItem extends React.Component {
     render(){
         let delay = this.props.delay.toString();
         return(
-            <div className="toast" role="alert" aria-live="assertive" aria-atomic="true" id={this.props.id} data-bs-delay={delay}>
+            <div className="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" id={this.props.id} data-bs-delay={delay}>
                 <div className="toast-header">
                 
                     <strong className="me-auto">{this.props.title}</strong>

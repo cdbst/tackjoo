@@ -43,7 +43,7 @@ body {
 
 /* Start To contents tables */
 .table-wrapper{
-  height: calc(100vh - 120px);;  
+  height: calc(100vh - 150px);;  
   overflow: auto;
 }
 
@@ -134,7 +134,25 @@ tbody tr:hover td {
 }
 /* End To override bootstrap modal style */
 
-
+/* Start To text input */
 .form-control{
     color: black !important;
 }
+/* End To text input */
+
+
+/* Start to toast */
+.toast{
+    background-color: white !important;
+}
+
+.toast * {
+    color: black !important;
+}
+
+.toast-header{
+    background-color: #83f195 !important;
+    font-weight: bold;
+}
+
+/* End to toast */

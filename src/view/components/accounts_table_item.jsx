@@ -31,7 +31,7 @@ class AccountsTableItem extends React.Component {
                 <td>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-primary" onClick={this.onClickLogin.bind(this)}>
+                            <button type="button" className="btn btn-info" onClick={this.onClickLogin.bind(this)}>
                                 <img src="./res/door-open-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>

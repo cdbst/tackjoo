@@ -54,21 +54,24 @@ class ContentsAccounts extends React.Component {
     }
 
     addAccount(_email, _pwd){
+
+        if(_email == '' || _pwd == ''){
+            this.props.sys_msg_q.enqueue('Warn', 'please input valid values.', 'warn', 20000);
+        }
         
-        //TODO check duplicated and then if already existed email, show alert message.
         let _dup_accounts_info = this.state.accounts_info.filter((account)=>{
             return account.email == _email;
         })
 
         if(_dup_accounts_info.length > 0){
-
+            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', 'warn', 20000);
             return;
         }
          
         //Try login and get cookie
 
 
-        // 로그인 시도후 결과에 따라 status 설정
+        // 로그인 시도후 결과에 따라 status 값 세팅.
 
         // this.accounts_info 에 정보 추가
 
@@ -85,7 +88,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info
         }));
 
-        this.props.sys_msg_q.enqueue('Add account', _email + 'has been added.', 'warn', 20000);
+        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', 'warn', 20000);
     }
 
     removeAccount(_email){
