@@ -57,32 +57,32 @@ class AccountEditModal extends React.Component {
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title" id={this.props.id + '-label'}>Add New Account</h5>
-                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div className="modal-body">
-                        <div className="mb-3 row">
-                            <form onSubmit={(e)=>{e.preventDefault();}}> 
-                                <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">Email</label>
-                                <div className="col-sm-10">
-                                    <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} />
-                                </div>
-                            </form>
+                        <div className="modal-header">
+                            <h5 className="modal-title" id={this.props.id + '-label'}>Add New Account</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div className="mb-3 row">
-                            <form onSubmit={this.onSubmitAccountInfo.bind(this)}> 
-                                <label htmlFor={this.EL_ID_MODAL_INPUT_PWD} className="col-sm-2 col-form-label font-weight-bold" >Password</label>
-                                <div className="col-sm-10">
-                                    <input type="password" name="password" autoComplete="on" className="form-control" id={this.EL_ID_MODAL_INPUT_PWD} />
-                                </div>
-                            </form>
+                        <div className="modal-body">
+                            <div className="mb-3 row">
+                                <form onSubmit={(e)=>{e.preventDefault();}}> 
+                                    <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">Email</label>
+                                    <div className="col-sm-10">
+                                        <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} />
+                                    </div>
+                                </form>
+                            </div>
+                            <div className="mb-3 row">
+                                <form onSubmit={this.onSubmitAccountInfo.bind(this)}> 
+                                    <label htmlFor={this.EL_ID_MODAL_INPUT_PWD} className="col-sm-2 col-form-label font-weight-bold" >Password</label>
+                                    <div className="col-sm-10">
+                                        <input type="password" name="password" autoComplete="on" className="form-control" id={this.EL_ID_MODAL_INPUT_PWD} />
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" className="btn btn-primary btn-inner-modal" id={this.EL_ID_BTN_OK} onClick={this.onSubmitAccountInfo.bind(this)}>OK</button>
-                    </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" id={this.EL_ID_BTN_OK} onClick={this.onSubmitAccountInfo.bind(this)}>OK</button>
+                        </div>
                     </div>
                 </div>
             </div>
