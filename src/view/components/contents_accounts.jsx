@@ -14,8 +14,10 @@ class ContentsAccounts extends React.Component {
         this.removeAccount = this.removeAccount.bind(this);
         this.getTableItems = this.getTableItems.bind(this);
         this.getAccountObj = this.getAccountObj.bind(this);
-        this.modifyAccount = this.modifyAccount.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
+        this.showAccountEditModal = this.showAccountEditModal.bind(this);
+
+        this.account_edit_modal_el_id = "add-account-modal";
 
         //structure(scheme) of account info :
         // {
@@ -34,6 +36,10 @@ class ContentsAccounts extends React.Component {
             account_table_list : table_items,
             accounts_info : accounts_info
         }
+
+        this.actions_col_width = 240;
+        this.status_col_width = 120;
+        this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -51,7 +57,7 @@ class ContentsAccounts extends React.Component {
     addAccount(_email, _pwd){
 
         if(_email == '' || _pwd == ''){
-            this.props.sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 20000);
+            this.props.sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             return;
         }
         
@@ -60,23 +66,19 @@ class ContentsAccounts extends React.Component {
         })
 
         if(_dup_accounts_info.length > 0){
-            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 20000);
+            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
             return;
         }
          
-        //Try login and get cookie
-
-
-        // 로그인 시도후 결과에 따라 status 값 세팅.
-
-        // this.accounts_info 에 정보 추가
+        // TODO : Try login and get cookie
+        // TODO : 로그인 시도후 결과에 따라 status 값 세팅.
+        // TODO : this.accounts_info 에 정보 추가
 
         let account = this.getAccountObj(_email, _pwd, this.ACCOUNT_STATUS.INVALID_ACCOUNT, 'abcd');
 
         let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
         _accounts_info.push(account);
 
-        // table item 갱신
         let _account_table_list = this.getTableItems(_accounts_info);
         
         this.setState(prevState => ({
@@ -84,26 +86,39 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info
         }));
 
-        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 20000);
+        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
     removeAccount(_email){
-        console.log('om remove !! ' + _email);
+        
+        //TODO user account 관련 리소스 정리 필요.
 
-        let _accounts_info = this.state.accounts_info.filter((account)=>{
+        let _accounts_info_to_remove = this.state.accounts_info.filter((account)=>{
             return account.email != _email;
         })
 
-        let _account_table_list = this.getTableItems(_accounts_info);
+        let _account_table_list = this.getTableItems(_accounts_info_to_remove);
         
         this.setState(prevState => ({
             account_table_list : _account_table_list,
-            accounts_info : _accounts_info
+            accounts_info : _accounts_info_to_remove
         }));
+
+        this.props.sys_msg_q.enqueue('Delete ccount', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
-    modifyAccount(_email, _pwd){
-        console.log('om modify !! ' + _email + ' ' + _pwd);
+    showAccountEditModal(_email, _pwd){
+
+        let el_pwd_inpt = document.getElementById(this.EL_ID_MODAL_INPUT_PWD);
+        let el_email_input = document.getElementById(this.EL_ID_MODAL_INPUT_EMAIL);
+
+        //Idd Item Needed;
+        el_email_input.value = _email;
+        el_pwd_inpt.value = _pwd
+
+        let el_modal = document.getElementById(this.account_edit_modal_el_id);
+        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     loginAccount(_email, _pwd){
@@ -112,7 +127,6 @@ class ContentsAccounts extends React.Component {
 
     getTableItems(accounts_info){
         let remove_handler = this.removeAccount;
-        let modify_handler = this.modifyAccount;
         let login_handler = this.loginAccount;
 
         return accounts_info.map((account) => 
@@ -120,17 +134,18 @@ class ContentsAccounts extends React.Component {
                 key={account.email} 
                 data={account} 
                 h_remove={remove_handler} 
-                h_modify={modify_handler} 
                 h_login={login_handler}
+                e_mail_col_width={this.email_col_width}
+                status_col_width={this.status_col_width}
+                actions_col_width={this.actions_col_width}
             />
         );
     }
 
     render() {
-
         return (
             <div className="container-fluid">
-                <AccountEditModal id="add-account-modal" h_add_new_account={this.addAccount.bind(this)}/>
+                <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
                 <br/>
                 <div className="row">
                     <div className="col">
@@ -144,9 +159,9 @@ class ContentsAccounts extends React.Component {
                 <table className="table table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">E-Mail</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col" style={{width : this.email_col_width}}>E-Mail</th>
+                            <th scope="col" style={{width : this.status_col_width}}>Status</th>
+                            <th scope="col" style={{width : this.actions_col_width}}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -156,7 +171,7 @@ class ContentsAccounts extends React.Component {
                 </div>
                 <div className="row footer">
                     <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                        <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target="#add-account-modal">
+                        <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
                             <img src="./res/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside">
