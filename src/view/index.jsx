@@ -6,13 +6,13 @@ const SystemMessageQueue = React.createContext();
 
 class Index extends React.Component {
 
+    static g_sys_msg_q = new ToastMessageQueue(10000);
+
     constructor(props) {
         super(props);
 
-        let _sys_msg_q = new ToastMessageQueue(10000);
-
         this.state = {
-            sys_msg_q : _sys_msg_q
+            sys_msg_q : Index.g_sys_msg_q
         };
     }
 
@@ -21,7 +21,7 @@ class Index extends React.Component {
             <div>
                 <Toast sys_msg_q={this.state.sys_msg_q}/>
                 <MenuBar/>
-                <MainContents sys_msg_q={this.state.sys_msg_q}/>
+                <MainContents />
             </div>
         );
     }

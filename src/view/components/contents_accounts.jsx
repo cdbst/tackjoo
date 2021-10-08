@@ -57,7 +57,7 @@ class ContentsAccounts extends React.Component {
     addAccount(_email, _pwd){
 
         if(_email == '' || _pwd == ''){
-            this.props.sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+            Index.g_sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             return;
         }
         
@@ -66,7 +66,7 @@ class ContentsAccounts extends React.Component {
         })
 
         if(_dup_accounts_info.length > 0){
-            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
+            Index.g_sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
             return;
         }
          
@@ -86,7 +86,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info
         }));
 
-        this.props.sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+        Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
     removeAccount(_email){
@@ -104,7 +104,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info_to_remove
         }));
 
-        this.props.sys_msg_q.enqueue('Delete Account', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+        Index.g_sys_msg_q.enqueue('Delete Account', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
     showAccountEditModal(_email, _pwd){

@@ -13,7 +13,7 @@ class MainContents extends React.Component {
                     tasks
                 </div>
                 <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
-                    <ContentsAccounts sys_msg_q={this.props.sys_msg_q}/>
+                    <ContentsAccounts />
                 </div>
                 <div className="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">Billing</div>
                 <div className="tab-pane fade" id="proxies" role="tabpanel" aria-labelledby="proxies-tab">Proxies</div>
