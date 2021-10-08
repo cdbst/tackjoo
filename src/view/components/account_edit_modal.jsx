@@ -10,9 +10,7 @@ class AccountEditModal extends React.Component {
         this.accounts = undefined;
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onSubmitAccountInfo = this.onSubmitAccountInfo.bind(this);
-        this.onSubmitId = this.onSubmitId.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
-        
     }
 
     componentDidMount(){
@@ -22,7 +20,6 @@ class AccountEditModal extends React.Component {
 
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
-
     }
 
     onModalshown(e){
@@ -34,8 +31,8 @@ class AccountEditModal extends React.Component {
         let el_pwd_inpt = document.getElementById(this.EL_ID_MODAL_INPUT_PWD);
         let el_email_input = document.getElementById(this.EL_ID_MODAL_INPUT_EMAIL);
 
-        el_pwd_inpt.value= '';
-        el_email_input.value= '';
+        el_pwd_inpt.value = '';
+        el_email_input.value = '';
     }
 
     onSubmitAccountInfo(e){
@@ -55,11 +52,6 @@ class AccountEditModal extends React.Component {
         bs_obj_modal.hide();
     }
 
-    onSubmitId(e){
-        e.preventDefault();
-    }
-
-
     render(){
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -71,7 +63,7 @@ class AccountEditModal extends React.Component {
                     </div>
                     <div className="modal-body">
                         <div className="mb-3 row">
-                            <form onSubmit={this.onSubmitId.bind(this)}> 
+                            <form onSubmit={(e)=>{e.preventDefault();}}> 
                                 <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">Email</label>
                                 <div className="col-sm-10">
                                     <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} />
