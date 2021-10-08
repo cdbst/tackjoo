@@ -150,9 +150,19 @@ tbody tr:hover td {
     color: black !important;
 }
 
-.toast-header{
+.toast-header-info{
     background-color: #83f195 !important;
-    font-weight: bold;
+    font-weight: bold !important;
+}
+
+.toast-header-warn{
+    background-color: #ffc107 !important;
+    font-weight: bold !important;
+}
+
+.toast-header-error{
+    background-color: #dc3545 !important;
+    font-weight: bold !important;
 }
 
 /* End to toast */

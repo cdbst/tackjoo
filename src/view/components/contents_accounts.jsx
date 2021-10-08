@@ -28,11 +28,6 @@ class ContentsAccounts extends React.Component {
         //TODO : get account info from Electron Native. and then push into accounts_info;
         let accounts_info = [];
 
-        //TODO : Below codes are test code
-        let account = this.getAccountObj('pakd123@naver.com', '12345', this.ACCOUNT_STATUS.INVALID_ACCOUNT, 'abcd');
-        accounts_info.push(account);
-        //TODO : Upper codes are test code
-
         let table_items = this.getTableItems(accounts_info);
 
         this.state = {
@@ -56,7 +51,8 @@ class ContentsAccounts extends React.Component {
     addAccount(_email, _pwd){
 
         if(_email == '' || _pwd == ''){
-            this.props.sys_msg_q.enqueue('Warn', 'please input valid values.', 'warn', 20000);
+            this.props.sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 20000);
+            return;
         }
         
         let _dup_accounts_info = this.state.accounts_info.filter((account)=>{
@@ -64,7 +60,7 @@ class ContentsAccounts extends React.Component {
         })
 
         if(_dup_accounts_info.length > 0){
-            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', 'warn', 20000);
+            this.props.sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 20000);
             return;
         }
          
@@ -88,7 +84,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info
         }));
 
-        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', 'warn', 20000);
+        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 20000);
     }
 
     removeAccount(_email){

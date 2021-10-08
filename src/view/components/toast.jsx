@@ -1,6 +1,7 @@
 
 
 class Toast extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -35,6 +36,7 @@ class Toast extends React.Component {
                 title={msg.title} 
                 contents={msg.contents}
                 delay={msg.delay}
+                type={msg.type}
             />
         );
     }
@@ -69,9 +71,11 @@ class ToastItem extends React.Component {
 
     render(){
         let delay = this.props.delay.toString();
+        let hdr_class_name = "toast-header-" + this.props.type;
+        console.log(hdr_class_name);
         return(
             <div className="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" id={this.props.id} data-bs-delay={delay}>
-                <div className="toast-header">
+                <div className={"toast-header " + hdr_class_name}>
                 
                     <strong className="me-auto">{this.props.title}</strong>
                     {/* <small className="text-muted">just now</small> */}
@@ -86,17 +90,19 @@ class ToastItem extends React.Component {
 }
 
 class ToastMessageQueue {
+
+    static TOAST_MSG_TYPE = {
+        WARN : 'warn',
+        ERR : 'error',
+        INFO : 'info'
+    }
+
     constructor(_delay, h_q_evt){
 
         this.enqueue = this.enqueue.bind(this);
         this.dequeue = this.dequeue.bind(this);
         this.add_event_listener = this.add_event_listener.bind(this);
-        // {
-        //     title : '', // string
-        //     message : '', // string
-        //     type : '' // erro, info, warn
-        //     uuid : '' // uuid string
-        // }
+
         this.queue = [];
         this.delay = _delay;
         this.h_q_evt = undefined;
