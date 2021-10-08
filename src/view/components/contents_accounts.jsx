@@ -86,7 +86,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info
         }));
 
-        this.props.sys_msg_q.enqueue('Add account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+        this.props.sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
     removeAccount(_email){
@@ -104,7 +104,7 @@ class ContentsAccounts extends React.Component {
             accounts_info : _accounts_info_to_remove
         }));
 
-        this.props.sys_msg_q.enqueue('Delete ccount', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+        this.props.sys_msg_q.enqueue('Delete Account', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
     }
 
     showAccountEditModal(_email, _pwd){

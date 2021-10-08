@@ -50,9 +50,6 @@ class Toast extends React.Component {
         b_obj_toast.show();
     }
 
-    componentDidMount(){
-    }
-
     render() {
         return (
             <div aria-live="polite" aria-atomic="true" className="position-relative" style={{zIndex: 50}}>
@@ -129,7 +126,7 @@ class ToastMessageQueue {
         this.queue.push(msg);
 
         setTimeout(()=>{
-            dequeue(_id, msg)
+            dequeue(_id, msg);
         }, dq_delay + 1000);
 
         if(this.h_q_evt != undefined){
