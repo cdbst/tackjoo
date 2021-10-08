@@ -81,7 +81,7 @@ class AccountEditModal extends React.Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" id={this.EL_ID_BTN_OK} onClick={this.onSubmitAccountInfo.bind(this)}>OK</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" id={this.EL_ID_BTN_OK} onClick={this.onSubmitAccountInfo.bind(this)}>Login</button>
                         </div>
                     </div>
                 </div>
