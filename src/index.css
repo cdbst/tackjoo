@@ -137,6 +137,7 @@ tbody tr:hover td {
 /* Start To text input */
 .form-control{
     color: black !important;
+    width: 450px !important;
 }
 /* End To text input */
 
