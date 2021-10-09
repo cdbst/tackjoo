@@ -12,7 +12,7 @@ class ContentsAccounts extends React.Component {
         this.addNewAccount = this.addAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
         this.getTableItems = this.getTableItems.bind(this);
-        this.getAccountObj = this.getAccountObj.bind(this);
+        this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
 
@@ -42,9 +42,10 @@ class ContentsAccounts extends React.Component {
     }
 
     componentDidMount(){
+
     }
 
-    getAccountObj(_email, _pwd, _status, _id = undefined){
+    genAccountObj(_email, _pwd, _status, _id = undefined){
 
         return {
             email : _email,
@@ -69,22 +70,15 @@ class ContentsAccounts extends React.Component {
             Index.g_sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
             return;
         }
-         
-        // TODO : Try login and get cookie
-        // TODO : 로그인 시도후 결과에 따라 status 값 세팅.
-        // TODO : this.accounts_info 에 정보 추가
         
-        let account_uid = uuidv4();
-        Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + _email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
-    
-        window.mainAPI.login(_email, _pwd, account_uid, (err) =>{
-            
+        let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+
+        window.mainAPI.addAccount(account.email, account.pwd, account.id, (err) =>{
+
             if(err){
-                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + _email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                Index.g_sys_msg_q.enqueue('Error', 'cannot save new account\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
                 return;
             }
-            
-            let account = this.getAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGIN, account_uid);
 
             let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
             _accounts_info.push(account);
@@ -96,23 +90,32 @@ class ContentsAccounts extends React.Component {
                 accounts_info : _accounts_info
             }));
 
-            Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.\n Login is successful', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+            Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
-    removeAccount(_email){
+    removeAccount(_id){
         
+        let account_to_remove = undefined;
+
+        let _updated_accounts_info = this.state.accounts_info.filter((account)=>{
+            if(account.id != _id) return true;
+            account_to_remove = account;
+            return false;
+        });
+
+        if(account_to_remove == undefined){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to delete.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
         //TODO user account 관련 리소스 정리 필요.
-
-        let _accounts_info_to_remove = this.state.accounts_info.filter((account)=>{
-            return account.email != _email;
-        })
-
-        let _account_table_list = this.getTableItems(_accounts_info_to_remove);
+        
+        let _account_table_list = this.getTableItems(_updated_accounts_info);
         
         this.setState(prevState => ({
             account_table_list : _account_table_list,
-            accounts_info : _accounts_info_to_remove
+            accounts_info : _updated_accounts_info
         }));
 
         Index.g_sys_msg_q.enqueue('Delete Account', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
@@ -132,8 +135,48 @@ class ContentsAccounts extends React.Component {
         bs_obj_modal.show();
     }
 
-    loginAccount(_email, _pwd){
-        console.log('on login !!' + _email + ' ' + _pwd);
+    loginAccount(_id){
+        
+        let account_to_login = undefined;
+
+        for(var i = 0; i < this.state.accounts_info.length; i++){
+            let account = this.state.accounts_info[i];
+            if(account.id != _id) continue;
+            account_to_login = account;
+            break;
+        }
+
+        if(account_to_login == undefined){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to login.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+            return;
+        }
+
+        Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+
+        window.mainAPI.login(_id, (err) =>{
+            
+            if(err){
+                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                return;
+            }
+
+            let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
+
+            for(var i = 0; i < _accounts_info.length; i++){
+                if(_accounts_info[i].id != _id) continue;
+                _accounts_info[i].status = ContentsAccounts.ACCOUNT_STATUS.LOGIN;
+                break;
+            }
+
+            let _account_table_list = this.getTableItems(_accounts_info);
+            
+            this.setState(prevState => ({
+                account_table_list : _account_table_list,
+                accounts_info : _accounts_info
+            }));
+
+            Index.g_sys_msg_q.enqueue('Login Successful', account_to_login.email + ' login successfully', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     getTableItems(accounts_info){

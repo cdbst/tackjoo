@@ -1,6 +1,7 @@
 
 const {ipcMain} = require("electron");
 const BrowserCxt = require("./api/browser_context");
+const BrowserCxtMngr = require("./api/browser_context_mngr").browserCxtMngr;
 
 function run(){
     // IPC Responses
@@ -10,7 +11,7 @@ function run(){
         event.reply('asynchronous-reply', 'pong')
     });
 
-    ipcMain.on('send_sensor_data', (event, sensor_data) => {
+    ipcMain.on('send-sensor-data', (event, sensor_data) => {
         
         //console.log(sensor_data);
 
@@ -18,11 +19,30 @@ function run(){
 
     });
 
-    ipcMain.on('login', (event, account_info) => {
+    ipcMain.on('add-account', (event, account_info) => {
         
-        let user_session = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd);
+        let borwser_context = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
-        user_session.login((err) =>{
+        borwser_context.open_main_page((err) =>{
+
+            if(err == undefined){
+                BrowserCxtMngr.add(borwser_context);
+            }
+
+            event.reply('add-account-reply', err);
+        });
+    });
+
+    ipcMain.on('login', (event, _id) => {
+        
+        let borwser_context = BrowserCxtMngr.get(_id);
+
+        if(borwser_context == undefined){
+            event.reply('login-reply', 'caanot found browser context.');
+            return;
+        }
+
+        borwser_context.login((err) =>{
             event.reply('login-reply', err);
         });
     });

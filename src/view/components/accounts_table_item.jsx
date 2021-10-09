@@ -11,11 +11,11 @@ class AccountsTableItem extends React.Component {
     }
 
     onClickLogin(){
-        this.props.h_login(this.props.data.email, this.props.data.pwd);
+        this.props.h_login(this.props.data.id);
     }
 
     onClickRemove(){
-        this.props.h_remove(this.props.data.email);
+        this.props.h_remove(this.props.data.id);
     }
 
     render(){

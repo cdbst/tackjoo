@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
 contextBridge.exposeInMainWorld('mainAPI', {
     testAPI : _testAPI,
     sendSensorData : _sendSensorData,
+    addAccount : _addAccount,
     login : _login
 });
 
@@ -33,7 +34,7 @@ function _sendSensorData(sensor_data){
     ipcRenderer.send('send_sensor_data', sensor_data);
 }
 
-function _login(_email, _pwd, _id, __callback){
+function _addAccount(_email, _pwd, _id, __callback){
 
     if(_email == '' || _email == undefined){
         __callback('login fail : email information is invalid');
@@ -50,7 +51,21 @@ function _login(_email, _pwd, _id, __callback){
         return;
     }
 
-    ipcRenderer.send('login', {email : _email, pwd : _pwd, id : _id});
+    ipcRenderer.send('add-account', {email : _email, pwd : _pwd, id : _id});
+
+    ipcRenderer.once('add-account-reply', (event, err) => {
+        __callback(err);
+    });
+}
+
+function _login(_id, __callback){
+
+    if(_id == '' || _id == undefined){
+        __callback('login fail : account unique id information is invalid');
+        return;
+    }
+
+    ipcRenderer.send('login', _id);
 
     ipcRenderer.once('login-reply', (event, err) => {
         __callback(err);
