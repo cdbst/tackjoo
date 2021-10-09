@@ -19,15 +19,13 @@ function run(){
         
         let borwser_context = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
-        //TODO : local filesystem에 사용자 정보를 업데이트 한다.
-
         borwser_context.open_main_page((err) =>{
 
             if(err == undefined){ // 새로운 유저를 추가하는 것이므로 여기서는 파일을 업데이트 한다.
 
                 BrowserCxtMngr.add(borwser_context);
 
-                update_user_info_file(BrowserCxtMngr, (err) =>{
+                write_user_info_file(BrowserCxtMngr, (err) =>{
                     event.reply('add-account-reply', err);
                 });
 
@@ -39,17 +37,22 @@ function run(){
 
     ipcMain.on('remove-account', (event, _id) => {
 
-        //TODO : local filesystem에 사용자 정보를 업데이트 한다.
-
         let result = BrowserCxtMngr.remove(_id);
 
         if(result == false){
             event.reply('remove-account-reply', 'caanot found browser context.');
         }else{
-            update_user_info_file(BrowserCxtMngr, (err) =>{
+            write_user_info_file(BrowserCxtMngr, (err) =>{
                 event.reply('remove-account-reply', err);
             });
         }
+    });
+
+    ipcMain.on('get-account-info', (event, _id) => {
+
+        read_user_info_file((_err, _data) =>{
+            event.reply('get-account-info-reply', {err : _err, data : _data});
+        });
     });
 
     ipcMain.on('login', (event, _id) => {
@@ -86,13 +89,22 @@ function run(){
     });
 }
 
-function update_user_info_file(_browser_context_mngr, __callback){
+function write_user_info_file(_browser_context_mngr, __callback){
 
     let file_data = _browser_context_mngr.get_file_data();
     let ufm = new UserFileManager();
 
     ufm.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
         __callback(err);
+    });
+}
+
+function read_user_info_file(__callback){
+
+    let ufm = new UserFileManager();
+
+    ufm.read(USER_FILE_PATH.USER_INFO, (err, data) =>{
+        __callback(err, data);
     });
 }
 

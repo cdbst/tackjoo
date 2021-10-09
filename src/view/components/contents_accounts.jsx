@@ -15,27 +15,23 @@ class ContentsAccounts extends React.Component {
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
+        this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
+        this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
+
 
         this.account_edit_modal_el_id = "add-account-modal";
 
-        //structure(scheme) of account info :
-        // {
-        //     email : '',
-        //     pwd : '',
-        //     status : '', // login condifion
-        //     id : '' // uuid
-        // }
+        //TODO : get account info from Electron Native. and then push into account_info;
+        this.__loadAccountInfoFile();
 
-        //TODO : get account info from Electron Native. and then push into accounts_info;
-        let accounts_info = [];
-
-        let table_items = this.getTableItems(accounts_info);
+        let account_info = [];
+        let table_items = this.getTableItems(account_info);
 
         this.state = {
-            account_table_list : table_items,
-            accounts_info : accounts_info
+            account_info : account_info,
+            account_table_list : table_items
         }
-
+        
         this.actions_col_width = 240;
         this.status_col_width = 120;
         this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width) + 'px)';
@@ -43,6 +39,39 @@ class ContentsAccounts extends React.Component {
 
     componentDidMount(){
 
+    }
+
+    __loadAccountInfoFile(){
+
+        window.mainAPI.getAccountInfo(_account_info => {
+
+
+            let updated_account_info = [];
+            let file_loaded_account_info = _account_info.data.accounts;
+
+            if(_account_info.err) {
+                Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            }else{
+                for(var i = 0; i < file_loaded_account_info.length; i++){
+                    let account = file_loaded_account_info[i];
+                    let account_obj = this.genAccountObj(account.email, account.pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+                    updated_account_info.push(account_obj);
+                }
+
+                this.__updateAccountInfo(updated_account_info);
+                Index.g_sys_msg_q.enqueue('Account info loading', 'Load account information from file successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            }
+        });
+    }
+
+    __updateAccountInfo(_account_info){
+
+        let _account_table_list = this.getTableItems(_account_info);
+            
+        this.setState(prevState => ({
+            account_table_list : _account_table_list,
+            account_info : _account_info
+        }));
     }
 
     genAccountObj(_email, _pwd, _status, _id = undefined){
@@ -55,18 +84,18 @@ class ContentsAccounts extends React.Component {
         };
     }
 
-    addAccount(_email, _pwd){
+    addAccount(_email, _pwd, modal = true){
 
         if(_email == '' || _pwd == ''){
             Index.g_sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             return;
         }
 
-        let _dup_accounts_info = this.state.accounts_info.filter((account)=>{
+        let _dup_account_info = this.state.account_info.filter((account)=>{
             return account.email == _email;
         })
 
-        if(_dup_accounts_info.length > 0){
+        if(_dup_account_info.length > 0){
             Index.g_sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
             return;
         }
@@ -80,17 +109,12 @@ class ContentsAccounts extends React.Component {
                 return;
             }
 
-            let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
-            _accounts_info.push(account);
+            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
+            _account_info.push(account);
 
-            let _account_table_list = this.getTableItems(_accounts_info);
-            
-            this.setState(prevState => ({
-                account_table_list : _account_table_list,
-                accounts_info : _accounts_info
-            }));
+            this.__updateAccountInfo(_account_info);
 
-            Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(modal) Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -98,7 +122,7 @@ class ContentsAccounts extends React.Component {
         
         let account_to_remove = undefined;
 
-        let _updated_accounts_info = this.state.accounts_info.filter((account)=>{
+        let _updated_account_info = this.state.account_info.filter((account)=>{
             if(account.id != _id) return true;
             account_to_remove = account;
             return false;
@@ -116,12 +140,7 @@ class ContentsAccounts extends React.Component {
                 Index.g_sys_msg_q.enqueue('WARN', 'Some error was accured while removing account ' + account_to_remove.email  + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }
 
-            let _account_table_list = this.getTableItems(_updated_accounts_info);
-        
-            this.setState(prevState => ({
-                account_table_list : _account_table_list,
-                accounts_info : _updated_accounts_info
-            }));
+            this.__updateAccountInfo(_updated_account_info);
 
             Index.g_sys_msg_q.enqueue('Delete Account', account_to_remove.email  + ' has been removed', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
@@ -145,8 +164,8 @@ class ContentsAccounts extends React.Component {
         
         let account_to_login = undefined;
 
-        for(var i = 0; i < this.state.accounts_info.length; i++){
-            let account = this.state.accounts_info[i];
+        for(var i = 0; i < this.state.account_info.length; i++){
+            let account = this.state.account_info[i];
             if(account.id != _id) continue;
             account_to_login = account;
             break;
@@ -166,30 +185,30 @@ class ContentsAccounts extends React.Component {
                 return;
             }
 
-            let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
+            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
 
-            for(var i = 0; i < _accounts_info.length; i++){
-                if(_accounts_info[i].id != _id) continue;
-                _accounts_info[i].status = ContentsAccounts.ACCOUNT_STATUS.LOGIN;
+            for(var i = 0; i < _account_info.length; i++){
+                if(_account_info[i].id != _id) continue;
+                _account_info[i].status = ContentsAccounts.ACCOUNT_STATUS.LOGIN;
                 break;
             }
 
-            let _account_table_list = this.getTableItems(_accounts_info);
+            let _account_table_list = this.getTableItems(_account_info);
             
             this.setState(prevState => ({
                 account_table_list : _account_table_list,
-                accounts_info : _accounts_info
+                account_info : _account_info
             }));
 
             Index.g_sys_msg_q.enqueue('Login Successful', account_to_login.email + ' login successfully', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
-    getTableItems(accounts_info){
+    getTableItems(account_info){
         let remove_handler = this.removeAccount;
         let login_handler = this.loginAccount;
 
-        return accounts_info.map((account) => 
+        return account_info.map((account) => 
             <AccountsTableItem 
                 key={account.email} 
                 data={account} 

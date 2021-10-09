@@ -16,7 +16,8 @@ contextBridge.exposeInMainWorld('mainAPI', {
     sendSensorData : _sendSensorData,
     addAccount : _addAccount,
     removeAccount : _removeAccount,
-    login : _login
+    login : _login,
+    getAccountInfo : _getAccountInfo
 });
 
 function _sendSensorData(sensor_data){
@@ -72,6 +73,15 @@ function _login(_id, __callback){
 
     ipcRenderer.once('login-reply', (event, err) => {
         __callback(err);
+    });
+}
+
+function _getAccountInfo(__callback){
+
+    ipcRenderer.send('get-account-info');
+
+    ipcRenderer.once('get-account-info-reply', (event, account_info) => {
+        __callback(account_info);
     });
 }
 
