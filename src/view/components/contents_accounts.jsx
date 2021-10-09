@@ -61,7 +61,7 @@ class ContentsAccounts extends React.Component {
             Index.g_sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             return;
         }
-        
+
         let _dup_accounts_info = this.state.accounts_info.filter((account)=>{
             return account.email == _email;
         })

@@ -1,7 +1,7 @@
-
 const {ipcMain} = require("electron");
-const BrowserCxt = require("./api/browser_context");
-const BrowserCxtMngr = require("./api/browser_context_mngr").browserCxtMngr;
+const BrowserCxt = require("./api/browser_context.js");
+const BrowserCxtMngr = require("./api/browser_context_mngr.js").browserCxtMngr;
+const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 
 function run(){
     // IPC Responses
@@ -26,7 +26,14 @@ function run(){
                 BrowserCxtMngr.add(borwser_context);
             }
 
-            event.reply('add-account-reply', err);
+            let file_data = BrowserCxtMngr.get_file_data();
+
+            let ufm = new UserFileManager();
+            let path = __dirname + '\\abcd\\test.json';
+
+            ufm.write(path, file_data, (err) =>{
+                event.reply('add-account-reply', err);
+            });
         });
     });
 

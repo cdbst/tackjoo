@@ -5,6 +5,7 @@ class BrowserContextManager{
         this.add = this.add.bind(this);
         this.remove = this.remove.bind(this);
         this.get = this.get.bind(this);
+        this.get_file_data = this.get_file_data.bind(this);
         this._browser_contexts_dict = {};
     }
 
@@ -23,6 +24,25 @@ class BrowserContextManager{
     get(_id){
         if(_id in this._browser_contexts_dict == false) return undefined;
         return this._browser_contexts_dict[_id];
+    }
+
+    get_file_data(){
+        
+        let ids = Object.keys(this._browser_contexts_dict);
+
+        let accounts_info = [];
+
+        ids.forEach((id) =>{
+            let browser_context = this._browser_contexts_dict[id];
+            accounts_info.push({
+                email : browser_context.email,
+                pwd : browser_context.pwd
+            });
+        });
+
+        return {
+            'accounts' : accounts_info
+        };
     }
 }
 

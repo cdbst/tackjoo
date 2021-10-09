@@ -261,7 +261,7 @@ class BrowserContext {
             __callback();
         })
         .catch(err => {
-            __callback(error);
+            __callback(err);
         });
 
     }
