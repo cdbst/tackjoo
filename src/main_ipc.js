@@ -2,6 +2,7 @@ const {ipcMain} = require("electron");
 const BrowserCxt = require("./api/browser_context.js");
 const BrowserCxtMngr = require("./api/browser_context_mngr.js").browserCxtMngr;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
+const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
 function run(){
     // IPC Responses
@@ -27,11 +28,9 @@ function run(){
             }
 
             let file_data = BrowserCxtMngr.get_file_data();
-
             let ufm = new UserFileManager();
-            let path = __dirname + '\\abcd\\test.json';
 
-            ufm.write(path, file_data, (err) =>{
+            ufm.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
                 event.reply('add-account-reply', err);
             });
         });

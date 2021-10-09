@@ -10,6 +10,8 @@ class UserFileManager{
         this.remove = this.remove.bind(this);
         this.exists = this.exists.bind(this);
         this.mkdir = this.mkdir.bind(this);
+        this.__encode_base64 = this.__encode_base64.bind(this);
+        this.__decode_base64 = this.__decode_base64.bind(this);
     }
 
     read(_path, __callback){
@@ -22,8 +24,9 @@ class UserFileManager{
             }
 
             try{
-                let accounts_info = JSON.parse(data);
-                __callback(undefined, accounts_info);
+                let decoded_data = this.__decode_base64(data);
+                let data_obj = JSON.parse(decoded_data);
+                __callback(undefined, data_obj);
                 
             }catch(err){
                 __callback(err, undefined);
@@ -80,10 +83,20 @@ class UserFileManager{
     __write(_path, _data, __callback){
 
         const data = JSON.stringify(_data);
+        const encoded_data = this.__encode_base64(data);
 
-        fs.writeFile(_path, data, (err) =>{ 
+        fs.writeFile(_path, encoded_data, (err) =>{ 
             __callback(err);
         });
+    }
+
+    __encode_base64(_data){
+        return Buffer.from(_data).toString('base64');
+    }
+    
+
+    __decode_base64(_data){
+        return Buffer.from(_data, 'base64').toString('ascii')
     }
 }
 
