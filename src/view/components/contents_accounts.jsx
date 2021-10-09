@@ -21,8 +21,7 @@ class ContentsAccounts extends React.Component {
 
         this.account_edit_modal_el_id = "add-account-modal";
 
-        //TODO : get account info from Electron Native. and then push into account_info;
-        this.__loadAccountInfoFile();
+        this.__loadAccountInfoFile(); 
 
         let account_info = [];
         let table_items = this.getTableItems(account_info);
@@ -45,21 +44,17 @@ class ContentsAccounts extends React.Component {
 
         window.mainAPI.getAccountInfo(_account_info => {
 
-
             let updated_account_info = [];
             let file_loaded_account_info = _account_info.data.accounts;
 
             if(_account_info.err) {
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
+                Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 for(var i = 0; i < file_loaded_account_info.length; i++){
                     let account = file_loaded_account_info[i];
-                    let account_obj = this.genAccountObj(account.email, account.pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
-                    updated_account_info.push(account_obj);
+                    this.addAccount(account.email, account.pwd, false); // modal disable.
                 }
-
-                this.__updateAccountInfo(updated_account_info);
-                Index.g_sys_msg_q.enqueue('Account info loading', 'Load account information from file successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
             }
         });
     }
