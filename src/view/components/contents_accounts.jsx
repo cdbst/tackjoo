@@ -216,16 +216,18 @@ class ContentsAccounts extends React.Component {
     }
 
     render() {
+        let num_of_accounts = this.state.account_info.length;
+        let num_of_login_accounts = this.state.account_info.filter((account) => account.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN).length;
         return (
             <div className="container-fluid">
                 <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
                 <br/>
                 <div className="row">
                     <div className="col">
-                        <h3 className="contents-title">TEST : Accounts (4/10)</h3>
+                        <h3 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h3>
                     </div>
                     <div className="col">
-                        <a>TEST : search item interface</a>
+                        {/* <a>TEST : search item interface</a> */}
                     </div>
                 </div>
                 <div className="table-wrapper">
