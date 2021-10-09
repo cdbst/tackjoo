@@ -76,7 +76,7 @@ class ContentsAccounts extends React.Component {
         window.mainAPI.addAccount(account.email, account.pwd, account.id, (err) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', 'cannot save new account\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                Index.g_sys_msg_q.enqueue('Error', 'cannot save new account ' + _email + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
                 return;
             }
 
@@ -123,7 +123,7 @@ class ContentsAccounts extends React.Component {
                 accounts_info : _updated_accounts_info
             }));
 
-            Index.g_sys_msg_q.enqueue('Delete Account', account_to_remove.email  + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('Delete Account', account_to_remove.email  + ' has been removed', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
