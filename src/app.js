@@ -1,6 +1,9 @@
 const { app, BrowserWindow, ipcMain} = require("electron");
 
 const path = require("path");
+const mainIPC = require('./main_ipc');
+
+mainIPC.run();
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -33,9 +36,3 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
-
-
-ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log(arg) // prints "ping"
-    event.reply('asynchronous-reply', 'pong')
-})

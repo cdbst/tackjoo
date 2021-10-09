@@ -12,11 +12,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-//Below code are for test.
-contextBridge.exposeInMainWorld('myAPI', {
-    testAPI : _testAPI
+contextBridge.exposeInMainWorld('mainAPI', {
+    testAPI : _testAPI,
+    sendSensorData : _sendSensorData
 });
 
+//API IPC Wrappers
 function _testAPI(cb){
 
     ipcRenderer.send('asynchronous-message', 'ping')
@@ -25,5 +26,9 @@ function _testAPI(cb){
         console.log(arg) // prints "pong"
         cb('acbcc');
     })
+}
+
+function _sendSensorData(sensor_data){
+    ipcRenderer.send('send_sensor_data', sensor_data);
 }
 
