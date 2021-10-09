@@ -23,8 +23,8 @@ class ContentsAccounts extends React.Component {
         // {
         //     email : '',
         //     pwd : '',
-        //     status : '',
-        //     session_cookie : ''
+        //     status : '', // login condifion
+        //     id : '' // uuid
         // }
 
         //TODO : get account info from Electron Native. and then push into accounts_info;
@@ -45,12 +45,13 @@ class ContentsAccounts extends React.Component {
     componentDidMount(){
     }
 
-    getAccountObj(_email, _pwd, _status, _session_cookie){
+    getAccountObj(_email, _pwd, _status, _id = undefined){
+
         return {
             email : _email,
             pwd : _pwd,
             status : _status,
-            session_cookie : _session_cookie
+            id : _id == undefined ? uuidv4() : _id
         };
     }
 
@@ -73,9 +74,13 @@ class ContentsAccounts extends React.Component {
         // TODO : Try login and get cookie
         // TODO : 로그인 시도후 결과에 따라 status 값 세팅.
         // TODO : this.accounts_info 에 정보 추가
+        let account_uid = uuidv4();
 
+        window.mainAPI.login(_email, _pwd, account_uid, (err) =>{
+            console.log(err);
+        });
 
-        let account = this.getAccountObj(_email, _pwd, this.ACCOUNT_STATUS.INVALID_ACCOUNT, 'abcd');
+        let account = this.getAccountObj(_email, _pwd, this.ACCOUNT_STATUS.INVALID_ACCOUNT, account_uid);
 
         let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
         _accounts_info.push(account);
