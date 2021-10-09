@@ -44,7 +44,6 @@ class ContentsAccounts extends React.Component {
 
         window.mainAPI.getAccountInfo(_account_info => {
 
-            let updated_account_info = [];
             let file_loaded_account_info = _account_info.data.accounts;
 
             if(_account_info.err) {
