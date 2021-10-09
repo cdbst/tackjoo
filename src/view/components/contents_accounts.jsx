@@ -1,10 +1,9 @@
 
 class ContentsAccounts extends React.Component {
 
-    ACCOUNT_STATUS = {
+    static ACCOUNT_STATUS = {
         LOGIN : 'login',
-        LOGOUT : 'logout',
-        INVALID_ACCOUNT : 'invalid'
+        LOGOUT : 'logout'
     }
 
     constructor(props) {
@@ -74,25 +73,31 @@ class ContentsAccounts extends React.Component {
         // TODO : Try login and get cookie
         // TODO : 로그인 시도후 결과에 따라 status 값 세팅.
         // TODO : this.accounts_info 에 정보 추가
-        let account_uid = uuidv4();
-
-        window.mainAPI.login(_email, _pwd, account_uid, (err) =>{
-            console.log(err);
-        });
-
-        let account = this.getAccountObj(_email, _pwd, this.ACCOUNT_STATUS.INVALID_ACCOUNT, account_uid);
-
-        let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
-        _accounts_info.push(account);
-
-        let _account_table_list = this.getTableItems(_accounts_info);
         
-        this.setState(prevState => ({
-            account_table_list : _account_table_list,
-            accounts_info : _accounts_info
-        }));
+        let account_uid = uuidv4();
+        Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + _email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+    
+        window.mainAPI.login(_email, _pwd, account_uid, (err) =>{
+            
+            if(err){
+                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + _email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                return;
+            }
+            
+            let account = this.getAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGIN, account_uid);
 
-        Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+            let _accounts_info = JSON.parse(JSON.stringify(this.state.accounts_info));
+            _accounts_info.push(account);
+
+            let _account_table_list = this.getTableItems(_accounts_info);
+            
+            this.setState(prevState => ({
+                account_table_list : _account_table_list,
+                accounts_info : _accounts_info
+            }));
+
+            Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.\n Login is successful', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+        });
     }
 
     removeAccount(_email){

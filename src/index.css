@@ -11,6 +11,20 @@ body {
 }
 /* End To Global */
 
+
+/* Start To common purpose */
+.span-text-color-red {
+    color : #dc3545 !important;
+    font-weight: bold;
+}
+
+.span-text-color-blue {
+    color : #0dcaf0 !important;
+    font-weight: bold;
+}
+
+/* End To common purpose */
+
 /* Start To Buttons */
 .btn{
     color: black !important;
@@ -108,7 +122,6 @@ tbody tr:hover td {
     padding-left: 8px;
 }
 /* End To Innter table buttons */
-
 
 
 /* Start To override bootstrap modal style */

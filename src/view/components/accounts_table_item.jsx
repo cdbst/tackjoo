@@ -19,10 +19,15 @@ class AccountsTableItem extends React.Component {
     }
 
     render(){
+        let status_text_class = this.props.data.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
         return(
             <tr>
-                <td style={{width : this.props.email_col_width}}>{this.props.data.email}</td>
-                <td style={{width : this.props.status_col_width}}>{this.props.data.status}</td>
+                <td style={{width : this.props.email_col_width}}>
+                    <span>{this.props.data.email}</span>
+                </td>
+                <td style={{width : this.props.status_col_width}}>
+                    <span className={status_text_class}>{this.props.data.status}</span>
+                </td>
                 <td style={{width : this.props.actions_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">

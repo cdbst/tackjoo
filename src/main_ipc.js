@@ -15,17 +15,16 @@ function run(){
         //console.log(sensor_data);
 
         //sensor data를 각각 로그인된 계정 세션에 전달하여 각각의 계정 세션(BrowserContext)은 이 sensor data를 nike akam sensor response server로 전송한다.
-        
+
     });
 
     ipcMain.on('login', (event, account_info) => {
         
         let user_session = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd);
 
-        user_session.login((err) => {
-            console.log(err);
+        user_session.login((err) =>{
+            event.reply('login-reply', err);
         });
-
     });
 }
 
