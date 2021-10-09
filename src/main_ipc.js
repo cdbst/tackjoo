@@ -23,16 +23,17 @@ function run(){
 
         borwser_context.open_main_page((err) =>{
 
-            if(err == undefined){
+            if(err == undefined){ // 새로운 유저를 추가하는 것이므로 여기서는 파일을 업데이트 한다.
+
                 BrowserCxtMngr.add(borwser_context);
-            }
 
-            let file_data = BrowserCxtMngr.get_file_data();
-            let ufm = new UserFileManager();
+                update_user_info_file(BrowserCxtMngr, (err) =>{
+                    event.reply('add-account-reply', err);
+                });
 
-            ufm.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
+            }else{
                 event.reply('add-account-reply', err);
-            });
+            }
         });
     });
 
@@ -45,7 +46,9 @@ function run(){
         if(result == false){
             event.reply('remove-account-reply', 'caanot found browser context.');
         }else{
-            event.reply('remove-account-reply', undefined);
+            update_user_info_file(BrowserCxtMngr, (err) =>{
+                event.reply('remove-account-reply', err);
+            });
         }
     });
 
@@ -80,6 +83,16 @@ function run(){
         }else{
             do_login();
         }
+    });
+}
+
+function update_user_info_file(_browser_context_mngr, __callback){
+
+    let file_data = _browser_context_mngr.get_file_data();
+    let ufm = new UserFileManager();
+
+    ufm.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
+        __callback(err);
     });
 }
 
