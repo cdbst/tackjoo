@@ -1,14 +1,16 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain} = require("electron");
+
 const path = require("path");
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1600,
+        width: 1200,
         height: 900,
         minWidth : 1200,
         minHeight : 900,
         webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
+            sandbox: true,
+            preload: path.join(__dirname, "preload.js")
         },
     });
     win.webContents.openDevTools();
@@ -31,3 +33,9 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
+
+
+ipcMain.on('asynchronous-message', (event, arg) => {
+    console.log(arg) // prints "ping"
+    event.reply('asynchronous-reply', 'pong')
+})

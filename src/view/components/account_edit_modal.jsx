@@ -45,7 +45,6 @@ class AccountEditModal extends React.Component {
         this.props.h_add_new_account(el_email_input.value, el_pwd_inpt.value);
 
         let el_modal = document.getElementById(this.props.id);
-        console.log(el_modal);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         
         bs_obj_modal.hide();

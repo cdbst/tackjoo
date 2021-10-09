@@ -73,6 +73,9 @@ class ContentsAccounts extends React.Component {
         // TODO : Try login and get cookie
         // TODO : 로그인 시도후 결과에 따라 status 값 세팅.
         // TODO : this.accounts_info 에 정보 추가
+        window.myAPI.testAPI((data)=>{
+            console.log(data);
+        });
 
         let account = this.getAccountObj(_email, _pwd, this.ACCOUNT_STATUS.INVALID_ACCOUNT, 'abcd');
 
