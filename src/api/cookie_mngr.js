@@ -9,7 +9,12 @@ class CookieManager{
         this.get_cookie_data = this.get_cookie_data.bind(this);
         this.add_serialized_cookies = this.add_serialized_cookies.bind(this);
         this.get_specific_serialized_cookie = this.get_specific_serialized_cookie.bind(this);
+        this.init = this.init.bind(this);
 
+        this.init();
+    }
+
+    init(){
         this.cookies = {};
         this.num_of_cookies = 0;
     }

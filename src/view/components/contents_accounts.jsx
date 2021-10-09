@@ -110,15 +110,21 @@ class ContentsAccounts extends React.Component {
         }
 
         //TODO user account 관련 리소스 정리 필요.
-        
-        let _account_table_list = this.getTableItems(_updated_accounts_info);
-        
-        this.setState(prevState => ({
-            account_table_list : _account_table_list,
-            accounts_info : _updated_accounts_info
-        }));
+        window.mainAPI.removeAccount(_id, (err)=>{
 
-        Index.g_sys_msg_q.enqueue('Delete Account', _email + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+            if(err){
+                Index.g_sys_msg_q.enqueue('WARN', 'Some error was accured while removing account ' + account_to_remove.email  + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            }
+
+            let _account_table_list = this.getTableItems(_updated_accounts_info);
+        
+            this.setState(prevState => ({
+                account_table_list : _account_table_list,
+                accounts_info : _updated_accounts_info
+            }));
+
+            Index.g_sys_msg_q.enqueue('Delete Account', account_to_remove.email  + ' has been removed.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     showAccountEditModal(_email, _pwd){

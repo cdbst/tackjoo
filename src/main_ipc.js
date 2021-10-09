@@ -6,11 +6,6 @@ const BrowserCxtMngr = require("./api/browser_context_mngr").browserCxtMngr;
 function run(){
     // IPC Responses
 
-    ipcMain.on('asynchronous-message', (event, arg) => {
-        console.log(arg) // prints "ping"
-        event.reply('asynchronous-reply', 'pong')
-    });
-
     ipcMain.on('send-sensor-data', (event, sensor_data) => {
         
         //console.log(sensor_data);
@@ -23,6 +18,8 @@ function run(){
         
         let borwser_context = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
+        //TODO : local filesystem에 사용자 정보를 업데이트 한다.
+
         borwser_context.open_main_page((err) =>{
 
             if(err == undefined){
@@ -33,18 +30,50 @@ function run(){
         });
     });
 
+    ipcMain.on('remove-account', (event, _id) => {
+
+        //TODO : local filesystem에 사용자 정보를 업데이트 한다.
+
+        let result = BrowserCxtMngr.remove(_id);
+
+        if(result == false){
+            event.reply('remove-account-reply', 'caanot found browser context.');
+        }else{
+            event.reply('remove-account-reply', undefined);
+        }
+    });
+
     ipcMain.on('login', (event, _id) => {
         
         let borwser_context = BrowserCxtMngr.get(_id);
 
         if(borwser_context == undefined){
-            event.reply('login-reply', 'caanot found browser context.');
+            event.reply('login-reply', 'cannot found browser context.');
             return;
         }
 
-        borwser_context.login((err) =>{
-            event.reply('login-reply', err);
-        });
+        let do_login = function(){
+
+            borwser_context.login((err) =>{
+                event.reply('login-reply', err);
+            });
+        }
+
+        if(borwser_context.is_login){
+
+            borwser_context.open_main_page((err) =>{ // for page refreesh.
+
+                if(err){
+                    event.reply('login-reply', 'caanot open nike.com main page.');
+                    return;
+                }
+
+                do_login();
+            });
+
+        }else{
+            do_login();
+        }
     });
 }
 

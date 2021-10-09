@@ -13,22 +13,11 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 contextBridge.exposeInMainWorld('mainAPI', {
-    testAPI : _testAPI,
     sendSensorData : _sendSensorData,
     addAccount : _addAccount,
+    removeAccount : _removeAccount,
     login : _login
 });
-
-//API IPC Wrappers
-function _testAPI(cb){
-
-    ipcRenderer.send('asynchronous-message', 'ping')
-
-    ipcRenderer.once('asynchronous-reply', (event, arg) => {
-        console.log(arg) // prints "pong"
-        cb('acbcc');
-    })
-}
 
 function _sendSensorData(sensor_data){
     ipcRenderer.send('send_sensor_data', sensor_data);
@@ -37,17 +26,17 @@ function _sendSensorData(sensor_data){
 function _addAccount(_email, _pwd, _id, __callback){
 
     if(_email == '' || _email == undefined){
-        __callback('login fail : email information is invalid');
+        __callback('add account fail : email information is invalid');
         return;
     }
 
     if(_pwd == '' || _pwd == undefined){
-        __callback('login fail : password information is invalid');
+        __callback('add account fail : password information is invalid');
         return;
     }
 
     if(_id == '' || _id == undefined){
-        __callback('login fail : account unique id information is invalid');
+        __callback('add account fail : account unique id information is invalid');
         return;
     }
 
@@ -56,6 +45,20 @@ function _addAccount(_email, _pwd, _id, __callback){
     ipcRenderer.once('add-account-reply', (event, err) => {
         __callback(err);
     });
+}
+
+function _removeAccount(_id, __callback){
+    if(_id == '' || _id == undefined){
+        __callback('remove account fail : account unique id information is invalid');
+        return;
+    }
+
+    ipcRenderer.send('remove-account', _id);
+
+    ipcRenderer.once('remove-account-reply', (event, err) => {
+        __callback(err);
+    });
+
 }
 
 function _login(_id, __callback){

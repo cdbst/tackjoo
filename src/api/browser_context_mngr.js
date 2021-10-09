@@ -2,6 +2,9 @@
 class BrowserContextManager{
 
     constructor(){
+        this.add = this.add.bind(this);
+        this.remove = this.remove.bind(this);
+        this.get = this.get.bind(this);
         this._browser_contexts_dict = {};
     }
 

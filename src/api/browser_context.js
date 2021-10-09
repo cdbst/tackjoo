@@ -27,8 +27,8 @@ class BrowserContext {
 
         this.is_login = false;
 
-        this.cookie_storage = new cookieMngr.CookieManager();
-        this.cookie_storage.add_cookie_data('social_type=comlogin');
+        this.__cookie_storage = new cookieMngr.CookieManager();
+        this.__cookie_storage.add_cookie_data('social_type=comlogin');
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -55,7 +55,7 @@ class BrowserContext {
             let body = qureystring.stringify(data).replace('_breeze-me', 'breeze-me');
                 
             let body_len = body.length;
-            let cookies = this.cookie_storage.get_cookie_data();
+            let cookies = this.__cookie_storage.get_cookie_data();
     
             let config = {
                 headers: {
@@ -90,17 +90,16 @@ class BrowserContext {
                     return;
                 }
     
-                //TODO : 로그인 실패에 대한 처리도 필요함.
                 if(res.data.ResponseObject.isError == 'true'){
                     __callback('login fail');
                     return;
                 }
     
                 res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.cookie_storage.add_cookie_data(cookie_data);
+                    this.__cookie_storage.add_cookie_data(cookie_data);
                 });
                 
-                this.login = true;
+                this.is_login = true;
 
                 __callback(undefined);
             })
@@ -123,7 +122,7 @@ class BrowserContext {
             } 
 
             res.headers['set-cookie'].forEach(cookie_data =>{
-                this.cookie_storage.add_cookie_data(cookie_data);
+                this.__cookie_storage.add_cookie_data(cookie_data);
             });
             
             __callback(undefined);
@@ -201,6 +200,7 @@ class BrowserContext {
     open_main_page(__callback){
 
         this.__before_request();
+        this.__cookie_storage.init();
 
         let config = {
             headers: {
@@ -231,7 +231,7 @@ class BrowserContext {
             }
     
             res.headers['set-cookie'].forEach(cookie_data =>{
-                this.cookie_storage.add_cookie_data(cookie_data);
+                this.__cookie_storage.add_cookie_data(cookie_data);
             });
 
             const $ = cheerio.load(res.data);
@@ -249,7 +249,7 @@ class BrowserContext {
                 return;
             }
 
-            this.cookie_storage.add_cookie_data('USERID=' + customer_id);
+            this.__cookie_storage.add_cookie_data('USERID=' + customer_id);
 
             this.sensor_data_server_url = this.__get_sensor_data_server_url_from_main_page($)
 
