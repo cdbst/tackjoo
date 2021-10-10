@@ -55,7 +55,8 @@ function register(){
     ipcMain.on('login', (event, data) => {
 
         IpcMainSensor.gen_sensor_data((sensor_data)=>{
-            console.log(sensor_data);
+            //TODO send sensor data to nike server. 
+            //console.log(sensor_data);
         });
         
         let _id = data.payload.id;

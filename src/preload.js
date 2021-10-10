@@ -31,11 +31,15 @@ function _register_get_sensor_data(_get_sensor_data){
  * Renderer process IPC Listenrs
  */
 
-ipcRenderer.on('gen-sensor-data', (event, data) => {
+ipcRenderer.on('gen-sensor-data', (event, _data) => {
 
-    get_sensor_data((sensor_data) =>{
+    get_sensor_data((_sensor_data) =>{
 
-        ipcRenderer.send('gen-sensor-data-reply' + data.id, sensor_data);
+        let ipc_data = get_ipc_data({
+            sensor_data : _sensor_data
+        })
+
+        ipcRenderer.send('gen-sensor-data-reply' + _data.id, ipc_data);
     });
 });
 
@@ -61,8 +65,13 @@ function get_ipc_data(_payload = undefined){
     }
 }
 
-function _sendSensorData(sensor_data){
-    ipcRenderer.send('send_sensor_data', sensor_data);
+function _sendSensorData(_sensor_data){
+
+    let data = get_ipc_data({
+        sensor_data : _sensor_data
+    });
+
+    ipcRenderer.send('send_sensor_data', data);
 }
 
 function _addAccount(_email, _pwd, _id, __callback){

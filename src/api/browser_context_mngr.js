@@ -6,6 +6,8 @@ class BrowserContextManager{
         this.remove = this.remove.bind(this);
         this.get = this.get.bind(this);
         this.get_file_data = this.get_file_data.bind(this);
+        this.get_all_browser_context = this.get_all_browser_context.bind(this);
+
         this._browser_contexts_dict = {};
     }
 
@@ -24,6 +26,16 @@ class BrowserContextManager{
     get(_id){
         if(_id in this._browser_contexts_dict == false) return undefined;
         return this._browser_contexts_dict[_id];
+    }
+
+    get_all_browser_context(){
+
+        let borwser_context_list = [];
+
+        for (var key in this._browser_contexts_dict){
+            borwser_context_list.push(this._browser_contexts_dict[key]);
+        }
+        return borwser_context_list;
     }
 
     get_file_data(){

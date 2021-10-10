@@ -127,7 +127,6 @@ class ContentsAccounts extends React.Component {
             return;
         }
 
-        //TODO user account 관련 리소스 정리 필요.
         window.electron.removeAccount(_id, (err)=>{
 
             if(err){

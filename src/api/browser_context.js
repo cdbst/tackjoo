@@ -34,6 +34,57 @@ class BrowserContext {
         this.sensor_data_server_url = undefined;
     }
 
+    send_sensor_data(sensor_data, __callback){
+
+        if(this.sensor_data_server_url == undefined){
+            __callback("This browser context has no sensor data server url " + this.email);
+            return;
+        }
+
+        let cookies = this.__cookie_storage.get_cookie_data();
+
+        let config = {
+            headers: {
+                "authority": BrowserContext.NIKE_DOMAIN_NAME,
+                "accept": "*/*",
+                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "cache-control": "no-cache",
+                "content-type": "text/plain;charset=UTF-8",
+                "pragma": "no-cache",
+                "sec-ch-ua": "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "cookie": cookies,
+                "origin": BrowserContext.NIKE_URL,
+                "referer": BrowserContext.NIKE_URL + "/kr/ko_kr",
+                'user-agent': BrowserContext.USER_AGENT,
+                'content-length': sensor_data.length
+            }
+        }
+
+        axios.post(this.sensor_data_server_url, sensor_data, config)
+        .then(res => {
+
+            if(res.status == 201 || res.status == 200){
+
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    this.__cookie_storage.add_cookie_data(cookie_data);
+                });
+
+                __callback(undefined);
+
+            }else{
+                __callback('send_sensor_data - response invalid status code :' + res.status);
+            }
+
+        })
+        .catch(error => {
+            __callback(error);
+        });
+    }
+
     login(__callback){
 
         this.__open_login_modal(err =>{
