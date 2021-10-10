@@ -34,8 +34,6 @@ ipcRenderer.on('req-sensor-data', (event, data) => {
     ipcRenderer.send('req-sensor-data-reply', 'test');
 });
 
-
-
 /**
  * 
  * Custom APIs for IPCs (Process : Renderer process -> Main process -> Renderer process)
@@ -117,6 +115,7 @@ function _login(_id, __callback){
     ipcRenderer.send('login', ipc_data);
 
     ipcRenderer.once('login-reply' + ipc_data.id, (event, err) => {
+        console.warn('test _login reply');
         __callback(err);
     });
 }

@@ -2,7 +2,6 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 
 const path = require("path");
 const IpcM = require('./ipc_main');
-IpcM.register();
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -15,18 +14,13 @@ function createWindow() {
             preload: path.join(__dirname, "preload.js")
         },
     });
+
+    IpcM.register(win);
+
     win.webContents.openDevTools();
     win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, "index.html"))
-    //TODO : DELETE TEST CODE (below codes.)
-    .then(()=>{
 
-        win.webContents.send('req-sensor-data', 'test');
-
-        ipcMain.once('req-sensor-data-reply', (event, err) => {
-            console.log('test req sensor data : data recv');    
-        });
-    });
 }
 
 app.whenReady().then(() => {

@@ -4,6 +4,8 @@ const BrowserCxtMngr = require("./api/browser_context_mngr.js").browserCxtMngr;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
+const IpcMainSensor = require('./ipc_main_sensor');
+
 function register(){
 
     ipcMain.on('add-account', (event, data) => {
@@ -51,6 +53,8 @@ function register(){
     });
 
     ipcMain.on('login', (event, data) => {
+
+        IpcMainSensor.req_sensor_data();
         
         let _id = data.payload.id;
         let borwser_context = BrowserCxtMngr.get(_id);

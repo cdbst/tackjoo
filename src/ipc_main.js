@@ -1,10 +1,11 @@
-const IpcMaccount = require('./ipc_main_account.js');
+const IpcMainAccount = require('./ipc_main_account.js');
+const IpcMainSensor = require('./ipc_main_sensor');
 
 
-function register(){
+function register(win){
     // IPC Responses
-    IpcMaccount.register();
+    IpcMainAccount.register();
+    IpcMainSensor.register(win);
 }
-
 
 module.exports.register = register;

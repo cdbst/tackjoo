@@ -1261,6 +1261,7 @@ var _cf = _cf || [],
             bmak["cma"](t, 2);
           },
           hmd: function (t, cb) {
+            console.log(t);
             bmak["cma"](t, 3, cb);
           },
           hmu: function (t) {
