@@ -17,16 +17,24 @@ contextBridge.exposeInMainWorld('electron', {
     addAccount : _addAccount,
     removeAccount : _removeAccount,
     login : _login,
-    getAccountInfo : _getAccountInfo
+    getAccountInfo : _getAccountInfo,
+    register_get_sensor_data : _register_get_sensor_data,
 });
 
+let get_sensor_data = undefined;
+
+function _register_get_sensor_data(_get_sensor_data){
+    get_sensor_data = _get_sensor_data;
+    get_sensor_data((sensor_data)=>{
+        console.log(sensor_data);
+    })
+}
 
 /**
  * 
  * Renderer process IPC Listenrs
  */
 
-//TODO Below codes are for test.
 ipcRenderer.on('req-sensor-data', (event, data) => {
 
     console.log('response req-sensor-data');
