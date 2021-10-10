@@ -32,12 +32,12 @@ class AccountsTableItem extends React.Component {
                     <div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-warning" onClick={this.onClickLogin.bind(this)}>
-                                <img src="./res/door-open-fill.svg" style={{width:24, height:24}}/>
+                                <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemove.bind(this)}>
-                                <img src="./res/trash-fill.svg" style={{width:24, height:24}}/>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                     </div>

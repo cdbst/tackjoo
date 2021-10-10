@@ -44,11 +44,10 @@ class ContentsAccounts extends React.Component {
 
         window.mainAPI.getAccountInfo(_account_info => {
 
-            let file_loaded_account_info = _account_info.data.accounts;
-
             if(_account_info.err) {
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
+                let file_loaded_account_info = _account_info.data.accounts;
                 Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 for(var i = 0; i < file_loaded_account_info.length; i++){
                     let account = file_loaded_account_info[i];
@@ -247,10 +246,10 @@ class ContentsAccounts extends React.Component {
                 <div className="row footer">
                     <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                         <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
-                            <img src="./res/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
+                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside">
-                            <img src="./res/door-open-fill.svg" style={{width:24, height:24}}/> Login All
+                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Login All
                         </button>
                     </div>
                 </div>

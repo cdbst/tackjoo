@@ -1,7 +1,7 @@
 const path = require('path');
 
 const USER_FILE_PATH = {
-    USER_INFO :  path.join(__dirname, 'res', 'user_info.dat')
+    USER_INFO :  path.join(__dirname, 'res', 'data', 'user_info.dat')
 }
 
 
