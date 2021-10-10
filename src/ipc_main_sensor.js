@@ -14,12 +14,10 @@ function req_sensor_data(__callback){
         return;
     }
 
-    g_win.webContents.send('req-sensor-data', 'test');
-
-    ipcMain.once('req-sensor-data-reply', (event, err) => {
-        console.log('test req sensor data : data recv');
-        //__callback()
-    });
+    // ipcMain.once('req-sensor-data-reply', (event, err) => {
+    //     console.log('test req sensor data : data recv');
+    //     //__callback()
+    // });
 }
 
 module.exports.register = register;

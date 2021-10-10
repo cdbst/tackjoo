@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-contextBridge.exposeInMainWorld('mainAPI', {
+contextBridge.exposeInMainWorld('electron', {
     sendSensorData : _sendSensorData,
     addAccount : _addAccount,
     removeAccount : _removeAccount,
@@ -115,7 +115,7 @@ function _login(_id, __callback){
     ipcRenderer.send('login', ipc_data);
 
     ipcRenderer.once('login-reply' + ipc_data.id, (event, err) => {
-        console.warn('test _login reply');
+
         __callback(err);
     });
 }

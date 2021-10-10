@@ -43,7 +43,7 @@ class ContentsAccounts extends React.Component {
 
     __loadAccountInfoFile(){
 
-        window.mainAPI.getAccountInfo(_account_info => {
+        window.electron.getAccountInfo(_account_info => {
 
             if(_account_info.err) {
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
@@ -96,7 +96,7 @@ class ContentsAccounts extends React.Component {
         
         let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
 
-        window.mainAPI.addAccount(account.email, account.pwd, account.id, (err) =>{
+        window.electron.addAccount(account.email, account.pwd, account.id, (err) =>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', 'cannot save new account ' + _email + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
@@ -128,7 +128,7 @@ class ContentsAccounts extends React.Component {
         }
 
         //TODO user account 관련 리소스 정리 필요.
-        window.mainAPI.removeAccount(_id, (err)=>{
+        window.electron.removeAccount(_id, (err)=>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('WARN', 'Some error was accured while removing account ' + account_to_remove.email  + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
@@ -178,7 +178,7 @@ class ContentsAccounts extends React.Component {
 
         if(modal) Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
-        window.mainAPI.login(_id, (err) =>{
+        window.electron.login(_id, (err) =>{
             
             if(err){
                 Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);

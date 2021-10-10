@@ -53,6 +53,6 @@ class MouseEventManager{
 const mouse_evt_mngr = new MouseEventManager();
 
 function send_sensor_data_hooker(sensor_data){
-    window.mainAPI.sendSensorData(sensor_data);
+    window.electron.sendSensorData(sensor_data);
 }
 
