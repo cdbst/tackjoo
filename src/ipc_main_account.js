@@ -54,7 +54,9 @@ function register(){
 
     ipcMain.on('login', (event, data) => {
 
-        IpcMainSensor.gen_sensor_data();
+        IpcMainSensor.gen_sensor_data((sensor_data)=>{
+            console.log(sensor_data);
+        });
         
         let _id = data.payload.id;
         let borwser_context = BrowserCxtMngr.get(_id);

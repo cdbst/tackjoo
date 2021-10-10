@@ -1,4 +1,5 @@
 const {ipcMain} = require("electron");
+const util = require("./ipc_main_util.js");
 
 let g_win = undefined;
 
@@ -13,10 +14,12 @@ function gen_sensor_data(__callback){
         return;
     }
 
-    g_win.webContents.send('gen-sensor-data', 'test');
+    let data = util.get_ipc_data();
 
-    ipcMain.once('gen-sensor-data-reply', (event, err) => {
-        console.log('test req sensor data : data recv');
+    g_win.webContents.send('gen-sensor-data', data);
+
+    ipcMain.once('gen-sensor-data-reply' + data.id, (event, sensor_data) => {
+        __callback(sensor_data);
     });
     
 }

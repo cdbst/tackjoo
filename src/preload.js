@@ -33,9 +33,10 @@ function _register_get_sensor_data(_get_sensor_data){
 
 ipcRenderer.on('gen-sensor-data', (event, data) => {
 
-    console.log('response gen-sensor-data');
+    get_sensor_data((sensor_data) =>{
 
-    ipcRenderer.send('gen-sensor-data-reply', 'test');
+        ipcRenderer.send('gen-sensor-data-reply' + data.id, sensor_data);
+    });
 });
 
 /**
