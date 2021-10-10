@@ -22,12 +22,8 @@ contextBridge.exposeInMainWorld('electron', {
 });
 
 let get_sensor_data = undefined;
-
 function _register_get_sensor_data(_get_sensor_data){
     get_sensor_data = _get_sensor_data;
-    get_sensor_data((sensor_data)=>{
-        console.log(sensor_data);
-    })
 }
 
 /**
@@ -35,11 +31,11 @@ function _register_get_sensor_data(_get_sensor_data){
  * Renderer process IPC Listenrs
  */
 
-ipcRenderer.on('req-sensor-data', (event, data) => {
+ipcRenderer.on('gen-sensor-data', (event, data) => {
 
-    console.log('response req-sensor-data');
+    console.log('response gen-sensor-data');
 
-    ipcRenderer.send('req-sensor-data-reply', 'test');
+    ipcRenderer.send('gen-sensor-data-reply', 'test');
 });
 
 /**
