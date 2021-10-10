@@ -20,6 +20,27 @@ contextBridge.exposeInMainWorld('mainAPI', {
     getAccountInfo : _getAccountInfo
 });
 
+
+/**
+ * 
+ * Renderer process IPC Listenrs
+ */
+
+//TODO Below codes are for test.
+ipcRenderer.on('req-sensor-data', (event, data) => {
+
+    console.log('response req-sensor-data');
+
+    ipcRenderer.send('req-sensor-data-reply', 'test');
+});
+
+
+
+/**
+ * 
+ * Custom APIs for IPCs (Process : Renderer process -> Main process -> Renderer process)
+ */
+
 function get_ipc_id() {
 
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>

@@ -4,16 +4,7 @@ const BrowserCxtMngr = require("./api/browser_context_mngr.js").browserCxtMngr;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
-function run(){
-    // IPC Responses
-
-    ipcMain.on('send-sensor-data', (event, sensor_data) => {
-        
-        //console.log(sensor_data);
-
-        //sensor data를 각각 로그인된 계정 세션에 전달하여 각각의 계정 세션(BrowserContext)은 이 sensor data를 nike akam sensor response server로 전송한다.
-
-    });
+function register(){
 
     ipcMain.on('add-account', (event, data) => {
 
@@ -113,4 +104,4 @@ function read_user_info_file(__callback){
     });
 }
 
-module.exports.run = run;
+module.exports.register = register;
