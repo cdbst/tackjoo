@@ -15,7 +15,10 @@ function run(){
 
     });
 
-    ipcMain.on('add-account', (event, account_info) => {
+    ipcMain.on('add-account', (event, data) => {
+
+        let account_info = data.payload;
+        let ipc_id = data.id;
         
         let borwser_context = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
@@ -26,48 +29,50 @@ function run(){
                 BrowserCxtMngr.add(borwser_context);
 
                 write_user_info_file(BrowserCxtMngr, (err) =>{
-                    event.reply('add-account-reply', err);
+                    event.reply('add-account-reply' + ipc_id, err);
                 });
 
             }else{
-                event.reply('add-account-reply', err);
+                event.reply('add-account-reply' + ipc_id, err);
             }
         });
     });
 
-    ipcMain.on('remove-account', (event, _id) => {
+    ipcMain.on('remove-account', (event, data) => {
 
+        let _id = data.payload.id;
         let result = BrowserCxtMngr.remove(_id);
 
         if(result == false){
             event.reply('remove-account-reply', 'caanot found browser context.');
         }else{
             write_user_info_file(BrowserCxtMngr, (err) =>{
-                event.reply('remove-account-reply', err);
+                event.reply('remove-account-reply' + data.id, err);
             });
         }
     });
 
-    ipcMain.on('get-account-info', (event, _id) => {
+    ipcMain.on('get-account-info', (event, data) => {
 
         read_user_info_file((_err, _data) =>{
-            event.reply('get-account-info-reply', {err : _err, data : _data});
+            event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
         });
     });
 
-    ipcMain.on('login', (event, _id) => {
+    ipcMain.on('login', (event, data) => {
         
+        let _id = data.payload.id;
         let borwser_context = BrowserCxtMngr.get(_id);
 
         if(borwser_context == undefined){
-            event.reply('login-reply', 'cannot found browser context.');
+            event.reply('login-reply' + data.id, 'cannot found browser context.');
             return;
         }
 
         let do_login = function(){
 
             borwser_context.login((err) =>{
-                event.reply('login-reply', err);
+                event.reply('login-reply' + data.id, err);
             });
         }
 
@@ -76,7 +81,7 @@ function run(){
             borwser_context.open_main_page((err) =>{ // for page refreesh.
 
                 if(err){
-                    event.reply('login-reply', 'caanot open nike.com main page.');
+                    event.reply('login-reply' + data.id, 'caanot open nike.com main page.');
                     return;
                 }
 

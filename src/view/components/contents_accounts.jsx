@@ -9,11 +9,12 @@ class ContentsAccounts extends React.Component {
     constructor(props) {
         super(props);
 
-        this.addNewAccount = this.addAccount.bind(this);
+        this.addAccount = this.addAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
         this.getTableItems = this.getTableItems.bind(this);
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
+        this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
@@ -153,7 +154,13 @@ class ContentsAccounts extends React.Component {
         bs_obj_modal.show();
     }
 
-    loginAccount(_id){
+    onClickLoginAll(e){
+        this.state.account_info.forEach((account)=>{
+            this.loginAccount(account.id, false);
+        });
+    }
+
+    loginAccount(_id, modal = true){
         
         let account_to_login = undefined;
 
@@ -165,16 +172,16 @@ class ContentsAccounts extends React.Component {
         }
 
         if(account_to_login == undefined){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to login.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to login.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             return;
         }
 
-        Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        if(modal) Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
         window.mainAPI.login(_id, (err) =>{
             
             if(err){
-                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
                 return;
             }
 
@@ -193,7 +200,7 @@ class ContentsAccounts extends React.Component {
                 account_info : _account_info
             }));
 
-            Index.g_sys_msg_q.enqueue('Login Successful', account_to_login.email + ' login successfully', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(modal) Index.g_sys_msg_q.enqueue('Login Successful', account_to_login.email + ' login successfully', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -248,7 +255,7 @@ class ContentsAccounts extends React.Component {
                         <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
                             <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
                         </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside">
+                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
                             <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Login All
                         </button>
                     </div>

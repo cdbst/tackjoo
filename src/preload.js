@@ -1,5 +1,5 @@
 const { contextBridge } = require('electron');
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 
 window.addEventListener('DOMContentLoaded', () => {
     const replaceText = (selector, text) => {
@@ -19,6 +19,23 @@ contextBridge.exposeInMainWorld('mainAPI', {
     login : _login,
     getAccountInfo : _getAccountInfo
 });
+
+function get_ipc_id() {
+
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+function get_ipc_data(_payload = undefined){
+
+    _payload = _payload == undefined ? {} : _payload;
+
+    return {
+        payload : _payload,
+        id : get_ipc_id()
+    }
+}
 
 function _sendSensorData(sensor_data){
     ipcRenderer.send('send_sensor_data', sensor_data);
@@ -41,9 +58,12 @@ function _addAccount(_email, _pwd, _id, __callback){
         return;
     }
 
-    ipcRenderer.send('add-account', {email : _email, pwd : _pwd, id : _id});
+    let ipc_payload = {email : _email, pwd : _pwd, id : _id}
+    let ipc_data = get_ipc_data(ipc_payload);
 
-    ipcRenderer.once('add-account-reply', (event, err) => {
+    ipcRenderer.send('add-account', ipc_data);
+
+    ipcRenderer.once('add-account-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 }
@@ -54,9 +74,11 @@ function _removeAccount(_id, __callback){
         return;
     }
 
-    ipcRenderer.send('remove-account', _id);
+    let ipc_data = get_ipc_data({id : _id});
 
-    ipcRenderer.once('remove-account-reply', (event, err) => {
+    ipcRenderer.send('remove-account', ipc_data);
+
+    ipcRenderer.once('remove-account-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 
@@ -69,18 +91,22 @@ function _login(_id, __callback){
         return;
     }
 
-    ipcRenderer.send('login', _id);
+    let ipc_data = get_ipc_data({id : _id});
 
-    ipcRenderer.once('login-reply', (event, err) => {
+    ipcRenderer.send('login', ipc_data);
+
+    ipcRenderer.once('login-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 }
 
 function _getAccountInfo(__callback){
 
-    ipcRenderer.send('get-account-info');
+    let ipc_data = get_ipc_data()
 
-    ipcRenderer.once('get-account-info-reply', (event, account_info) => {
+    ipcRenderer.send('get-account-info', ipc_data);
+
+    ipcRenderer.once('get-account-info-reply' + ipc_data.id, (event, account_info) => {
         __callback(account_info);
     });
 }
