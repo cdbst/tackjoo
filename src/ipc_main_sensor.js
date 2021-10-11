@@ -26,7 +26,7 @@ function register(_win){
 function gen_sensor_data(__callback){
 
     if(g_win == undefined){
-        console.error('Error : IpcMainSensor module is not registered.');
+        __callback('Error : IpcMainSensor module is not registered.', undefined);
         return;
     }
 
@@ -35,7 +35,7 @@ function gen_sensor_data(__callback){
     g_win.webContents.send('gen-sensor-data', data);
 
     ipcMain.once('gen-sensor-data-reply' + data.id, (event, data) => {
-        __callback(data.payload.sensor_data);
+        __callback(undefined, data.payload.sensor_data);
     });
     
 }

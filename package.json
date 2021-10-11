@@ -30,7 +30,8 @@
     "cookie": "^0.4.1",
     "copyfiles": "^2.4.1",
     "esbuild": "^0.12.28",
-    "querystring": "^0.2.1"
+    "querystring": "^0.2.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "electron": "^14.0.1"

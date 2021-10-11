@@ -54,10 +54,13 @@ function register(){
 
     ipcMain.on('login', (event, data) => {
 
-        IpcMainSensor.gen_sensor_data((sensor_data)=>{
-            //TODO send sensor data to nike server. 
-            //console.log(sensor_data);
-        });
+        // IpcMainSensor.gen_sensor_data((err, sensor_data)=>{
+        //     //TODO send sensor data to nike server. 
+        //     if(err){
+        //         console.warn(err);
+        //     }
+        //     console.log(sensor_data);
+        // });
         
         let _id = data.payload.id;
         let borwser_context = BrowserCxtMngr.get(_id);
