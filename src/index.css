@@ -142,9 +142,14 @@ tbody tr:hover td {
     background-color: #202225 !important;
 }
 
+.modal-select, .modal-select-option{
+    color: black !important;
+}
+
 .btn-inner-modal{
     width: 120px !important;
 }
+
 /* End To override bootstrap modal style */
 
 /* Start To text input */

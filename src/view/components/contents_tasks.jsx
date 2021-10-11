@@ -4,6 +4,18 @@ class ContentsTasks extends React.Component {
     //Type 종류
     //드로우
     //구매
+    static TASK_TYPES = {
+        NORMAL : 'Normal',
+        DROW : 'Drow'
+    }
+
+    static getTaskTypes (){
+        let types = [];
+        for(let type in ContentsTasks.TASK_TYPES){
+            types.push(ContentsTasks.TASK_TYPES[type]);
+        }
+        return types;
+    }
 
     //status 종류 =====
     //stop (아무 것도 안하는 상태)
@@ -20,20 +32,36 @@ class ContentsTasks extends React.Component {
     //footer buttn
     //Quick Task : 로그인된 모든 Account에 대한 드로우, 선착순 물건에 대한 구매/예약 대기 Task를 생성한다.
 
+    
+
 
     constructor(props) {
         super(props);
+
+        this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
+
+        this.tasks = [];
+
+        this.task_edit_modal_id = 'edit-task-modal'
+
     }
 
     componentDidMount(){
 
     }
 
+    onClickBtnNewTask(){
+
+        let el_modal = document.getElementById(this.task_edit_modal_id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
     render() {
 
         return (
             <div className="container-fluid">
-                {/*TODO: add or edit tasks modal <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/> */}
+                <TaskEditModal id={this.task_edit_modal_id}/>
                 <br/>
                 <div className="row">
                     <div className="col">
@@ -67,8 +95,8 @@ class ContentsTasks extends React.Component {
                         <button type="button" className="btn btn-primary btn-footer-inside">
                             <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> Quick Tasks
                         </button>
-                        <button type="button" className="btn btn-primary btn-footer-inside">
-                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Task
+                        <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
+                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}} /> New Task
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside" >
                             <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Run All

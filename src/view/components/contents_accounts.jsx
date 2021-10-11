@@ -20,7 +20,7 @@ class ContentsAccounts extends React.Component {
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
 
 
-        this.account_edit_modal_el_id = "add-account-modal";
+        this.account_edit_modal_el_id = "edit-account-modal";
 
         let account_info = [];
         let table_items = this.getTableItems(account_info);

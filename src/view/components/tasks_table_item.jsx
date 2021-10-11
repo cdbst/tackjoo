@@ -11,7 +11,8 @@ class TasksTableItem extends React.Component {
     // <th scope="col">Account</th>
     // <th scope="col">Status</th>
     // <th scope="col">Open Time</th>
-    // <th scope="col">Actions</th>
+    // <th scope="col">Actions</th> 
+    // 엑션 종류 : 편집, 시작/멈춤, 제거, 예약
 
     render(){
         
