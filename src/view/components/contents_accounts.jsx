@@ -22,8 +22,6 @@ class ContentsAccounts extends React.Component {
 
         this.account_edit_modal_el_id = "add-account-modal";
 
-        this.__loadAccountInfoFile(); 
-
         let account_info = [];
         let table_items = this.getTableItems(account_info);
 
@@ -38,7 +36,7 @@ class ContentsAccounts extends React.Component {
     }
 
     componentDidMount(){
-
+        this.__loadAccountInfoFile();
     }
 
     __loadAccountInfoFile(){

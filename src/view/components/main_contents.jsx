@@ -10,7 +10,7 @@ class MainContents extends React.Component {
             <div className="tab-content">
 
                 <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
-                    tasks
+                    <ContentsTasks />
                 </div>
                 <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
                     <ContentsAccounts />
