@@ -15,11 +15,16 @@ class BrowserContext {
         this.__get_csrfToken = this.__get_csrfToken.bind(this);
         this.__get_USERID_from_main_page = this.__get_USERID_from_main_page.bind(this);
         this.__get_sensor_data_server_url_from_main_page = this.__get_sensor_data_server_url_from_main_page.bind(this);
-        this.__open_login_modal =this.__open_login_modal.bind(this);
+        this.__open_login_modal = this.__open_login_modal.bind(this);
+        this.__get_open_page_header = this.__get_open_page_header.bind(this);
+        this.__post_process_open_page = this.__post_process_open_page.bind(this);
 
+
+        this.is_anonymous = this.is_anonymous.bind(this);
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
         this.open_main_page = this.open_main_page.bind(this);
+        this.open_feed_page = this.open_feed_page.bind(this);
 
         this.email = _email;
         this.pwd = _pwd;
@@ -32,6 +37,11 @@ class BrowserContext {
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
+    }
+
+    is_anonymous(){
+        if(this.email == undefined || this.pwd == undefined || this.id == undefined) return true;
+        else return false;
     }
 
     send_sensor_data(sensor_data, __callback){
@@ -86,6 +96,11 @@ class BrowserContext {
     }
 
     login(__callback){
+
+        if(this.is_anonymous()){
+            __callback('This browser context is anonymous');
+            return;
+        }
 
         this.__open_login_modal(err =>{
 
@@ -248,29 +263,59 @@ class BrowserContext {
         return customer_id;
     }
 
+    __get_open_page_header(){
+        return {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'none',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': 1,
+            'connection': 'keep-alive',
+            'user-agent': BrowserContext.USER_AGENT
+        }
+    }
+
+    __post_process_open_page(res_headers, $){
+
+        res_headers['set-cookie'].forEach(cookie_data =>{
+            this.__cookie_storage.add_cookie_data(cookie_data);
+        });
+
+        this.csrfToken = this.__get_csrfToken($);
+        if(this.csrfToken == undefined){
+            return false;
+        }
+
+        let customer_id = this.__get_USERID_from_main_page($);
+        if(customer_id == undefined){
+            return false;
+        }
+
+        this.__cookie_storage.add_cookie_data('USERID=' + customer_id);
+
+        this.sensor_data_server_url = this.__get_sensor_data_server_url_from_main_page($)
+        if(this.sensor_data_server_url == undefined){
+            return false;
+        }
+
+        return true;
+    }
+
     open_main_page(__callback){
 
         this.__before_request();
         this.__cookie_storage.init();
 
         let config = {
-            headers: {
-                'authority': BrowserContext.NIKE_DOMAIN_NAME,
-                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'accept-encoding': 'gzip, deflate, br',
-                'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'cache-control': 'no-cache',
-                'pragma': 'no-cache',
-                'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-fetch-dest': 'document',
-                'sec-fetch-mode': 'navigate',
-                'sec-fetch-site': 'none',
-                'sec-fetch-user': '?1',
-                'upgrade-insecure-requests': 1,
-                'connection': 'keep-alive',
-                'user-agent': BrowserContext.USER_AGENT
-            }
+            headers: this.__get_open_page_header()
         }
 
         axios.get(BrowserContext.NIKE_URL + '/kr/ko_kr', config)
@@ -280,32 +325,12 @@ class BrowserContext {
                 __callback('open_main_page : response ' + res.status);
                 return;
             }
-    
-            res.headers['set-cookie'].forEach(cookie_data =>{
-                this.__cookie_storage.add_cookie_data(cookie_data);
-            });
 
             const $ = cheerio.load(res.data);
-            this.csrfToken = this.__get_csrfToken($);
 
-            if(this.csrfToken == undefined){
-                __callback('open_main_page : cannot found csrfToken information from main page');
-                return;
-            }
-
-            let customer_id = this.__get_USERID_from_main_page($);
-
-            if(customer_id == undefined){
-                __callback('open_main_page : cannot found customer_id information from main page');
-                return;
-            }
-
-            this.__cookie_storage.add_cookie_data('USERID=' + customer_id);
-
-            this.sensor_data_server_url = this.__get_sensor_data_server_url_from_main_page($)
-
-            if(this.sensor_data_server_url == undefined){
-                __callback('open_main_page : cannot found sensor_data_server_url information from main page');
+            let result = this.__post_process_open_page(res.headers, $);
+            if(!result){
+                __callback('open_main_page : cannot store informations');
                 return;
             }
 
@@ -314,7 +339,40 @@ class BrowserContext {
         .catch(err => {
             __callback(err);
         });
+    }
 
+    open_feed_page(__callback){
+        this.__before_request();
+        this.__cookie_storage.init();
+
+        let config = {
+            headers: this.__get_open_page_header()
+        }
+
+        axios.get(BrowserContext.NIKE_URL + '/kr/launch/', config)
+        .then(res => {
+
+            if(res.status != 200){
+                __callback('open_feed_page : response ' + res.status);
+                return;
+            }
+
+            const $ = cheerio.load(res.data);
+
+            let result = this.__post_process_open_page(res.headers, $);
+            if(!result){
+                __callback('open_feed_page : cannot store informations');
+                return;
+            }
+            
+            // TODO : 물품 리스트 파싱하는 모듈을 따로 파일로 분리하여 모듈화 하여 호출한다.
+            //let product_list = this.__get_product_list_from_feed_page($);
+
+            __callback();
+        })
+        .catch(err => {
+            __callback(err);
+        });
     }
 }
 

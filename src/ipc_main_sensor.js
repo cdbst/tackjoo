@@ -1,6 +1,6 @@
 const {ipcMain} = require("electron");
 const util = require("./ipc_main_util.js");
-const BrowserCxtMngr = require("./api/browser_context_mngr.js").browserCxtMngr;
+const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrowserCxtMngr;
 
 let g_win = undefined;
 
@@ -11,7 +11,7 @@ function register(_win){
         
         let sensor_data = data.payload.sensor_data;
 
-        let browser_context_list = BrowserCxtMngr.get_all_browser_context();
+        let browser_context_list = UserBrowserCxtMngr.get_all_browser_context();
 
         browser_context_list.forEach((browser_context) =>{
             browser_context.send_sensor_data(sensor_data, (err)=>{

@@ -7,6 +7,7 @@ const SystemMessageQueue = React.createContext();
 class Index extends React.Component {
 
     static g_sys_msg_q = new ToastMessageQueue(10000);
+    static g_product_mngr = new ProductManager();
 
     constructor(props) {
         super(props);

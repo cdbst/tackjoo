@@ -58,6 +58,6 @@ class BrowserContextManager{
     }
 }
 
-let browserCxtMngr = new BrowserContextManager();
+let userUserBrowserCxtMngr = new BrowserContextManager();
 
-module.exports.browserCxtMngr = browserCxtMngr;
+module.exports.userUserBrowserCxtMngr = userUserBrowserCxtMngr;
