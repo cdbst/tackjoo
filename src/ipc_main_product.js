@@ -12,8 +12,8 @@ function register(){
 
         let browser_cxt = new BrowserCxt.BrowserContext();
 
-        browser_cxt.open_feed_page((_err)=>{
-            event.reply('get-product-list-reply' + data.id, {err : _err});
+        browser_cxt.open_feed_page((_err, product_info)=>{
+            event.reply('get-product-list-reply' + data.id, {err : _err, data : product_info});
         });
     });
 }

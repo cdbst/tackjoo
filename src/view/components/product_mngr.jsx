@@ -50,8 +50,9 @@ class ProductManager{
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
     __initProductInfo(){
-        window.electron.getProductList((err)=>{
+        window.electron.getProductList((err, product_info)=>{
             console.log(err);
+            console.log(product_info);
         });
     }
 
