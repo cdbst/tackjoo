@@ -6,7 +6,7 @@ let get_products_info_from_feed_page = ($) => {
 
     $('.launch-list-item').each((idx, el)=>{
 
-        let maybe_meaningful_nodes = get_specific_tag_nodes(el, ['a', 'img']);
+        let maybe_meaningful_nodes = get_specific_tag_nodes(el, ['a', 'img', 'div']);
 
         let product_alt_name = undefined;
         let product_name = undefined;
@@ -14,7 +14,6 @@ let get_products_info_from_feed_page = ($) => {
         let product_url = undefined;
         let product_img_url = undefined;
         
-
         for(var i = 0; i < maybe_meaningful_nodes.length; i++){
             let maybe_meaningful_node = maybe_meaningful_nodes[i];
 
@@ -26,10 +25,14 @@ let get_products_info_from_feed_page = ($) => {
                 product_name = maybe_meaningful_node.attribs.title;
             }else if(maybe_meaningful_node.name == 'a' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 product_type_text = maybe_meaningful_node.childNodes[0].data;
+            }else if(maybe_meaningful_node.name == 'div' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
+                product_type_text = maybe_meaningful_node.childNodes[0].data;
             }
         }
         
         if(product_type_text == undefined) return;
+
+        product_type_text = product_type_text.replace(/(\t|\n)/gi, '').trim();
 
         let result = is_valid_product(product_type_text);
         if(result == false) return;
