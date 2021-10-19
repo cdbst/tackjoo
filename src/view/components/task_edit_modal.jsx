@@ -11,8 +11,20 @@ class TaskEditModal extends React.Component {
         this.onModalshown = this.onModalshown.bind(this);
 
         this.onChangeType = this.onChangeType.bind(this);
+        this.onChangeProductName = this.onChangeProductName.bind(this);
 
-        this.select_items_type = ContentsTasks.getTaskTypes();
+        this.products_list = Index.g_product_mngr.getProductList();
+        this.filtered_product_list = this.products_list;
+
+        this.selected_product_name = undefined;
+        this.selected_product_type = undefined;
+        this.seledted_proudct_id = undefined;
+
+        this.state = {
+            product_types : [],
+            product_names : [],
+            product_ids : [],
+        }
     }
 
     componentDidMount(){
@@ -28,6 +40,26 @@ class TaskEditModal extends React.Component {
     onModalshown(e){
         // let el_email_input = document.getElementById(this.);
         // el_email_input.focus();
+
+        this.products_list = Index.g_product_mngr.getProductList();
+
+        let product_types = [];
+
+        this.products_list.forEach((product) => {
+            if(product_types.includes(product.type_text) == false){
+                product_types.push(product.type_text);
+            }
+        });
+
+        if(product_types.length == 0) return;
+
+        this.setState(_ => ({
+            product_types : product_types,
+        }));
+
+        
+        this.onChangeType(product_types[0])
+
     }
 
     onModalClosed(e){
@@ -38,9 +70,38 @@ class TaskEditModal extends React.Component {
         // el_email_input.value = '';
     }
 
-    onChangeType(value){
-        console.log(value);
+    onChangeProductName(value, selected_key){
+
+        this.selected_product_name = value;
+        this.seledted_proudct_id = selected_key;
+
+        //TODO : Get Detail Product Info
     }
+
+    onChangeType(value){
+        
+        this.filtered_product_list = this.products_list.filter((product) =>{
+            return product.type_text == value;
+        });
+
+        let _product_names = this.filtered_product_list.map((filtered_product) => filtered_product.name + ' (' + filtered_product.alt_name + ')' );
+        let _product_ids =  this.filtered_product_list.map((filtered_product) => filtered_product._id);
+
+        this.selected_product_type = value;
+
+        this.setState(_ => ({
+            product_names : _product_names,
+            product_ids : _product_ids,
+        }));
+
+        this.onChangeProductName(_product_names[0], _product_ids[0])
+    }
+
+    //TODO : Get Detail Product Info
+    getDetailProductInfo(product_id){
+
+    }
+
 
     getTableItems(account_info){
         let remove_handler = this.removeAccount;
@@ -87,12 +148,10 @@ class TaskEditModal extends React.Component {
                         <div className="modal-body">
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    {/* TYPE 을 먼저 선택하면 선택가능한 Product를 가져올 수 있도록 처리해아함.*/}
-                                    <TaskEditModalSelectItem label="Type" options={this.select_items_type} h_on_change={this.onChangeType.bind(this)}/>
+                                    <TaskEditModalSelectItem label="Type" options={this.state.product_types} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    {/* TODO  GET product list from nike server*/}
-                                    <TaskEditModalSelectItem label="Product" options={['a', 'b', 'c', 'dasdfsafsadsfsadfdsaffsa']}/>
+                                    <TaskEditModalSelectItem label="Product" options={this.state.product_names} option_keys={this.state.product_ids} h_on_change={this.onChangeProductName.bind(this)}/>
                                 </div>
                             </div>
                         </div>
@@ -116,14 +175,17 @@ class TaskEditModalSelectItem extends React.Component {
 
     }
 
-    getOptionItems(itmes){
+    getOptionItems(items, keys = undefined){
         
+        let key_list = keys == undefined ? [...Array(items.length).keys()] : keys;
+
         let idx = 0;
-        return itmes.map((item) => 
+        return items.map((item) => 
             <option
                 className="modal-select-option"
-                key={idx++}
+                key={key_list[idx]}
                 value={item}
+                data-key={key_list[idx++]}
             >
             {item}
             </option>
@@ -131,11 +193,13 @@ class TaskEditModalSelectItem extends React.Component {
     }
 
     onChangeOption(e){
-        this.props.h_on_change(e.target.value);
+        const selected_idx = e.target.options.selectedIndex;
+        const selected_key = e.target.options[selected_idx].getAttribute('data-key');
+        this.props.h_on_change(e.target.value, selected_key);
     }
 
     render(){
-        let option_items = this.getOptionItems(this.props.options);
+        let option_items = this.getOptionItems(this.props.options, this.props.option_keys);
 
         return(
             <div className="row">

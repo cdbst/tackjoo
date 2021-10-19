@@ -1,22 +1,6 @@
 
 class ContentsTasks extends React.Component {
 
-    //Type 종류
-    //드로우
-    //구매
-    static TASK_TYPES = {
-        NORMAL : 'Normal',
-        DROW : 'Drow'
-    }
-
-    static getTaskTypes (){
-        let types = [];
-        for(let type in ContentsTasks.TASK_TYPES){
-            types.push(ContentsTasks.TASK_TYPES[type]);
-        }
-        return types;
-    }
-
     //status 종류 =====
     //stop (아무 것도 안하는 상태)
     //ready (대기중인 상태로 얼마나 있다가 작업이 시작되는지 표시해야함)
@@ -31,8 +15,6 @@ class ContentsTasks extends React.Component {
 
     //footer buttn
     //Quick Task : 로그인된 모든 Account에 대한 드로우, 선착순 물건에 대한 구매/예약 대기 Task를 생성한다.
-
-    
 
 
     constructor(props) {

@@ -152,7 +152,7 @@ function _getProductList(__callback){
 
     ipcRenderer.send('get-product-list', ipc_data);
 
-    ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_list) => {
-        __callback(product_list);
+    ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_info) => {
+        __callback(product_info);
     });
 }

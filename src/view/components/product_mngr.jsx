@@ -27,7 +27,13 @@
 class ProductManager{
 
     constructor(){
-        this.products = []
+
+        this.__initProductInfo = this.__initProductInfo.bind(this);
+        this.__gen_product_info_obj = this.__gen_product_info_obj.bind(this);
+        this.__poolProductInfo = this.__poolProductInfo.bind(this);
+        this.getProductList = this.getProductList.bind(this);
+
+        this.__products = []
         // {
         //     product_name : '' // string
         //     product_type : '' // drow, normal
@@ -42,7 +48,7 @@ class ProductManager{
         //     id : uuidv4()
         // }
 
-        this.__initProductInfo = this.__initProductInfo.bind(this);
+        
         this.__initProductInfo();
     }
 
@@ -50,17 +56,53 @@ class ProductManager{
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
     __initProductInfo(){
-        window.electron.getProductList((err, product_info)=>{
-            console.log(err);
-            console.log(product_info);
+        window.electron.getProductList((product_info)=>{
+
+            if(product_info.err != undefined){
+                Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            };
+
+            product_info.data.forEach((product) =>{
+                this.__products.push(this.__gen_product_info_obj(product.product_name, 
+                    product.product_alt_name, 
+                    product.product_img_url,
+                    product.product_url,
+                    product.product_type_text))
+            });
+
+            Index.g_sys_msg_q.enqueue('Loading Product Information', 'Product information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
+    }
+
+    __gen_product_info_obj(_product_name, _product_alt_name, _product_img_url, _product_url, _type_text){
+
+        let product_obj =  {
+            name : _product_name,
+            alt_name : _product_alt_name,
+            img_url : _product_img_url,
+            url : _product_url,
+            type_text : _type_text,
+            category : undefined,
+            start_time : undefined,
+            end_time : undefined,
+            price : undefined,
+            size_list : [],
+            is_sold_out : undefined,
+            _id : uuidv4()
+        }
+        return product_obj;
     }
 
     /**
      * 새로운 제품 정보를 가져오기 위해 일정 주기(설정 값)마다 polling 합니다.
      */
-    poolProductInfo(){
+    __poolProductInfo(){
 
+    }
+
+    getProductList(){
+        return this.__products;
     }
 
 }
