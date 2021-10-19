@@ -58,8 +58,7 @@ class TaskEditModal extends React.Component {
         }));
 
         
-        this.onChangeType(product_types[0])
-
+        this.onChangeType(product_types[0]);
     }
 
     onModalClosed(e){
@@ -94,7 +93,7 @@ class TaskEditModal extends React.Component {
             product_ids : _product_ids,
         }));
 
-        this.onChangeProductName(_product_names[0], _product_ids[0])
+        this.onChangeProductName(_product_names[0], _product_ids[0]);
     }
 
     //TODO : Get Detail Product Info
