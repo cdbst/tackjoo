@@ -2,7 +2,7 @@ const cookieMngr = require("./cookie_mngr.js");
 const axios = require('axios');
 const cheerio = require('cheerio');
 const qureystring = require('querystring');
-const product_info_parser = require('./product_info.js');
+const product_page_parser = require('./product_page_parser.js');
 
 class BrowserContext {
 
@@ -370,7 +370,7 @@ class BrowserContext {
             // TODO : 물품 리스트 파싱하는 모듈을 따로 파일로 분리하여 모듈화 하여 호출한다.
             //let product_list = this.__get_product_list_from_feed_page($);
 
-            let product_list = product_info_parser.get_product_list_info_from_feed_page($);
+            let product_list = product_page_parser.get_product_list_info_from_feed_page($);
 
             __callback(undefined, product_list);
         })
@@ -404,7 +404,7 @@ class BrowserContext {
                 return;
             }
 
-            let product_info = product_info_parser.get_product_info_from_product_page($)
+            let product_info = product_page_parser.get_product_info_from_product_page($)
             
             __callback(undefined, product_info);
         })
