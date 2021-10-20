@@ -1,6 +1,6 @@
-const { v4: uuidv4 } = require('uuid');
+const NIKE_URL = 'https://www.nike.com';
 
-let get_products_info_from_feed_page = ($) => {
+let get_product_list_info_from_feed_page = ($) => {
 
     let product_list = [];
 
@@ -21,7 +21,7 @@ let get_products_info_from_feed_page = ($) => {
                 product_img_url = maybe_meaningful_node.attribs['data-src'];
                 product_alt_name = maybe_meaningful_node.attribs.alt;
             }else if(maybe_meaningful_node.name == 'a' && has_class(maybe_meaningful_node, ['card-link'])){
-                product_url = maybe_meaningful_node.attribs.href;
+                product_url = NIKE_URL + maybe_meaningful_node.attribs.href;
                 product_name = maybe_meaningful_node.attribs.title;
             }else if(maybe_meaningful_node.name == 'a' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 product_type_text = maybe_meaningful_node.childNodes[0].data;
@@ -44,7 +44,6 @@ let get_products_info_from_feed_page = ($) => {
             product_url : product_url,
             product_img_url : product_img_url
         });
-
     });
 
     return product_list;
@@ -160,4 +159,10 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
     return specific_childs;
 }
 
-module.exports.get_products_info_from_feed_page = get_products_info_from_feed_page;
+function get_product_info_from_product_page ($) {
+
+}
+
+
+module.exports.get_product_list_info_from_feed_page = get_product_list_info_from_feed_page;
+module.exports.get_product_info_from_product_page = get_product_info_from_product_page;

@@ -32,6 +32,7 @@ class ProductManager{
         this.__gen_product_info_obj = this.__gen_product_info_obj.bind(this);
         this.__poolProductInfo = this.__poolProductInfo.bind(this);
         this.getProductList = this.getProductList.bind(this);
+        this.getProductInfo = this.getProductInfo.bind(this);
 
         this.__products = []
         // {
@@ -56,14 +57,14 @@ class ProductManager{
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
     __initProductInfo(){
-        window.electron.getProductList((product_info)=>{
+        window.electron.getProductList((product_list_info)=>{
 
-            if(product_info.err != undefined){
+            if(product_list_info.err != undefined){
                 Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             };
 
-            product_info.data.forEach((product) =>{
+            product_list_info.data.forEach((product) =>{
                 this.__products.push(this.__gen_product_info_obj(product.product_name, 
                     product.product_alt_name, 
                     product.product_img_url,
@@ -92,6 +93,20 @@ class ProductManager{
             _id : uuidv4()
         }
         return product_obj;
+    }
+
+    getProductInfo(_product_id, __callback){
+        
+        let product_obj = this.__products.find((product) => { return product._id === _product_id});
+
+        if(product_obj == undefined){
+            __callback('Cannot found product information ..', undefined);
+            return;
+        }
+
+        window.electron.getProductInfo(product_obj.url, (product_info) =>{
+            __callback(product_info.err, product_info.data);
+        });
     }
 
     /**

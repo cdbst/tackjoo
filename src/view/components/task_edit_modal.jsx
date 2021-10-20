@@ -11,7 +11,7 @@ class TaskEditModal extends React.Component {
         this.onModalshown = this.onModalshown.bind(this);
 
         this.onChangeType = this.onChangeType.bind(this);
-        this.onChangeProductName = this.onChangeProductName.bind(this);
+        this.onChangeProduct = this.onChangeProduct.bind(this);
 
         this.products_list = Index.g_product_mngr.getProductList();
         this.filtered_product_list = this.products_list;
@@ -24,8 +24,10 @@ class TaskEditModal extends React.Component {
             product_types : [],
             product_names : [],
             product_ids : [],
-            product_img_url : '...',
-            product_img_desc : '...'
+            product_img : {
+                url : './res/img/exclamation-diamond.svg',
+                desc : '...'
+            }
         }
     }
 
@@ -70,19 +72,28 @@ class TaskEditModal extends React.Component {
         // el_email_input.value = '';
     }
 
-    onChangeProductName(value, selected_key){
+    onChangeProduct(value, selected_key){
 
         this.selected_product_name = value;
         this.seledted_proudct_id = selected_key;
 
         //TODO : Get Detail Product Info
+        Index.g_product_mngr.getProductInfo(this.seledted_proudct_id, (err, product_info) =>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+            console.log(product_info);
+        });
 
         //Update product image
         let selected_product =  this.products_list.find((product) => { return product._id == selected_key });
 
         this.setState(_ => ({
-            product_img_url : selected_product.img_url,
-            product_img_desc : value
+            product_img : {
+                url : selected_product.img_url,
+                desc : value
+            }
         }));
     }
 
@@ -102,14 +113,8 @@ class TaskEditModal extends React.Component {
             product_ids : _product_ids
         }));
 
-        this.onChangeProductName(_product_names[0], _product_ids[0]);
+        this.onChangeProduct(_product_names[0], _product_ids[0]);
     }
-
-    //TODO : Get Detail Product Info
-    getDetailProductInfo(product_id){
-
-    }
-
 
     getTableItems(account_info){
         let remove_handler = this.removeAccount;
@@ -156,7 +161,7 @@ class TaskEditModal extends React.Component {
                         <div className="modal-body">
                             <div className="mb-12 row" style={{marginBottom : 30}}>
                                 <div className="text-center">
-                                    <img src={this.state.product_img_url} className="rounded tesk-edit-modal-product-img" alt={this.state.product_img_desc}/>
+                                    <img className="rounded tesk-edit-modal-product-img" src={this.state.product_img.url} alt={this.state.product_img.desc}/>
                                 </div>
                             </div>
                             <div className="mb-12 row">
@@ -164,7 +169,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem label="Type" options={this.state.product_types} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem label="Product" options={this.state.product_names} option_keys={this.state.product_ids} h_on_change={this.onChangeProductName.bind(this)}/>
+                                    <TaskEditModalSelectItem label="Product" options={this.state.product_names} option_keys={this.state.product_ids} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
                         </div>

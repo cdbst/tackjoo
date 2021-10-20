@@ -2,7 +2,7 @@ const cookieMngr = require("./cookie_mngr.js");
 const axios = require('axios');
 const cheerio = require('cheerio');
 const qureystring = require('querystring');
-const product_info = require('./product_info.js');
+const product_info_parser = require('./product_info.js');
 
 class BrowserContext {
 
@@ -26,6 +26,7 @@ class BrowserContext {
         this.logout = this.logout.bind(this);
         this.open_main_page = this.open_main_page.bind(this);
         this.open_feed_page = this.open_feed_page.bind(this);
+        this.open_product_page = this.open_product_page.bind(this);
 
         this.email = _email;
         this.pwd = _pwd;
@@ -369,9 +370,43 @@ class BrowserContext {
             // TODO : 물품 리스트 파싱하는 모듈을 따로 파일로 분리하여 모듈화 하여 호출한다.
             //let product_list = this.__get_product_list_from_feed_page($);
 
-            let product_list = product_info.get_products_info_from_feed_page($);
+            let product_list = product_info_parser.get_product_list_info_from_feed_page($);
 
             __callback(undefined, product_list);
+        })
+        .catch(err => {
+            __callback(err);
+        });
+    }
+
+    open_product_page(product_url, __callback){
+
+        this.__before_request();
+        this.__cookie_storage.init();
+
+        let config = {
+            headers: this.__get_open_page_header()
+        }
+
+        axios.get(product_url, config)
+        .then(res => {
+
+            if(res.status != 200){
+                __callback('open_product_page : response ' + res.status);
+                return;
+            }
+
+            const $ = cheerio.load(res.data);
+
+            let result = this.__post_process_open_page(res.headers, $);
+            if(!result){
+                __callback('open_product_page : cannot store informations');
+                return;
+            }
+
+            let product_info = product_info_parser.get_product_info_from_product_page($)
+            
+            __callback(undefined, product_info);
         })
         .catch(err => {
             __callback(err);

@@ -19,7 +19,8 @@ contextBridge.exposeInMainWorld('electron', {
     login : _login,
     getAccountInfo : _getAccountInfo,
     register_get_sensor_data : _register_get_sensor_data,
-    getProductList : _getProductList
+    getProductList : _getProductList,
+    getProductInfo : _getProductInfo
 });
 
 let get_sensor_data = undefined;
@@ -152,7 +153,18 @@ function _getProductList(__callback){
 
     ipcRenderer.send('get-product-list', ipc_data);
 
-    ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_info) => {
+    ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_list) => {
+        __callback(product_list);
+    });
+}
+
+function _getProductInfo(_product_url, __callback){
+
+    let ipc_data = get_ipc_data({product_url : _product_url});
+
+    ipcRenderer.send('get-product-info', ipc_data);
+
+    ipcRenderer.once('get-product-info-reply' + ipc_data.id, (event, product_info) => {
         __callback(product_info);
     });
 }
