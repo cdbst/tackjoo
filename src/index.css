@@ -185,3 +185,13 @@ tbody tr:hover td {
 }
 
 /* End to toast */
+
+
+/* Start to Task Edit Modal */
+.tesk-edit-modal-product-img{
+    width: 300px !important;
+    height: 300px !important;
+}
+
+
+/* End to Task Edit Modal */

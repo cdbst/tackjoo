@@ -24,6 +24,8 @@ class TaskEditModal extends React.Component {
             product_types : [],
             product_names : [],
             product_ids : [],
+            product_img_url : '...',
+            product_img_desc : '...'
         }
     }
 
@@ -56,7 +58,6 @@ class TaskEditModal extends React.Component {
         this.setState(_ => ({
             product_types : product_types,
         }));
-
         
         this.onChangeType(product_types[0]);
     }
@@ -75,6 +76,14 @@ class TaskEditModal extends React.Component {
         this.seledted_proudct_id = selected_key;
 
         //TODO : Get Detail Product Info
+
+        //Update product image
+        let selected_product =  this.products_list.find((product) => { return product._id == selected_key });
+
+        this.setState(_ => ({
+            product_img_url : selected_product.img_url,
+            product_img_desc : value
+        }));
     }
 
     onChangeType(value){
@@ -90,7 +99,7 @@ class TaskEditModal extends React.Component {
 
         this.setState(_ => ({
             product_names : _product_names,
-            product_ids : _product_ids,
+            product_ids : _product_ids
         }));
 
         this.onChangeProductName(_product_names[0], _product_ids[0]);
@@ -140,11 +149,16 @@ class TaskEditModal extends React.Component {
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
-                        {/* <div className="modal-header">
+                        <div className="modal-header">
                             <h5 className="modal-title" id={this.props.id + '-label'}>Edit Task</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div> */}
+                        </div>
                         <div className="modal-body">
+                            <div className="mb-12 row" style={{marginBottom : 30}}>
+                                <div className="text-center">
+                                    <img src={this.state.product_img_url} className="rounded tesk-edit-modal-product-img" alt={this.state.product_img_desc}/>
+                                </div>
+                            </div>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
                                     <TaskEditModalSelectItem label="Type" options={this.state.product_types} h_on_change={this.onChangeType.bind(this)}/>
@@ -202,10 +216,10 @@ class TaskEditModalSelectItem extends React.Component {
 
         return(
             <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-3 text-left">
                     <label className="col-sm-2 col-form-label text-white font-weight-bold">{this.props.label}</label>
                 </div>
-                <div className="col-md-8">
+                <div className="col-md-9">
                     <select className="form-select modal-select" aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
                         {option_items}
                     </select>

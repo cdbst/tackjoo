@@ -18,10 +18,10 @@ let get_products_info_from_feed_page = ($) => {
             let maybe_meaningful_node = maybe_meaningful_nodes[i];
 
             if(maybe_meaningful_node.name == 'img'){
-                product_url = maybe_meaningful_node.attribs['data-src'];
+                product_img_url = maybe_meaningful_node.attribs['data-src'];
                 product_alt_name = maybe_meaningful_node.attribs.alt;
             }else if(maybe_meaningful_node.name == 'a' && has_class(maybe_meaningful_node, ['card-link'])){
-                product_img_url = maybe_meaningful_node.attribs.href;
+                product_url = maybe_meaningful_node.attribs.href;
                 product_name = maybe_meaningful_node.attribs.title;
             }else if(maybe_meaningful_node.name == 'a' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 product_type_text = maybe_meaningful_node.childNodes[0].data;
