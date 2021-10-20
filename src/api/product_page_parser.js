@@ -32,7 +32,7 @@ let get_product_list_info_from_feed_page = ($) => {
         
         if(product_type_text == undefined) return;
 
-        product_type_text = product_type_text.replace(/(\t|\n)/gi, '').trim();
+        product_type_text = strip_usless_string(product_type_text)
 
         let result = is_valid_product(product_type_text);
         if(result == false) return;
@@ -129,6 +129,10 @@ function has_specific_attrs(el, attr){
     return false;
 }
 
+function strip_usless_string(string){
+    return string.replace(/(\t|\n)/gi, '').trim();
+}
+
 function get_specific_child_text_nodes (element, text_data = undefined) {
 
     let specific_childs = [];
@@ -160,7 +164,19 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
 }
 
 function get_product_info_from_product_page ($) {
+    //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
+    let el_order_btn = $('.btn-order')[0];
+    if(el_order_btn.length == 0) return undefined;
 
+    let el_order_btn_text = get_specific_child_text_nodes(el_order_btn);
+    if(el_order_btn_text.length == 0) return undefined;
+
+    let order_btn_text = el_order_btn_text.length == 1 ? el_order_btn_text[0].data : el_order_btn_text[2].data;
+    order_btn_text = strip_usless_string(order_btn_text);
+
+    //STEP2 지금 당장 구매 가능한 상품의 경우 product id를 취득하고 이것을 기반으로 구매 가능한 사이즈를 찾는다.
+
+    //STEP3 지금 당장 구매 불가능한 상품의 경우 제품의 판매 시작 시간, 판매 종료 시간을 취득한다.
 }
 
 
