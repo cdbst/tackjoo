@@ -405,6 +405,10 @@ class BrowserContext {
             }
 
             let product_info = product_page_parser.get_product_info_from_product_page($)
+            if(product_info == undefined){
+                __callback('Cannot collect product information.');
+                return;
+            }
             
             __callback(undefined, product_info);
         })

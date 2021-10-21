@@ -83,7 +83,6 @@ class TaskEditModal extends React.Component {
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
-            console.log(product_info);
         });
 
         //Update product image

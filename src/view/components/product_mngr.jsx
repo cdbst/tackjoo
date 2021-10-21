@@ -90,14 +90,15 @@ class ProductManager{
             price : undefined,
             size_list : [],
             is_sold_out : undefined,
+            product_id : undefined,
             _id : uuidv4()
         }
         return product_obj;
     }
 
-    getProductInfo(_product_id, __callback){
+    getProductInfo(_id, __callback){
         
-        let product_obj = this.__products.find((product) => { return product._id === _product_id});
+        let product_obj = this.__products.find((product) => { return product._id === _id});
 
         if(product_obj == undefined){
             __callback('Cannot found product information ..', undefined);

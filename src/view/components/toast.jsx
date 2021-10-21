@@ -29,6 +29,9 @@ class Toast extends React.Component {
     }
 
     getToastItems(msgs){
+
+        if(msgs === undefined || msgs.length === 0) return <div></div>;
+
         return msgs.map((msg) => 
             <ToastItem 
                 key={msg.id}

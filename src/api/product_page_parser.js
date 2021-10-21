@@ -1,4 +1,9 @@
 const NIKE_URL = 'https://www.nike.com';
+const RESERVED_IDENTIFIERS = {normal : 'buy', ftfs :'coming soon', draw : 'the draw'};
+
+function strip_usless_string(string){
+    return string.replace(/(\t|\n)/gi, '').trim();
+}
 
 let get_product_list_info_from_feed_page = ($) => {
 
@@ -129,10 +134,6 @@ function has_specific_attrs(el, attr){
     return false;
 }
 
-function strip_usless_string(string){
-    return string.replace(/(\t|\n)/gi, '').trim();
-}
-
 function get_specific_child_text_nodes (element, text_data = undefined) {
 
     let specific_childs = [];
@@ -164,19 +165,91 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
 }
 
 function get_product_info_from_product_page ($) {
+
+    let product_info = {
+        product_id : undefined
+    };
+
+    //STEP0 product id 를 파싱해야한다.
+    let product_id = parse_product_id_from_product_page($);
+    if(product_id == undefined) return undefined;
+
     //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
-    let el_order_btn = $('.btn-order')[0];
+    let product_type = parse_product_type_from_product_page($);
+
+    if(product_type == undefined || product_type != RESERVED_IDENTIFIERS.normal){
+        //TODO : STEP2 지금 당장 구매 불가능한 상품의 경우 제품의 판매 시작 시간, 판매 종료 시간을 취득한다.
+
+        if(product_type == RESERVED_IDENTIFIERS.draw){
+            //TODO 작업 진행 상황
+            parse_draw_time_from_product_page($);
+        }else if(product_type == RESERVED_IDENTIFIERS.ftfs){
+
+        }
+
+        return product_info;
+    } else{
+        //TODO : STEP2 지금 당장 구매 가능한 상품의 경우 구매 가능한 사이즈를 찾는다. HTTP REQ (productSkuInventory)
+    }
+
+    return product_info;
+}
+
+function parse_draw_time_from_product_page($){
+    let el_p_draw_info = $('.draw-info');
+
+    if(el_p_draw_info.length == 0) return;
+    
+    let text_draw_info = get_specific_child_text_nodes(el_p_draw_info[0]);
+
+    console.log('test');
+}
+
+function parse_product_id_from_product_page($){
+
+    let product_id = undefined;
+    let scripts = $('script:not([src])');
+
+    scripts.each((idx, script) =>{
+        if(Object.keys(script.attribs).length != 0) return;
+        if(script.childNodes.length != 1) return;
+
+        let script_code = script.childNodes[0].data;
+
+        if(script_code.includes('categoryInfo =') == false) return;
+        script_code = strip_usless_string(script_code);
+
+        product_id = script_code.split('var productInfo = {')[1].split(',', 1)[0].replace('id : ', '');
+    });
+
+    return product_id;
+}
+
+function parse_product_type_from_product_page($){
+
+    let el_order_btn = $('.draw-button');
     if(el_order_btn.length == 0) return undefined;
 
-    let el_order_btn_text = get_specific_child_text_nodes(el_order_btn);
+    let el_order_btn_text = get_specific_child_text_nodes(el_order_btn[0]);
     if(el_order_btn_text.length == 0) return undefined;
 
-    let order_btn_text = el_order_btn_text.length == 1 ? el_order_btn_text[0].data : el_order_btn_text[2].data;
-    order_btn_text = strip_usless_string(order_btn_text);
+    let product_type = undefined;
 
-    //STEP2 지금 당장 구매 가능한 상품의 경우 product id를 취득하고 이것을 기반으로 구매 가능한 사이즈를 찾는다.
+    for(var i = 0; i < el_order_btn_text.length; i++){
+        let text = strip_usless_string(el_order_btn_text[i].data).toLowerCase();
 
-    //STEP3 지금 당장 구매 불가능한 상품의 경우 제품의 판매 시작 시간, 판매 종료 시간을 취득한다.
+        if(text.includes(RESERVED_IDENTIFIERS.normal)){
+            product_type = RESERVED_IDENTIFIERS.normal;
+        }else if(text.includes(RESERVED_IDENTIFIERS.ftfs)){
+            product_type = RESERVED_IDENTIFIERS.ftfs;
+        }else if(text.includes(RESERVED_IDENTIFIERS.draw)){
+            product_type = RESERVED_IDENTIFIERS.draw;
+        }
+
+        if(product_type != undefined) break;
+    }
+
+    return product_type;
 }
 
 
