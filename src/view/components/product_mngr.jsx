@@ -78,21 +78,16 @@ class ProductManager{
 
     __gen_product_info_obj(_product_name, _product_alt_name, _product_img_url, _product_url, _type_text){
 
-        let product_obj =  {
-            name : _product_name,
-            alt_name : _product_alt_name,
-            img_url : _product_img_url,
-            url : _product_url,
-            type_text : _type_text,
-            category : undefined,
-            start_time : undefined,
-            end_time : undefined,
-            price : undefined,
-            size_list : [],
-            sold_out : undefined,
-            product_id : undefined,
-            _id : uuidv4()
-        }
+        let product_obj = common.get_product_info_obj_scheme();
+        
+        common.update_product_info_obj(product_obj, 'name', _product_name);
+        common.update_product_info_obj(product_obj, 'alt_name', _product_alt_name);
+        common.update_product_info_obj(product_obj, 'img_url', _product_img_url);
+        common.update_product_info_obj(product_obj, 'url', _product_url);
+        common.update_product_info_obj(product_obj, 'type_text', _type_text);
+        common.update_product_info_obj(product_obj, 'type_text', _type_text);
+        common.update_product_info_obj(product_obj, '_id', common.uuidv4());
+
         return product_obj;
     }
 

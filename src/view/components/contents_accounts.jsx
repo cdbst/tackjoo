@@ -72,7 +72,7 @@ class ContentsAccounts extends React.Component {
             email : _email,
             pwd : _pwd,
             status : _status,
-            id : _id == undefined ? uuidv4() : _id
+            id : _id == undefined ? common.uuidv4() : _id
         };
     }
 

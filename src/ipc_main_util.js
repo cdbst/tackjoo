@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+const common = require('./common/common.js');
 
 /**
  * 
@@ -11,8 +11,8 @@ function get_ipc_data(_payload = undefined){
 
     return {
         payload : _payload,
-        id : uuidv4()
+        id : common.uuidv4()
     }
 }
 
-module.exports.get_ipc_data = get_ipc_data
+module.exports.get_ipc_data = get_ipc_data;

@@ -114,7 +114,7 @@ class ToastMessageQueue {
 
     enqueue(_title, _contents, _type, _delay = undefined){
 
-        let _id = uuidv4();
+        let _id = common.uuidv4();
         let dequeue = this.dequeue;
         let dq_delay = _delay == undefined ? this.delay : _delay;
 
