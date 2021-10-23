@@ -8,12 +8,12 @@ const IpcMainSensor = require('./ipc_main_sensor');
 
 function register(){
 
-    ipcMain.on('get-product-list', (event, data) => {
+    ipcMain.on('get-product-info-list', (event, data) => {
 
         let browser_cxt = new BrowserCxt.BrowserContext();
 
         browser_cxt.open_feed_page((_err, product_list_info)=>{
-            event.reply('get-product-list-reply' + data.id, {err : _err, data : product_list_info});
+            event.reply('get-product-info-list-reply' + data.id, {err : _err, data : product_list_info});
         });
     });
 

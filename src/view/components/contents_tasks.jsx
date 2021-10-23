@@ -67,7 +67,6 @@ class ContentsTasks extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {/*TODO: setThe table item {this.state.account_table_list} */}
                         <TasksTableItem/>
                     </tbody>
                 </table>

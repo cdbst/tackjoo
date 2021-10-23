@@ -8,6 +8,17 @@
         );
     }
 
+    exports.merge_object = function (target, source) {
+        //console.log(source);
+
+        Object.entries(source).forEach(([key, value]) =>{
+            if(value == undefined) return;
+            target[key] = value;
+        });
+
+        return target;
+    }
+
     exports.get_product_info_obj_scheme = function(){
 
         let product_obj =  {

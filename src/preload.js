@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('electron', {
     login : _login,
     getAccountInfo : _getAccountInfo,
     register_get_sensor_data : _register_get_sensor_data,
-    getProductList : _getProductList,
+    getProductInfoList : _getProductInfoList,
     getProductInfo : _getProductInfo
 });
 
@@ -147,13 +147,13 @@ function _getAccountInfo(__callback){
     });
 }
 
-function _getProductList(__callback){
+function _getProductInfoList(__callback){
 
     let ipc_data = get_ipc_data();
 
-    ipcRenderer.send('get-product-list', ipc_data);
+    ipcRenderer.send('get-product-info-list', ipc_data);
 
-    ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_list) => {
+    ipcRenderer.once('get-product-info-list-reply' + ipc_data.id, (event, product_list) => {
         __callback(product_list.err, product_list.data);
     });
 }

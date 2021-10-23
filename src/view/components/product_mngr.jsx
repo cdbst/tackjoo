@@ -28,25 +28,26 @@ class ProductManager{
 
     constructor(){
 
-        this.updateProductInfo = this.updateProductInfo.bind(this);
+        this.getProductInfoList = this.getProductInfoList.bind(this);
         this.__poolProductInfo = this.__poolProductInfo.bind(this);
         this.getProductList = this.getProductList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
+        this.__updateProductInfo = this.__updateProductInfo.bind(this);
 
-        this.__products = []
+        this.__product_info_list = [];
 
-        this.updateProductInfo();
+        this.getProductInfoList();
     }
 
     /**
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
-    updateProductInfo(__callback = undefined){
+    getProductInfoList(__callback = undefined){
 
-        window.electron.getProductList((error, product_info_list)=>{
+        window.electron.getProductInfoList((error, product_info_list)=>{
 
             if(error != undefined){
-                //Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 if(__callback != undefined) __callback('Cannot load product information.', undefined);
                 return;
             };
@@ -54,20 +55,28 @@ class ProductManager{
             product_info_list.forEach((_product_info) =>{
 
                 let product_info = common.get_product_info_obj_scheme();
-                product_info = Object.assign(product_info, _product_info);
-                common.update_product_info_obj(product_info, '_id', common.uuidv4())
-                this.__products.push(product_info);
+                product_info = common.merge_object(product_info, _product_info);
+                common.update_product_info_obj(product_info, '_id', common.uuidv4());
+                this.__product_info_list.push(product_info);
             });
 
-            if(__callback != undefined) __callback(undefined, this.__products);
+            if(__callback != undefined) __callback(undefined, this.__product_info_list);
 
-            //Index.g_sys_msg_q.enqueue('Loading Product Information', 'Product information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('Loading Product Information', 'Product information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
+    }
+
+    __updateProductInfo(_id, product_info){
+        for(var i = 0; i < this.__product_info_list.length; i++){
+            if(this.__product_info_list[i]._id != _id) continue;
+            this.__product_info_list[i] = common.merge_object(this.__product_info_list[i], product_info);
+            return this.__product_info_list[i];
+        }
     }
 
     getProductInfo(_id, __callback){
         
-        let product_obj = this.__products.find((product) => { return product._id === _id});
+        let product_obj = this.__product_info_list.find((product) => { return product._id === _id});
 
         if(product_obj == undefined){
             __callback('Cannot found product information ..', undefined);
@@ -75,7 +84,9 @@ class ProductManager{
         }
 
         window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
-            __callback(error, product_info);
+            //update product info
+            let updated_product_info = this.__updateProductInfo(_id, product_info);
+            __callback(error, updated_product_info);
         });
     }
 
@@ -87,7 +98,7 @@ class ProductManager{
     }
 
     getProductList(){
-        return this.__products;
+        return this.__product_info_list;
     }
 
 }

@@ -84,6 +84,8 @@ class TaskEditModal extends React.Component {
                 return;
             }
 
+            console.log(product_info);
+
             //TODO 
         });
 
