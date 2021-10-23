@@ -39,6 +39,6 @@
     }
 
     exports.NIKE_URL = 'https://www.nike.com';
-    exports.PRODUCT_TYPE = {normal : 'buy', ftfs :'coming soon', draw : 'the draw'};
+    exports.PRODUCT_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW'};
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

@@ -10,11 +10,11 @@ function get_product_type(product_type_string){
 
     let text = strip_usless_string(product_type_string).toLowerCase();
 
-    if(text.includes(common.PRODUCT_TYPE.normal)){
+    if(text.includes(common.PRODUCT_TYPE.normal.toLowerCase())){
         product_type = common.PRODUCT_TYPE.normal;
-    }else if(text.includes(common.PRODUCT_TYPE.ftfs)){
+    }else if(text.includes(common.PRODUCT_TYPE.ftfs.toLowerCase())){
         product_type = common.PRODUCT_TYPE.ftfs;
-    }else if(text.includes(common.PRODUCT_TYPE.draw)){
+    }else if(text.includes(common.PRODUCT_TYPE.draw.toLowerCase())){
         product_type = common.PRODUCT_TYPE.draw;
     }
 
