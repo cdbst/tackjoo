@@ -182,10 +182,10 @@ function get_product_info_from_product_page ($) {
     let _product_info = common.get_product_info_obj_scheme();
 
     if($('.product-soldout').length > 0){
-        common.update_product_info_obj(_product_info, 'sold_out', true);
+        common.update_product_info_obj(_product_info, 'soldout', true);
         return _product_info;
     }else{
-        common.update_product_info_obj(_product_info, 'sold_out', false);
+        common.update_product_info_obj(_product_info, 'soldout', false);
     }
 
     //STEP-1 price info를 파싱한다.
@@ -200,6 +200,7 @@ function get_product_info_from_product_page ($) {
 
     //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
     let sell_type = parse_sell_type_from_product_page($);
+    common.update_product_info_obj(_product_info, 'sell_type', sell_type);
 
     if(sell_type == common.SELL_TYPE.draw){
         let draw_time_info = parse_draw_time_from_product_page($);
@@ -214,6 +215,8 @@ function get_product_info_from_product_page ($) {
         if(open_time == undefined) return undefined;
         common.update_product_info_obj(_product_info, 'open_time', open_time);
     }else if(sell_type = common.SELL_TYPE.normal){
+        
+        parse_product_options_from_product_page($);
 
     }else{
         //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
@@ -370,13 +373,50 @@ function parse_sell_type_from_product_page($){
 
     for(var i = 0; i < el_order_btn_text.length; i++){
         
-        let sell_type = get_sell_type(el_order_btn_text[i].data);
+        sell_type = get_sell_type(el_order_btn_text[i].data);
         if(sell_type != undefined) break;
     }
 
     return sell_type;
 }
 
+function parse_product_options_from_product_page($){
+
+}
+
+function update_product_info_as_sku_inventory_info(product_info, sku_inventory_info){
+
+    common.update_product_info_obj(product_info, 'soldout', !sku_inventory_info.usable);
+
+    let _size_info_list = [];
+    
+    sku_inventory_info.skuPricing.forEach((size_info) =>{
+        console.log(size_info);
+        let size_info_obj = common.get_size_info_obj_scheme();
+
+        let external_id_array = size_info['externalId'].split('  ');
+
+        let _external_id = external_id_array[0];
+        let _name = external_id_array[1];
+        let _sku_id = size_info['skuId'];
+        let _price = size_info['price'];
+        let _quantity = size_info['quantity'];
+        let _id = size_info['selectedOptions'][0];
+
+        common.update_size_info_obj(size_info_obj, 'external_id', _external_id);
+        common.update_size_info_obj(size_info_obj, 'name', _name);
+        common.update_size_info_obj(size_info_obj, 'sku_id', _sku_id);
+        common.update_size_info_obj(size_info_obj, 'price', _price);
+        common.update_size_info_obj(size_info_obj, 'quantity', _quantity);
+        common.update_size_info_obj(size_info_obj, 'id', _id);
+
+        _size_info_list.push(size_info_obj);
+    });
+
+    common.update_product_info_obj(product_info, 'size_info_list', _size_info_list);
+}
+
 
 module.exports.get_product_list_info_from_feed_page = get_product_list_info_from_feed_page;
 module.exports.get_product_info_from_product_page = get_product_info_from_product_page;
+module.exports.update_product_info_as_sku_inventory_info = update_product_info_as_sku_inventory_info;

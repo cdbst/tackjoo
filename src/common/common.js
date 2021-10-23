@@ -19,9 +19,29 @@
         return target;
     }
 
+    exports.get_size_info_obj_scheme = function (){
+        return {
+            name : undefined,
+            sku_id : undefined,
+            price : undefined,
+            quantity : undefined,
+            id : undefined,
+            external_id : undefined
+        }
+    }
+
+    exports.update_size_info_obj = function(size_info_obj, key, value){
+        if(key in this.get_size_info_obj_scheme() == false){
+            throw 'Product object is not includes property : ' + key;
+        }
+
+        size_info_obj[key] = value;
+        return size_info_obj;
+    }
+
     exports.get_product_info_obj_scheme = function(){
 
-        let product_obj =  {
+        return {
             name : undefined,
             alt_name : undefined,
             img_url : undefined,
@@ -31,17 +51,15 @@
             open_time : undefined,
             close_time : undefined,
             price : undefined,
-            size_list : [],
-            sold_out : undefined,
+            size_info_list : [],
+            soldout : undefined,
             product_id : undefined,
             _id : undefined
-        }
-
-        return product_obj;
+        };
     }
 
     exports.update_product_info_obj = function(product_info_obj, key, value){
-        if(key in product_info_obj == false){
+        if(key in this.get_product_info_obj_scheme() == false){
             throw 'Product object is not includes property : ' + key;
         }
 

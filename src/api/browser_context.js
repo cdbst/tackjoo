@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const qureystring = require('querystring');
 const product_page_parser = require('./product_page_parser.js');
+const common = require('../common/common.js');
 
 class BrowserContext {
 
@@ -27,6 +28,7 @@ class BrowserContext {
         this.open_main_page = this.open_main_page.bind(this);
         this.open_feed_page = this.open_feed_page.bind(this);
         this.open_product_page = this.open_product_page.bind(this);
+        this.get_product_sku_inventory = this.get_product_sku_inventory.bind(this);
 
         this.email = _email;
         this.pwd = _pwd;
@@ -412,6 +414,73 @@ class BrowserContext {
         .catch(err => {
             __callback(err);
         });
+    }
+
+    get_product_sku_inventory(product_url, product_id, __callback){
+
+        let cookies = this.__cookie_storage.get_cookie_data();
+
+        let _headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'cookie' : cookies,
+            'pragma': 'no-cache',
+            'referer': product_url,
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        }
+
+        let config = {
+            headers: _headers,
+            params: {
+                productId : product_id,
+                _ : new Date().getTime()
+            }
+        }
+
+        let product_sku_inventory_url =  BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory';
+
+        axios.get(product_sku_inventory_url, config)
+        .then(res => {
+
+            if(res.status != 200){
+                __callback('get_product_sku_inventory : response ' + res.status);
+                return;
+            }
+
+            res.headers['set-cookie'].forEach(cookie_data =>{
+                this.__cookie_storage.add_cookie_data(cookie_data);
+            });
+
+            if((res.data instanceof Object) == false){
+                __callback('get_product_sku_inventory : unexpected data : data is not object type');
+                return;
+            }
+
+            if(('usable' in res.data) == false){
+                __callback('get_product_sku_inventory : unexpected data : \'unable\' information is not exist.');
+                return;
+            }
+            
+            if(('skuPricing' in res.data) == false){
+                __callback('get_product_sku_inventory : unexpected data : \'skuPricing\' information is not exist.');
+                return;
+            }
+
+            __callback(undefined, res.data);
+        })
+        .catch(err => {
+            __callback(err);
+        });
+
     }
 }
 
