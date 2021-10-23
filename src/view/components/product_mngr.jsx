@@ -28,67 +28,41 @@ class ProductManager{
 
     constructor(){
 
-        this.__initProductInfo = this.__initProductInfo.bind(this);
-        this.__gen_product_info_obj = this.__gen_product_info_obj.bind(this);
+        this.updateProductInfo = this.updateProductInfo.bind(this);
         this.__poolProductInfo = this.__poolProductInfo.bind(this);
         this.getProductList = this.getProductList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
 
         this.__products = []
-        // {
-        //     product_name : '' // string
-        //     product_type : '' // drow, normal
-        //     category : '' // shoe , cloths
-        //     start_time : ''//date
-        //     end_time : '' //date
-        //     product_url : '' //string
-        //     product_img_url : '' // string
-        //     price : '' //string
-        //     size: [] // list of int
-        //     sold_out : false // boolean
-        //     id : uuidv4()
-        // }
 
-        
-        this.__initProductInfo();
+        this.updateProductInfo();
     }
 
     /**
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
-    __initProductInfo(){
-        window.electron.getProductList((product_list_info)=>{
+    updateProductInfo(__callback = undefined){
 
-            if(product_list_info.err != undefined){
-                Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+        window.electron.getProductList((error, product_info_list)=>{
+
+            if(error != undefined){
+                //Index.g_sys_msg_q.enqueue('Error', 'Cannot load product information.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                if(__callback != undefined) __callback('Cannot load product information.', undefined);
                 return;
             };
 
-            product_list_info.data.forEach((product) =>{
-                this.__products.push(this.__gen_product_info_obj(product.product_name, 
-                    product.product_alt_name, 
-                    product.product_img_url,
-                    product.product_url,
-                    product.product_type_text))
+            product_info_list.forEach((_product_info) =>{
+
+                let product_info = common.get_product_info_obj_scheme();
+                product_info = Object.assign(product_info, _product_info);
+                common.update_product_info_obj(product_info, '_id', common.uuidv4())
+                this.__products.push(product_info);
             });
 
-            Index.g_sys_msg_q.enqueue('Loading Product Information', 'Product information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(__callback != undefined) __callback(undefined, this.__products);
+
+            //Index.g_sys_msg_q.enqueue('Loading Product Information', 'Product information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
-    }
-
-    __gen_product_info_obj(_product_name, _product_alt_name, _product_img_url, _product_url, _type_text){
-
-        let product_obj = common.get_product_info_obj_scheme();
-        
-        common.update_product_info_obj(product_obj, 'name', _product_name);
-        common.update_product_info_obj(product_obj, 'alt_name', _product_alt_name);
-        common.update_product_info_obj(product_obj, 'img_url', _product_img_url);
-        common.update_product_info_obj(product_obj, 'url', _product_url);
-        common.update_product_info_obj(product_obj, 'type_text', _type_text);
-        common.update_product_info_obj(product_obj, 'type_text', _type_text);
-        common.update_product_info_obj(product_obj, '_id', common.uuidv4());
-
-        return product_obj;
     }
 
     getProductInfo(_id, __callback){
@@ -100,8 +74,8 @@ class ProductManager{
             return;
         }
 
-        window.electron.getProductInfo(product_obj.url, (product_info) =>{
-            __callback(product_info.err, product_info.data);
+        window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
+            __callback(error, product_info);
         });
     }
 

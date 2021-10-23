@@ -15,10 +15,10 @@
             alt_name : undefined,
             img_url : undefined,
             url : undefined,
-            type_text : undefined,
+            sell_type : undefined,
             category : undefined,
-            start_time : undefined,
-            end_time : undefined,
+            open_time : undefined,
+            close_time : undefined,
             price : undefined,
             size_list : [],
             sold_out : undefined,
@@ -39,6 +39,6 @@
     }
 
     exports.NIKE_URL = 'https://www.nike.com';
-    exports.RESERVED_IDENTIFIERS = {normal : 'buy', ftfs :'coming soon', draw : 'the draw'};
+    exports.PRODUCT_TYPE = {normal : 'buy', ftfs :'coming soon', draw : 'the draw'};
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

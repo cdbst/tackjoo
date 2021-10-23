@@ -1,8 +1,25 @@
-const NIKE_URL = 'https://www.nike.com';
-const RESERVED_IDENTIFIERS = {normal : 'buy', ftfs :'coming soon', draw : 'the draw'};
+const common = require('../common/common.js');
 
 function strip_usless_string(string){
     return string.replace(/(\t|\n)/gi, '').trim();
+}
+
+function get_product_type(product_type_string){
+
+    let product_type = undefined;
+
+    let text = strip_usless_string(product_type_string).toLowerCase();
+
+    if(text.includes(common.PRODUCT_TYPE.normal)){
+        product_type = common.PRODUCT_TYPE.normal;
+    }else if(text.includes(common.PRODUCT_TYPE.ftfs)){
+        product_type = common.PRODUCT_TYPE.ftfs;
+    }else if(text.includes(common.PRODUCT_TYPE.draw)){
+        product_type = common.PRODUCT_TYPE.draw;
+    }
+
+    return product_type;
+
 }
 
 function estimate_open_year(month){
@@ -30,7 +47,7 @@ let get_product_list_info_from_feed_page = ($) => {
 
         let product_alt_name = undefined;
         let product_name = undefined;
-        let product_type_text = undefined;
+        let sell_type_text = undefined;
         let product_url = undefined;
         let product_img_url = undefined;
         
@@ -41,50 +58,31 @@ let get_product_list_info_from_feed_page = ($) => {
                 product_img_url = maybe_meaningful_node.attribs['data-src'];
                 product_alt_name = maybe_meaningful_node.attribs.alt;
             }else if(maybe_meaningful_node.name == 'a' && has_class(maybe_meaningful_node, ['card-link'])){
-                product_url = NIKE_URL + maybe_meaningful_node.attribs.href;
+                product_url = common.NIKE_URL + maybe_meaningful_node.attribs.href;
                 product_name = maybe_meaningful_node.attribs.title;
             }else if(maybe_meaningful_node.name == 'a' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
-                product_type_text = maybe_meaningful_node.childNodes[0].data;
+                sell_type_text = maybe_meaningful_node.childNodes[0].data;
             }else if(maybe_meaningful_node.name == 'div' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
-                product_type_text = maybe_meaningful_node.childNodes[0].data;
+                sell_type_text = maybe_meaningful_node.childNodes[0].data;
             }
         }
         
-        if(product_type_text == undefined) return;
+        if(sell_type_text == undefined) return;
+        let sell_type = get_product_type(sell_type_text);
+        if(sell_type == undefined) return;
 
-        product_type_text = strip_usless_string(product_type_text)
+        let product_info = common.get_product_info_obj_scheme();
 
-        let result = is_valid_product(product_type_text);
-        if(result == false) return;
+        common.update_product_info_obj(product_info, 'name', product_name);
+        common.update_product_info_obj(product_info, 'alt_name', product_alt_name);
+        common.update_product_info_obj(product_info, 'sell_type', sell_type);
+        common.update_product_info_obj(product_info, 'url', product_url);
+        common.update_product_info_obj(product_info, 'img_url', product_img_url);
 
-        product_list.push({
-            product_name : product_name,
-            product_alt_name : product_alt_name,
-            product_type_text : product_type_text,
-            product_url : product_url,
-            product_img_url : product_img_url
-        });
+        product_list.push(product_info);
     });
 
     return product_list;
-}
-
-function is_valid_product(product_type_text){
-    let reserved_proudct_type_texts = { common : 'Buy',  fcfs : 'Coming Soon', draw : 'THE DRAW'};
-
-    if(product_type_text == reserved_proudct_type_texts.common){
-        return true;
-    }
-
-    if(product_type_text == reserved_proudct_type_texts.fcfs){
-        return true;
-    }
-
-    if(product_type_text.includes(reserved_proudct_type_texts.draw)){
-        return true;
-    }
-
-    return false;
 }
 
 function get_specific_tag_nodes (element, tags, class_names = [], data_attrs = {}) {
@@ -181,63 +179,49 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
 
 function get_product_info_from_product_page ($) {
 
-    let product_info = {
-        product_id : undefined,
-        sale_time: {
-            open : undefined,
-            close : undefined
-        },
-        soldout : undefined,
-        price : undefined
-    };
+    let _product_info = common.get_product_info_obj_scheme();
 
     if($('.product-soldout').length > 0){
-        product_info.soldout = true;
-        return product_info;
+        common.update_product_info_obj(_product_info, 'sold_out', true);
+        return _product_info;
     }else{
-        product_info.soldout = false;
+        common.update_product_info_obj(_product_info, 'sold_out', false);
     }
 
     //STEP-1 price info를 파싱한다.
     let price = parse_price_from_product_page($);
     if(price == undefined) return undefined;
-
-    product_info.price = price;
+    common.update_product_info_obj(_product_info, 'price', price);
 
     //STEP0 product id 를 파싱해야한다.
     let product_id = parse_product_id_from_product_page($);
     if(product_id == undefined) return undefined;
-
-    product_info.product_id = product_id;
+    common.update_product_info_obj(_product_info, 'product_id', product_id);
 
     //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
     let product_type = parse_product_type_from_product_page($);
 
-    if(product_type == undefined || product_type != RESERVED_IDENTIFIERS.normal){
+    if(product_type == undefined || product_type != common.PRODUCT_TYPE.normal){
         //TODO : STEP2 지금 당장 구매 불가능한 상품의 경우 제품의 판매 시작 시간, 판매 종료 시간을 취득한다.
 
-        if(product_type == RESERVED_IDENTIFIERS.draw){
+        if(product_type == common.PRODUCT_TYPE.draw){
             //TODO 작업 진행 상황
             let draw_time_info = parse_draw_time_from_product_page($);
             if(draw_time_info == undefined) return undefined;
 
-            product_info.sale_time.open = draw_time_info.open;
-            product_info.sale_time.close = draw_time_info.close;
+            common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
+            common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
 
-        }else if(product_type == RESERVED_IDENTIFIERS.ftfs){
+        }else if(product_type == common.PRODUCT_TYPE.ftfs){
             let open_time = parse_ftfs_time_from_product_page($);
 
             if(open_time == undefined) return undefined;
-
-            product_info.sale_time.open = open_time;
+            common.update_product_info_obj(_product_info, 'open_time', open_time);
         }
 
-        return product_info;
-    } else{
-        //TODO : STEP2 지금 당장 구매 가능한 상품의 경우 구매 가능한 사이즈를 찾는다. HTTP REQ (productSkuInventory)
     }
 
-    return product_info;
+    return _product_info;
 }
 
 function parse_price_from_product_page($){
@@ -388,12 +372,12 @@ function parse_product_type_from_product_page($){
     for(var i = 0; i < el_order_btn_text.length; i++){
         let text = strip_usless_string(el_order_btn_text[i].data).toLowerCase();
 
-        if(text.includes(RESERVED_IDENTIFIERS.normal)){
-            product_type = RESERVED_IDENTIFIERS.normal;
-        }else if(text.includes(RESERVED_IDENTIFIERS.ftfs)){
-            product_type = RESERVED_IDENTIFIERS.ftfs;
-        }else if(text.includes(RESERVED_IDENTIFIERS.draw)){
-            product_type = RESERVED_IDENTIFIERS.draw;
+        if(text.includes(common.PRODUCT_TYPE.normal)){
+            product_type = common.PRODUCT_TYPE.normal;
+        }else if(text.includes(common.PRODUCT_TYPE.ftfs)){
+            product_type = common.PRODUCT_TYPE.ftfs;
+        }else if(text.includes(common.PRODUCT_TYPE.draw)){
+            product_type = common.PRODUCT_TYPE.draw;
         }
 
         if(product_type != undefined) break;

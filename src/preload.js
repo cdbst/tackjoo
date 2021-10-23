@@ -154,7 +154,7 @@ function _getProductList(__callback){
     ipcRenderer.send('get-product-list', ipc_data);
 
     ipcRenderer.once('get-product-list-reply' + ipc_data.id, (event, product_list) => {
-        __callback(product_list);
+        __callback(product_list.err, product_list.data);
     });
 }
 
@@ -165,6 +165,6 @@ function _getProductInfo(_product_url, __callback){
     ipcRenderer.send('get-product-info', ipc_data);
 
     ipcRenderer.once('get-product-info-reply' + ipc_data.id, (event, product_info) => {
-        __callback(product_info);
+        __callback(product_info.err, product_info.data);
     });
 }

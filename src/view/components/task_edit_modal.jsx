@@ -50,8 +50,8 @@ class TaskEditModal extends React.Component {
         let product_types = [];
 
         this.products_list.forEach((product) => {
-            if(product_types.includes(product.type_text) == false){
-                product_types.push(product.type_text);
+            if(product_types.includes(product.sell_type) == false){
+                product_types.push(product.sell_type);
             }
         });
 
@@ -77,12 +77,14 @@ class TaskEditModal extends React.Component {
         this.selected_product_name = value;
         this.seledted_proudct_id = selected_key;
 
-        //TODO : Get Detail Product Info
+        //TODO : Get Detail Product Info and update modal ui
         Index.g_product_mngr.getProductInfo(this.seledted_proudct_id, (err, product_info) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
+
+            //TODO 
         });
 
         //Update product image
@@ -99,7 +101,7 @@ class TaskEditModal extends React.Component {
     onChangeType(value){
         
         this.filtered_product_list = this.products_list.filter((product) =>{
-            return product.type_text == value;
+            return product.sell_type == value;
         });
 
         let _product_names = this.filtered_product_list.map((filtered_product) => filtered_product.name + ' (' + filtered_product.alt_name + ')' );
