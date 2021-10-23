@@ -5,6 +5,21 @@ function strip_usless_string(string){
     return string.replace(/(\t|\n)/gi, '').trim();
 }
 
+function estimate_open_year(month){
+
+    //시작 date 정보에 year 정보가 없으므로 현재 날짜를 구해와서, open_month 가 현재 month보다 이전이면 open year을 내년으로 취급한다.
+    let today = new Date();
+    let cur_month = today.getMonth() + 1; //return range is (0 ~ 11)
+
+    let year = today.getFullYear()
+
+    if(month < cur_month){
+        year++;
+    }
+
+    return year;
+}
+
 let get_product_list_info_from_feed_page = ($) => {
 
     let product_list = [];
@@ -167,12 +182,33 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
 function get_product_info_from_product_page ($) {
 
     let product_info = {
-        product_id : undefined
+        product_id : undefined,
+        sale_time: {
+            open : undefined,
+            close : undefined
+        },
+        soldout : undefined,
+        price : undefined
     };
+
+    if($('.product-soldout').length > 0){
+        product_info.soldout = true;
+        return product_info;
+    }else{
+        product_info.soldout = false;
+    }
+
+    //STEP-1 price info를 파싱한다.
+    let price = parse_price_from_product_page($);
+    if(price == undefined) return undefined;
+
+    product_info.price = price;
 
     //STEP0 product id 를 파싱해야한다.
     let product_id = parse_product_id_from_product_page($);
     if(product_id == undefined) return undefined;
+
+    product_info.product_id = product_id;
 
     //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
     let product_type = parse_product_type_from_product_page($);
@@ -182,9 +218,18 @@ function get_product_info_from_product_page ($) {
 
         if(product_type == RESERVED_IDENTIFIERS.draw){
             //TODO 작업 진행 상황
-            parse_draw_time_from_product_page($);
-        }else if(product_type == RESERVED_IDENTIFIERS.ftfs){
+            let draw_time_info = parse_draw_time_from_product_page($);
+            if(draw_time_info == undefined) return undefined;
 
+            product_info.sale_time.open = draw_time_info.open;
+            product_info.sale_time.close = draw_time_info.close;
+
+        }else if(product_type == RESERVED_IDENTIFIERS.ftfs){
+            let open_time = parse_ftfs_time_from_product_page($);
+
+            if(open_time == undefined) return undefined;
+
+            product_info.sale_time.open = open_time;
         }
 
         return product_info;
@@ -195,14 +240,119 @@ function get_product_info_from_product_page ($) {
     return product_info;
 }
 
+function parse_price_from_product_page($){
+    try{
+        let el_price_info_div = $('div.headline-5.pb6-sm.fs14-sm.fs16-md');
+        if(el_price_info_div.length == undefined) return undefined;
+
+        let price_info_text = get_specific_child_text_nodes(el_price_info_div[0]);
+
+        if(price_info_text.length == 0) return undefined;
+
+        return price_info_text[0].data.trim();
+        
+    }catch(e){
+        return undefined;
+    }
+}
+
 function parse_draw_time_from_product_page($){
-    let el_p_draw_info = $('.draw-info');
-
-    if(el_p_draw_info.length == 0) return;
     
-    let text_draw_info = get_specific_child_text_nodes(el_p_draw_info[0]);
+    try{
 
-    console.log('test');
+        let el_p_draw_info = $('.draw-info');
+
+        if(el_p_draw_info.length == 0) return;
+        
+        let text_draw_info = get_specific_child_text_nodes(el_p_draw_info[0]);
+
+        if(text_draw_info.length == 0){
+            return;
+        }
+
+        let text_draw_time = text_draw_info[0].data;
+    
+        //do parsing (example data -> '10/25(월) 10:00 ~ 10:30 (30분)')
+        let text_draw_time_arr = text_draw_time.split(' ~ ');
+        let text_draw_time_before = text_draw_time_arr[0];
+        let text_draw_time_after = text_draw_time_arr[1];
+
+        let text_draw_time_before_arr = text_draw_time_before.split(' ');
+        let draw_date_info = text_draw_time_before_arr[0];
+        let draw_start_time = text_draw_time_before_arr[1].split(':');
+        let draw_start_hour = parseInt(draw_start_time[0]);
+        let draw_start_min = parseInt(draw_start_time[1]);
+
+        let draw_month = parseInt(draw_date_info.split('/')[0]);
+        let draw_date = parseInt(draw_date_info.split('/')[1].replace(/\(.*\)/gi, ''));
+
+        let text_draw_time_after_arr = text_draw_time_after.split(' ');
+        let draw_end_time = text_draw_time_after_arr[0].split(':');
+        let draw_end_hour = parseInt(draw_end_time[0]);
+        let draw_end_min = parseInt(draw_end_time[1]);
+
+        let draw_year = estimate_open_year(draw_month);
+
+        //new Date(년, 월, 일, 시, 분, 초, 밀리초)
+        let _draw_start_date = new Date(draw_year, draw_month, draw_date, draw_start_hour, draw_start_min, 0, 0);
+        let _draw_end_date = new Date(draw_year, draw_month, draw_date, draw_end_hour, draw_end_min, 0, 0);
+
+        return {
+            open : _draw_start_date,
+            close : _draw_end_date
+        }
+
+    }catch(e){
+        return undefined;
+    }
+}
+
+function parse_ftfs_time_from_product_page($){
+    try{
+        let el_div_open_time_info = $('.available-date-component');
+
+        if(el_div_open_time_info.length == 0) return undefined;
+
+        let el_open_time_text = get_specific_child_text_nodes(el_div_open_time_info[0]);
+
+        if(el_open_time_text.length == 0) return undefined;
+
+        let open_time_text = el_open_time_text[0].data;
+        let afternoon = undefined;
+
+        if(open_time_text.includes('오전')){
+            afternoon = false;
+        }else if(open_time_text.includes('오후')){
+            afternoon = true;
+        }else{
+            return undefined;
+        }
+
+        open_time_text = open_time_text.replace(/(\D)/gi, ' ');
+        open_time_text = open_time_text.replace(/(\s+)/gi, ' ');
+        let open_time_text_arr = open_time_text.split(' ');
+        open_time_text_arr.pop();
+        
+        let open_month = parseInt(open_time_text_arr[0]);
+        let open_date = parseInt(open_time_text_arr[1]);
+        let open_hour = parseInt(open_time_text_arr[2]) ;
+        let open_min = 0;
+        if(open_time_text_arr.length > 3){
+            open_min = parseInt(open_time_text_arr[3]);
+        }
+
+
+        open_hour = afternoon ? open_hour + 12 : open_hour;
+
+        //시작 date 정보에 year 정보가 없으므로 현재 날짜를 구해와서, open_month 가 현재 month보다 이전이면 open year을 내년으로 취급한다.
+        let open_year = estimate_open_year(open_month);
+
+        //new Date(년, 월, 일, 시, 분, 초, 밀리초)
+        return new Date(open_year, open_month, open_date, open_hour, open_min, 0, 0);
+
+    }catch(e){
+        return undefined;
+    }
 }
 
 function parse_product_id_from_product_page($){

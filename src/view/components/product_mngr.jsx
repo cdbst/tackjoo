@@ -89,7 +89,7 @@ class ProductManager{
             end_time : undefined,
             price : undefined,
             size_list : [],
-            is_sold_out : undefined,
+            sold_out : undefined,
             product_id : undefined,
             _id : uuidv4()
         }
