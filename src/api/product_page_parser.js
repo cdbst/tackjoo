@@ -4,21 +4,21 @@ function strip_usless_string(string){
     return string.replace(/(\t|\n)/gi, '').trim();
 }
 
-function get_product_type(product_type_string){
+function get_sell_type(sell_type_string){
 
-    let product_type = undefined;
+    let sell_type = undefined;
 
-    let text = strip_usless_string(product_type_string).toLowerCase();
+    let text = strip_usless_string(sell_type_string).toLowerCase();
 
-    if(text.includes(common.PRODUCT_TYPE.normal.toLowerCase())){
-        product_type = common.PRODUCT_TYPE.normal;
-    }else if(text.includes(common.PRODUCT_TYPE.ftfs.toLowerCase())){
-        product_type = common.PRODUCT_TYPE.ftfs;
-    }else if(text.includes(common.PRODUCT_TYPE.draw.toLowerCase())){
-        product_type = common.PRODUCT_TYPE.draw;
+    if(text.includes(common.SELL_TYPE.normal.toLowerCase())){
+        sell_type = common.SELL_TYPE.normal;
+    }else if(text.includes(common.SELL_TYPE.ftfs.toLowerCase())){
+        sell_type = common.SELL_TYPE.ftfs;
+    }else if(text.includes(common.SELL_TYPE.draw.toLowerCase())){
+        sell_type = common.SELL_TYPE.draw;
     }
 
-    return product_type;
+    return sell_type;
 
 }
 
@@ -68,7 +68,7 @@ let get_product_list_info_from_feed_page = ($) => {
         }
         
         if(sell_type_text == undefined) return;
-        let sell_type = get_product_type(sell_type_text);
+        let sell_type = get_sell_type(sell_type_text);
         if(sell_type == undefined) return;
 
         let product_info = common.get_product_info_obj_scheme();
@@ -199,26 +199,25 @@ function get_product_info_from_product_page ($) {
     common.update_product_info_obj(_product_info, 'product_id', product_id);
 
     //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
-    let product_type = parse_product_type_from_product_page($);
+    let sell_type = parse_sell_type_from_product_page($);
 
-    if(product_type == undefined || product_type != common.PRODUCT_TYPE.normal){
-        //TODO : STEP2 지금 당장 구매 불가능한 상품의 경우 제품의 판매 시작 시간, 판매 종료 시간을 취득한다.
+    if(sell_type == common.SELL_TYPE.draw){
+        let draw_time_info = parse_draw_time_from_product_page($);
+        if(draw_time_info == undefined) return undefined;
 
-        if(product_type == common.PRODUCT_TYPE.draw){
-            //TODO 작업 진행 상황
-            let draw_time_info = parse_draw_time_from_product_page($);
-            if(draw_time_info == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
+        common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
 
-            common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
-            common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
+    }else if(sell_type == common.SELL_TYPE.ftfs){
+        let open_time = parse_ftfs_time_from_product_page($);
 
-        }else if(product_type == common.PRODUCT_TYPE.ftfs){
-            let open_time = parse_ftfs_time_from_product_page($);
+        if(open_time == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'open_time', open_time);
+    }else if(sell_type = common.SELL_TYPE.normal){
 
-            if(open_time == undefined) return undefined;
-            common.update_product_info_obj(_product_info, 'open_time', open_time);
-        }
-
+    }else{
+        //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
+        return undefined;
     }
 
     return _product_info;
@@ -359,7 +358,7 @@ function parse_product_id_from_product_page($){
     return product_id;
 }
 
-function parse_product_type_from_product_page($){
+function parse_sell_type_from_product_page($){
 
     let el_order_btn = $('.draw-button');
     if(el_order_btn.length == 0) return undefined;
@@ -367,23 +366,15 @@ function parse_product_type_from_product_page($){
     let el_order_btn_text = get_specific_child_text_nodes(el_order_btn[0]);
     if(el_order_btn_text.length == 0) return undefined;
 
-    let product_type = undefined;
+    let sell_type = undefined;
 
     for(var i = 0; i < el_order_btn_text.length; i++){
-        let text = strip_usless_string(el_order_btn_text[i].data).toLowerCase();
-
-        if(text.includes(common.PRODUCT_TYPE.normal)){
-            product_type = common.PRODUCT_TYPE.normal;
-        }else if(text.includes(common.PRODUCT_TYPE.ftfs)){
-            product_type = common.PRODUCT_TYPE.ftfs;
-        }else if(text.includes(common.PRODUCT_TYPE.draw)){
-            product_type = common.PRODUCT_TYPE.draw;
-        }
-
-        if(product_type != undefined) break;
+        
+        let sell_type = get_sell_type(el_order_btn_text[i].data);
+        if(sell_type != undefined) break;
     }
 
-    return product_type;
+    return sell_type;
 }
 
 

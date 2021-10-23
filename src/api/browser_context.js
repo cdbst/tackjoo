@@ -366,9 +366,6 @@ class BrowserContext {
                 __callback('open_feed_page : cannot store informations');
                 return;
             }
-            
-            // TODO : 물품 리스트 파싱하는 모듈을 따로 파일로 분리하여 모듈화 하여 호출한다.
-            //let product_list = this.__get_product_list_from_feed_page($);
 
             let product_list = product_page_parser.get_product_list_info_from_feed_page($);
 

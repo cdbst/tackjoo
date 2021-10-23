@@ -192,7 +192,7 @@ class ContentsAccounts extends React.Component {
 
             let _account_table_list = this.getTableItems(_account_info);
             
-            this.setState(prevState => ({
+            this.setState(_ => ({
                 account_table_list : _account_table_list,
                 account_info : _account_info
             }));
