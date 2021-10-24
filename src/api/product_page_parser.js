@@ -211,7 +211,7 @@ function get_product_info_from_product_page ($) {
 
         //draw_id와 size_info_list 정보는 draw open 시간일 때만 확인이 가능함.
         let draw_id = parse_draw_id_from_from_product_page($);
-        common.update_product_info_obj(_product_info, 'close_time', draw_id);
+        common.update_product_info_obj(_product_info, 'draw_id', draw_id);
 
         let size_info_list = parse_draw_size_info_list_from_product_page($);
         common.update_product_info_obj(_product_info, 'size_info_list', size_info_list);
