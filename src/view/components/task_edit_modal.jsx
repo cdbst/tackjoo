@@ -12,13 +12,15 @@ class TaskEditModal extends React.Component {
 
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
+        this.getLoggedInAccountInfoList = this.getLoggedInAccountInfoList.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
 
         this.state = {
             filtered_product_info_list : this.product_info_list,
-            selected_product : undefined
+            selected_product : undefined,
+            logged_in_account_info_list : [],
         }
 
         this.ref_options_size = React.createRef();
@@ -36,12 +38,32 @@ class TaskEditModal extends React.Component {
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
     }
 
+    getLoggedInAccountInfoList(__callback){
+
+        window.electron.getLoggedInAccountInfoList((error, logged_in_account_info_list) =>{
+            if(error){
+                Index.g_sys_msg_q.enqueue('Error', 'Cannot gathering logged in account informations.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                __callback(error, undefined);
+                return;
+            }
+
+            if(logged_in_account_info_list.length == 0){
+                Index.g_sys_msg_q.enqueue('Warn', 'Logged in accounts are not exist.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            }
+
+            __callback(undefined, logged_in_account_info_list);
+        });
+    }
+
     onModalshown(e){
 
-        this.product_info_list = Index.g_product_mngr.getProductInfoList();
+        this.getLoggedInAccountInfoList((_error, _logged_in_account_info_list) =>{
 
-        this.setState({filtered_product_info_list : this.product_info_list}, () => {
-            this.onChangeType(this.ref_options_type.current.getSelectedOptionValue());
+            this.product_info_list = Index.g_product_mngr.getProductInfoList();
+
+            this.setState({filtered_product_info_list : this.product_info_list, logged_in_account_info_list : _logged_in_account_info_list}, () => {
+                this.onChangeType(this.ref_options_type.current.getSelectedOptionValue());
+            });
         });
     }
 
@@ -122,6 +144,9 @@ class TaskEditModal extends React.Component {
 
         let size_list = Index.g_product_mngr.getProductSizeList(this.state.selected_product);
 
+        let logged_in_account_email_list = this.state.logged_in_account_info_list.map((account_info) => account_info.email);
+        let logged_in_account_id_list = this.state.logged_in_account_info_list.map((account_info) => account_info._id);
+
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
@@ -149,7 +174,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem label="Account" options={[]} h_on_change={this.onChangeProduct.bind(this)}/>
+                                    <TaskEditModalSelectItem label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
                                 </div>
                             </div>
                         </div>

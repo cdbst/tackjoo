@@ -8,6 +8,21 @@ const IpcMainSensor = require('./ipc_main_sensor');
 
 function register(){
 
+    ipcMain.on('get-logged-in-account-info-list', (event, data) => {
+
+        try{
+            let logged_in_browser_contexts = UserBrowserCxtMngr.get_all_logged_in_browser_contexts();
+            let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
+            event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
+        }catch(e){
+            event.reply('get-logged-in-account-info-list-reply' + data.id, {err : e, data : undefined});
+        }
+        
+
+        // event.reply('get-logged-in-account-info-list-reply' + data.id, {err : _err, data : _data});
+        
+    });
+
     ipcMain.on('add-account', (event, data) => {
 
         let account_info = data.payload;

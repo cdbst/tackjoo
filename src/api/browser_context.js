@@ -29,6 +29,7 @@ class BrowserContext {
         this.open_feed_page = this.open_feed_page.bind(this);
         this.open_product_page = this.open_product_page.bind(this);
         this.get_product_sku_inventory = this.get_product_sku_inventory.bind(this);
+        this.get_account_info = this.get_account_info.bind(this);
 
         this.email = _email;
         this.pwd = _pwd;
@@ -41,6 +42,14 @@ class BrowserContext {
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
+    }
+
+    get_account_info(){
+        return {
+            email : this.email,
+            pwd : this.pwd,
+            _id : this.id
+        }
     }
 
     is_anonymous(){

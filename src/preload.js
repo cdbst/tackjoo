@@ -20,7 +20,8 @@ contextBridge.exposeInMainWorld('electron', {
     getAccountInfo : _getAccountInfo,
     register_get_sensor_data : _register_get_sensor_data,
     getProductInfoList : _getProductInfoList,
-    getProductInfo : _getProductInfo
+    getProductInfo : _getProductInfo,
+    getLoggedInAccountInfoList : _getLoggedInAccountInfoList
 });
 
 let get_sensor_data = undefined;
@@ -166,5 +167,16 @@ function _getProductInfo(_product_url, __callback){
 
     ipcRenderer.once('get-product-info-reply' + ipc_data.id, (event, product_info) => {
         __callback(product_info.err, product_info.data);
+    });
+}
+
+function _getLoggedInAccountInfoList(__callback){
+
+    let ipc_data = get_ipc_data();
+
+    ipcRenderer.send('get-logged-in-account-info-list', ipc_data);
+
+    ipcRenderer.once('get-logged-in-account-info-list-reply' + ipc_data.id, (event, logged_in_account_info_list) => {
+        __callback(logged_in_account_info_list.err, logged_in_account_info_list.data);
     });
 }

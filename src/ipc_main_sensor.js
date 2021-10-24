@@ -11,7 +11,7 @@ function register(_win){
         
         let sensor_data = data.payload.sensor_data;
 
-        let browser_context_list = UserBrowserCxtMngr.get_all_browser_context();
+        let browser_context_list = UserBrowserCxtMngr.get_all_browser_contexts();
 
         browser_context_list.forEach((browser_context) =>{
             browser_context.send_sensor_data(sensor_data, (err)=>{

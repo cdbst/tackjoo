@@ -6,7 +6,8 @@ class BrowserContextManager{
         this.remove = this.remove.bind(this);
         this.get = this.get.bind(this);
         this.get_file_data = this.get_file_data.bind(this);
-        this.get_all_browser_context = this.get_all_browser_context.bind(this);
+        this.get_all_browser_contexts = this.get_all_browser_contexts.bind(this);
+        this.get_all_logged_in_browser_contexts = this.get_all_logged_in_browser_contexts.bind(this);
 
         this._browser_contexts_dict = {};
     }
@@ -28,7 +29,7 @@ class BrowserContextManager{
         return this._browser_contexts_dict[_id];
     }
 
-    get_all_browser_context(){
+    get_all_browser_contexts(){
 
         let borwser_context_list = [];
 
@@ -36,6 +37,12 @@ class BrowserContextManager{
             borwser_context_list.push(this._browser_contexts_dict[key]);
         }
         return borwser_context_list;
+    }
+
+    get_all_logged_in_browser_contexts(){
+        let borwser_context_list = this.get_all_browser_contexts();
+
+        return borwser_context_list.filter((borwser_context) => {return borwser_context.is_login});
     }
 
     get_file_data(){
