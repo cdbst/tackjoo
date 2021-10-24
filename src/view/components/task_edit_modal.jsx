@@ -14,11 +14,16 @@ class TaskEditModal extends React.Component {
         this.onChangeProduct = this.onChangeProduct.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
+        this.selected_product_size = undefined;
 
         this.state = {
             filtered_product_info_list : this.product_info_list,
             selected_product : undefined
         }
+
+        this.ref_options_size = React.createRef();
+        this.ref_options_type = React.createRef();
+        this.ref_options_product = React.createRef();
     }
 
     componentDidMount(){
@@ -36,8 +41,7 @@ class TaskEditModal extends React.Component {
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
 
         this.setState({filtered_product_info_list : this.product_info_list}, () => {
-            let sell_types = Index.g_product_mngr.getValueList(this.product_info_list, 'sell_type', false);
-            this.onChangeType(sell_types[0]);
+            this.onChangeType(this.ref_options_type.current.getSelectedOptionValue());
         });
     }
 
@@ -47,6 +51,7 @@ class TaskEditModal extends React.Component {
 
         // el_pwd_inpt.value = '';
         // el_email_input.value = '';
+        
     }
 
     onChangeProduct(selected_key){
@@ -68,10 +73,13 @@ class TaskEditModal extends React.Component {
 
             }
 
+            if(product_info.size_info_list.length == 0){
+                Index.g_sys_msg_q.enqueue('Warning', 'This product has no size information yet. So, Task will buy similar size that you select.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 7000);
+            }
+            
             //TODO
-            console.log(product_info);
             this.setState(_ => ({
-                selected_product : selected_product
+                selected_product : product_info
             }));
         });
 
@@ -83,12 +91,8 @@ class TaskEditModal extends React.Component {
             return product.sell_type == value;
         });
 
-        let _product_ids = Index.g_product_mngr.getValueList(_filtered_product_info_list, '_id');
-
         this.setState({filtered_product_info_list : _filtered_product_info_list}, () => {
-            if(_product_ids.length > 0){
-                this.onChangeProduct(_product_ids[0]);
-            }
+            this.onChangeProduct(this.ref_options_product.current.getSelectedOptionKey());
         });
     }
 
@@ -116,6 +120,8 @@ class TaskEditModal extends React.Component {
         let product_img_url = this.state.selected_product == undefined ? './res/img/exclamation-diamond.svg' : this.state.selected_product.img_url;
         let product_desc_name = this.state.selected_product == undefined ? '' : Index.g_product_mngr.getProductDescName(this.state.selected_product);
 
+        let size_list = Index.g_product_mngr.getProductSizeList(this.state.selected_product);
+
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
@@ -132,13 +138,20 @@ class TaskEditModal extends React.Component {
                             </div>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
+                                    <TaskEditModalSelectItem ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
+                                    <TaskEditModalSelectItem ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
-                            
+                            <div className="mb-12 row">
+                                <div className="col-md-6">
+                                    <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
+                                </div>
+                                <div className="col-md-6">
+                                    <TaskEditModalSelectItem label="Account" options={[]} h_on_change={this.onChangeProduct.bind(this)}/>
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
@@ -158,6 +171,11 @@ class TaskEditModalSelectItem extends React.Component {
         this.onChangeOption = this.onChangeOption.bind(this);
         this.getOptionItems = this.getOptionItems.bind(this);
 
+        this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
+        this.getSelectedOptionKey = this.getSelectedOptionKey.bind(this);
+
+
+        this.ref_options = React.createRef();
     }
 
     getOptionItems(items, keys = undefined){
@@ -178,11 +196,25 @@ class TaskEditModalSelectItem extends React.Component {
     }
 
     onChangeOption(e){
+
         const selected_idx = e.target.options.selectedIndex;
         const selected_key = e.target.options[selected_idx].getAttribute('data-key');
         
         let data_to_pass = this.props.option_keys == undefined ? e.target.value : selected_key;
-        this.props.h_on_change(data_to_pass);
+
+        if(this.props.h_on_change != undefined) this.props.h_on_change(data_to_pass);
+    }
+
+    getSelectedOptionKey(){
+
+        if(this.props.option_keys == undefined) return undefined;
+
+        let selected_idx = this.ref_options.current.selectedIndex;
+        return this.props.option_keys[selected_idx];
+    }
+
+    getSelectedOptionValue(){
+        return this.ref_options.current.value;
     }
 
     render(){
@@ -194,7 +226,7 @@ class TaskEditModalSelectItem extends React.Component {
                     <label className="col-sm-2 col-form-label text-white font-weight-bold">{this.props.label}</label>
                 </div>
                 <div className="col-md-9">
-                    <select className="form-select modal-select" aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
+                    <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
                         {option_items}
                     </select>
                 </div>

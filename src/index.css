@@ -161,6 +161,9 @@ tbody tr:hover td {
 
 
 /* Start to toast */
+.toast-container{
+    z-index: 7000 !important;
+}
 .toast{
     background-color: white !important;
 }

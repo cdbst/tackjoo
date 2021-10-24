@@ -53,7 +53,7 @@ class Toast extends React.Component {
 
     render() {
         return (
-            <div aria-live="polite" aria-atomic="true" className="position-relative" style={{zIndex: 50}}>
+            <div aria-live="polite" aria-atomic="true" className="position-relative" >
                 <div className="toast-container position-absolute top-0 end-0 p-3">
                     {this.state.toast_items}
                 </div>

@@ -38,6 +38,9 @@ class ProductManager{
         this.getProductDescNameList = this.getProductDescNameList.bind(this);
         this.getValueList = this.getValueList.bind(this);
 
+        this.getProductSizeList =this.getProductSizeList.bind(this);
+        this.__getDefaultSizeNameList = this.__getDefaultSizeNameList.bind(this);
+
         this.__product_info_list = [];
 
         this.loadProductInfoList();
@@ -119,4 +122,29 @@ class ProductManager{
         return [...new Set(value_list)];
     }
 
+    getProductSizeList(product_info){
+
+        let size_list = undefined;
+
+        if(product_info != undefined && product_info.size_info_list.length > 0){
+            size_list = product_info['size_info_list'].filter((size_info) => {return size_info.quantity > 0}).map((size_info) => size_info.name);
+        }else if(product_info != undefined){
+            size_list = this.__getDefaultSizeNameList();
+        }else{
+            size_list = [];
+        }
+
+        return size_list
+    }
+
+    __getDefaultSizeNameList(){
+        const size_num = 20;
+        const base_size = 200;
+        let size_names = [];
+
+        for(var i = 0; i < size_num; i++){
+            size_names.push((base_size + i * 5).toString());
+        }
+        return size_names;
+    }
 }
