@@ -63,16 +63,18 @@ class TaskEditModal extends React.Component {
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
+                
+            }else{
+
             }
-            
+
             //TODO
-            // console.log(product_info);
+            console.log(product_info);
+            this.setState(_ => ({
+                selected_product : selected_product
+            }));
         });
 
-        this.setState(_ => ({
-            selected_product : selected_product
-        }));
     }
 
     onChangeType(value){
@@ -142,7 +144,7 @@ class TaskEditModal extends React.Component {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id={this.props.id + '-label'}>Edit Task</h5>
+                            <h5 className="modal-title" id={this.props.id + '-label'}>{product_desc_name}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -159,6 +161,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
+                            
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
