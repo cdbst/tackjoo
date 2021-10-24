@@ -28,21 +28,25 @@ class ProductManager{
 
     constructor(){
 
-        this.getProductInfoList = this.getProductInfoList.bind(this);
+        this.loadProductInfoList = this.loadProductInfoList.bind(this);
         this.__poolProductInfo = this.__poolProductInfo.bind(this);
-        this.getProductList = this.getProductList.bind(this);
+        this.getProductInfoList = this.getProductInfoList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
         this.__updateProductInfo = this.__updateProductInfo.bind(this);
 
+        this.getProductDescName = this.getProductDescName.bind(this);
+        this.getProductDescNameList = this.getProductDescNameList.bind(this);
+        this.getValueList = this.getValueList.bind(this);
+
         this.__product_info_list = [];
 
-        this.getProductInfoList();
+        this.loadProductInfoList();
     }
 
     /**
      * 'feed' page(https://www.nike.com/kr/launch/)에서 제품 정보를 가져옵니다.
      */
-    getProductInfoList(__callback = undefined){
+    loadProductInfoList(__callback = undefined){
 
         window.electron.getProductInfoList((error, product_info_list)=>{
 
@@ -97,8 +101,22 @@ class ProductManager{
 
     }
 
-    getProductList(){
+    getProductInfoList(){
         return this.__product_info_list;
+    }
+
+    getProductDescName(product_info){
+        return product_info.name + ' (' + product_info.alt_name + ')';
+    }
+
+    getProductDescNameList(product_info_list){
+        return product_info_list.map((product_info) => this.getProductDescName(product_info) );
+    }
+
+    getValueList(product_info_list, attr_name, duplicate = true){
+        let value_list = product_info_list.map((product_info) => product_info[attr_name]);
+        if(duplicate) return value_list;
+        return [...new Set(value_list)];
     }
 
 }

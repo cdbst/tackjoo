@@ -13,12 +13,7 @@ class TaskEditModal extends React.Component {
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
 
-        this.getProductNameList = this.getProductNameList.bind(this);    
-        this.getProductIDList = this.getProductIDList.bind(this);
-        this.getSellTypeList = this.getSellTypeList.bind(this);
-        this.getProductDescName = this.getProductDescName.bind(this);
-
-        this.product_info_list = Index.g_product_mngr.getProductList();
+        this.product_info_list = Index.g_product_mngr.getProductInfoList();
 
         this.state = {
             filtered_product_info_list : this.product_info_list,
@@ -38,10 +33,10 @@ class TaskEditModal extends React.Component {
 
     onModalshown(e){
 
-        this.product_info_list = Index.g_product_mngr.getProductList();
+        this.product_info_list = Index.g_product_mngr.getProductInfoList();
 
         this.setState({filtered_product_info_list : this.product_info_list}, () => {
-            let sell_types = this.getSellTypeList(this.product_info_list);
+            let sell_types = Index.g_product_mngr.getValueList(this.product_info_list, 'sell_type', false);
             this.onChangeType(sell_types[0]);
         });
     }
@@ -58,6 +53,11 @@ class TaskEditModal extends React.Component {
 
         //Update product image
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
+
+        if(selected_product == undefined){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot found product info.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
 
         //TODO : Get Detail Product Info and update modal ui
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
@@ -83,36 +83,13 @@ class TaskEditModal extends React.Component {
             return product.sell_type == value;
         });
 
-        let _product_ids = this.getProductIDList(_filtered_product_info_list);
+        let _product_ids = Index.g_product_mngr.getValueList(_filtered_product_info_list, '_id');
 
         this.setState({filtered_product_info_list : _filtered_product_info_list}, () => {
             if(_product_ids.length > 0){
                 this.onChangeProduct(_product_ids[0]);
             }
         });
-    }
-
-    getProductDescName(product_info){
-        return product_info.name + ' (' + product_info.alt_name + ')';
-    }
-
-    getProductNameList(product_info_list){
-        return product_info_list.map((product_info) => this.getProductDescName(product_info) );
-    }
-
-    getProductIDList(product_info_list){
-        return product_info_list.map((product_info) => product_info._id);
-    }
-
-    getSellTypeList(product_info_list){
-        let product_types = [];
-
-        product_info_list.forEach((product) => {
-            if(product_types.includes(product.sell_type) == false){
-                product_types.push(product.sell_type);
-            }
-        });
-        return product_types;
     }
 
     onSubmitTaskInfo(e){
@@ -132,12 +109,12 @@ class TaskEditModal extends React.Component {
 
     render(){
 
-        let sell_type_list = this.getSellTypeList(this.product_info_list);
-        let product_name_list = this.getProductNameList(this.state.filtered_product_info_list);
-        let product_id_list = this.getProductIDList(this.state.filtered_product_info_list);
+        let sell_type_list = Index.g_product_mngr.getValueList(this.product_info_list, 'sell_type', false);
+        let product_name_list = Index.g_product_mngr.getProductDescNameList(this.state.filtered_product_info_list);
+        let product_id_list = Index.g_product_mngr.getValueList(this.state.filtered_product_info_list, '_id');
 
         let product_img_url = this.state.selected_product == undefined ? './res/img/exclamation-diamond.svg' : this.state.selected_product.img_url;
-        let product_desc_name = this.state.selected_product == undefined ? '' : this.getProductDescName(this.state.selected_product);
+        let product_desc_name = this.state.selected_product == undefined ? '' : Index.g_product_mngr.getProductDescName(this.state.selected_product);
 
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
