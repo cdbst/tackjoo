@@ -26,7 +26,9 @@
             price : undefined,
             quantity : undefined,
             id : undefined,
-            external_id : undefined
+            external_id : undefined,
+            draw_product_xref : undefined,
+            draw_sku_xref : undefined,
         }
     }
 
@@ -54,6 +56,7 @@
             size_info_list : [],
             soldout : undefined,
             product_id : undefined,
+            draw_id : undefined,
             _id : undefined
         };
     }

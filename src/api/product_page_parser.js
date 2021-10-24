@@ -188,17 +188,17 @@ function get_product_info_from_product_page ($) {
         common.update_product_info_obj(_product_info, 'soldout', false);
     }
 
-    //STEP-1 price info를 파싱한다.
+    
     let price = parse_price_from_product_page($);
     if(price == undefined) return undefined;
     common.update_product_info_obj(_product_info, 'price', price);
 
-    //STEP0 product id 를 파싱해야한다.
+    
     let product_id = parse_product_id_from_product_page($);
     if(product_id == undefined) return undefined;
     common.update_product_info_obj(_product_info, 'product_id', product_id);
 
-    //STEP1 버튼 상태를 보고 이 상품 페이지가 DRAW인지 선착순인지 일반 구매 상품인지 구별한다.
+    
     let sell_type = parse_sell_type_from_product_page($);
     common.update_product_info_obj(_product_info, 'sell_type', sell_type);
 
@@ -209,15 +209,21 @@ function get_product_info_from_product_page ($) {
         common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
         common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
 
+        //draw_id와 size_info_list 정보는 draw open 시간일 때만 확인이 가능함.
+        let draw_id = parse_draw_id_from_from_product_page($);
+        common.update_product_info_obj(_product_info, 'close_time', draw_id);
+
+        let size_info_list = parse_draw_size_info_list_from_product_page($);
+        common.update_product_info_obj(_product_info, 'size_info_list', size_info_list);
+
     }else if(sell_type == common.SELL_TYPE.ftfs){
         let open_time = parse_ftfs_time_from_product_page($);
 
         if(open_time == undefined) return undefined;
         common.update_product_info_obj(_product_info, 'open_time', open_time);
-    }else if(sell_type = common.SELL_TYPE.normal){
-        
-        parse_product_options_from_product_page($);
 
+    }else if(sell_type = common.SELL_TYPE.normal){
+    
     }else{
         //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
         return undefined;
@@ -380,8 +386,59 @@ function parse_sell_type_from_product_page($){
     return sell_type;
 }
 
-function parse_product_options_from_product_page($){
+function parse_draw_size_info_list_from_product_page($){
+    
+    let size_info_list = [];
+    
+    try{
 
+        let el_option_list_draw_product = $('*[data-theDrawProductXref]');
+        if(el_option_list_draw_product.length == 0) return undefined;
+
+        el_option_list_draw_product.each((idx, el_option) =>{
+
+            if(('data-externalid' in el_option.attribs) == false) return;
+
+            let data_external_id_array = el_option.attribs['data-externalid'].split('  ');
+            
+            if(data_external_id_array.length != 2) return;
+
+            let external_id = data_external_id_array[0];
+
+            let sku_id = el_option.attribs['data-skuid'];
+            if(sku_id == undefined) return;
+
+            let the_draw_product_xref = el_option.attribs['data-thedrawproductxref'];
+            if(the_draw_product_xref == undefined) return;
+
+            let the_draw_sku_xref = el_option.attribs['data-thedrawskuxref'];
+            if(the_draw_sku_xref == undefined) return;
+
+            let size_name = el_option.attribs['data-value'];
+            if(size_name == undefined) return;
+
+            let size_info_obj = common.get_size_info_obj_scheme();
+            common.update_size_info_obj(size_info_obj, 'name', size_name);
+            common.update_size_info_obj(size_info_obj, 'sku_id', sku_id);
+            common.update_size_info_obj(size_info_obj, 'external_id', external_id);
+            common.update_size_info_obj(size_info_obj, 'draw_product_xref', the_draw_product_xref);
+            common.update_size_info_obj(size_info_obj, 'draw_sku_xref', the_draw_sku_xref);
+
+            size_info_list.push(size_info_obj);
+        });
+
+        return size_info_list;
+        
+    }catch(e){
+        return size_info_list;
+    }
+    
+}
+
+function parse_draw_id_from_from_product_page($){
+    let el_option_list_draw_product = $('*[data-thedrawid]');
+    if(el_option_list_draw_product.length == 0) return undefined;
+    return el_option_list_draw_product[0].attribs['data-thedrawid'];
 }
 
 function update_product_info_as_sku_inventory_info(product_info, sku_inventory_info){
