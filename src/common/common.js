@@ -70,22 +70,25 @@
         return product_info_obj;
     }
 
-    exports.get_formatted_date_str = function(date){
+    exports.paded_time_str = function(val){
+        return val < 10 ? '0' + val.toString() : val.toString()
+    }
+
+    exports.get_formatted_date_str = function(date, with_time = false){
 
         if(date == undefined) return '';
 
-        let paded_str = (val) =>{
-            return val < 10 ? '0' + val.toString() : val.toString()
-        }
+        var year = date.getFullYear().toString();
+        var month = this.paded_time_str(date.getMonth() + 1);
+        var day = this.paded_time_str(date.getDate());
 
-        var year = (date.getFullYear() % 100).toString();
-        var month = paded_str(date.getMonth() + 1);
-        var day = paded_str(date.getDate());
-        var hour = paded_str(date.getHours());
-        var min = paded_str(date.getMinutes());
-        var seconds = paded_str(date.getSeconds());
+        if(with_time == false) return [year, month, day].join('-');
 
-        return [year, month, day].join('.') + ' ' + [hour, min, seconds].join(':');
+        var hour = this.paded_time_str(date.getHours());
+        var min = this.paded_time_str(date.getMinutes());
+        var seconds = this.paded_time_str(date.getSeconds());
+
+        return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
     }
 
 

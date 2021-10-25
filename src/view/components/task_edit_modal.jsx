@@ -2,6 +2,7 @@ class TaskEditModal extends React.Component {
 
     EL_ID_MODAL_SELECT_TYPE = 'edit-task-type-select';
     EL_ID_MODAL_SELECT_PRODUCT = 'edit-task-product-select';
+    EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input"
 
     constructor(props) {
         super(props);
@@ -36,6 +37,16 @@ class TaskEditModal extends React.Component {
 
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
+
+        
+        let el_schedule_time_input = document.getElementById(this.EL_ID_MODAL_INPUT_SCHDULE_TIME);
+        this.schedule_time_input_instance = flatpickr(el_schedule_time_input, {
+            enableTime: true,
+            time_24hr: true,
+            enableSeconds: true,
+            minuteIncrement : 5,
+            dateFormat: "Y-m-d H:i:S"
+        });
     }
 
     getLoggedInAccountInfoList(__callback){
@@ -148,10 +159,14 @@ class TaskEditModal extends React.Component {
         let logged_in_account_id_list = this.state.logged_in_account_info_list.map((account_info) => account_info._id);
 
         
-        let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time);
-        let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time);
+        let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
+        let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time, true);
 
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
+
+        if(open_time_str != ''){
+            this.schedule_time_input_instance.setDate(open_time_str, false);
+        }
 
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -185,24 +200,34 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <hr/>
-                            {product_sell_type != common.SELL_TYPE.normal &&
-                                <div className="mb-12 row">
-                                    <div className="col-md-2">
-                                        <label className="task-eidt-modal-option-label">Open</label>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
-                                    </div>
-                                    <div className="col-md-2 ">
-                                        <label className="task-eidt-modal-option-label">Close</label> 
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
-                                    </div>
-                                </div>
-                            }
                             
-
+                            {product_sell_type != common.SELL_TYPE.normal &&
+                                <div>
+                                    <div className="mb-12 row">
+                                        <div className="col-md-2">
+                                            <label className="task-eidt-modal-option-label">Open</label>
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
+                                        </div>
+                                        <div className="col-md-2 ">
+                                            <label className="task-eidt-modal-option-label">Close</label> 
+                                        </div>
+                                        <div className="col-md-4">
+                                            <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                    <div className="mb-12 row">
+                                        <div className="col-md-2">
+                                            <label className="task-eidt-modal-option-label">Schedule</label>
+                                        </div>
+                                        <div className="col-md-10">
+                                            <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
+                                        </div>
+                                    </div>
+                                </div>   
+                            }
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
