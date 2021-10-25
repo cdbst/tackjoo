@@ -17,10 +17,6 @@ function register(){
         }catch(e){
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : e, data : undefined});
         }
-        
-
-        // event.reply('get-logged-in-account-info-list-reply' + data.id, {err : _err, data : _data});
-        
     });
 
     ipcMain.on('add-account', (event, data) => {

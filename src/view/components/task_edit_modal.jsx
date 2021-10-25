@@ -90,10 +90,10 @@ class TaskEditModal extends React.Component {
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                
-            }else{
-
+                return;
             }
+
+            //TODO : Normal product type임에도 불구하고 size_info_list를 취득하지 못한 경우 어떻게 처리할 것인가?
 
             if(product_info.size_info_list.length == 0){
                 Index.g_sys_msg_q.enqueue('Warning', 'This product has no size information yet. So, Task will buy similar size that you select.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 7000);
@@ -147,6 +147,12 @@ class TaskEditModal extends React.Component {
         let logged_in_account_email_list = this.state.logged_in_account_info_list.map((account_info) => account_info.email);
         let logged_in_account_id_list = this.state.logged_in_account_info_list.map((account_info) => account_info._id);
 
+        
+        let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time);
+        let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time);
+
+        let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
+
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
@@ -169,6 +175,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
+                            <hr/>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
                                     <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
@@ -177,6 +184,25 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
                                 </div>
                             </div>
+                            <hr/>
+                            {product_sell_type != common.SELL_TYPE.normal &&
+                                <div className="mb-12 row">
+                                    <div className="col-md-2">
+                                        <label className="task-eidt-modal-option-label">Open</label>
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
+                                    </div>
+                                    <div className="col-md-2 ">
+                                        <label className="task-eidt-modal-option-label">Close</label> 
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
+                                    </div>
+                                </div>
+                            }
+                            
+
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
@@ -247,8 +273,8 @@ class TaskEditModalSelectItem extends React.Component {
 
         return(
             <div className="row">
-                <div className="col-md-3 text-left">
-                    <label className="col-sm-2 col-form-label text-white font-weight-bold">{this.props.label}</label>
+                <div className="col-md-3 text-left task-eidt-modal-option-label">
+                    <label className="col-sm-2 col-form-label font-weight-bold task-eidt-modal-option-label">{this.props.label}</label>
                 </div>
                 <div className="col-md-9">
                     <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>

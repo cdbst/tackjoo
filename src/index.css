@@ -196,5 +196,9 @@ tbody tr:hover td {
     height: 300px !important;
 }
 
+.task-eidt-modal-option-label{
+    color: #ffc107 !important;
+}
+
 
 /* End to Task Edit Modal */

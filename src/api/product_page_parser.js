@@ -448,7 +448,7 @@ function update_product_info_as_sku_inventory_info(product_info, sku_inventory_i
     let _size_info_list = [];
     
     sku_inventory_info.skuPricing.forEach((size_info) =>{
-        console.log(size_info);
+        
         let size_info_obj = common.get_size_info_obj_scheme();
 
         let external_id_array = size_info['externalId'].split('  ');

@@ -32,8 +32,8 @@ function register(){
                 browser_cxt.get_product_sku_inventory(product_url, product_info.product_id, (_err, sku_inventory_info) => {
 
                     if(_err){
-                        event.reply('get-product-info-reply' + data.id, {err : _err, data : product_info});
-                        return;     
+                        event.reply('get-product-info-reply' + data.id, {err : _err, data : undefined});
+                        return;
                     }
 
                     product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
