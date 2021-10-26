@@ -21,29 +21,55 @@ class ContentsTasks extends React.Component {
         super(props);
 
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
-
+        this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.tasks = [];
-
-        this.task_edit_modal_id = 'edit-task-modal'
-
-    }
-
-    componentDidMount(){
+        this.task_edit_modal_id = 'edit-task-modal';
 
     }
 
     onClickBtnNewTask(){
-
         let el_modal = document.getElementById(this.task_edit_modal_id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
+    }
+
+    onCreateNewTask(product_info, size_name, account_id, schedule_date){
+        console.log(arguments);
+
+        //1. TODO 스케쥴 time이 현재 시간보다 과거 시간이면 즉시 실행한다.
+        //2. TODO 스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
+
+        //3. TODO 아직 size 정보가 없는 product_info라면 open 이후에 size 정보를 취득할 수 있으므로,
+        //open시 공개되는 size 정보와 가장 유사한 size로 구매 또는 DRAW를 신청하도록 한다.
+
+        //4. TODO 파라메터 account_id에 해당하는 browser context를 취득하여 해당 browser context에서 구매 또는 응모를 시도해야한다.
+        //그리고, login이 계속 유지 중인지 아닌지 판단할 수 있는 로직도 필요시 구현해야 한다.
+        //만약 로그인 세션이 만료가 됐다면, task 수행 과정에서 다시 login을 시도하는 로직의 구현이 필요할 수 있다.
+
+        //4-1. TODO TASK table item 추가/제거/관리 코드 작성, 사용자 TASK UI 관련 코드 작성 등.
+        
+
+        //5. TODO task object 프로토타입
+        // {
+        //     product_info : product_info // product info object
+        //     size_name : size_name // 구매 시도할 size name
+        //     account_id : account_id // 구매 시도할 account id(browser context id)
+        //     schedule_date : schedule_date // Date Object 구매 시도할 date object
+        //     task_cond : TYPE_OF_TASK_COND // 테스크의 현재 진행 상태
+        // }
+
+        //6. TODO TYPE_OF_TASK_COND 프로토타입
+        // ready, stop, on product page, on cart page, ready to pay, complete
+        // draw일경우 이미 신청된 것이라면 complete 바로 표시.
+        // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
+
     }
 
     render() {
 
         return (
             <div className="container-fluid">
-                <TaskEditModal id={this.task_edit_modal_id}/>
+                <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
                 <br/>
                 <div className="row">
                     <div className="col">

@@ -27,7 +27,9 @@ class TaskEditModal extends React.Component {
         this.ref_options_size = React.createRef();
         this.ref_options_type = React.createRef();
         this.ref_options_product = React.createRef();
+        this.ref_options_account = React.createRef();
 
+        this.schedule_time_input_instance = undefined;
     }
 
     componentDidMount(){
@@ -39,7 +41,6 @@ class TaskEditModal extends React.Component {
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
 
-        
         let el_schedule_time_input = document.getElementById(this.EL_ID_MODAL_INPUT_SCHDULE_TIME);
         this.schedule_time_input_instance = flatpickr(el_schedule_time_input, {
             enableTime: true,
@@ -63,12 +64,6 @@ class TaskEditModal extends React.Component {
     }
 
     onModalClosed(e){
-        // let el_pwd_inpt = document.getElementById(this.);
-        // let el_email_input = document.getElementById(this.);
-
-        // el_pwd_inpt.value = '';
-        // el_email_input.value = '';
-        
     }
 
     getLoggedInAccountInfoList(__callback){
@@ -90,7 +85,6 @@ class TaskEditModal extends React.Component {
 
     onChangeProduct(selected_key, __callback = undefined){
 
-        //Update product image
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
 
         if(selected_product == undefined){
@@ -98,7 +92,6 @@ class TaskEditModal extends React.Component {
             return;
         }
 
-        //TODO : Get Detail Product Info and update modal ui
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -107,7 +100,6 @@ class TaskEditModal extends React.Component {
             }
 
             //TODO : Normal product type임에도 불구하고 size_info_list를 취득하지 못한 경우 어떻게 처리할 것인가?
-
             if(product_info.size_info_list.length == 0){
                 Index.g_sys_msg_q.enqueue('Warning', 'This product has no size information yet. So, Task will buy similar size that you select.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 7000);
             }
@@ -116,7 +108,7 @@ class TaskEditModal extends React.Component {
                 __callback(undefined, product_info);
                 return;
             } 
-            //TODO
+            
             this.setState(_ => ({
                 selected_product : product_info
             }));
@@ -144,17 +136,35 @@ class TaskEditModal extends React.Component {
         });
     }
 
-    onSubmitTaskInfo(e){
+    onSubmitTaskInfo(){
 
-        e.preventDefault();
+        if(this.state.selected_product == undefined){
+            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (invalid product information.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        let selected_size = this.ref_options_size.current.getSelectedOptionValue();
+        if(selected_size == undefined || selected_size == ''){
+            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (size is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        let selected_account = this.ref_options_account.current.getSelectedOptionKey();
+        if(selected_account == undefined || selected_account == ''){
+            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        let selected_schedule = this.schedule_time_input_instance.selectedDates;
+        if(this.state.selected_product.sell_type != common.SELL_TYPE.normal && selected_schedule.length == 0){
+            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        this.props.h_create_task(this.state.selected_product, selected_size, selected_account, selected_schedule[0]);
         
-        // let el_pwd_inpt = document.getElementById(this.);
-        // let el_email_input = document.getElementById(this.);
-
-        // this.props.h_add_new_account(el_email_input.value, el_pwd_inpt.value);
-
-        // let el_modal = document.getElementById(this.props.id);
-        // var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        let el_modal = document.getElementById(this.props.id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         
         bs_obj_modal.hide();
     }
@@ -179,7 +189,6 @@ class TaskEditModal extends React.Component {
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
 
         if(open_time_str != '') this.schedule_time_input_instance.setDate(open_time_str, false);
-        
 
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -209,7 +218,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
+                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
                                 </div>
                             </div>
                             <hr/>
