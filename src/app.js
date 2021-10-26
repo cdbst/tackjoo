@@ -5,9 +5,9 @@ const IpcM = require('./ipc_main');
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1200,
+        width: 1280,
         height: 900,
-        minWidth : 1200,
+        minWidth : 1280,
         minHeight : 900,
         webPreferences: {
             sandbox: true,

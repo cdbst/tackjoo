@@ -27,6 +27,7 @@ class TaskEditModal extends React.Component {
         this.ref_options_size = React.createRef();
         this.ref_options_type = React.createRef();
         this.ref_options_product = React.createRef();
+
     }
 
     componentDidMount(){
@@ -46,23 +47,6 @@ class TaskEditModal extends React.Component {
             enableSeconds: true,
             minuteIncrement : 5,
             dateFormat: "Y-m-d H:i:S"
-        });
-    }
-
-    getLoggedInAccountInfoList(__callback){
-
-        window.electron.getLoggedInAccountInfoList((error, logged_in_account_info_list) =>{
-            if(error){
-                Index.g_sys_msg_q.enqueue('Error', 'Cannot gathering logged in account informations.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                __callback(error, undefined);
-                return;
-            }
-
-            if(logged_in_account_info_list.length == 0){
-                Index.g_sys_msg_q.enqueue('Warn', 'Logged in accounts are not exist.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            }
-
-            __callback(undefined, logged_in_account_info_list);
         });
     }
 
@@ -87,7 +71,24 @@ class TaskEditModal extends React.Component {
         
     }
 
-    onChangeProduct(selected_key){
+    getLoggedInAccountInfoList(__callback){
+
+        window.electron.getLoggedInAccountInfoList((error, logged_in_account_info_list) =>{
+            if(error){
+                Index.g_sys_msg_q.enqueue('Error', 'Cannot gathering logged in account informations.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                __callback(error, undefined);
+                return;
+            }
+
+            if(logged_in_account_info_list.length == 0){
+                Index.g_sys_msg_q.enqueue('Warn', 'Logged in accounts are not exist.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            }
+
+            __callback(undefined, logged_in_account_info_list);
+        });
+    }
+
+    onChangeProduct(selected_key, __callback = undefined){
 
         //Update product image
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
@@ -101,6 +102,7 @@ class TaskEditModal extends React.Component {
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                if(__callback) __callback(err, undefined);
                 return;
             }
 
@@ -109,7 +111,11 @@ class TaskEditModal extends React.Component {
             if(product_info.size_info_list.length == 0){
                 Index.g_sys_msg_q.enqueue('Warning', 'This product has no size information yet. So, Task will buy similar size that you select.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 7000);
             }
-            
+
+            if(__callback){
+                __callback(undefined, product_info);
+                return;
+            } 
             //TODO
             this.setState(_ => ({
                 selected_product : product_info
@@ -124,8 +130,17 @@ class TaskEditModal extends React.Component {
             return product.sell_type == value;
         });
 
-        this.setState({filtered_product_info_list : _filtered_product_info_list}, () => {
-            this.onChangeProduct(this.ref_options_product.current.getSelectedOptionKey());
+        if(_filtered_product_info_list.length == 0){
+            Index.g_sys_msg_q.enqueue('Error', value + " has no product information.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        this.onChangeProduct(_filtered_product_info_list[0]._id, (err, _product_info) =>{
+            let new_state = {filtered_product_info_list : _filtered_product_info_list};
+            if(_product_info){
+                new_state['selected_product'] = _product_info;
+            }
+            this.setState(_ => (new_state));
         });
     }
 
@@ -158,15 +173,13 @@ class TaskEditModal extends React.Component {
         let logged_in_account_email_list = this.state.logged_in_account_info_list.map((account_info) => account_info.email);
         let logged_in_account_id_list = this.state.logged_in_account_info_list.map((account_info) => account_info._id);
 
-        
         let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
         let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time, true);
 
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
 
-        if(open_time_str != ''){
-            this.schedule_time_input_instance.setDate(open_time_str, false);
-        }
+        if(open_time_str != '') this.schedule_time_input_instance.setDate(open_time_str, false);
+        
 
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -200,34 +213,31 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <hr/>
-                            
-                            {product_sell_type != common.SELL_TYPE.normal &&
-                                <div>
-                                    <div className="mb-12 row">
-                                        <div className="col-md-2">
-                                            <label className="task-eidt-modal-option-label">Open</label>
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
-                                        </div>
-                                        <div className="col-md-2 ">
-                                            <label className="task-eidt-modal-option-label">Close</label> 
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
-                                        </div>
+                            <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
+                                <div className="mb-12 row" >
+                                    <div className="col-md-2">
+                                        <label className="task-eidt-modal-option-label">Open</label>
                                     </div>
-                                    <hr/>
-                                    <div className="mb-12 row">
-                                        <div className="col-md-2">
-                                            <label className="task-eidt-modal-option-label">Schedule</label>
-                                        </div>
-                                        <div className="col-md-10">
-                                            <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
-                                        </div>
+                                    <div className="col-md-4">
+                                        <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
                                     </div>
-                                </div>   
-                            }
+                                    <div className="col-md-2 ">
+                                        <label className="task-eidt-modal-option-label">Close</label> 
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div className="mb-12 row">
+                                    <div className="col-md-2">
+                                        <label className="task-eidt-modal-option-label">Schedule</label>
+                                    </div>
+                                    <div className="col-md-10">
+                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
