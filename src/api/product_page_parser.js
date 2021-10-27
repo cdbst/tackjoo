@@ -19,7 +19,6 @@ function get_sell_type(sell_type_string){
     }
 
     return sell_type;
-
 }
 
 function estimate_open_year(month){

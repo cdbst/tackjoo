@@ -91,7 +91,6 @@
         return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
     }
 
-
     exports.NIKE_URL = 'https://www.nike.com';
     exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW'};
 
