@@ -25,10 +25,8 @@ class ServerClock{
         }, 1000);
     }
 
-    __invoke_alam(date) {
-
-        console.log(date);
-        console.log(this.alam_subscribers);
+    __invoke_alam(date) { 
+        //TODO mutex, lock이 필요한지 검토 필요.
 
         for(var i = this.alam_subscribers.length - 1; i >= 0 ; i--){
 
