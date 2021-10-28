@@ -25,7 +25,7 @@ function estimate_open_year(month){
 
     //시작 date 정보에 year 정보가 없으므로 현재 날짜를 구해와서, open_month 가 현재 month보다 이전이면 open year을 내년으로 취급한다.
     let today = new Date();
-    let cur_month = today.getMonth() + 1; //return range is (0 ~ 11)
+    let cur_month = today.getMonth(); //return range is (0 ~ 11)
 
     let year = today.getFullYear()
 
@@ -274,7 +274,7 @@ function parse_draw_time_from_product_page($){
         let draw_start_hour = parseInt(draw_start_time[0]);
         let draw_start_min = parseInt(draw_start_time[1]);
 
-        let draw_month = parseInt(draw_date_info.split('/')[0]);
+        let draw_month = parseInt(draw_date_info.split('/')[0]) - 1;
         let draw_date = parseInt(draw_date_info.split('/')[1].replace(/\(.*\)/gi, ''));
 
         let text_draw_time_after_arr = text_draw_time_after.split(' ');
@@ -324,14 +324,13 @@ function parse_ftfs_time_from_product_page($){
         let open_time_text_arr = open_time_text.split(' ');
         open_time_text_arr.pop();
         
-        let open_month = parseInt(open_time_text_arr[0]);
+        let open_month = parseInt(open_time_text_arr[0]) - 1;
         let open_date = parseInt(open_time_text_arr[1]);
         let open_hour = parseInt(open_time_text_arr[2]) ;
         let open_min = 0;
         if(open_time_text_arr.length > 3){
             open_min = parseInt(open_time_text_arr[3]);
         }
-
 
         open_hour = afternoon ? open_hour + 12 : open_hour;
 

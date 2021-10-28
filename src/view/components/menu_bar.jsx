@@ -27,9 +27,6 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
                     </li>
-                    <li>
-                        <ServerClock></ServerClock>
-                    </li>
                 </ul>
             </div>
         );

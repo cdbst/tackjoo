@@ -46,7 +46,7 @@ class TaskEditModal extends React.Component {
             enableTime: true,
             time_24hr: true,
             enableSeconds: true,
-            minuteIncrement : 5,
+            minuteIncrement : 2,
             dateFormat: "Y-m-d H:i:S"
         });
     }
