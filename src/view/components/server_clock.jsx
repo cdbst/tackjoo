@@ -21,7 +21,7 @@ class ServerClock{
     __setPowerOnClock() {
         this.clock_handler = setInterval(()=>{
             this.server_time.setSeconds(this.server_time.getSeconds() + 1);
-            this.__invoke_alam(this.server_time)
+            this.__invoke_alam(this.server_time);
         }, 1000);
     }
 
@@ -32,9 +32,13 @@ class ServerClock{
 
             let subscriber = this.alam_subscribers[i];
 
-            if(date < subscriber.date) continue;
-            subscriber.invoke();
-            this.alam_subscribers.splice(i, 1);
+            if(subscriber.date == undefined){
+                subscriber.invoke(date);
+            }else{
+                if(date < subscriber.date) continue;
+                subscriber.invoke(date);
+                this.alam_subscribers.splice(i, 1);
+            }
         }
     }
 
@@ -51,10 +55,16 @@ class ServerClock{
         return xml_http_req.getResponseHeader("Date");
     }
 
+    /**
+     * @description server timer에 알람을 등록한다.
+     * 
+     * @param {Date} date 언제 알람을 받을지 정해준다. (미 지정시 1초마다 invoke가 호출됨.)
+     * @param {function} invoke_handler 알람을 받을 event handler
+     * @returns 등록 성공시 true return, 반대의 경우 false return.
+     */
     subscribeAlam(date, invoke_handler){
 
-        if(date == undefined) return false;
-        if(date instanceof Date == false) return false;
+        if(date != undefined && date instanceof Date == false) return false;
 
         if(invoke_handler == undefined) return false;
         if(typeof invoke_handler !== 'function') return false;
