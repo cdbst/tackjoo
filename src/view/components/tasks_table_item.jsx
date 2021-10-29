@@ -1,9 +1,17 @@
 
 class TasksTableItem extends React.Component {
+
+    static TASK_STATUS = {
+        READY : 'ready', //아직 open time이 전이라 play 할 수 없는 상태임.
+        PAUSE : 'pause',
+        PLAY : 'play'
+    }
+
     constructor(props) {
         super(props);
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
+        this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
 
         // <this.props.task_info data example>
         // let task_obj = {
@@ -21,6 +29,17 @@ class TasksTableItem extends React.Component {
         // draw일경우 이미 신청된 것이라면 complete 바로 표시.
         // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
 
+        this.state = {
+            status : TasksTableItem.TASK_STATUS.PAUSE
+        }
+
+    }
+
+    onClickStatusBtn(){
+        let new_status = this.state.status != TasksTableItem.TASK_STATUS.PLAY ? TasksTableItem.TASK_STATUS.PLAY : TasksTableItem.TASK_STATUS.PAUSE;
+        this.setState(_ => ({
+            status : new_status
+        }));
     }
 
     onClickRemoveBtn(){
@@ -37,6 +56,8 @@ class TasksTableItem extends React.Component {
         let product_name = Index.g_product_mngr.getProductDescName(this.props.task_info.product_info);
         let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
+
+        let status_btn = this.state.status != TasksTableItem.TASK_STATUS.PLAY ? './res/img/play-fill.svg' : './res/img/pause-fill.svg'
 
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
@@ -61,18 +82,18 @@ class TasksTableItem extends React.Component {
                     <span>{schedule_time_str}</span>
                 </td>
                 <td >
-                    <span>test status</span>
+                    <span>{this.state.status}</span>
                 </td>
                 <td >
                     <div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-warning" >
-                                <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/>
+                                <img src={status_btn} style={{width:24, height:24}} onClick={this.onClickStatusBtn.bind(this)}/>
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" >
-                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
+                                <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
