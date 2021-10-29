@@ -25,7 +25,6 @@ class TasksTableItem extends React.Component {
 
     render(){
 
-        console.log(this.props.task_info);
         let product_name = Index.g_product_mngr.getProductDescName(this.props.task_info.product_info);
         let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
