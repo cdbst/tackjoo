@@ -22,8 +22,14 @@ class ContentsTasks extends React.Component {
 
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
-        this.tasks = [];
+        this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
+
+        this.task_list = [];
         this.task_edit_modal_id = 'edit-task-modal';
+
+        this.state = {
+            task_table_items : []
+        }
 
     }
 
@@ -33,12 +39,21 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
-    onCreateNewTask(product_info, size_name, account_id, schedule_date){
-        console.log(arguments);
-
-        //1. TODO 스케쥴 time이 현재 시간보다 과거 시간이면 즉시 실행한다.
-        //2. TODO 스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
-
+    onCreateNewTask(product_info, size_name, account_id, account_email, schedule_time){
+    
+        if(schedule_time != undefined){
+        
+            //스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
+            if(product_info.open_time != undefined && product_info.open_time > schedule_time){
+                schedule_time = product_info.open_time;
+            }
+    
+            //2-1 TODO 스케쥴 time이 end time보다 미래의 시간이라면 작업을 수행할 수 없기 때문에 스케쥴 time을 open time으로 변경한다.
+            if(product_info.end_time != undefined && product_info.end_time < schedule_time){
+                schedule_time = product_info.open_time;
+            }
+        }
+        
         //3. TODO 아직 size 정보가 없는 product_info라면 open 이후에 size 정보를 취득할 수 있으므로,
         //open시 공개되는 size 정보와 가장 유사한 size로 구매 또는 DRAW를 신청하도록 한다.
 
@@ -48,21 +63,41 @@ class ContentsTasks extends React.Component {
 
         //4-1. TODO TASK table item 추가/제거/관리 코드 작성, 사용자 TASK UI 관련 코드 작성 등.
         
-
         //5. TODO task object 프로토타입
         // {
         //     product_info : product_info // product info object
         //     size_name : size_name // 구매 시도할 size name
         //     account_id : account_id // 구매 시도할 account id(browser context id)
-        //     schedule_date : schedule_date // Date Object 구매 시도할 date object
+        //     schedule_time : schedule_time // Date Object 구매 시도할 date object
         //     task_cond : TYPE_OF_TASK_COND // 테스크의 현재 진행 상태
         // }
 
-        //6. TODO TYPE_OF_TASK_COND 프로토타입
-        // ready, stop, on product page, on cart page, ready to pay, complete
-        // draw일경우 이미 신청된 것이라면 complete 바로 표시.
-        // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
+        let task_obj = {
+            product_info : product_info,
+            size_name : size_name,
+            account_email : account_email,
+            account_id : account_id,
+            schedule_time : schedule_time,
+            _id : common.uuidv4()
+        };
 
+        this.task_list.push(task_obj);
+        let el_task_table_items = this.__genTasksTableItems(this.task_list);
+        
+        this.setState(_ => ({
+            task_table_items : el_task_table_items,
+        }));
+
+    }
+
+    __genTasksTableItems(task_list){
+        return task_list.map((task_obj) => 
+            <TasksTableItem 
+                key={task_obj._id} 
+                // h_remove={remove_handler}
+                task_info={task_obj}
+            />
+        );
     }
 
     render() {
@@ -89,11 +124,12 @@ class ContentsTasks extends React.Component {
                             <th scope="col">Account</th>
                             <th scope="col">Status</th>
                             <th scope="col">Open Time</th>
+                            <th scope="col">Scheduled Time</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <TasksTableItem/>
+                        {this.state.task_table_items}
                     </tbody>
                 </table>
                 </div>

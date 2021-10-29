@@ -3,38 +3,57 @@ class TasksTableItem extends React.Component {
     constructor(props) {
         super(props);
 
+        // <this.props.task_info data example>
+        // let task_obj = {
+        //     product_info : product_info,
+        //     size_name : size_name,
+        //     account_email : account_email,
+        //     account_id : account_id,
+        //     schedule_date : schedule_date,
+        //     _id : common.uuidv4()
+        // };
+
+
+        //6. TODO TYPE_OF_TASK_COND 프로토타입
+        // ready, stop, on product page, on cart page, ready to pay, complete
+        // draw일경우 이미 신청된 것이라면 complete 바로 표시.
+        // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
+
     }
 
-    // <th scope="col">Type</th>
-    // <th scope="col">Product</th>
-    // <th scope="col">Size</th>
-    // <th scope="col">Account</th>
-    // <th scope="col">Status</th>
-    // <th scope="col">Open Time</th>
-    // <th scope="col">Actions</th> 
     // 엑션 종류 : 편집, 시작/멈춤, 제거, 예약
 
     render(){
-        
+
+        console.log(this.props.task_info);
+        let product_name = Index.g_product_mngr.getProductDescName(this.props.task_info.product_info);
+        let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
+        let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
+
+        // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
+        // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
         return(
             <tr>
                 <td >
-                    <span>test type</span>
+                    <span>{this.props.task_info.product_info.sell_type}</span>
                 </td>
                 <td >
-                    <span>test product</span>
+                    <span>{product_name}</span>
                 </td>
                 <td >
-                    <span>test size</span>
+                    <span>{this.props.task_info.size_name}</span>
                 </td>
                 <td >
-                    <span>test account</span>
+                    <span>{this.props.task_info.account_email}</span>
                 </td>
                 <td >
                     <span>test status</span>
                 </td>
                 <td >
-                    <span>test open time</span>
+                    <span>{open_time_str}</span>
+                </td>
+                <td >
+                    <span>{schedule_time_str}</span>
                 </td>
                 <td >
                     <div>

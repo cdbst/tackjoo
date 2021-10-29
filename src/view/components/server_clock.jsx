@@ -8,11 +8,13 @@ class ServerClock{
         this.__setPowerOffClock = this.__setPowerOffClock.bind(this);
         this.__invoke_alam = this.__invoke_alam.bind(this);
         this.subscribeAlam = this.subscribeAlam.bind(this);
-
-        let server_time = this.__getServerDateTime();
-        this.server_time = new Date(server_time);
+        this.getServerTime = this.getServerTime.bind(this);
 
         this.alam_subscribers = [];
+
+        //TODO: server time을 재대로 얻어오지 못했을 때 어떻게 처리해야하는지 고민 필요.
+        let server_time = this.__getServerDateTime();
+        this.server_time = new Date(server_time);
 
         this.clock_handler = undefined;
         this.__setPowerOnClock();
@@ -23,6 +25,11 @@ class ServerClock{
             this.server_time.setSeconds(this.server_time.getSeconds() + 1);
             this.__invoke_alam(this.server_time);
         }, 1000);
+    }
+    
+    __setPowerOffClock() {
+        if(this.clock_handler == undefined) return;
+        clearInterval(this.clock_handler);
     }
 
     __invoke_alam(date) { 
@@ -40,11 +47,6 @@ class ServerClock{
                 this.alam_subscribers.splice(i, 1);
             }
         }
-    }
-
-    __setPowerOffClock() {
-        if(this.clock_handler == undefined) return;
-        clearInterval(this.clock_handler);
     }
 
     __getServerDateTime(){
@@ -74,5 +76,9 @@ class ServerClock{
             invoke : invoke_handler
         });
         return true;
+    }
+
+    getServerTime(){
+        return this.server_time;
     }
 }

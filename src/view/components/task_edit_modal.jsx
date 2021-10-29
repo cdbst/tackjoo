@@ -149,19 +149,30 @@ class TaskEditModal extends React.Component {
             return;
         }
 
-        let selected_account = this.ref_options_account.current.getSelectedOptionKey();
-        if(selected_account == undefined || selected_account == ''){
+        let selected_account_id = this.ref_options_account.current.getSelectedOptionKey();
+        if(selected_account_id == undefined || selected_account_id == ''){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        let selected_schedule = this.schedule_time_input_instance.selectedDates;
-        if(this.state.selected_product.sell_type != common.SELL_TYPE.normal && selected_schedule.length == 0){
+        let selected_account_email = this.ref_options_account.current.getSelectedOptionValue();
+        if(selected_account_email == undefined || selected_account_email == ''){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        this.props.h_create_task(this.state.selected_product, selected_size, selected_account, selected_schedule[0]);
+        let selected_schedule = undefined;
+        
+        if(this.state.selected_product.sell_type != common.SELL_TYPE.normal){
+            selected_schedule = this.schedule_time_input_instance.selectedDates;
+            if(selected_schedule.length == 0){
+                Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+            selected_schedule = selected_schedule[0];
+        }
+
+        this.props.h_create_task(this.state.selected_product, selected_size, selected_account_id, selected_account_email, selected_schedule);
         
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
