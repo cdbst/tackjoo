@@ -27,6 +27,9 @@ class TasksTableItem extends React.Component {
         this.props.h_remove(this.props.task_info._id);
     }
 
+    // TODO EDIT 버튼과 그에 따른 기능 구현.
+    // TODO Run Pause 버튼과 그에 따른 기능 구현.
+
     // 엑션 종류 : 편집, 시작/멈춤, 제거, 예약
 
     render(){
@@ -52,13 +55,13 @@ class TasksTableItem extends React.Component {
                     <span>{this.props.task_info.account_email}</span>
                 </td>
                 <td >
-                    <span>test status</span>
-                </td>
-                <td >
                     <span>{open_time_str}</span>
                 </td>
                 <td >
                     <span>{schedule_time_str}</span>
+                </td>
+                <td >
+                    <span>test status</span>
                 </td>
                 <td >
                     <div>

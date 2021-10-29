@@ -140,9 +140,9 @@ class ContentsTasks extends React.Component {
                             <th scope="col">Product</th>
                             <th scope="col">Size</th>
                             <th scope="col">Account</th>
-                            <th scope="col">Status</th>
                             <th scope="col">Open Time</th>
                             <th scope="col">Scheduled Time</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
