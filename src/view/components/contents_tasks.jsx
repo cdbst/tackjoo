@@ -22,7 +22,9 @@ class ContentsTasks extends React.Component {
 
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
+        this.onRemoveTask = this.onRemoveTask.bind(this);
         this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
+        this.__updateTaskTalbeItems = this.__updateTaskTalbeItems.bind(this);
 
         this.task_list = [];
         this.task_edit_modal_id = 'edit-task-modal';
@@ -81,22 +83,35 @@ class ContentsTasks extends React.Component {
             _id : common.uuidv4()
         };
 
-
         //TODO. type이 draw이면서, 같은 id, 같은 상품의 task가 이미 생성되어 있다면 중복 등록 불가 toast를 출력해준다.
         this.task_list.push(task_obj);
+
+        this.__updateTaskTalbeItems();
+    }
+
+    onRemoveTask(task_id){
+        for(var i = 0; i < this.task_list.length; i++){
+            if(this.task_list[i]._id == task_id){
+                this.task_list.splice(i, 1);
+                break;
+            }
+        }
+        this.__updateTaskTalbeItems();
+    }
+
+    __updateTaskTalbeItems(){
         let el_task_table_items = this.__genTasksTableItems(this.task_list);
         
         this.setState(_ => ({
             task_table_items : el_task_table_items
         }));
-
     }
 
     __genTasksTableItems(task_list){
         return task_list.map((task_obj) => 
             <TasksTableItem 
                 key={task_obj._id} 
-                // h_remove={remove_handler}
+                h_remove={this.onRemoveTask.bind(this)}
                 task_info={task_obj}
             />
         );

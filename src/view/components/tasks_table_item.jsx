@@ -3,6 +3,8 @@ class TasksTableItem extends React.Component {
     constructor(props) {
         super(props);
 
+        this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
+
         // <this.props.task_info data example>
         // let task_obj = {
         //     product_info : product_info,
@@ -19,6 +21,10 @@ class TasksTableItem extends React.Component {
         // draw일경우 이미 신청된 것이라면 complete 바로 표시.
         // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
 
+    }
+
+    onClickRemoveBtn(){
+        this.props.h_remove(this.props.task_info._id);
     }
 
     // 엑션 종류 : 편집, 시작/멈춤, 제거, 예약
@@ -67,7 +73,7 @@ class TasksTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-danger" >
+                            <button type="button" className="btn btn-danger" onClick={this.onClickRemoveBtn.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
