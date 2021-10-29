@@ -119,13 +119,14 @@ class ContentsTasks extends React.Component {
 
     render() {
 
+
         return (
             <div className="container-fluid">
                 <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
                 <br/>
                 <div className="row">
                     <div className="col">
-                        <h3 className="contents-title">{"TEST : Tasks (3/4)"}</h3>
+                        <h3 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h3>
                     </div>
                     <div className="col">
                         {/* <a>TEST : search item interface</a> */}
