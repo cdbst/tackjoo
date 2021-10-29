@@ -5,10 +5,10 @@ const IpcM = require('./ipc_main');
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1280,
-        height: 900,
-        minWidth : 1280,
-        minHeight : 900,
+        width: 1440,
+        height: 960,
+        minWidth : 1440,
+        minHeight : 960,
         webPreferences: {
             sandbox: true,
             preload: path.join(__dirname, "preload.js")

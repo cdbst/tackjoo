@@ -81,11 +81,13 @@ class ContentsTasks extends React.Component {
             _id : common.uuidv4()
         };
 
+
+        //TODO. type이 draw이면서, 같은 id, 같은 상품의 task가 이미 생성되어 있다면 중복 등록 불가 toast를 출력해준다.
         this.task_list.push(task_obj);
         let el_task_table_items = this.__genTasksTableItems(this.task_list);
         
         this.setState(_ => ({
-            task_table_items : el_task_table_items,
+            task_table_items : el_task_table_items
         }));
 
     }

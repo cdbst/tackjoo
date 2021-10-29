@@ -257,6 +257,17 @@ class TaskEditModal extends React.Component {
                                         <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
                                     </div>
                                 </div>
+                                <hr/>
+                                <div className="mb-12 row">
+                                    <div className="col-md-2">
+                                        <label className="task-eidt-modal-option-label">Price</label>
+                                    </div>
+                                    <div className="col-md-10">
+                                        <label className="task-eidt-modal-option-label">
+                                            {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
