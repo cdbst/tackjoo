@@ -8,6 +8,8 @@ class TasksTableItem extends React.Component {
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
+        this.__mount = false;
+
         // <this.props.task_info data example>
         // let task_obj = {
         //     product_info : product_info,
@@ -29,6 +31,7 @@ class TasksTableItem extends React.Component {
 
         if((this.props.task_info.schedule_time != undefined) && this.props.task_info.schedule_time > cur_server_time){
             initial_status = common.TASK_STATUS.READY;
+            Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
         }else{
             initial_status = common.TASK_STATUS.PAUSE;
         }
@@ -36,13 +39,19 @@ class TasksTableItem extends React.Component {
         this.state = {
             status : initial_status
         };
-
-        Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
     }
 
-    onAlamScheduledTime(date){
+    componentDidMount(){
+        this.__mount = true;
+    }
 
-        console.log('ALAM ON!!!');
+    componentWillUnmount(){
+        this.__mount = false;
+    }
+
+    onAlamScheduledTime(_date){      
+        console.log('Alam!!');
+        if(this.__mount == false) return;
 
         this.setState(_ => ({
             status : common.TASK_STATUS.PLAY
@@ -113,11 +122,11 @@ class TasksTableItem extends React.Component {
                                 <img src={status_btn} style={{width:24, height:24}} onClick={this.onClickStatusBtn.bind(this)}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        {/* <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" >
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
                             </button>
-                        </div>
+                        </div> */}
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemoveBtn.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>

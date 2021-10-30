@@ -25,6 +25,7 @@ class ContentsTasks extends React.Component {
         this.onRemoveTask = this.onRemoveTask.bind(this);
         this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
         this.__updateTaskTalbeItems = this.__updateTaskTalbeItems.bind(this);
+        this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
 
         this.task_list = [];
         this.task_edit_modal_id = 'edit-task-modal';
@@ -83,10 +84,23 @@ class ContentsTasks extends React.Component {
             _id : common.uuidv4()
         };
 
-        //TODO. type이 draw이면서, 같은 id, 같은 상품의 task가 이미 생성되어 있다면 중복 등록 불가 toast를 출력해준다.
+        if(this.__checkTaskDuplicated(task_obj)){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+            return;
+        }
         this.task_list.push(task_obj);
 
         this.__updateTaskTalbeItems();
+    }
+
+    __checkTaskDuplicated(task_obj){
+        let duplicated = this.task_list.filter((task) =>{
+            if(task.account_id != task_obj.account_id) return false;
+            if(task_obj.product_info.sell_type == common.SELL_TYPE.draw && task.product_info._id == task_obj.product_info._id) return true;
+            else return false;
+        });
+
+        return duplicated.length != 0;
     }
 
     onRemoveTask(task_id){
