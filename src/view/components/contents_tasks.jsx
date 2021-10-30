@@ -65,30 +65,21 @@ class ContentsTasks extends React.Component {
         //만약 로그인 세션이 만료가 됐다면, task 수행 과정에서 다시 login을 시도하는 로직의 구현이 필요할 수 있다.
 
         //4-1. TODO TASK table item 추가/제거/관리 코드 작성, 사용자 TASK UI 관련 코드 작성 등.
-        
-        //5. TODO task object 프로토타입
-        // {
-        //     product_info : product_info // product info object
-        //     size_name : size_name // 구매 시도할 size name
-        //     account_id : account_id // 구매 시도할 account id(browser context id)
-        //     schedule_time : schedule_time // Date Object 구매 시도할 date object
-        //     task_cond : TYPE_OF_TASK_COND // 테스크의 현재 진행 상태
-        // }
 
-        let task_obj = {
-            product_info : product_info,
-            size_name : size_name,
-            account_email : account_email,
-            account_id : account_id,
-            schedule_time : schedule_time,
-            _id : common.uuidv4()
-        };
+        let task_info_obj = common.get_task_info_obj_scheme();
+        common.update_task_info_obj(task_info_obj, 'product_info', product_info);
+        common.update_task_info_obj(task_info_obj, 'size_name', size_name);
+        common.update_task_info_obj(task_info_obj, 'account_email', account_email);
+        common.update_task_info_obj(task_info_obj, 'account_id', account_id);
+        common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+        common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
 
-        if(this.__checkTaskDuplicated(task_obj)){
+    
+        if(this.__checkTaskDuplicated(task_info_obj)){
             Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
             return;
         }
-        this.task_list.push(task_obj);
+        this.task_list.push(task_info_obj);
 
         this.__updateTaskTalbeItems();
     }

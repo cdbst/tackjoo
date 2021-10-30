@@ -10,17 +10,6 @@ class TasksTableItem extends React.Component {
 
         this.__mount = false;
 
-        // <this.props.task_info data example>
-        // let task_obj = {
-        //     product_info : product_info,
-        //     size_name : size_name,
-        //     account_email : account_email,
-        //     account_id : account_id,
-        //     schedule_date : schedule_date,
-        //     _id : common.uuidv4()
-        // };
-
-
         //6. TODO TYPE_OF_TASK_COND 프로토타입
         // ready, stop, on product page, on cart page, ready to pay, complete
         // draw일경우 이미 신청된 것이라면 complete 바로 표시.
@@ -50,7 +39,6 @@ class TasksTableItem extends React.Component {
     }
 
     onAlamScheduledTime(_date){      
-        console.log('Alam!!');
         if(this.__mount == false) return;
 
         this.setState(_ => ({

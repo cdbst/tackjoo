@@ -19,6 +19,27 @@
         return target;
     }
 
+    exports.get_task_info_obj_scheme = function (){
+        return {
+            product_info : undefined,
+            size_name : undefined,
+            account_email : undefined,
+            account_id : undefined,
+            schedule_time : undefined,
+            status: undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_task_info_obj = function(task_info_obj, key, value){
+        if(key in this.get_task_info_obj_scheme() == false){
+            throw 'task info object is not includes property : ' + key;
+        }
+
+        task_info_obj[key] = value;
+        return task_info_obj;
+    }
+
     exports.get_size_info_obj_scheme = function (){
         return {
             name : undefined,
@@ -34,7 +55,7 @@
 
     exports.update_size_info_obj = function(size_info_obj, key, value){
         if(key in this.get_size_info_obj_scheme() == false){
-            throw 'Product object is not includes property : ' + key;
+            throw 'size info object is not includes property : ' + key;
         }
 
         size_info_obj[key] = value;
