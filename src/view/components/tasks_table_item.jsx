@@ -1,17 +1,12 @@
 
 class TasksTableItem extends React.Component {
 
-    static TASK_STATUS = {
-        READY : 'ready', //아직 open time이 전이라 play 할 수 없는 상태임.
-        PAUSE : 'pause',
-        PLAY : 'play'
-    }
-
     constructor(props) {
         super(props);
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
+        this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
         // <this.props.task_info data example>
         // let task_obj = {
@@ -29,14 +24,41 @@ class TasksTableItem extends React.Component {
         // draw일경우 이미 신청된 것이라면 complete 바로 표시.
         // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
 
-        this.state = {
-            status : TasksTableItem.TASK_STATUS.PAUSE
+        let initial_status = undefined;
+        let cur_server_time = Index.g_server_clock.getServerTime();
+
+        if((this.props.task_info.schedule_time != undefined) && this.props.task_info.schedule_time > cur_server_time){
+            initial_status = common.TASK_STATUS.READY;
+        }else{
+            initial_status = common.TASK_STATUS.PAUSE;
         }
 
+        this.state = {
+            status : initial_status
+        };
+
+        Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
+    }
+
+    onAlamScheduledTime(date){
+
+        console.log('ALAM ON!!!');
+
+        this.setState(_ => ({
+            status : common.TASK_STATUS.PLAY
+        }));
     }
 
     onClickStatusBtn(){
-        let new_status = this.state.status != TasksTableItem.TASK_STATUS.PLAY ? TasksTableItem.TASK_STATUS.PLAY : TasksTableItem.TASK_STATUS.PAUSE;
+        //TODO 아직 open time이 전이라 play 할 수 없는 상태인 ready status에 대한 처리가 필요함 (open 이전에 play하려고 했을 때 처리.)
+        let cur_server_time = Index.g_server_clock.getServerTime();
+        
+        if(this.state.status == common.TASK_STATUS.READY && this.props.task_info.schedule_time > cur_server_time){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot start this task before open time.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
+
+        let new_status = this.state.status != common.TASK_STATUS.PLAY ? common.TASK_STATUS.PLAY : common.TASK_STATUS.PAUSE;
         this.setState(_ => ({
             status : new_status
         }));
@@ -57,7 +79,7 @@ class TasksTableItem extends React.Component {
         let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
 
-        let status_btn = this.state.status != TasksTableItem.TASK_STATUS.PLAY ? './res/img/play-fill.svg' : './res/img/pause-fill.svg'
+        let status_btn = this.state.status != common.TASK_STATUS.PLAY ? './res/img/play-fill.svg' : './res/img/pause-fill.svg'
 
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
