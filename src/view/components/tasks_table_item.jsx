@@ -103,9 +103,10 @@ class TasksTableItem extends React.Component {
     // 엑션 종류 : 편집, 시작/멈춤, 제거, 예약
 
     render(){
-
-        let product_name = Index.g_product_mngr.getProductDescName(this.props.task_info.product_info);
-        let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
+        
+        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+        let product_name = ProductManager.getProductDescName(product_info);
+        let open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
 
         let status_btn = this.state.status != common.TASK_STATUS.PAUSE ? './res/img/pause-fill.svg' : './res/img/play-fill.svg';
@@ -115,7 +116,7 @@ class TasksTableItem extends React.Component {
         return(
             <tr>
                 <td >
-                    <span>{this.props.task_info.product_info.sell_type}</span>
+                    <span>{product_info.sell_type}</span>
                 </td>
                 <td >
                     <span>{product_name}</span>

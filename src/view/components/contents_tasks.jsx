@@ -67,7 +67,7 @@ class ContentsTasks extends React.Component {
         //4-1. TODO TASK table item 추가/제거/관리 코드 작성, 사용자 TASK UI 관련 코드 작성 등.
 
         let task_info_obj = common.get_task_info_obj_scheme();
-        common.update_task_info_obj(task_info_obj, 'product_info', product_info);
+        common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
         common.update_task_info_obj(task_info_obj, 'size_name', size_name);
         common.update_task_info_obj(task_info_obj, 'account_email', account_email);
         common.update_task_info_obj(task_info_obj, 'account_id', account_id);

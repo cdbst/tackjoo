@@ -33,9 +33,6 @@ class ProductManager{
         this.getProductInfoList = this.getProductInfoList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
         this.__updateProductInfo = this.__updateProductInfo.bind(this);
-
-        this.getProductDescName = this.getProductDescName.bind(this);
-        this.getProductDescNameList = this.getProductDescNameList.bind(this);
         this.getValueList = this.getValueList.bind(this);
 
         this.getProductSizeList =this.getProductSizeList.bind(this);
@@ -86,9 +83,11 @@ class ProductManager{
         let product_obj = this.__product_info_list.find((product) => { return product._id === _id});
 
         if(product_obj == undefined){
-            __callback('Cannot found product information ..', undefined);
-            return;
+            if(__callback) __callback('Cannot found product information ..', undefined);
+            return undefined;
         }
+
+        if (__callback == undefined) return product_obj;
 
         window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
             //update product info
@@ -108,12 +107,12 @@ class ProductManager{
         return this.__product_info_list;
     }
 
-    getProductDescName(product_info){
+    static getProductDescName(product_info){
         return product_info.name + ' (' + product_info.alt_name + ')';
     }
 
-    getProductDescNameList(product_info_list){
-        return product_info_list.map((product_info) => this.getProductDescName(product_info) );
+    static getProductDescNameList(product_info_list){
+        return product_info_list.map((product_info) => ProductManager.getProductDescName(product_info) );
     }
 
     getValueList(product_info_list, attr_name, duplicate = true){

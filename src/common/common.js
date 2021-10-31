@@ -21,7 +21,7 @@
 
     exports.get_task_info_obj_scheme = function (){
         return {
-            product_info : undefined,
+            product_info_id : undefined,
             size_name : undefined,
             account_email : undefined,
             account_id : undefined,
