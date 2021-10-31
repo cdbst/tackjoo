@@ -8,7 +8,12 @@ class TasksTableItem extends React.Component {
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
+        this.onPlayTask = this.onPlayTask.bind(this);
+        this.onPauseTask = this.onPauseTask.bind(this);
+
         this.__mount = false;
+
+        this.ref_status_btn = React.createRef();
 
         //6. TODO TYPE_OF_TASK_COND 프로토타입
         // ready, stop, on product page, on cart page, ready to pay, complete
@@ -39,11 +44,29 @@ class TasksTableItem extends React.Component {
     }
 
     onAlamScheduledTime(_date){      
-        if(this.__mount == false) return;
+        this.onPlayTask();
+    }
 
-        this.setState(_ => ({
-            status : common.TASK_STATUS.PLAY
-        }));
+    onPlayTask(){
+        this.ref_status_btn.current.disabled = true;
+        window.electron.playTask(this.props.task_info, (err, data) =>{
+
+            if(this.__mount == false) return;
+            this.setState({ status : common.TASK_STATUS.PLAY}, () => {
+                this.ref_status_btn.current.disabled = false;
+            });
+        });
+    }
+
+    onPauseTask(){
+        this.ref_status_btn.current.disabled = true;
+        window.electron.pauseTask(this.props.task_info, (err, data) =>{
+            
+            if(this.__mount == false) return;
+            this.setState({ status : common.TASK_STATUS.PAUSE}, () => {
+                this.ref_status_btn.current.disabled = false;
+            });
+        });
     }
 
     onClickStatusBtn(){
@@ -55,10 +78,16 @@ class TasksTableItem extends React.Component {
             return;
         }
 
-        let new_status = this.state.status != common.TASK_STATUS.PLAY ? common.TASK_STATUS.PLAY : common.TASK_STATUS.PAUSE;
-        this.setState(_ => ({
-            status : new_status
-        }));
+        let new_status = this.state.status != common.TASK_STATUS.PAUSE ? common.TASK_STATUS.PAUSE : common.TASK_STATUS.PLAY;
+
+        if(new_status == common.TASK_STATUS.PLAY){
+            this.onPlayTask();
+        }else if(new_status == common.TASK_STATUS.PAUSE){
+            this.onPauseTask();
+        }
+
+        // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
+        // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
     }
 
     onClickRemoveBtn(){
@@ -76,7 +105,7 @@ class TasksTableItem extends React.Component {
         let open_time_str = this.props.task_info.product_info.open_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
 
-        let status_btn = this.state.status != common.TASK_STATUS.PLAY ? './res/img/play-fill.svg' : './res/img/pause-fill.svg'
+        let status_btn = this.state.status != common.TASK_STATUS.PAUSE ? './res/img/pause-fill.svg' : './res/img/play-fill.svg';
 
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
@@ -106,8 +135,8 @@ class TasksTableItem extends React.Component {
                 <td >
                     <div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-warning" >
-                                <img src={status_btn} style={{width:24, height:24}} onClick={this.onClickStatusBtn.bind(this)}/>
+                            <button ref={this.ref_status_btn} type="button" className="btn btn-warning" onClick={this.onClickStatusBtn.bind(this)}>
+                                <img src={status_btn} style={{width:24, height:24}} />
                             </button>
                         </div>
                         {/* <div className="float-start button-wrapper-inner-table">

@@ -1,13 +1,8 @@
 const {ipcMain} = require("electron");
 const BrowserCxt = require("./api/browser_context.js");
-const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrowserCxtMngr;
-const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
-const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
 const common = require('./common/common.js');
 const product_page_parser = require('./api/product_page_parser.js');
-
-const IpcMainSensor = require('./ipc_main_sensor');
 
 function register(){
 

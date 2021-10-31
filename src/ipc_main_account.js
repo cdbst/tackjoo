@@ -4,8 +4,6 @@ const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrow
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
-const IpcMainSensor = require('./ipc_main_sensor');
-
 function register(){
 
     ipcMain.on('get-logged-in-account-info-list', (event, data) => {

@@ -21,7 +21,9 @@ contextBridge.exposeInMainWorld('electron', {
     register_get_sensor_data : _register_get_sensor_data,
     getProductInfoList : _getProductInfoList,
     getProductInfo : _getProductInfo,
-    getLoggedInAccountInfoList : _getLoggedInAccountInfoList
+    getLoggedInAccountInfoList : _getLoggedInAccountInfoList,
+    playTask: _playTask,
+    pauseTask: _pauseTask
 });
 
 let get_sensor_data = undefined;
@@ -178,5 +180,37 @@ function _getLoggedInAccountInfoList(__callback){
 
     ipcRenderer.once('get-logged-in-account-info-list-reply' + ipc_data.id, (event, logged_in_account_info_list) => {
         __callback(logged_in_account_info_list.err, logged_in_account_info_list.data);
+    });
+}
+
+
+let task_ipc_handler_map = {};
+
+function _playTask(_task_info, __callback){
+    
+    let ipc_data = get_ipc_data({task_info : _task_info});
+
+    let task_evt_handler = (event, data) => {
+        __callback(undefined, data);
+    }
+
+    task_ipc_handler_map[_task_info._id] = task_evt_handler;
+
+    ipcRenderer.send('play-task', ipc_data);
+    ipcRenderer.on('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+}
+
+function _pauseTask(_task_info, __callback){
+
+    let ipc_data = get_ipc_data({task_info : _task_info});
+    
+    ipcRenderer.send('pause-task', ipc_data);
+
+    ipcRenderer.once('pause-task-reply' + _task_info._id, (event, data) => {
+        ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+        delete task_ipc_handler_map[_task_info._id];
+
+        // TODO test code.
+        __callback(undefined, 'success');
     });
 }
