@@ -31,6 +31,9 @@ class BrowserContext {
         this.get_product_sku_inventory = this.get_product_sku_inventory.bind(this);
         this.get_account_info = this.get_account_info.bind(this);
 
+        this.clear_cookies = this.clear_cookies.bind(this);
+        this.clear_csrfToken = this.clear_csrfToken.bind(this);
+
         this.email = _email;
         this.pwd = _pwd;
         this.id = _id;
@@ -181,6 +184,8 @@ class BrowserContext {
                 this.is_login = true;
 
                 __callback(undefined);
+
+                this.open_main_page();
             })
             .catch(err => {
                 __callback(err);
@@ -322,20 +327,31 @@ class BrowserContext {
         return true;
     }
 
-    open_main_page(__callback){
-
-        this.__before_request();
+    clear_cookies(){
         this.__cookie_storage.init();
+    }
+    
+    clear_csrfToken(){
+        this.csrfToken = undefined;
+    }
+
+    open_main_page(__callback = undefined){
+
 
         let config = {
             headers: this.__get_open_page_header()
+        }
+
+        if(this.__cookie_storage.num_of_cookies > 0){
+            let cookies = this.__cookie_storage.get_cookie_data();
+            config.headers['cookie'] = cookies;
         }
 
         axios.get(BrowserContext.NIKE_URL + '/kr/ko_kr', config)
         .then(res => {
 
             if(res.status != 200){
-                __callback('open_main_page : response ' + res.status);
+                if(__callback) __callback('open_main_page : response ' + res.status);
                 return;
             }
 
@@ -343,14 +359,14 @@ class BrowserContext {
 
             let result = this.__post_process_open_page(res.headers, $);
             if(!result){
-                __callback('open_main_page : cannot store informations');
+                if(__callback) __callback('open_main_page : cannot store informations');
                 return;
             }
 
-            __callback();
+            if(__callback) __callback();
         })
         .catch(err => {
-            __callback(err);
+            if(__callback) __callback(err);
         });
     }
 

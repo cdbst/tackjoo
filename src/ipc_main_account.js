@@ -80,6 +80,8 @@ function register(){
 
         if(borwser_context.is_login){
 
+            borwser_context.clear_cookies();
+            borwser_context.clear_csrfToken();
             borwser_context.open_main_page((err) =>{ // for page refreesh.
 
                 if(err){
