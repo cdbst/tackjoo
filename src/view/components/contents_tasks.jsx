@@ -84,10 +84,15 @@ class ContentsTasks extends React.Component {
         this.__updateTaskTalbeItems();
     }
 
-    __checkTaskDuplicated(task_obj){
-        let duplicated = this.task_list.filter((task) =>{
-            if(task.account_id != task_obj.account_id) return false;
-            if(task_obj.product_info.sell_type == common.SELL_TYPE.draw && task.product_info._id == task_obj.product_info._id) return true;
+    __checkTaskDuplicated(task_info_to_check){
+
+        let task_info_to_check_product_info = Index.g_product_mngr.getProductInfo(task_info_to_check.product_info_id);
+
+        let duplicated = this.task_list.filter((task_info) =>{
+            if(task_info.account_id != task_info_to_check.account_id) return false;
+
+            let task_info_product_info = Index.g_product_mngr.getProductInfo(task_info.product_info_id);
+            if(task_info_to_check_product_info.sell_type == common.SELL_TYPE.draw && task_info_product_info._id == task_info_to_check_product_info._id) return true;
             else return false;
         });
 
