@@ -25,7 +25,6 @@ class TasksTableItem extends React.Component {
 
         if((this.props.task_info.schedule_time != undefined) && this.props.task_info.schedule_time > cur_server_time){
             initial_status = common.TASK_STATUS.READY;
-            Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
         }else{
             initial_status = common.TASK_STATUS.PAUSE;
         }
@@ -37,6 +36,10 @@ class TasksTableItem extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
+
+        if(this.props.task_info.schedule_time != undefined){
+            Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
+        }
     }
 
     componentWillUnmount(){
@@ -61,7 +64,7 @@ class TasksTableItem extends React.Component {
     onPauseTask(){
         this.ref_status_btn.current.disabled = true;
         window.electron.pauseTask(this.props.task_info, (err, data) =>{
-            
+
             if(this.__mount == false) return;
             this.setState({ status : common.TASK_STATUS.PAUSE}, () => {
                 this.ref_status_btn.current.disabled = false;
@@ -80,14 +83,14 @@ class TasksTableItem extends React.Component {
 
         let new_status = this.state.status != common.TASK_STATUS.PAUSE ? common.TASK_STATUS.PAUSE : common.TASK_STATUS.PLAY;
 
+        
+        // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
+        // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
         if(new_status == common.TASK_STATUS.PLAY){
             this.onPlayTask();
         }else if(new_status == common.TASK_STATUS.PAUSE){
             this.onPauseTask();
         }
-
-        // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
-        // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
     }
 
     onClickRemoveBtn(){

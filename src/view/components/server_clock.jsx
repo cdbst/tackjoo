@@ -13,11 +13,11 @@ class ServerClock{
         this.alam_subscribers = [];
 
         //TODO: server time을 재대로 얻어오지 못했을 때 어떻게 처리해야하는지 고민 필요.
-        let server_time = this.__getServerDateTime();
-        this.server_time = new Date(server_time);
-
+        this.__getServerDateTime((date)=>{
+            this.server_time = new Date(date);
+            this.__setPowerOnClock();
+        });
         this.clock_handler = undefined;
-        this.__setPowerOnClock();
     }
 
     __setPowerOnClock() {
@@ -49,12 +49,20 @@ class ServerClock{
         }
     }
 
-    __getServerDateTime(){
-        xml_http_req = new XMLHttpRequest();
-        xml_http_req.open('HEAD', common.NIKE_URL + '/kr/ko_kr/', false);
-        xml_http_req.setRequestHeader("Content-Type", "text/html");
-        xml_http_req.send('');
-        return xml_http_req.getResponseHeader("Date");
+    __getServerDateTime(__callback){
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", common.NIKE_URL + '/kr/ko_kr/', true);
+        xhr.onload = (e) =>{
+            if(xhr.readyState === 4){
+                __callback(xhr.getResponseHeader("Date"));
+            }
+        };
+        xhr.onerror = function (e) {
+            console.error(xhr.statusText);
+            Index.g_sys_msg_q.enqueue('Error', 'cannot read nike server time.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+        };
+        xhr.send(null); 
     }
 
     /**
