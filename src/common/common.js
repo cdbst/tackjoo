@@ -113,7 +113,7 @@
     }
 
     exports.NIKE_URL = 'https://www.nike.com';
-    exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW'};
+    exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW', notify :'Notify Me'};
     exports.TASK_STATUS = {
         READY : 'ready', //아직 open time이 전이라 play 할 수 없는 상태임.
         PAUSE : 'pause',

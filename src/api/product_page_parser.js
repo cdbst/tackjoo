@@ -16,6 +16,8 @@ function get_sell_type(sell_type_string){
         sell_type = common.SELL_TYPE.ftfs;
     }else if(text.includes(common.SELL_TYPE.draw.toLowerCase())){
         sell_type = common.SELL_TYPE.draw;
+    }else if(text.includes(common.SELL_TYPE.notify.toLowerCase())){
+        sell_type = common.SELL_TYPE.notify;
     }
 
     return sell_type;
@@ -42,7 +44,7 @@ let get_product_list_info_from_feed_page = ($) => {
 
     $('.launch-list-item').each((idx, el)=>{
 
-        let maybe_meaningful_nodes = get_specific_tag_nodes(el, ['a', 'img', 'div']);
+        let maybe_meaningful_nodes = get_specific_tag_nodes(el, ['a', 'img', 'div', 'button']);
 
         let product_alt_name = undefined;
         let product_name = undefined;
@@ -62,6 +64,8 @@ let get_product_list_info_from_feed_page = ($) => {
             }else if(maybe_meaningful_node.name == 'a' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 sell_type_text = maybe_meaningful_node.childNodes[0].data;
             }else if(maybe_meaningful_node.name == 'div' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
+                sell_type_text = maybe_meaningful_node.childNodes[0].data;
+            }else if(maybe_meaningful_node.name == 'button' && has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 sell_type_text = maybe_meaningful_node.childNodes[0].data;
             }
         }
@@ -215,7 +219,7 @@ function get_product_info_from_product_page ($) {
         let size_info_list = parse_draw_size_info_list_from_product_page($);
         common.update_product_info_obj(_product_info, 'size_info_list', size_info_list);
 
-    }else if(sell_type == common.SELL_TYPE.ftfs){
+    }else if(sell_type == common.SELL_TYPE.ftfs || sell_type == common.SELL_TYPE.notify){
         let open_time = parse_ftfs_time_from_product_page($);
 
         if(open_time == undefined) return undefined;
