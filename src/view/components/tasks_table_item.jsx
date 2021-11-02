@@ -51,8 +51,12 @@ class TasksTableItem extends React.Component {
     }
 
     onPlayTask(){
+
         this.ref_status_btn.current.disabled = true;
-        window.electron.playTask(this.props.task_info, (err, data) =>{
+
+        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+
+        window.electron.playTask(this.props.task_info, product_info,(err, data) =>{
 
             if(this.__mount == false) return;
             this.setState({ status : common.TASK_STATUS.PLAY}, () => {

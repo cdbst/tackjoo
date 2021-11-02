@@ -39,6 +39,7 @@ class ProductManager{
         this.__getDefaultSizeNameList = this.__getDefaultSizeNameList.bind(this);
 
         this.__product_info_list = [];
+        this.__product_info_req_gate = new RequestGate();
 
         this.loadProductInfoList();
     }
@@ -78,22 +79,33 @@ class ProductManager{
         }
     }
 
-    getProductInfo(_id, __callback){
+    getProductInfo(_id, __subscriber){
         
         let product_obj = this.__product_info_list.find((product) => { return product._id === _id});
 
         if(product_obj == undefined){
-            if(__callback) __callback('Cannot found product information ..', undefined);
+            if(__subscriber) __subscriber('Cannot found product information ..', undefined);
             return undefined;
         }
 
-        if (__callback == undefined) return product_obj;
+        if (__subscriber == undefined) return product_obj;
 
-        window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
-            //update product info
-            let updated_product_info = this.__updateProductInfo(_id, product_info);
-            __callback(error, updated_product_info);
-        });
+        
+        if(this.__product_info_req_gate.isRequstOnPending(_id)){
+            this.__product_info_req_gate.subscribe(_id, __subscriber);
+            return;
+        }else{
+            this.__product_info_req_gate.subscribe(_id, __subscriber);
+            window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
+
+                if(product_info == undefined) return;
+            
+                //update product info
+                let updated_product_info = this.__updateProductInfo(_id, product_info);
+                this.__product_info_req_gate.notify(updated_product_info._id, error, updated_product_info);
+
+            });
+        }
     }
 
     /**
