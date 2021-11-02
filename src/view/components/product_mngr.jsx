@@ -119,14 +119,6 @@ class ProductManager{
         return this.__product_info_list;
     }
 
-    static getProductDescName(product_info){
-        return product_info.name + ' (' + product_info.alt_name + ')';
-    }
-
-    static getProductDescNameList(product_info_list){
-        return product_info_list.map((product_info) => ProductManager.getProductDescName(product_info) );
-    }
-
     getValueList(product_info_list, attr_name, duplicate = true){
         let value_list = product_info_list.map((product_info) => product_info[attr_name]);
         if(duplicate) return value_list;
@@ -157,5 +149,31 @@ class ProductManager{
             size_names.push((base_size + i * 5).toString());
         }
         return size_names;
+    }
+
+    static getProductDescName(product_info){
+        return product_info.name + ' (' + product_info.alt_name + ')';
+    }
+
+    static getProductDescNameList(product_info_list){
+        return product_info_list.map((product_info) => ProductManager.getProductDescName(product_info) );
+    }
+
+    static isValidProductInfoToTasking(product_info){
+
+        if(product_info == undefined) return false;
+    
+        if(product_info.size_info_list.length == 0) return false;
+
+        let has_quantity = false;
+        for(var i = 0; i < product_info.size_info_list.length; i++){
+            let size_info = product_info.size_info_list[i];
+            if(size_info.quantity == 1){
+                has_quantity = true;
+                break;
+            }
+        }
+
+        if(has_quantity == false) return false;
     }
 }

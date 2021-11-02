@@ -18,10 +18,11 @@ class RequestGate{
     }
 
     notify(_id, error, product_info){
-        this.queue[_id].forEach((subscriber) =>{
+        let subscribers = [...this.queue[_id]];
+        this.queue[_id] = [];
+        subscribers.forEach((subscriber) =>{
             subscriber(error, product_info);
         });
-        this.queue[_id] = [];
     }
 
     isRequstOnPending(_id){

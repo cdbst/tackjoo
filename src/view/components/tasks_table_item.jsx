@@ -10,10 +10,13 @@ class TasksTableItem extends React.Component {
 
         this.onPlayTask = this.onPlayTask.bind(this);
         this.onPauseTask = this.onPauseTask.bind(this);
+        this.setTaskStatus = this.setTaskStatus.bind(this);
 
         this.__mount = false;
 
         this.ref_status_btn = React.createRef();
+
+        this.retry_cnt_task_play = Index.g_app_config.MAX_RETRY_COUNT_TASK;
 
         //6. TODO TYPE_OF_TASK_COND 프로토타입
         // ready, stop, on product page, on cart page, ready to pay, complete
@@ -37,6 +40,7 @@ class TasksTableItem extends React.Component {
     componentDidMount(){
         this.__mount = true;
 
+
         if(this.props.task_info.schedule_time != undefined){
             Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
         }
@@ -47,35 +51,61 @@ class TasksTableItem extends React.Component {
     }
 
     onAlamScheduledTime(_date){      
-        this.onPlayTask();
+        this.onPlayTask(this.retry_cnt_task_play);
     }
 
-    onPlayTask(){
+    onPlayTask(retry_cnt, set_state = true){
 
         this.ref_status_btn.current.disabled = true;
 
-        Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id, (err, product_info) =>{
+        let play_task = () => {
 
-            //TODO : 이 타이밍에는 구매에 필요한 반드시 필요한 product info 조건이 완성이 되어 있어야 한다.
-            // 이 것을 확인하기 위한 예외처리를 추가해야 한다.
-            window.electron.playTask(this.props.task_info, product_info, (err, data) =>{
+            Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id, (err, product_info) =>{
 
-                if(this.__mount == false) return;
-                this.setState({ status : common.TASK_STATUS.PLAY}, () => {
+                if(ProductManager.isValidProductInfoToTasking(product_info) == false){
+
+                    if(retry_cnt == 0){
+                        this.onPauseTask(false);
+                        this.setTaskStatus(common.TASK_STATUS.FAIL, ()=>{
+                            this.ref_status_btn.current.disabled = false;
+                        });
+                    }else{
+                        this.onPlayTask(retry_cnt - 1, false);
+                    }
+                    return;
+                }
+    
+                //TODO : 이 타이밍에는 구매에 필요한 반드시 필요한 product info 조건이 완성이 되어 있어야 한다.
+                // 이 것을 확인하기 위한 예외처리를 추가해야 한다.
+                window.electron.playTask(this.props.task_info, product_info, (err, data) =>{
                     this.ref_status_btn.current.disabled = false;
                 });
             });
-        });
+        }
+
+        if(set_state){
+            this.setTaskStatus(common.TASK_STATUS.PLAY, play_task);
+        }else{
+            play_task();
+        }
     }
 
-    onPauseTask(){
+    onPauseTask(set_state = true){
         this.ref_status_btn.current.disabled = true;
         window.electron.pauseTask(this.props.task_info, (err, data) =>{
 
-            if(this.__mount == false) return;
-            this.setState({ status : common.TASK_STATUS.PAUSE}, () => {
-                this.ref_status_btn.current.disabled = false;
-            });
+            if(set_state){
+                this.setTaskStatus(common.TASK_STATUS.PAUSE, ()=>{
+                    this.ref_status_btn.current.disabled = false;
+                });
+            }
+        });
+    }
+
+    setTaskStatus(_status, __callback){
+        if(this.__mount == false) return;
+        this.setState({ status : _status }, () => {
+            __callback();
         });
     }
 
@@ -88,13 +118,24 @@ class TasksTableItem extends React.Component {
             return;
         }
 
-        let new_status = this.state.status != common.TASK_STATUS.PAUSE ? common.TASK_STATUS.PAUSE : common.TASK_STATUS.PLAY;
+        let getNextStatus = () =>{
+            if(this.state.status == common.TASK_STATUS.FAIL){
+                return common.TASK_STATUS.PLAY;
+            }else if(this.state.status == common.TASK_STATUS.READY){
+                return common.TASK_STATUS.PLAY;
+            }else if(this.state.status == common.TASK_STATUS.PLAY){
+                return common.TASK_STATUS.PAUSE;
+            }else if(this.state.status == common.TASK_STATUS.PAUSE){
+                return common.TASK_STATUS.PLAY;
+            }
+        }
 
-        
+        let new_status = getNextStatus(this.state.status);
+
         // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
         // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
         if(new_status == common.TASK_STATUS.PLAY){
-            this.onPlayTask();
+            this.onPlayTask(this.retry_cnt_task_play);
         }else if(new_status == common.TASK_STATUS.PAUSE){
             this.onPauseTask();
         }
@@ -116,7 +157,7 @@ class TasksTableItem extends React.Component {
         let open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
 
-        let status_btn = this.state.status != common.TASK_STATUS.PAUSE ? './res/img/pause-fill.svg' : './res/img/play-fill.svg';
+        let status_btn = this.state.status != common.TASK_STATUS.PLAY ? './res/img/play-fill.svg' :'./res/img/pause-fill.svg';
 
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.

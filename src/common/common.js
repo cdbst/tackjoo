@@ -117,7 +117,8 @@
     exports.TASK_STATUS = {
         READY : 'ready', //아직 open time이 전이라 play 할 수 없는 상태임.
         PAUSE : 'pause',
-        PLAY : 'play'
+        PLAY : 'play',
+        FAIL : 'fail'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);
