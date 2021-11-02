@@ -186,13 +186,13 @@ function _getLoggedInAccountInfoList(__callback){
 
 let task_ipc_handler_map = {};
 
-function _playTask(_task_info, __callback){
+function _playTask(_task_info, _product_info, __callback){
     
-    let ipc_data = get_ipc_data({task_info : _task_info});
+    let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info});
 
     let task_evt_handler = (event, data) => {
         __callback(undefined, data);
-    }
+    };
 
     task_ipc_handler_map[_task_info._id] = task_evt_handler;
 

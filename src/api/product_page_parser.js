@@ -206,26 +206,15 @@ function get_product_info_from_product_page ($) {
     common.update_product_info_obj(_product_info, 'sell_type', sell_type);
 
     if(sell_type == common.SELL_TYPE.draw){
-        let draw_time_info = parse_draw_time_from_product_page($);
-        if(draw_time_info == undefined) return undefined;
 
-        common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
-        common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
-
-        //draw_id와 size_info_list 정보는 draw open 시간일 때만 확인이 가능함.
-        let draw_id = parse_draw_id_from_from_product_page($);
-        common.update_product_info_obj(_product_info, 'draw_id', draw_id);
-
-        let size_info_list = parse_draw_size_info_list_from_product_page($);
-        common.update_product_info_obj(_product_info, 'size_info_list', size_info_list);
+        parse_draw_product_page($, _product_info);
 
     }else if(sell_type == common.SELL_TYPE.ftfs || sell_type == common.SELL_TYPE.notify){
-        let open_time = parse_ftfs_time_from_product_page($);
-
-        if(open_time == undefined) return undefined;
-        common.update_product_info_obj(_product_info, 'open_time', open_time);
+        
+        parse_closed_product_page($, _product_info);
 
     }else if(sell_type = common.SELL_TYPE.normal){
+        
     
     }else{
         //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
@@ -251,18 +240,41 @@ function parse_price_from_product_page($){
     }
 }
 
+function parse_draw_product_page($, _product_info){
+
+    let draw_time_info = parse_draw_time_from_product_page($);
+    if(draw_time_info != undefined){
+        common.update_product_info_obj(_product_info, 'open_time', draw_time_info.open);
+        common.update_product_info_obj(_product_info, 'close_time', draw_time_info.close);
+    }
+
+    //draw_id와 size_info_list 정보는 draw open 시간일 때만 확인이 가능함.
+    let draw_id = parse_draw_id_from_from_product_page($);
+    common.update_product_info_obj(_product_info, 'draw_id', draw_id);
+
+    let size_info_list = parse_draw_size_info_list_from_product_page($);
+    common.update_product_info_obj(_product_info, 'size_info_list', size_info_list);
+}
+
+function parse_closed_product_page($, _product_info){
+    let open_time = parse_ftfs_time_from_product_page($);
+
+    if(open_time == undefined) return undefined;
+    common.update_product_info_obj(_product_info, 'open_time', open_time);
+}
+
 function parse_draw_time_from_product_page($){
     
     try{
 
         let el_p_draw_info = $('.draw-info');
 
-        if(el_p_draw_info.length == 0) return;
+        if(el_p_draw_info.length == 0) return undefined;
         
         let text_draw_info = get_specific_child_text_nodes(el_p_draw_info[0]);
 
         if(text_draw_info.length == 0){
-            return;
+            return undefined;
         }
 
         let text_draw_time = text_draw_info[0].data;

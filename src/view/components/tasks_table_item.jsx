@@ -54,13 +54,16 @@ class TasksTableItem extends React.Component {
 
         this.ref_status_btn.current.disabled = true;
 
-        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+        Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id, (err, product_info) =>{
 
-        window.electron.playTask(this.props.task_info, product_info,(err, data) =>{
+            //TODO : 이 타이밍에는 구매에 필요한 반드시 필요한 product info 조건이 완성이 되어 있어야 한다.
+            // 이 것을 확인하기 위한 예외처리를 추가해야 한다.
+            window.electron.playTask(this.props.task_info, product_info, (err, data) =>{
 
-            if(this.__mount == false) return;
-            this.setState({ status : common.TASK_STATUS.PLAY}, () => {
-                this.ref_status_btn.current.disabled = false;
+                if(this.__mount == false) return;
+                this.setState({ status : common.TASK_STATUS.PLAY}, () => {
+                    this.ref_status_btn.current.disabled = false;
+                });
             });
         });
     }
