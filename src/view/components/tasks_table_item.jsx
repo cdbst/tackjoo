@@ -110,9 +110,8 @@ class TasksTableItem extends React.Component {
     }
 
     onClickStatusBtn(){
-        //TODO 아직 open time이 전이라 play 할 수 없는 상태인 ready status에 대한 처리가 필요함 (open 이전에 play하려고 했을 때 처리.)
-        let cur_server_time = Index.g_server_clock.getServerTime();
         
+        let cur_server_time = Index.g_server_clock.getServerTime();
         if(this.state.status == common.TASK_STATUS.READY && this.props.task_info.schedule_time > cur_server_time){
             Index.g_sys_msg_q.enqueue('Error', 'Cannot start this task before open time.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
             return;
