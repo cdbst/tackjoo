@@ -98,12 +98,14 @@ class ProductManager{
             this.__product_info_req_gate.subscribe(_id, __subscriber);
             window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
                 //TODO 예외처리 방법에 대한 로직 새로 생각해야함. task 로직 구현과 관련해서 생각 필요.
-                if(product_info == undefined) return;
+                if(product_info == undefined){
+                    this.__product_info_req_gate.notify(product_obj._id, error, product_obj);
+                    return;
+                }
             
                 //update product info
                 let updated_product_info = this.__updateProductInfo(_id, product_info);
                 this.__product_info_req_gate.notify(updated_product_info._id, error, updated_product_info);
-
             });
         }
     }
@@ -162,6 +164,7 @@ class ProductManager{
     static isValidProductInfoToTasking(product_info){
 
         if(product_info == undefined) return false;
+        if(product_info.soldout == undefined || product_info.soldout == true) return false;
     
         if(product_info.size_info_list.length == 0) return false;
 

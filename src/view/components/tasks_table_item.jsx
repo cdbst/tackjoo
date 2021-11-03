@@ -75,8 +75,6 @@ class TasksTableItem extends React.Component {
                     return;
                 }
     
-                //TODO : 이 타이밍에는 구매에 필요한 반드시 필요한 product info 조건이 완성이 되어 있어야 한다.
-                // 이 것을 확인하기 위한 예외처리를 추가해야 한다.
                 window.electron.playTask(this.props.task_info, product_info, (err, data) =>{
                     this.ref_status_btn.current.disabled = false;
                 });
