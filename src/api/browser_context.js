@@ -30,6 +30,8 @@ class BrowserContext {
         this.open_product_page = this.open_product_page.bind(this);
         this.get_product_sku_inventory = this.get_product_sku_inventory.bind(this);
         this.get_account_info = this.get_account_info.bind(this);
+        this.apply_draw = this.apply_draw.bind(this);
+        this.open_page = this.open_page.bind(this);
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
@@ -337,14 +339,12 @@ class BrowserContext {
 
     open_main_page(__callback = undefined){
 
-
         let config = {
             headers: this.__get_open_page_header()
         }
 
         if(this.__cookie_storage.num_of_cookies > 0){
-            let cookies = this.__cookie_storage.get_cookie_data();
-            config.headers['cookie'] = cookies;
+            config.headers['cookie'] = this.__cookie_storage.get_cookie_data();
         }
 
         axios.get(BrowserContext.NIKE_URL + '/kr/ko_kr', config)
@@ -371,8 +371,6 @@ class BrowserContext {
     }
 
     open_feed_page(__callback){
-        this.__before_request();
-        this.__cookie_storage.init();
 
         let config = {
             headers: this.__get_open_page_header()
@@ -404,9 +402,6 @@ class BrowserContext {
     }
 
     open_product_page(product_url, __callback){
-
-        this.__before_request();
-        this.__cookie_storage.init();
 
         let config = {
             headers: this.__get_open_page_header()
@@ -505,7 +500,44 @@ class BrowserContext {
         .catch(err => {
             __callback(err);
         });
+    }
 
+    open_page(url, retry, __callback){
+
+        let config = {
+            headers: this.__get_open_page_header()
+        }
+
+        if(this.__cookie_storage.num_of_cookies > 0){
+            config.headers['cookie'] = this.__cookie_storage.get_cookie_data();
+        }
+
+        axios.get(url, config)
+        .then(res => {
+
+            if(res.status != 200){
+                __callback('open_page : response ' + res.status, retry);
+                return;
+            }
+
+            const $ = cheerio.load(res.data);
+            const csrfToken = this.__get_csrfToken($);
+
+            if(csrfToken == undefined){
+                __callback('open_page : cannot found csrfToken', retry);
+                return;
+            }
+
+            __callback(undefined, retry, csrfToken, $);
+        })
+        .catch(err => {
+            __callback(err, retry);
+        });
+    }
+
+    apply_draw(product_id, draw_id, sku_id, product_url, csrfToken, __callback){
+
+        
     }
 }
 

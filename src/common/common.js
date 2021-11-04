@@ -27,7 +27,8 @@
             account_id : undefined,
             schedule_time : undefined,
             status: undefined,
-            _id : undefined
+            _id : undefined,
+            retry_cnt : undefined,
         };
     }
 

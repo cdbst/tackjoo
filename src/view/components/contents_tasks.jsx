@@ -73,6 +73,7 @@ class ContentsTasks extends React.Component {
         common.update_task_info_obj(task_info_obj, 'account_id', account_id);
         common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
         common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
+        common.update_task_info_obj(task_info_obj, 'retry_cnt', Index.g_app_config.MAX_RETRY_COUNT_TASK);
 
     
         if(this.__checkTaskDuplicated(task_info_obj)){
