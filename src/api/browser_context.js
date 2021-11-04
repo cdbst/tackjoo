@@ -535,7 +535,7 @@ class BrowserContext {
         });
     }
 
-    apply_draw(product_info, draw_id, sku_id, draw_product_xref, draw_sku_xref, csrfToken, retry, __callback){
+    apply_draw(product_info, size_info, csrfToken, retry, __callback){
 
         //TODO 이미 드로우 신청한 상황에 대한 예외 처리 필요.
     }

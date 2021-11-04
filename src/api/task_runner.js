@@ -19,6 +19,8 @@ class TaskRunner{
 
         this.__stop = false;
         this.retry_cnt = task_info.retry_cnt == undefined ? 100 : task_info.retry_cnt;
+
+        this.csrfToken = undefined;
     }
 
     judge_appropreate_size_info(){
@@ -116,7 +118,7 @@ class TaskRunner{
         this.open_product_page(__callback);
     }
 
-    click_apply_draw_button(csrfToken, retry, size_info, __callback){
+    click_apply_draw_button(size_info, retry, __callback){
 
         if(size_info == undefined){
             size_info = this.judge_appropreate_size_info();
@@ -130,15 +132,15 @@ class TaskRunner{
         this.send_sensor_data(()=>{
 
             //apply_draw(product_info, draw_id, sku_id, draw_product_xref, draw_sku_xref, csrfToken, __callback)
-            this.browser_context.apply_draw(this.product_info, this.product_info.draw_id, size_info.sku_id, size_info.draw_product_xref, csrfToken, retry, (err, retry)=>{
+            this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, retry, (err, retry)=>{
 
                 if(err){
                     console.error(err);
 
-                    if(retry == 0){
+                    if(retry <= 0){
                         __callback('cannot apply THE DRAW.');
                     }else{
-                        this.click_apply_draw_button(csrfToken, retry, size_info, __callback);
+                        this.click_apply_draw_button(size_info, --retry, __callback);
                     }
                     return;
                 }
@@ -156,7 +158,7 @@ class TaskRunner{
         const open_page_cb = (err, retry, csrfToken, $) => {
 
             if(err){
-                if(retry == 0){
+                if(retry <= 0){
                     __callback('cannot access to product page');
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
@@ -165,7 +167,7 @@ class TaskRunner{
             }
 
             if(csrfToken == undefined){
-                if(retry == 0){
+                if(retry <= 0){
                     __callback('cannot found access token from product page');
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
@@ -173,8 +175,10 @@ class TaskRunner{
                 return;
             }
 
+            this.csrfToken = csrfToken;
+
             if(this.product_info.sell_type == common.SELL_TYPE.draw){
-                this.click_apply_draw_button(csrfToken, this.retry_cnt, undefined, __callback);
+                this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
             }else{
                 //
             }
