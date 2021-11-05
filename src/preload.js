@@ -191,6 +191,12 @@ function _playTask(_task_info, _product_info, __callback){
     let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info});
 
     let task_evt_handler = (event, task_status) => {
+
+        if(task_status.data.done == true){
+            ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+            delete task_ipc_handler_map[_task_info._id];
+        }
+
         __callback(task_status.err, task_status.data);
     };
 
@@ -206,11 +212,10 @@ function _pauseTask(_task_info, __callback){
     
     ipcRenderer.send('pause-task', ipc_data);
 
-    ipcRenderer.once('pause-task-reply' + _task_info._id, (event, data) => {
+    ipcRenderer.once('pause-task-reply' + _task_info._id, (event, task_status) => {
         ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
         delete task_ipc_handler_map[_task_info._id];
 
-        // TODO test code.
-        __callback(undefined, 'success');
+        __callback(task_status.err);
     });
 }

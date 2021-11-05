@@ -86,6 +86,7 @@ class TaskRunner{
         }
 
         if(size_info == undefined){
+            this.running = false;
             __callback('cannot found size information.');
             return;
         }
@@ -101,6 +102,7 @@ class TaskRunner{
                     console.error(err);
 
                     if(retry <= 0){
+                        this.running = false;
                         __callback('cannot submit THE DRAW product.');
                     }else{
                         this.click_apply_draw_button(size_info, --retry, __callback);
@@ -109,6 +111,7 @@ class TaskRunner{
                 }
 
                 //TODO SEND SUCCESS DATA TO Renderer process.
+                this.running = false;
                 __callback(undefined, draw_entry_data);
             });
         });
@@ -126,6 +129,7 @@ class TaskRunner{
 
             if(err){
                 if(retry <= 0){
+                    this.running = false;
                     __callback('cannot access to product page');
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
@@ -135,6 +139,7 @@ class TaskRunner{
 
             if(csrfToken == undefined){
                 if(retry <= 0){
+                    this.running = false;
                     __callback('cannot found access token from product page');
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
@@ -148,7 +153,7 @@ class TaskRunner{
                 this.status_channel('submit THE DRAW product');
                 this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
             }else{
-                //
+                //TODO add codes for nomal product.
             }
             
         }

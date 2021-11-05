@@ -26,6 +26,7 @@ function register(){
 
         task_runner.start((err, data)=>{
             let _msg = err == undefined ? 'success' : 'fail';
+            TaskRunnerManager.remove(task_runner._id);
             event.reply('play-task-reply' + task_info._id, {err : err, data : {data : data, msg : _msg, done : true}});
         });
     });
