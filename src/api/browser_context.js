@@ -556,7 +556,7 @@ class BrowserContext {
         let cookies = this.__cookie_storage.get_cookie_data();
 
         let config = {
-            headers = {
+            headers : {
                 "authority": BrowserContext.NIKE_DOMAIN_NAME,
                 "accept": "application/json, text/javascript, */*; q=0.01",
                 "accept-encoding": "gzip, deflate, br",
@@ -575,7 +575,7 @@ class BrowserContext {
                 "user-agent": BrowserContext.USER_AGENT,
                 "x-requested-with": "XMLHttpRequest"
             }
-        }
+        };
 
 
         axios.post(BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', payload, config)
