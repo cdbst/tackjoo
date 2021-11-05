@@ -5,9 +5,9 @@ class TaskRunner{
 
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
+        this.check_stopped = this.check_stopped.bind(this);
 
         this.open_product_page = this.open_product_page.bind(this);
-        this.judge_appropreate_size= this.judge_appropreate_size.bind(this);
         this.send_sensor_data = this.send_sensor_data.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
@@ -17,7 +17,7 @@ class TaskRunner{
         this.product_info = product_info;
         this.status_channel = status_channel;
 
-        this.__stop = false;
+        this.running = false;
         this.retry_cnt = task_info.retry_cnt == undefined ? 100 : task_info.retry_cnt;
 
         this.csrfToken = undefined;
@@ -79,6 +79,8 @@ class TaskRunner{
 
     click_apply_draw_button(size_info, retry, __callback){
 
+        if(this.check_stopped(__callback)) return;
+
         if(size_info == undefined){
             size_info = this.judge_appropreate_size_info();
         }
@@ -90,6 +92,8 @@ class TaskRunner{
 
         this.send_sensor_data(()=>{
 
+            if(this.check_stopped(__callback)) return;
+
             //apply_draw(product_info, draw_id, sku_id, draw_product_xref, draw_sku_xref, csrfToken, __callback)
             this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, retry, (err, retry, draw_entry_data)=>{
 
@@ -97,7 +101,7 @@ class TaskRunner{
                     console.error(err);
 
                     if(retry <= 0){
-                        __callback('cannot apply THE DRAW.');
+                        __callback('cannot submit THE DRAW product.');
                     }else{
                         this.click_apply_draw_button(size_info, --retry, __callback);
                     }
@@ -112,9 +116,13 @@ class TaskRunner{
 
     open_product_page(__callback){
 
-        this.__stop = false;
+        if(this.check_stopped(__callback)) return;
+
+        this.status_channel('open product page');
 
         const open_page_cb = (err, retry, csrfToken, $) => {
+
+            if(this.check_stopped(__callback)) return;
 
             if(err){
                 if(retry <= 0){
@@ -137,6 +145,7 @@ class TaskRunner{
             this.csrfToken = csrfToken;
 
             if(this.product_info.sell_type == common.SELL_TYPE.draw){
+                this.status_channel('submit THE DRAW product');
                 this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
             }else{
                 //
@@ -149,11 +158,20 @@ class TaskRunner{
 
     start(__callback){
 
-        this.__stop = false;
+        this.running = true;
         this.open_product_page(__callback);
     }
 
     stop(){
-        this.__stop = true;
+        this.running = false;
+    }
+
+    check_stopped(__callback){
+        if(this.running == true) return false;
+        
+        __callback('task is stopped.');
+        return true;
     }
 }
+
+module.exports.TaskRunner = TaskRunner;
