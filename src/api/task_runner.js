@@ -39,60 +39,24 @@ class TaskRunner{
 
         let target_size_name = this.task_info.size_name;
         
-        var i = 0;
-        var j = 0;
+        let target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.size_name == target_size_name });
+        if(target_size_info != undefined) return target_size_info;
 
+        let min_gap = 9999;
+        let target_size = parseInt(target_size_name);
         let target_size_info = undefined;
-        let found_target_size_info = false;
-        
-        // TODO 알고리즘 최적화 필요...
-        while(target_size_info == undefined){
-            
-            if(found_target_size_info == false){
 
-                let size_info = this.product_info.size_info_list[i];
+        for(var i = 0; i < size_info_list_has_quantity.length; i++){
+            let size_info = size_info_list_has_quantity[i];
+            let size = parseInt(size_info.size_name);
+            let cur_gap = Math.abs(target_size - size);
 
-                if(size_info.name == target_size_name){
-
-                    found_target_size_info = true;
-
-                    if(size_info.quantity != 0){
-                        target_size_info = size_info;
-                        break;
-                    }
-                }
-
-                i++;
-
-            }else{
-
-                j++;
-
-                let upper_size_idx = Math.min((i + j), size_info_len - 1);
-                let lower_size_idx = Math.max((i - j), 0);
-
-                let upper_size_info = this.product_info.size_info_list[upper_size_idx];
-                if(upper_size_info.quantity != 0){
-                    target_size_info = upper_size_idx;
-                    break;
-                }else if(lower_size_idx.quantity != 0){
-                    target_size_info = lower_size_idx;
-                    break;
-                }
-            }
-
-            if(i == size_info_len - 1){ // not found yet.. random select..
-                let max = size_info_list_has_quantity.length - 1;
-                let random_idx = Math.random() * (max - 0) + 0;
-
-                target_size_info = size_info_list_has_quantity[random_idx];
-                break;
-            }
-
-            if(j == size_info_len - 1){ // cannot found anymore..
-                break;
+            if(min_gap > cur_gap){
+                min_gap = cur_gap;
+                target_size_info = size_info;
             }
         }
+        return target_size_info;
     }
 
     send_sensor_data(__callback){
