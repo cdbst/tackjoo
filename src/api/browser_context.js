@@ -10,6 +10,7 @@ class BrowserContext {
     static NIKE_DOMAIN_NAME = 'www.nike.com';
     static NIKE_URL = 'https://www.nike.com';
     static USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36';
+    static SEC_CA_UA = "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\""
 
     constructor(_email, _pwd, _id){
 
@@ -79,7 +80,7 @@ class BrowserContext {
                 "cache-control": "no-cache",
                 "content-type": "text/plain;charset=UTF-8",
                 "pragma": "no-cache",
-                "sec-ch-ua": "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\"",
+                "sec-ch-ua": BrowserContext.SEC_CA_UA,
                 "sec-ch-ua-mobile": "?0",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
@@ -537,7 +538,69 @@ class BrowserContext {
 
     apply_draw(product_info, size_info, csrfToken, retry, __callback){
 
-        //TODO 이미 드로우 신청한 상황에 대한 예외 처리 필요.
+
+        let payload_obj = {
+            prodId : product_info.product_id,
+            theDrawId : product_info.draw_id,
+            skuId : size_info.sku_id,
+            redirectUrl : product_info.url,
+            thedrawproductxref : size_info.draw_product_xref,
+            thedrawskuxref : size_info.draw_sku_xref,
+            infoAgree: true,
+            smsAgree: true,
+            csrfToken: csrfToken
+        };
+
+        let payload = qureystring.stringify(payload_obj);
+
+        let cookies = this.__cookie_storage.get_cookie_data();
+
+        let config = {
+            headers = {
+                "authority": BrowserContext.NIKE_DOMAIN_NAME,
+                "accept": "application/json, text/javascript, */*; q=0.01",
+                "accept-encoding": "gzip, deflate, br",
+                "accept-language": "ko,en;q=0.9,en-US;q=0.8",
+                "content-length": payload.length, // must be fixed
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "cookie": cookies,
+                "origin": BrowserContext.NIKE_URL,
+                "referer": product_info.url,
+                "sec-ch-ua": BrowserContext.SEC_CA_UA,
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "Windows",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "user-agent": BrowserContext.USER_AGENT,
+                "x-requested-with": "XMLHttpRequest"
+            }
+        }
+
+
+        axios.post(BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', payload, config)
+        .then(res => {
+
+            //TODO 이미 드로우 신청한 상황에 대한 예외 처리 필요.
+            if(res.status != 200){
+                __callback('apply_draw : invalid response status code.' + res.status, retry);
+                return;
+            }
+
+            if(('result' in res.data) == false){
+                __callback('apply_draw : recv invalid payload.', retry);
+            }
+
+            if(res.data['result'] == false){
+                __callback('apply_draw : draw failed.', retry);
+            }
+
+            __callback(undefined, retry, res.data);
+
+        })
+        .catch(error => {
+            __callback(error, retry);
+        });
     }
 }
 

@@ -76,11 +76,6 @@ class TaskRunner{
         });
     }
 
-    start(__callback){
-
-        this.__stop = false;
-        this.open_product_page(__callback);
-    }
 
     click_apply_draw_button(size_info, retry, __callback){
 
@@ -96,7 +91,7 @@ class TaskRunner{
         this.send_sensor_data(()=>{
 
             //apply_draw(product_info, draw_id, sku_id, draw_product_xref, draw_sku_xref, csrfToken, __callback)
-            this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, retry, (err, retry)=>{
+            this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, retry, (err, retry, draw_entry_data)=>{
 
                 if(err){
                     console.error(err);
@@ -110,7 +105,7 @@ class TaskRunner{
                 }
 
                 //TODO SEND SUCCESS DATA TO Renderer process.
-                __callback(undefined);
+                __callback(undefined, draw_entry_data);
             });
         });
     }
@@ -152,6 +147,11 @@ class TaskRunner{
         this.browser_context.open_page(this.product_info.product_url, this.retry_cnt, open_page_cb);
     }
 
+    start(__callback){
+
+        this.__stop = false;
+        this.open_product_page(__callback);
+    }
 
     stop(){
         this.__stop = true;
