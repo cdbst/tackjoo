@@ -183,7 +183,6 @@ function _getLoggedInAccountInfoList(__callback){
     });
 }
 
-
 let task_ipc_handler_map = {};
 
 function _playTask(_task_info, _product_info, __callback){
@@ -214,8 +213,7 @@ function _pauseTask(_task_info, __callback){
 
     ipcRenderer.once('pause-task-reply' + _task_info._id, (event, task_status) => {
         ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
-        delete task_ipc_handler_map[_task_info._id];
-
+        if(_task_info._id in task_ipc_handler_map) delete task_ipc_handler_map[_task_info._id];
         __callback(task_status.err);
     });
 }
