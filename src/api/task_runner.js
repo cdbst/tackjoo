@@ -44,7 +44,6 @@ class TaskRunner{
 
         let min_gap = 9999;
         let target_size = parseInt(target_size_name);
-        let target_size_info = undefined;
 
         for(var i = 0; i < size_info_list_has_quantity.length; i++){
             let size_info = size_info_list_has_quantity[i];

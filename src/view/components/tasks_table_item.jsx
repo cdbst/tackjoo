@@ -76,6 +76,8 @@ class TasksTableItem extends React.Component {
                 }
     
                 window.electron.playTask(this.props.task_info, product_info, (err, data) =>{
+
+                    //TODO : stats update 처리 필요.
                     this.ref_status_btn.current.disabled = false;
                 });
             });
