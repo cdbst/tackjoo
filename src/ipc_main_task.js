@@ -12,13 +12,16 @@ function register(){
         
         let task_info = data.payload.task_info;
         let product_info = data.payload.product_info;
+
+        let browser_context = UserBrowserCxtMngr.get(task_info.account_id);
         
-        if((task_info.account_id in UserBrowserCxtMngr) == false){
+        if(browser_context == undefined){
             event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
             return;
         }
 
-        let browser_context = UserBrowserCxtMngr[task_info.account_id];
+        event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.PLAY, done : false});
+
         let task_runner = new TaskRunner(browser_context, task_info, product_info, (task_status)=>{
             event.reply('play-task-reply' + task_info._id, {status : task_status, done : false});
         });

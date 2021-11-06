@@ -131,7 +131,7 @@ class TaskRunner{
                     this.running = false;
                     __callback(common.TASK_STATUS.FAIL);
                 }else{
-                    this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
+                    this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
                 }
                 return;
             }
@@ -141,7 +141,7 @@ class TaskRunner{
                     this.running = false;
                     __callback(common.TASK_STATUS.FAIL);
                 }else{
-                    this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
+                    this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
                 }
                 return;
             }
@@ -157,7 +157,7 @@ class TaskRunner{
             
         }
 
-        this.browser_context.open_page(this.product_info.product_url, this.retry_cnt, open_page_cb);
+        this.browser_context.open_page(this.product_info.url, this.retry_cnt, open_page_cb);
     }
 
     start(__callback){

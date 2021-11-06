@@ -100,6 +100,7 @@ class TaskTableItem extends React.Component {
 
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                this.ref_status_btn.current.disabled = false;
             }else{
                 if(set_state){
                     this.setTaskStatus(common.TASK_STATUS.PAUSE, ()=>{
