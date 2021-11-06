@@ -188,8 +188,6 @@ class TaskTableItem extends React.Component {
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
 
-        console.log('cur status :' + this.state.status);
-
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
         return(

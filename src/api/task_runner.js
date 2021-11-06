@@ -126,35 +126,37 @@ class TaskRunner{
 
             if(this.check_stopped(__callback)) return;
 
-            if(err){
-                if(retry <= 0){
-                    this.running = false;
-                    __callback(common.TASK_STATUS.FAIL);
-                }else{
-                    this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
+            this.send_sensor_data(()=>{
+
+                if(err){
+                    if(retry <= 0){
+                        this.running = false;
+                        __callback(common.TASK_STATUS.FAIL);
+                    }else{
+                        this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
+                    }
+                    return;
                 }
-                return;
-            }
-
-            if(csrfToken == undefined){
-                if(retry <= 0){
-                    this.running = false;
-                    __callback(common.TASK_STATUS.FAIL);
-                }else{
-                    this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
+    
+                if(csrfToken == undefined){
+                    if(retry <= 0){
+                        this.running = false;
+                        __callback(common.TASK_STATUS.FAIL);
+                    }else{
+                        this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
+                    }
+                    return;
                 }
-                return;
-            }
-
-            this.csrfToken = csrfToken;
-
-            if(this.product_info.sell_type == common.SELL_TYPE.draw){
-                this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
-                this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
-            }else{
-                //TODO add codes for nomal product.
-            }
-            
+    
+                this.csrfToken = csrfToken;
+    
+                if(this.product_info.sell_type == common.SELL_TYPE.draw){
+                    this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
+                    this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
+                }else{
+                    //TODO add codes for nomal product.
+                }
+            });
         }
 
         this.browser_context.open_page(this.product_info.url, this.retry_cnt, open_page_cb);
