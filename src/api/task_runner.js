@@ -1,4 +1,5 @@
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
+const common = require("../common/common.js");
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, status_channel){
@@ -86,7 +87,7 @@ class TaskRunner{
 
         if(size_info == undefined){
             this.running = false;
-            __callback('cannot found size information.');
+            __callback(common.TASK_STATUS.FAIL);
             return;
         }
 
@@ -102,16 +103,15 @@ class TaskRunner{
 
                     if(retry <= 0){
                         this.running = false;
-                        __callback('cannot submit THE DRAW product.');
+                        __callback(common.TASK_STATUS.FAIL);
                     }else{
                         this.click_apply_draw_button(size_info, --retry, __callback);
                     }
                     return;
                 }
 
-                //TODO SEND SUCCESS DATA TO Renderer process.
                 this.running = false;
-                __callback(undefined, draw_entry_data);
+                __callback(common.TASK_STATUS.DONE);
             });
         });
     }
@@ -120,7 +120,7 @@ class TaskRunner{
 
         if(this.check_stopped(__callback)) return;
 
-        this.status_channel('open product page');
+        this.status_channel(common.TASK_STATUS.ON_PAGE);
 
         const open_page_cb = (err, retry, csrfToken, $) => {
 
@@ -129,7 +129,7 @@ class TaskRunner{
             if(err){
                 if(retry <= 0){
                     this.running = false;
-                    __callback('cannot access to product page');
+                    __callback(common.TASK_STATUS.FAIL);
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
                 }
@@ -139,7 +139,7 @@ class TaskRunner{
             if(csrfToken == undefined){
                 if(retry <= 0){
                     this.running = false;
-                    __callback('cannot found access token from product page');
+                    __callback(common.TASK_STATUS.FAIL);
                 }else{
                     this.browser_context.open_page(this.product_info.product_url, --retry, open_page_cb);
                 }
@@ -149,7 +149,7 @@ class TaskRunner{
             this.csrfToken = csrfToken;
 
             if(this.product_info.sell_type == common.SELL_TYPE.draw){
-                this.status_channel('submit THE DRAW product');
+                this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
                 this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
             }else{
                 //TODO add codes for nomal product.
@@ -173,7 +173,7 @@ class TaskRunner{
     check_stopped(__callback){
         if(this.running == true) return false;
         
-        __callback('task is stopped.');
+        __callback(common.TASK_STATUS.PAUSE);
         return true;
     }
 }

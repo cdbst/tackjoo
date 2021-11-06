@@ -120,7 +120,7 @@ class ContentsTasks extends React.Component {
 
     __genTasksTableItems(task_list){
         return task_list.map((task_obj) => 
-            <TasksTableItem 
+            <TaskTableItem 
                 key={task_obj._id} 
                 h_remove={this.onRemoveTask.bind(this)}
                 task_info={task_obj}

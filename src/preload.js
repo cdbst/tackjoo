@@ -134,7 +134,6 @@ function _login(_id, __callback){
     ipcRenderer.send('login', ipc_data);
 
     ipcRenderer.once('login-reply' + ipc_data.id, (event, err) => {
-
         __callback(err);
     });
 }
@@ -189,14 +188,14 @@ function _playTask(_task_info, _product_info, __callback){
     
     let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info});
 
-    let task_evt_handler = (event, task_status) => {
+    let task_evt_handler = (_event, _data) => {
 
-        if(task_status.data.done == true){
+        if(_data.done == true){
             ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
             delete task_ipc_handler_map[_task_info._id];
         }
 
-        __callback(task_status.err, task_status.data);
+        __callback(_data.status);
     };
 
     task_ipc_handler_map[_task_info._id] = task_evt_handler;
@@ -211,9 +210,12 @@ function _pauseTask(_task_info, __callback){
     
     ipcRenderer.send('pause-task', ipc_data);
 
-    ipcRenderer.once('pause-task-reply' + _task_info._id, (event, task_status) => {
+    ipcRenderer.once('pause-task-reply' + _task_info._id, (_event, data) => {
+
         ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+
         if(_task_info._id in task_ipc_handler_map) delete task_ipc_handler_map[_task_info._id];
-        __callback(task_status.err);
+
+        __callback(data.err);
     });
 }

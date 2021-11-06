@@ -119,7 +119,12 @@
         READY : 'ready', //아직 open time이 전이라 play 할 수 없는 상태임.
         PAUSE : 'pause',
         PLAY : 'play',
-        FAIL : 'fail'
+        FAIL : 'fail',
+        DONE : 'done',
+        ON_PAGE : 'on product page',
+        ADD_TO_CART : 'add to cart',
+        TRY_TO_DRAW : 'try to draw',
+        TRY_DO_PAY : 'try to pay'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

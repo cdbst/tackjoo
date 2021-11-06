@@ -18,16 +18,15 @@ function register(){
         }
 
         let browser_context = UserBrowserCxtMngr[task_info.account_id];
-        let task_runner = new TaskRunner(browser_context, task_info, product_info, (task_status_msg)=>{
-            event.reply('play-task-reply' + task_info._id, {err : undefined, data : {data : undefined, msg : task_status_msg, done : false}});
+        let task_runner = new TaskRunner(browser_context, task_info, product_info, (task_status)=>{
+            event.reply('play-task-reply' + task_info._id, {err : undefined, data : {status : task_status, done : false}});
         });
 
         TaskRunnerManager.add(task_runner);
 
-        task_runner.start((err, data)=>{
-            let _msg = err == undefined ? 'success' : 'fail';
+        task_runner.start((task_status)=>{
             TaskRunnerManager.remove(task_runner._id);
-            event.reply('play-task-reply' + task_info._id, {err : err, data : {data : data, msg : _msg, done : true}});
+            event.reply('play-task-reply' + task_info._id, {err : err, data : {status : task_status, done : true}});
         });
     });
 
@@ -44,7 +43,6 @@ function register(){
         task_runner.stop();
         TaskRunnerManager.remove(task_runner._id);
         event.reply('pause-task-reply' + task_info._id, {err : undefined});
-
     });
 }
 
