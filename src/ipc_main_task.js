@@ -43,7 +43,7 @@ function register(){
         }
 
         task_runner.stop();
-        TaskRunnerManager.remove(task_runner._id);
+        TaskRunnerManager.remove(task_runner.task_info._id);
         event.reply('pause-task-reply' + task_info._id, {err : undefined});
     });
 }

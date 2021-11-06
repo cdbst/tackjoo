@@ -94,19 +94,20 @@ class TaskTableItem extends React.Component {
         }
     }
 
-    onPauseTask(set_state = true){
+    onPauseTask(__callback){
         this.ref_status_btn.current.disabled = true;
         window.electron.pauseTask(this.props.task_info, (err) =>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
                 this.ref_status_btn.current.disabled = false;
+                if(__callback) __callback();
             }else{
-                if(set_state){
-                    this.setTaskStatus(common.TASK_STATUS.PAUSE, ()=>{
-                        this.ref_status_btn.current.disabled = false;
-                    });
-                }
+                
+                this.setTaskStatus(common.TASK_STATUS.PAUSE, ()=>{
+                    this.ref_status_btn.current.disabled = false;
+                    if(__callback) __callback();
+                });
             }
         });
     }
@@ -139,7 +140,9 @@ class TaskTableItem extends React.Component {
     }
 
     onClickRemoveBtn(){
-        this.props.h_remove(this.props.task_info._id);
+        this.onPauseTask(() =>{
+            this.props.h_remove(this.props.task_info._id);
+        });
     }
 
     getStatusBtnSrc(task_status){
