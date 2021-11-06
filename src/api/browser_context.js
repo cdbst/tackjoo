@@ -538,7 +538,6 @@ class BrowserContext {
 
     apply_draw(product_info, size_info, csrfToken, retry, __callback){
 
-
         let payload_obj = {
             prodId : product_info.product_id,
             theDrawId : product_info.draw_id,

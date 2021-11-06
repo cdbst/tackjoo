@@ -21,6 +21,8 @@ class ContentsTasks extends React.Component {
         super(props);
 
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
+        this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
+
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
         this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
@@ -28,12 +30,25 @@ class ContentsTasks extends React.Component {
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
 
         this.task_list = [];
+        this.table_item_refs = [];
         this.task_edit_modal_id = 'edit-task-modal';
 
         this.state = {
             task_table_items : []
         }
 
+    }
+
+    onClickBtnRunAll(){
+        this.table_item_refs.forEach((table_item_ref) =>{
+            table_item_ref.current.onPlayTask();
+        });
+    }
+
+    onClickBtnStopAll(){
+        this.table_item_refs.forEach((table_item_ref) =>{
+            table_item_ref.current.onPauseTask();
+        });
     }
 
     onClickBtnNewTask(){
@@ -119,13 +134,26 @@ class ContentsTasks extends React.Component {
     }
 
     __genTasksTableItems(task_list){
-        return task_list.map((task_obj) => 
-            <TaskTableItem 
-                key={task_obj._id} 
-                h_remove={this.onRemoveTask.bind(this)}
-                task_info={task_obj}
-            />
-        );
+
+        let task_table_items = [];
+        this.table_item_refs = [];
+
+        for(var i = 0; i < task_list.length; i++){
+            let task_info = task_list[i];
+            let task_ref = React.createRef();
+            this.table_item_refs.push(task_ref);
+            task_table_items.push(
+                <TaskTableItem 
+                    key={task_info._id} 
+                    id={task_info._id}
+                    h_remove={this.onRemoveTask.bind(this)}
+                    task_info={task_info}
+                    ref={task_ref}
+                />
+            );
+        }
+
+        return task_table_items;
     }
 
     render() {
@@ -170,10 +198,10 @@ class ContentsTasks extends React.Component {
                         <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
                             <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}} /> New Task
                         </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" >
-                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Run All
+                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
+                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}} /> Run All
                         </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" >
+                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
                             <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Stop All
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside" >

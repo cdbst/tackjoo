@@ -16,6 +16,9 @@ class TaskTableItem extends React.Component {
         this.setTaskStatus = this.setTaskStatus.bind(this);
         this.getStatusBtnSrc = this.getStatusBtnSrc.bind(this);
 
+        this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
+        this.isPossibleToPause = this.isPossibleToPause.bind(this);
+
         this.__mount = false;
 
         this.ref_status_btn = React.createRef();
@@ -59,6 +62,7 @@ class TaskTableItem extends React.Component {
 
     onPlayTask(retry_cnt, set_state = true){
 
+        if(this.isPossibleToPlay() == false) return;
         this.ref_status_btn.current.disabled = true;
 
         let play_task = () => {
@@ -95,7 +99,10 @@ class TaskTableItem extends React.Component {
     }
 
     onPauseTask(__callback){
+
+        if(this.isPossibleToPause() == false) return;
         this.ref_status_btn.current.disabled = true;
+
         window.electron.pauseTask(this.props.task_info, (err) =>{
 
             if(err){
@@ -140,16 +147,21 @@ class TaskTableItem extends React.Component {
     }
 
     onClickRemoveBtn(){
-        this.onPauseTask(() =>{
+
+        if(this.isPossibleToPause()){
+            this.onPauseTask(() =>{
+                this.props.h_remove(this.props.task_info._id);
+            });
+        }else{
             this.props.h_remove(this.props.task_info._id);
-        });
+        }
     }
 
-    getStatusBtnSrc(task_status){
+    getStatusBtnSrc(){
 
         let btn_src = '';
 
-        switch(task_status){
+        switch(this.state.status){
             case common.TASK_STATUS.READY : 
                 btn_src = TaskTableItem.PLAY_BTN_SRC;
                 break;
@@ -180,6 +192,53 @@ class TaskTableItem extends React.Component {
         }
 
         return btn_src;
+    }
+
+    isPossibleToPlay(){
+        switch(this.state.status){
+            case common.TASK_STATUS.READY : 
+                let cur_server_time = Index.g_server_clock.getServerTime();
+                return this.props.task_info.schedule_time <= cur_server_time;
+            case common.TASK_STATUS.PAUSE : 
+                return true;
+            case common.TASK_STATUS.PLAY : 
+                return false;
+            case common.TASK_STATUS.FAIL : 
+                return true;
+            case common.TASK_STATUS.DONE : 
+                return true;
+            case common.TASK_STATUS.ON_PAGE : 
+                return false;
+            case common.TASK_STATUS.ADD_TO_CART : 
+                return false;
+            case common.TASK_STATUS.TRY_TO_DRAW : 
+                return false;
+            case common.TASK_STATUS.TRY_DO_PAY : 
+                return false;
+        }
+    }
+
+    isPossibleToPause(){
+        switch(this.state.status){
+            case common.TASK_STATUS.READY : 
+                return false;
+            case common.TASK_STATUS.PAUSE : 
+                return false;
+            case common.TASK_STATUS.PLAY : 
+                return true;
+            case common.TASK_STATUS.FAIL : 
+                return false;
+            case common.TASK_STATUS.DONE : 
+                return false;
+            case common.TASK_STATUS.ON_PAGE : 
+                return true;
+            case common.TASK_STATUS.ADD_TO_CART : 
+                return true;
+            case common.TASK_STATUS.TRY_TO_DRAW : 
+                return true;
+            case common.TASK_STATUS.TRY_DO_PAY : 
+                return true;
+        }
     }
 
     render(){
