@@ -44,7 +44,6 @@ class TaskTableItem extends React.Component {
     componentDidMount(){
         this.__mount = true;
 
-
         if(this.props.task_info.schedule_time != undefined){
             Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
         }
@@ -79,9 +78,9 @@ class TaskTableItem extends React.Component {
                     return;
                 }
     
-                window.electron.playTask(this.props.task_info, product_info, (data) =>{
+                window.electron.playTask(this.props.task_info, product_info, (status) =>{
 
-                    this.setTaskStatus(data.status, ()=>{
+                    this.setTaskStatus(status, ()=>{
                         this.ref_status_btn.current.disabled = false;
                     });
                 });
@@ -127,7 +126,7 @@ class TaskTableItem extends React.Component {
             return;
         }
 
-        let new_status = is_play_btn ? common.TASK_STATUS.PAUSE : common.TASK_STATUS.PLAY;
+        let new_status = is_play_btn ? common.TASK_STATUS.PLAY : common.TASK_STATUS.PAUSE;
 
         // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
         // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
@@ -187,6 +186,8 @@ class TaskTableItem extends React.Component {
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
+
+        console.log('cur status :' + this.state.status);
 
         // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
         // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.

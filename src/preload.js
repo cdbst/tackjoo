@@ -188,14 +188,14 @@ function _playTask(_task_info, _product_info, __callback){
     
     let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info});
 
-    let task_evt_handler = (_event, _data) => {
+    let task_evt_handler = (_event, data) => {
 
-        if(_data.done == true){
+        if(data.done == true){
             ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
             delete task_ipc_handler_map[_task_info._id];
         }
 
-        __callback(_data.status);
+        __callback(data.status);
     };
 
     task_ipc_handler_map[_task_info._id] = task_evt_handler;
