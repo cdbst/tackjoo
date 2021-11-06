@@ -11,6 +11,14 @@ body {
 }
 /* End To Global */
 
+/* Start To Contents Title */
+.contents-title {
+    color : #83f195 !important;
+    font-weight: bold;
+}
+
+/* End To Contents Title */
+
 
 /* Start To common purpose */
 .span-text-color-red {
@@ -66,6 +74,7 @@ thead tr:nth-child(1) th{
     position: sticky;
     top: 0;
     z-index: 10;
+    color: #83f195 !important;
 }
 tbody tr:hover td {
     background: #83f195 !important;

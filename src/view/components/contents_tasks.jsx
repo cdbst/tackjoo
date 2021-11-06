@@ -165,7 +165,7 @@ class ContentsTasks extends React.Component {
                 <br/>
                 <div className="row">
                     <div className="col">
-                        <h3 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h3>
+                        <h4 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h4>
                     </div>
                     <div className="col">
                         {/* <a>TEST : search item interface</a> */}

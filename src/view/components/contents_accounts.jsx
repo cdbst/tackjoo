@@ -227,7 +227,7 @@ class ContentsAccounts extends React.Component {
                 <br/>
                 <div className="row">
                     <div className="col">
-                        <h3 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h3>
+                        <h4 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
                     </div>
                     <div className="col">
                         {/* <a>TEST : search item interface</a> */}
