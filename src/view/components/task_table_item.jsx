@@ -250,32 +250,30 @@ class TaskTableItem extends React.Component {
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
 
-        // TODO product name이 너무 길면 적당한 길이로 표현해주도록 처리해야 함.
-        // TODO 각 cell의 고정된 너비(또는 비율)를 적용해야 함.
         return(
             <tr>
-                <td >
+                <td style={{width : this.props.type_col_width, maxWidth : this.props.type_col_width}}>
                     <span>{product_info.sell_type}</span>
                 </td>
-                <td >
-                    <span>{product_name}</span>
+                <td style={{width : this.props.product_col_width, maxWidth : this.props.product_col_width}}>
+                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={product_name}>{product_name}</div>
                 </td>
-                <td >
+                <td style={{width : this.props.size_col_width, maxWidth : this.props.size_col_width}}>
                     <span>{this.props.task_info.size_name}</span>
                 </td>
-                <td >
-                    <span>{this.props.task_info.account_email}</span>
+                <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
+                    <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.task_info.account_email}>{this.props.task_info.account_email}</div>
                 </td>
-                <td >
+                <td style={{width : this.props.open_time_col_width, maxWidth : this.props.open_time_col_width}}>
                     <span>{open_time_str}</span>
                 </td>
-                <td >
+                <td style={{width : this.props.scheduled_time_col_width, maxWidth : this.props.scheduled_time_col_width}}>
                     <span>{schedule_time_str}</span>
                 </td>
-                <td >
+                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
                     <span>{this.state.status}</span>
                 </td>
-                <td >
+                <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
                             <button ref={this.ref_status_btn} type="button" className="btn btn-warning" onClick={this.onClickStatusBtn.bind(this, status_btn == TaskTableItem.PLAY_BTN_SRC)}>

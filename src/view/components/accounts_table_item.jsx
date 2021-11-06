@@ -22,13 +22,13 @@ class AccountsTableItem extends React.Component {
         let status_text_class = this.props.data.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
         return(
             <tr>
-                <td style={{width : this.props.email_col_width}}>
+                <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
                     <span>{this.props.data.email}</span>
                 </td>
-                <td style={{width : this.props.status_col_width}}>
+                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
                     <span className={status_text_class}>{this.props.data.status}</span>
                 </td>
-                <td style={{width : this.props.actions_col_width}}>
+                <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-warning" onClick={this.onClickLogin.bind(this)}>

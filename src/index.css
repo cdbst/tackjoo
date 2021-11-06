@@ -9,7 +9,13 @@ body {
     height: 100% !important;
     background-color: #32353b !important;
 }
+
 /* End To Global */
+.cut-text { 
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
 
 /* Start To Contents Title */
 .contents-title {

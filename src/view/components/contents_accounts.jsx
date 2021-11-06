@@ -18,6 +18,7 @@ class ContentsAccounts extends React.Component {
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
+        this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
 
 
         this.account_edit_modal_el_id = "edit-account-modal";
@@ -30,6 +31,10 @@ class ContentsAccounts extends React.Component {
             account_table_list : table_items
         }
         
+        this.__setupColumnsWidth();
+    }
+
+    __setupColumnsWidth(){
         this.actions_col_width = 240;
         this.status_col_width = 120;
         this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width) + 'px)';
@@ -237,9 +242,9 @@ class ContentsAccounts extends React.Component {
                 <table className="table table-hover">
                     <thead>
                         <tr>
-                            <th scope="col" style={{width : this.email_col_width}}>E-Mail</th>
-                            <th scope="col" style={{width : this.status_col_width}}>Status</th>
-                            <th scope="col" style={{width : this.actions_col_width}}>Actions</th>
+                            <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>E-Mail</th>
+                            <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
+                            <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>

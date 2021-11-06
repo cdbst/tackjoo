@@ -28,6 +28,7 @@ class ContentsTasks extends React.Component {
         this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
         this.__updateTaskTalbeItems = this.__updateTaskTalbeItems.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
+        this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
 
         this.task_list = [];
         this.table_item_refs = [];
@@ -35,8 +36,29 @@ class ContentsTasks extends React.Component {
 
         this.state = {
             task_table_items : []
-        }
+        };
 
+        this.__setupColumnsWidth();
+    }
+
+    __setupColumnsWidth(){
+        this.type_col_width = 124.5;
+        this.size_col_width = 53;
+        this.account_col_width = 240;
+        this.open_time_col_width = 180;
+        this.scheduled_time_col_width = 180;
+        this.status_col_width = 180;
+        this.action_col_width = 145.5;
+
+        let cols_width_without_product_col = this.type_col_width + 
+            this.size_col_width + 
+            this.account_col_width + 
+            this.open_time_col_width + 
+            this.scheduled_time_col_width + 
+            this.status_col_width +
+            this.action_col_width;
+
+        this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
     }
 
     onClickBtnRunAll(){
@@ -149,6 +171,14 @@ class ContentsTasks extends React.Component {
                     h_remove={this.onRemoveTask.bind(this)}
                     task_info={task_info}
                     ref={task_ref}
+                    type_col_width={this.type_col_width}
+                    product_col_width={this.product_col_width}
+                    size_col_width={this.size_col_width}
+                    account_col_width={this.account_col_width}
+                    open_time_col_width={this.open_time_col_width}
+                    scheduled_time_col_width={this.scheduled_time_col_width}
+                    status_col_width={this.status_col_width}
+                    action_col_width={this.action_col_width}
                 />
             );
         }
@@ -175,14 +205,14 @@ class ContentsTasks extends React.Component {
                 <table className="table table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Type</th>
-                            <th scope="col">Product</th>
-                            <th scope="col">Size</th>
-                            <th scope="col">Account</th>
-                            <th scope="col">Open Time</th>
-                            <th scope="col">Scheduled Time</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>Type</th>
+                            <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>Product</th>
+                            <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>Size</th>
+                            <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>Account</th>
+                            <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>Open Time</th>
+                            <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>Scheduled Time</th>
+                            <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
+                            <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
