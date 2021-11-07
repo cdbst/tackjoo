@@ -46,13 +46,15 @@ class ContentsAccounts extends React.Component {
 
     __loadAccountInfoFile(){
 
+        Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
         window.electron.getAccountInfo(_account_info => {
 
             if(_account_info.err) {
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
                 let file_loaded_account_info = _account_info.data.accounts;
-                Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                
                 for(var i = 0; i < file_loaded_account_info.length; i++){
                     let account = file_loaded_account_info[i];
                     this.addAccount(account.email, account.pwd, false); // modal disable.
