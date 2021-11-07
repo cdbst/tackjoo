@@ -45,6 +45,7 @@ class BrowserContext {
 
         this.__cookie_storage = new cookieMngr.CookieManager();
         this.__cookie_storage.add_cookie_data('social_type=comlogin');
+        this.__cookie_storage.add_cookie_data('NikeCookie=ok');
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -590,7 +591,9 @@ class BrowserContext {
                 __callback('apply_draw : recv invalid payload.', retry);
             }
 
-            if(res.data['result'] == false){
+            if(res.data['dupFlag'] == true){
+                __callback(undefined, retry, res.data);
+            }else if(res.data['result'] == false){
                 __callback('apply_draw : draw failed.', retry);
             }
 

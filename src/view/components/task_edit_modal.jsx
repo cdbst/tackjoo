@@ -126,7 +126,8 @@ class TaskEditModal extends React.Component {
             Index.g_sys_msg_q.enqueue('Error', value + " has no product information.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
-
+        
+        //TODO : Bugfix (모달 처음 열었을 때 버그. 보는 상품이랑 선택된 상품이랑 다름)
         this.onChangeProduct(_filtered_product_info_list[0]._id, (err, _product_info) =>{
             let new_state = {filtered_product_info_list : _filtered_product_info_list};
             if(_product_info){

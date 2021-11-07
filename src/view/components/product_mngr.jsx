@@ -132,7 +132,12 @@ class ProductManager{
         let size_list = undefined;
 
         if(product_info != undefined && product_info.size_info_list.length > 0){
-            size_list = product_info['size_info_list'].filter((size_info) => {return size_info.quantity > 0}).map((size_info) => size_info.name);
+            if(product_info.sell_type == common.SELL_TYPE.draw){
+                size_list = product_info['size_info_list'].map((size_info) => size_info.name);
+            }else{
+                size_list = product_info['size_info_list'].filter((size_info) => {return size_info.quantity > 0}).map((size_info) => size_info.name);
+            }
+            
         }else if(product_info != undefined){
             size_list = this.__getDefaultSizeNameList();
         }else{
@@ -168,6 +173,8 @@ class ProductManager{
     
         if(product_info.size_info_list.length == 0) return false;
 
+        if(product_info.sell_type == common.SELL_TYPE.draw) return true;
+
         let has_quantity = false;
         for(var i = 0; i < product_info.size_info_list.length; i++){
             let size_info = product_info.size_info_list[i];
@@ -177,6 +184,6 @@ class ProductManager{
             }
         }
 
-        if(has_quantity == false) return false;
+        return has_quantity;
     }
 }

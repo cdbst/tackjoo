@@ -17,11 +17,11 @@ class RequestGate{
         this.queue[_id].push(subscriber);
     }
 
-    notify(_id, error, product_info){
+    notify(_id, error, data){
         let subscribers = [...this.queue[_id]];
         this.queue[_id] = [];
         subscribers.forEach((subscriber) =>{
-            subscriber(error, product_info);
+            subscriber(error, data);
         });
     }
 

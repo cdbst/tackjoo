@@ -32,6 +32,10 @@ class TaskRunner{
             return undefined;
         }
 
+        if(this.product_info.sell_type == common.SELL_TYPE.draw){
+            return this.product_info.size_info_list.find((size_info) => { return size_info.name == this.task_info.size_name} );
+        }
+
         let size_info_list_has_quantity = this.product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
 
         if(size_info_list_has_quantity.length == 0){ // 재고가 하나도 없는 상태임.
@@ -154,7 +158,8 @@ class TaskRunner{
                     this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
                     this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
                 }else{
-                    //TODO add codes for nomal product.
+                    //TODO add codes for nomal product. // TAST CODE
+                    __callback(common.TASK_STATUS.DONE);
                 }
             });
         }
@@ -165,7 +170,9 @@ class TaskRunner{
     start(__callback){
 
         this.running = true;
-        this.open_product_page(__callback);
+        this.send_sensor_data(()=>{
+            this.open_product_page(__callback);
+        });
     }
 
     stop(){
