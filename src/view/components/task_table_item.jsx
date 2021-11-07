@@ -62,8 +62,12 @@ class TaskTableItem extends React.Component {
 
     onPlayTask(retry_cnt, set_state = true){
 
-        if(this.isPossibleToPlay() == false) return;
         this.ref_status_btn.current.disabled = true;
+
+        if(this.isPossibleToPlay() == false){
+            this.ref_status_btn.current.disabled = false;
+            return;
+        }
 
         let play_task = () => {
 
@@ -100,8 +104,14 @@ class TaskTableItem extends React.Component {
 
     onPauseTask(__callback){
 
-        if(this.isPossibleToPause() == false) return;
         this.ref_status_btn.current.disabled = true;
+
+        if(this.isPossibleToPause() == false){
+            this.ref_status_btn.current.disabled = false;
+            if(__callback)__callback();
+            return;
+        } 
+        
 
         window.electron.pauseTask(this.props.task_info, (err) =>{
 

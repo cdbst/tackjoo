@@ -22,6 +22,7 @@ class ContentsTasks extends React.Component {
 
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
+        this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
@@ -59,6 +60,23 @@ class ContentsTasks extends React.Component {
             this.action_col_width;
 
         this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
+    }
+
+    onClickBtnRemoveAll(){
+        Index.g_prompt_modal.popModal('Remove All Task Items', 'Are you sure want to remove all of task items?', (is_ok)=>{
+            if(is_ok == false) return;
+
+            let paused_remain = this.table_item_refs.length;
+
+            this.table_item_refs.forEach((table_item_ref) =>{
+                table_item_ref.current.onPauseTask(()=>{
+                    if(--paused_remain == 0){
+                        this.task_list = [];
+                        this.__updateTaskTalbeItems();
+                    }
+                });
+            });
+        });
     }
 
     onClickBtnRunAll(){
@@ -144,6 +162,7 @@ class ContentsTasks extends React.Component {
                 break;
             }
         }
+
         this.__updateTaskTalbeItems();
     }
 
@@ -234,7 +253,7 @@ class ContentsTasks extends React.Component {
                         <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
                             <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Stop All
                         </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" >
+                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
                             <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Remove All
                         </button>
                     </div>

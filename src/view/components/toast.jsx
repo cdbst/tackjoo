@@ -16,9 +16,21 @@ class Toast extends React.Component {
         }
         
         this.props.sys_msg_q.add_event_listener(this.onQueueChanged);
+
+        this.__mount = false;
+    }
+
+    componentDidMount(){
+        this.__mount = true;
+    }
+
+    componentWillUnmount(){
+        this.__mount = false;
     }
 
     onQueueChanged(added, msg_item){
+
+        if(this.__mount == false) return;
 
         let _toast_items = this.getToastItems(this.props.sys_msg_q.queue);
 
