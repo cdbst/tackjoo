@@ -21,6 +21,7 @@ class BrowserContext {
         this.__open_login_modal = this.__open_login_modal.bind(this);
         this.__get_open_page_header = this.__get_open_page_header.bind(this);
         this.__post_process_open_page = this.__post_process_open_page.bind(this);
+        this.__remove_aws_cookies = this.__remove_aws_cookies.bind(this);
 
 
         this.is_anonymous = this.is_anonymous.bind(this);
@@ -49,6 +50,15 @@ class BrowserContext {
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
+
+        this.__req_retry_interval = 2000;
+    }
+
+    __remove_aws_cookies(){
+        this.__cookie_storage.remove_cookie_data('AWSALBTG');
+        this.__cookie_storage.remove_cookie_data('AWSALBCORS');
+        this.__cookie_storage.remove_cookie_data('AWSALB');
+        this.__cookie_storage.remove_cookie_data('AWSALBTGCORS');
     }
 
     get_account_info(){
@@ -111,6 +121,7 @@ class BrowserContext {
 
         })
         .catch(error => {
+            this.__remove_aws_cookies();
             __callback(error);
         });
     }
@@ -192,6 +203,7 @@ class BrowserContext {
                 this.open_main_page();
             })
             .catch(err => {
+                this.__remove_aws_cookies();
                 __callback(err);
             });
         });
@@ -216,6 +228,7 @@ class BrowserContext {
             __callback(undefined);
         })
         .catch(err => {
+            this.__remove_aws_cookies();
             __callback(err);
         });
 
@@ -300,7 +313,7 @@ class BrowserContext {
             'sec-fetch-site': 'none',
             'sec-fetch-user': '?1',
             'upgrade-insecure-requests': 1,
-            'connection': 'keep-alive',
+            //'connection': 'keep-alive',
             'user-agent': BrowserContext.USER_AGENT
         }
     }
@@ -368,6 +381,7 @@ class BrowserContext {
             if(__callback) __callback();
         })
         .catch(err => {
+            this.__remove_aws_cookies();
             if(__callback) __callback(err);
         });
     }
@@ -399,6 +413,7 @@ class BrowserContext {
             __callback(undefined, product_list);
         })
         .catch(err => {
+            this.__remove_aws_cookies();
             __callback(err);
         });
     }
@@ -434,6 +449,7 @@ class BrowserContext {
             __callback(undefined, product_info);
         })
         .catch(err => {
+            this.__remove_aws_cookies();
             __callback(err);
         });
     }
@@ -500,6 +516,7 @@ class BrowserContext {
             __callback(undefined, res.data);
         })
         .catch(err => {
+            this.__remove_aws_cookies();
             __callback(err);
         });
     }
@@ -518,7 +535,10 @@ class BrowserContext {
         .then(res => {
 
             if(res.status != 200){
-                __callback('open_page : response ' + res.status, retry);
+                this.__remove_aws_cookies();
+                setTimeout(()=>{
+                    __callback('open_page : response ' + res.status, retry);
+                }, this.__req_retry_interval);
                 return;
             }
 
@@ -530,14 +550,19 @@ class BrowserContext {
             const csrfToken = this.__get_csrfToken($);
 
             if(csrfToken == undefined){
-                __callback('open_page : cannot found csrfToken', retry);
+                setTimeout(()=>{
+                    __callback('open_page : cannot found csrfToken', retry);
+                }, this.__req_retry_interval);
                 return;
             }
 
             __callback(undefined, retry, csrfToken, $);
         })
         .catch(err => {
-            __callback(err, retry);
+            this.__remove_aws_cookies();
+            setTimeout(()=>{
+                __callback(err, retry);
+            }, this.__req_retry_interval);
         });
     }
 
@@ -587,6 +612,7 @@ class BrowserContext {
 
             //TODO 이미 드로우 신청한 상황에 대한 예외 처리 필요.
             if(res.status != 200){
+                this.__remove_aws_cookies();
                 __callback('apply_draw : invalid response status code.' + res.status, retry);
                 return;
             }
@@ -605,6 +631,7 @@ class BrowserContext {
 
         })
         .catch(error => {
+            this.__remove_aws_cookies();
             __callback(error, retry);
         });
     }
