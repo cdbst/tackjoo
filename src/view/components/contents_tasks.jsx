@@ -242,19 +242,19 @@ class ContentsTasks extends React.Component {
                 <div className="row footer">
                     <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                         <button type="button" className="btn btn-primary btn-footer-inside">
-                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> Quick Tasks
+                            <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> Quick Tasks
                         </button>
                         <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
-                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}} /> New Task
+                            <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> New Task
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}} /> Run All
+                            <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> Run All
                         </button>
                         <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Stop All
+                            <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> Pause All
                         </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
-                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Remove All
+                        <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
+                            <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> Remove All
                         </button>
                     </div>
                 </div>
