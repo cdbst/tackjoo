@@ -58,7 +58,10 @@ class TaskEditModal extends React.Component {
             this.product_info_list = Index.g_product_mngr.getProductInfoList();
 
             this.setState({filtered_product_info_list : this.product_info_list, logged_in_account_info_list : _logged_in_account_info_list}, () => {
-                this.onChangeType(this.ref_options_type.current.getSelectedOptionValue());
+                this.onChangeType(
+                    this.ref_options_type.current.getSelectedOptionValue(),
+                    this.ref_options_product.current.getSelectedOptionKey()
+                );
             });
         });
     }
@@ -116,19 +119,20 @@ class TaskEditModal extends React.Component {
 
     }
 
-    onChangeType(value){
+    onChangeType(type_name, product_id = undefined){
         
         let _filtered_product_info_list = this.product_info_list.filter((product) =>{
-            return product.sell_type == value;
+            return product.sell_type == type_name;
         });
 
         if(_filtered_product_info_list.length == 0){
-            Index.g_sys_msg_q.enqueue('Error', value + " has no product information.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('Error', type_name + " has no product information.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
+
+        let selected_product_id = product_id == undefined ? _filtered_product_info_list[0]._id : product_id;
         
-        //TODO : Bugfix (모달 처음 열었을 때 버그. 보는 상품이랑 선택된 상품이랑 다름)
-        this.onChangeProduct(_filtered_product_info_list[0]._id, (err, _product_info) =>{
+        this.onChangeProduct(selected_product_id, (err, _product_info) =>{
             let new_state = {filtered_product_info_list : _filtered_product_info_list};
             if(_product_info){
                 new_state['selected_product'] = _product_info;

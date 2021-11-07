@@ -522,6 +522,10 @@ class BrowserContext {
                 return;
             }
 
+            res.headers['set-cookie'].forEach(cookie_data =>{
+                this.__cookie_storage.add_cookie_data(cookie_data);
+            });
+
             const $ = cheerio.load(res.data);
             const csrfToken = this.__get_csrfToken($);
 
