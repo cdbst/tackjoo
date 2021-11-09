@@ -1,27 +1,30 @@
-const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 
 class TaskRunner{
-    constructor(browser_context, task_info, product_info, status_channel){
+    constructor(browser_context, task_info, product_info, status_channel, task_end_callback){
 
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
         this.check_stopped = this.check_stopped.bind(this);
 
         this.open_product_page = this.open_product_page.bind(this);
-        this.send_sensor_data = this.send_sensor_data.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
+        this.__end_task = this.__end_task.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
         this.product_info = product_info;
         this.status_channel = status_channel;
+        this.task_end_callback = task_end_callback;
 
         this.running = false;
-        this.retry_cnt = task_info.retry_cnt == undefined ? 100 : task_info.retry_cnt;
-
         this.csrfToken = undefined;
+    }
+
+    __end_task(task_status){
+        this.running = false;
+        this.task_end_callback(task_status);
     }
 
     judge_appropreate_size_info(){
@@ -63,126 +66,78 @@ class TaskRunner{
         return target_size_info;
     }
 
-    send_sensor_data(__callback){
+    click_apply_draw_button(size_info){
 
-        gen_sensor_data((error, sensor_data)=>{
+        if(this.check_stopped()) return;
 
-            if(error){
-                console.warn('cannot generate sensor data.');
-            }
-
-            this.browser_context.send_sensor_data(sensor_data, (error) =>{
-                if(error){
-                    console.warn('fail with send sensor data.');
-                }
-                __callback();
-            });
-        });
-    }
-
-
-    click_apply_draw_button(size_info, retry, __callback){
-
-        if(this.check_stopped(__callback)) return;
+        this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
 
         if(size_info == undefined){
             size_info = this.judge_appropreate_size_info();
         }
 
         if(size_info == undefined){
-            this.running = false;
-            __callback(common.TASK_STATUS.FAIL);
+            this.__end_task(common.TASK_STATUS.FAIL);
             return;
         }
 
-        this.send_sensor_data(()=>{
+        this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
 
-            if(this.check_stopped(__callback)) return;
-
-            //apply_draw(product_info, draw_id, sku_id, draw_product_xref, draw_sku_xref, csrfToken, __callback)
-            this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, retry, (err, retry, draw_entry_data)=>{
-
-                if(err){
-                    console.error(err);
-
-                    if(retry <= 0){
-                        this.running = false;
-                        __callback(common.TASK_STATUS.FAIL);
-                    }else{
-                        this.click_apply_draw_button(size_info, --retry, __callback);
-                    }
-                    return;
-                }
-
-                this.running = false;
-                __callback(common.TASK_STATUS.DONE);
-            });
+            if(err){
+                console.error(err);
+                this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }else{
+                this.__end_task(common.TASK_STATUS.DONE);
+            }
         });
     }
 
-    open_product_page(__callback){
+    open_product_page(){
 
-        if(this.check_stopped(__callback)) return;
+        if(this.check_stopped()) return;
 
         this.status_channel(common.TASK_STATUS.ON_PAGE);
 
-        const open_page_cb = (err, retry, csrfToken, $) => {
+        this.browser_context.open_page(this.product_info.url, (err, csrfToken, $)=>{
 
-            if(this.check_stopped(__callback)) return;
+            if(err){
+                console.error(err);
+                this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }
 
-            this.send_sensor_data(()=>{
+            if(csrfToken == undefined){
+                console.error('cannot found csrfToken !');
+                this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }
 
-                if(err){
-                    if(retry <= 0){
-                        this.running = false;
-                        __callback(common.TASK_STATUS.FAIL);
-                    }else{
-                        this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
-                    }
-                    return;
-                }
-    
-                if(csrfToken == undefined){
-                    if(retry <= 0){
-                        this.running = false;
-                        __callback(common.TASK_STATUS.FAIL);
-                    }else{
-                        this.browser_context.open_page(this.product_info.url, --retry, open_page_cb);
-                    }
-                    return;
-                }
-    
-                this.csrfToken = csrfToken;
-    
-                if(this.product_info.sell_type == common.SELL_TYPE.draw){
-                    this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
-                    this.click_apply_draw_button(undefined, this.retry_cnt, __callback);
-                }else{
-                    //TODO add codes for nomal product. // TAST CODE
-                    __callback(common.TASK_STATUS.DONE);
-                }
-            });
-        }
+            this.csrfToken = csrfToken;
 
-        this.browser_context.open_page(this.product_info.url, this.retry_cnt, open_page_cb);
+            if(this.product_info.sell_type == common.SELL_TYPE.draw){
+                this.click_apply_draw_button(undefined);
+            }else{
+
+                //TODO add codes for nomal product. // TAST CODE
+                this.__end_task(common.TASK_STATUS.DONE);
+            }
+        });
     }
 
-    start(__callback){
-
+    start(){
         this.running = true;
-        this.send_sensor_data(()=>{
-            this.open_product_page(__callback);
-        });
+        this.open_product_page();
     }
 
     stop(){
         this.running = false;
     }
 
-    check_stopped(__callback){
+    check_stopped(){
         if(this.running == true) return false;
         
-        __callback(common.TASK_STATUS.PAUSE);
+        this.__end_task(common.TASK_STATUS.PAUSE);
         return true;
     }
 }

@@ -22,14 +22,14 @@ function register(){
 
         let task_runner = new TaskRunner(browser_context, task_info, product_info, (task_status)=>{
             event.reply('play-task-reply' + task_info._id, {status : task_status, done : false});
+        }, (task_status) =>{
+            TaskRunnerManager.remove(task_runner._id);
+            event.reply('play-task-reply' + task_info._id, {status : task_status, done : true});
         });
 
         TaskRunnerManager.add(task_runner);
 
-        task_runner.start((task_status)=>{
-            TaskRunnerManager.remove(task_runner._id);
-            event.reply('play-task-reply' + task_info._id, {status : task_status, done : true});
-        });
+        task_runner.start();
     });
 
     ipcMain.on('pause-task', (event, data) =>{
