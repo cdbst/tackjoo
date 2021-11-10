@@ -386,7 +386,16 @@ function parse_sell_type_from_product_page($){
     let el_order_btn = $('.draw-button');
     if(el_order_btn.length == 0) return undefined;
 
-    let el_order_btn_text = get_specific_child_text_nodes(el_order_btn[0]);
+    let el_buy_btn = $('.btn-buy');
+
+    let el_order_btn_text = undefined;
+
+    if(el_buy_btn.length > 0){
+        el_order_btn_text = get_specific_child_text_nodes(el_buy_btn[0]);
+    }else{
+        el_order_btn_text = get_specific_child_text_nodes(el_order_btn[0]);
+    }
+
     if(el_order_btn_text.length == 0) return undefined;
 
     let sell_type = undefined;

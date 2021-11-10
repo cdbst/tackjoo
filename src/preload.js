@@ -191,8 +191,10 @@ function _playTask(_task_info, _product_info, __callback){
     let task_evt_handler = (_event, data) => {
 
         if(data.done == true){
-            ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
-            delete task_ipc_handler_map[_task_info._id];
+            if(_task_info._id in task_ipc_handler_map){
+                ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+                delete task_ipc_handler_map[_task_info._id];
+            }
         }
 
         __callback(data.status);
@@ -212,9 +214,10 @@ function _pauseTask(_task_info, __callback){
 
     ipcRenderer.once('pause-task-reply' + _task_info._id, (_event, data) => {
 
-        ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
-
-        if(_task_info._id in task_ipc_handler_map) delete task_ipc_handler_map[_task_info._id];
+        if(_task_info._id in task_ipc_handler_map){
+            ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+            delete task_ipc_handler_map[_task_info._id];
+        }
 
         __callback(data.err);
     });

@@ -134,7 +134,9 @@
         ON_PAGE : 'Try to open webpage',
         ADD_TO_CART : 'Add to cart',
         TRY_TO_DRAW : 'Try to draw',
-        TRY_DO_PAY : 'Try to pay'
+        TRY_DO_PAY : 'Try to pay',
+        GET_PRODUCT_INFO : 'Try to get product info',
+        IMPOSSIBLE_TO_BUY : 'Maybe Sold Out'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

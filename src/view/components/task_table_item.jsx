@@ -57,61 +57,36 @@ class TaskTableItem extends React.Component {
     }
 
     onAlamScheduledTime(_date){      
-        this.onPlayTask(this.retry_cnt_task_play);
+        this.onPlayTask();
     }
 
-    onPlayTask(retry_cnt, set_state = true){
+    onPlayTask(){
 
+        if(this.isPossibleToPlay() == false) return;
         this.ref_status_btn.current.disabled = true;
-
-        if(this.isPossibleToPlay() == false){
+        
+        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+        if(product_info == undefined){
+            Index.g_sys_msg_q.enqueue('Error', 'Cannot found product information', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             this.ref_status_btn.current.disabled = false;
             return;
         }
 
-        let play_task = () => {
+        window.electron.playTask(this.props.task_info, product_info, (status) =>{
 
-            Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id, (err, product_info) =>{
-
-                if(ProductManager.isValidProductInfoToTasking(product_info) == false){
-
-                    if(retry_cnt == 0){
-                        this.setTaskStatus(common.TASK_STATUS.FAIL, ()=>{
-                            this.ref_status_btn.current.disabled = false;
-                        });
-                    }else{
-                        this.onPlayTask(retry_cnt - 1, false);
-                    }
-
-                    return;
-                }
-    
-                window.electron.playTask(this.props.task_info, product_info, (status) =>{
-
-                    this.setTaskStatus(status, ()=>{
-                        this.ref_status_btn.current.disabled = false;
-                    });
-                });
+            this.setTaskStatus(status, ()=>{
+                this.ref_status_btn.current.disabled = false;
             });
-        }
-
-        if(set_state){
-            this.setTaskStatus(common.TASK_STATUS.PLAY, play_task);
-        }else{
-            play_task();
-        }
+        });
     }
 
     onPauseTask(__callback){
 
-        this.ref_status_btn.current.disabled = true;
-
         if(this.isPossibleToPause() == false){
-            this.ref_status_btn.current.disabled = false;
             if(__callback)__callback();
             return;
         } 
-        
+        this.ref_status_btn.current.disabled = true;
 
         window.electron.pauseTask(this.props.task_info, (err) =>{
 
@@ -150,7 +125,7 @@ class TaskTableItem extends React.Component {
         // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
         // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
         if(new_status == common.TASK_STATUS.PLAY){
-            this.onPlayTask(this.retry_cnt_task_play);
+            this.onPlayTask();
         }else if(new_status == common.TASK_STATUS.PAUSE){
             this.onPauseTask();
         }
@@ -199,6 +174,12 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.TRY_DO_PAY : 
                 btn_src = TaskTableItem.PAUSE_BTN_SRC;
                 break;
+            case common.TASK_STATUS.GET_PRODUCT_INFO :
+                btn_src = TaskTableItem.PAUSE_BTN_SRC;
+                break;
+            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
+                btn_src = TaskTableItem.PLAY_BTN_SRC;
+                break;
         }
 
         return btn_src;
@@ -225,6 +206,10 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.TRY_DO_PAY : 
                 return false;
+            case common.TASK_STATUS.GET_PRODUCT_INFO :
+                return false;
+            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
+                return true;
         }
     }
 
@@ -248,6 +233,10 @@ class TaskTableItem extends React.Component {
                 return true;
             case common.TASK_STATUS.TRY_DO_PAY : 
                 return true;
+            case common.TASK_STATUS.GET_PRODUCT_INFO :
+                return true;
+            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
+                return false;
         }
     }
 

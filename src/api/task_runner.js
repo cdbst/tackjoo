@@ -7,9 +7,10 @@ class TaskRunner{
         this.stop = this.stop.bind(this);
         this.check_stopped = this.check_stopped.bind(this);
 
-        this.open_product_page = this.open_product_page.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
+        this.open_product_page = this.open_product_page.bind(this);
+        this.is_valid_product_info_to_tasking = this.is_valid_product_info_to_tasking.bind(this);
         this.__end_task = this.__end_task.bind(this);
 
         this.browser_context = browser_context;
@@ -101,7 +102,7 @@ class TaskRunner{
 
         this.status_channel(common.TASK_STATUS.ON_PAGE);
 
-        this.cur_req_id = this.browser_context.open_page(this.product_info.url, (err, csrfToken, $)=>{
+        this.cur_req_id = this.browser_context.open_product_page(this.product_info.url, (err, product_info, csrfToken)=>{
 
             if(err){
                 console.error(err);
@@ -109,9 +110,15 @@ class TaskRunner{
                 return;
             }
 
-            if(csrfToken == undefined){
-                console.error('cannot found csrfToken !');
+            if(product_info == undefined){
                 this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }
+
+            this.product_info = common.merge_object(this.product_info, product_info);
+
+            if(this.is_valid_product_info_to_tasking() == false){
+                this.__end_task(common.TASK_STATUS.IMPOSSIBLE_TO_BUY);
                 return;
             }
 
@@ -120,11 +127,31 @@ class TaskRunner{
             if(this.product_info.sell_type == common.SELL_TYPE.draw){
                 this.click_apply_draw_button(undefined);
             }else{
-
                 //TODO add codes for nomal product. // TAST CODE
                 this.__end_task(common.TASK_STATUS.DONE);
             }
         });
+    }
+
+    is_valid_product_info_to_tasking(){
+
+        if(this.product_info == undefined) return false;
+        if(this.product_info.soldout == undefined || this.product_info.soldout == true) return false;
+    
+        if(this.product_info.size_info_list.length == 0) return false;
+
+        if(this.product_info.sell_type == common.SELL_TYPE.draw) return true;
+
+        let has_quantity = false;
+        for(var i = 0; i < this.product_info.size_info_list.length; i++){
+            let size_info = this.product_info.size_info_list[i];
+            if(size_info.quantity == 1){
+                has_quantity = true;
+                break;
+            }
+        }
+
+        return has_quantity;
     }
 
     start(){

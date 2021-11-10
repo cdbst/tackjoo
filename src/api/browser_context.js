@@ -186,10 +186,12 @@ class BrowserContext {
 
         let cfg_expected_status = undefined;
         let cfg_need_csrfToken = undefined;
+        let cfg_expected_keys = undefined;
 
         if(req_cfg != undefined){
             if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
             if('need_csrfToken' in req_cfg) cfg_need_csrfToken = req_cfg['need_csrfToken'];
+            if('expected_keys' in req_cfg) cfg_expected_keys = req_cfg['expected_keys'];
         }
 
         let req_id = common.uuidv4();
@@ -216,6 +218,17 @@ class BrowserContext {
 
                         if(csrfToken == undefined){
                             throw new Error('(GET req) GET data has no csrfToken information');   
+                        }
+                    }
+
+                    if(cfg_expected_keys != undefined){
+                        if(typeof res.data !== 'object'){
+                            throw new Error('(GET req) expected payload data is not object type' + res.status);
+                        }
+                        let data_keys = Object.keys(res.data);
+                        let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
+                        if(intersection.length == 0){
+                            throw new Error('(GET req) expected payload data has no expected key' + res.status);
                         }
                     }
                     
@@ -610,10 +623,10 @@ class BrowserContext {
 
     open_product_page(product_url, __callback){
 
-        
         let headers = this.__get_open_page_header();
+        headers['cookie'] = this.__cookie_storage.get_cookie_data();
         
-        this.__request_get(product_url, headers, undefined, (err, res) =>{
+        return this.__request_get(product_url, headers, undefined, (err, res) =>{
 
             if(err){
                 __callback(err);
@@ -633,15 +646,28 @@ class BrowserContext {
                 return;
             }
 
-            let product_info = product_page_parser.get_product_info_from_product_page($)
+            let product_info = product_page_parser.get_product_info_from_product_page($);
             if(product_info == undefined){
                 __callback('Cannot collect product information.');
                 return;
             }
-            
-            __callback(undefined, product_info);
-        });
 
+            if(product_info.sell_type == common.SELL_TYPE.normal){
+
+                this.get_product_sku_inventory(product_url, product_info.product_id, (_err, sku_inventory_info) => {
+
+                    if(_err){
+                        __callback(_err, product_info, this.csrfToken);
+                        return;
+                    }
+    
+                    product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
+                    __callback(undefined, product_info, this.csrfToken);
+                });
+            }else{
+                __callback(undefined, product_info, this.csrfToken);
+            }
+        }, {need_csrfToken : true});
     }
 
     get_product_sku_inventory(product_url, product_id, __callback){
@@ -703,7 +729,7 @@ class BrowserContext {
             }
 
             __callback(undefined, res.data);
-        });
+        }, {expected_keys : ['usable', 'skuPricing']});
     }
 
     open_page(url, __callback){
