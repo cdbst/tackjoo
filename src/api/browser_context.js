@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const qureystring = require('querystring');
 const product_page_parser = require('./product_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
+const common = require("../common/common.js");
 
 class BrowserContext {
 
@@ -23,6 +24,7 @@ class BrowserContext {
         this.__post_process_open_page = this.__post_process_open_page.bind(this);
         this.__remove_aws_cookies = this.__remove_aws_cookies.bind(this);
         this.__send_fake_sensor_data = this.__send_fake_sensor_data.bind(this);
+        this.cancel_request = this.cancel_request.bind(this);
 
         this.__request_post = this.__request_post.bind(this);
         this.__request_get = this.__request_get.bind(this);
@@ -59,6 +61,9 @@ class BrowserContext {
         this.__req_retry_interval = 2000; // app 설정으로 부터 지정되어야 할 값임.
         this.__req_retry_cnt = 100;
         this.__req_timout = 0;
+
+        //requst_queue
+        this.request_canceler = {};
     }
 
     __send_fake_sensor_data(__callback){
@@ -80,12 +85,29 @@ class BrowserContext {
         });
     }
 
-    __request_post(url, headers, payload, __callback){
+    cancel_request(req_id){
+        if(req_id in this.request_canceler == false) return false;
+        this.request_canceler[req_id] = true;
+        return true;
+    }
+
+    __request_post(url, headers, payload, __callback, req_cfg = undefined){
 
         let config = { 
             headers: headers,
             timeout: this.__req_timout
         };
+
+        let cfg_expected_status = undefined;
+        let cfg_expected_keys = undefined;
+
+        if(req_cfg != undefined){
+            if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
+            if('expected_keys' in req_cfg) cfg_expected_keys = req_cfg['expected_keys'];
+        }
+
+        let req_id = common.uuidv4();
+        this.request_canceler[req_id] = false;
 
         let req = (retry, cb) => {
 
@@ -95,11 +117,25 @@ class BrowserContext {
 
                 axios.post(url, payload, config)
                 .then(res => {
-                    if(res.status != 200 && res.status != 201){
-                        cb('(post req) invalid status code ' + res.status, retry, res);
-                    }else{
-                        cb(undefined, retry, res);
+
+                    if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
+                        throw new Error('(POST req) unexpected status code ' + res.status);
+                    }else if(res.status != 200 && res.status != 201){
+                        throw new Error('(POST req) invalid status code ' + res.status);
                     }
+
+                    if(cfg_expected_keys != undefined){
+                        if(typeof res.data !== 'object'){
+                            throw new Error('(POST req) expected payload data is not object type' + res.status);
+                        }
+                        let data_keys = Object.keys(res.data);
+                        let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
+                        if(intersection.length == 0){
+                            throw new Error('(POST req) expected payload data has no expected key' + res.status);
+                        }
+                    }
+
+                    cb(undefined, retry, res);
                 })
                 .catch(err => {
                     this.__remove_aws_cookies();
@@ -110,9 +146,17 @@ class BrowserContext {
         }
 
         let req_cb = (err, retry, res) =>{
+
+            if(this.request_canceler[req_id] == true){
+                delete this.request_canceler[req_id];
+                __callback('(POST) request has been canceled.', res);
+                return;
+            }
+
             if(err){
                 //TODO write log mesage..
                 if(retry == 0){
+                    delete this.request_canceler[req_id];
                     __callback(err, undefined);
                 }else{
                     setTimeout(()=>{
@@ -120,14 +164,16 @@ class BrowserContext {
                     }, this.__req_retry_interval); 
                 }
             }else{
+                delete this.request_canceler[req_id];
                 __callback(undefined, res);
             }
         }
 
         req(this.__req_retry_cnt, req_cb);
+        return req_id;
     }
 
-    __request_get(url, headers, params, __callback){
+    __request_get(url, headers, params, __callback, req_cfg = undefined){
 
         let config = { 
             headers: headers,
@@ -138,6 +184,17 @@ class BrowserContext {
             config['params'] = params;
         }
 
+        let cfg_expected_status = undefined;
+        let cfg_need_csrfToken = undefined;
+
+        if(req_cfg != undefined){
+            if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
+            if('need_csrfToken' in req_cfg) cfg_need_csrfToken = req_cfg['need_csrfToken'];
+        }
+
+        let req_id = common.uuidv4();
+        this.request_canceler[req_id] = false;
+
         let req = (retry, cb) => {
 
             this.__send_fake_sensor_data((err) =>{
@@ -146,11 +203,24 @@ class BrowserContext {
 
                 axios.get(url, config)
                 .then(res => {
-                    if(res.status != 200 && res.status != 201){
-                        cb('(get req) invalid status code ' + res.status, retry, res);
-                    }else{
-                        cb(undefined, retry, res);
+
+                    if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
+                        throw new Error('(GET req) unexpected status code ' + res.status);
+                    }else if(res.status != 200 && res.status != 201){
+                        throw new Error('(GET req) invalid status code ' + res.status);
                     }
+
+                    if(cfg_need_csrfToken != undefined && cfg_need_csrfToken == true){
+                        const $ = cheerio.load(res.data);
+                        let csrfToken = this.__get_csrfToken($);
+
+                        if(csrfToken == undefined){
+                            throw new Error('(GET req) GET data has no csrfToken information');   
+                        }
+                    }
+                    
+                    cb(undefined, retry, res);
+
                 })
                 .catch(err => {
                     this.__remove_aws_cookies();
@@ -160,9 +230,17 @@ class BrowserContext {
         }
 
         let req_cb = (err, retry, res) =>{
+
+            if(this.request_canceler[req_id] == true){
+                delete this.request_canceler[req_id];
+                __callback('request has been canceled.', res);
+                return;
+            }
+
             if(err){
                 //TODO write log mesage..
                 if(retry == 0){
+                    delete this.request_canceler[req_id];
                     __callback(err, undefined);
                 }else{
                     setTimeout(()=>{
@@ -170,11 +248,14 @@ class BrowserContext {
                     }, this.__req_retry_interval); 
                 }
             }else{
+                delete this.request_canceler[req_id];
                 __callback(undefined, res);
             }
         }
 
         req(this.__req_retry_cnt, req_cb);
+
+        return req_id;
     }
 
     __remove_aws_cookies(){
@@ -232,11 +313,14 @@ class BrowserContext {
 
             if(res.status == 201 || res.status == 200){
 
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
-
-                __callback(undefined);
+                if('set-cookie' in res.headers){
+                    res.headers['set-cookie'].forEach(cookie_data =>{
+                        this.__cookie_storage.add_cookie_data(cookie_data);
+                    });
+                    __callback(undefined);
+                }else{
+                    __callback('send_sensor_data - cannot recv akam sensor cookie :' + res.status);    
+                }
 
             }else{
                 __callback('send_sensor_data - response invalid status code :' + res.status);
@@ -627,7 +711,7 @@ class BrowserContext {
         let headers = this.__get_open_page_header();
         headers['cookie'] = this.__cookie_storage.get_cookie_data();
 
-        this.__request_get(url, headers, undefined, (err, res) =>{
+        return this.__request_get(url, headers, undefined, (err, res) =>{
 
             if(err){
                 __callback(err);
@@ -654,7 +738,7 @@ class BrowserContext {
             }
 
             __callback(undefined, csrfToken, $);
-        });
+        }, {need_csrfToken : true});
     }
 
     apply_draw(product_info, size_info, csrfToken, __callback){
@@ -694,7 +778,7 @@ class BrowserContext {
             "x-requested-with": "XMLHttpRequest"
         }
 
-        this.__request_post(BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload, (err, res) =>{
+        return this.__request_post(BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload, (err, res) =>{
 
             if(err){
                 __callback(err);

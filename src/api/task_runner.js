@@ -20,6 +20,8 @@ class TaskRunner{
 
         this.running = false;
         this.csrfToken = undefined;
+
+        this.cur_req_id = undefined;
     }
 
     __end_task(task_status){
@@ -81,7 +83,7 @@ class TaskRunner{
             return;
         }
 
-        this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
+        this.cur_req_id = this.browser_context.apply_draw(this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
 
             if(err){
                 console.error(err);
@@ -99,7 +101,7 @@ class TaskRunner{
 
         this.status_channel(common.TASK_STATUS.ON_PAGE);
 
-        this.browser_context.open_page(this.product_info.url, (err, csrfToken, $)=>{
+        this.cur_req_id = this.browser_context.open_page(this.product_info.url, (err, csrfToken, $)=>{
 
             if(err){
                 console.error(err);
@@ -132,13 +134,14 @@ class TaskRunner{
 
     stop(){
         this.running = false;
+        this.__end_task(common.TASK_STATUS.PAUSE);
+        if(this.cur_req_id != undefined){
+            this.browser_context.cancel_request(this.cur_req_id);
+        }
     }
 
     check_stopped(){
-        if(this.running == true) return false;
-        
-        this.__end_task(common.TASK_STATUS.PAUSE);
-        return true;
+        return !this.running;
     }
 }
 
