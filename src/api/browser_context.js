@@ -5,6 +5,7 @@ const qureystring = require('querystring');
 const product_page_parser = require('./product_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
+const Mutex = require('async-mutex').Mutex;
 
 class BrowserContext {
 
@@ -65,6 +66,8 @@ class BrowserContext {
 
         //requst_queue
         this.request_canceler = {};
+
+        //on cart mutex - 한 계정에서 병렬로 여러 물건을 구매할 수 없음.
     }
 
     __send_fake_sensor_data(__callback){
@@ -127,12 +130,12 @@ class BrowserContext {
 
                     if(cfg_expected_keys != undefined){
                         if(typeof res.data !== 'object'){
-                            throw new Error('(POST req) expected payload data is not object type' + res.status);
+                            throw new Error('(POST req) expected payload data is not object type');
                         }
                         let data_keys = Object.keys(res.data);
                         let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
                         if(intersection.length == 0){
-                            throw new Error('(POST req) expected payload data has no expected key' + res.status);
+                            throw new Error('(POST req) expected payload data has no expected key');
                         }
                     }
 
@@ -837,12 +840,9 @@ class BrowserContext {
         }, {expected_keys : ['result']});
     }
 
-    add_to_cart(task_info, product_info, size_info, csrfToken, __callback){
+    add_to_cart(product_info, size_info, csrfToken, __callback){
 
-        if(this.__is_cart_queue_empty() == false){
-            this.__enqueue_cart(task_info, product_info, size_info, csrfToken, __callback);
-            return;
-        }
+        //TODO async-mutex 적용 필요.
 
         let payload_obj = {
             'itemAttributes[FW_SIZE]' : size_info['name'],

@@ -84,7 +84,7 @@ class TaskRunner{
             return;
         }
 
-        this.cur_req_id = this.browser_context.add_to_cart(this.task_info, this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
+        this.cur_req_id = this.browser_context.add_to_cart(this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
 
             if(err){
                 console.error(err);

@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cdbst/snkrs_bot_kr#readme",
   "dependencies": {
+    "async-mutex": "^0.3.2",
     "axios": "^0.22.0",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
