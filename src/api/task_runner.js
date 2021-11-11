@@ -7,6 +7,7 @@ class TaskRunner{
         this.stop = this.stop.bind(this);
         this.check_stopped = this.check_stopped.bind(this);
 
+        this.click_buy_button = this.click_buy_button.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
         this.open_product_page = this.open_product_page.bind(this);
@@ -50,7 +51,7 @@ class TaskRunner{
 
         let target_size_name = this.task_info.size_name;
         
-        let target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.size_name == target_size_name });
+        let target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.name == target_size_name });
         if(target_size_info != undefined) return target_size_info;
 
         let min_gap = 9999;
@@ -67,6 +68,33 @@ class TaskRunner{
             }
         }
         return target_size_info;
+    }
+
+    click_buy_button(){
+        //add cart first..
+
+        if(this.check_stopped()) return;
+
+        this.status_channel(common.TASK_STATUS.TRY_DO_PAY);
+
+        let size_info = this.judge_appropreate_size_info();
+    
+        if(size_info == undefined){
+            this.__end_task(common.TASK_STATUS.IMPOSSIBLE_TO_BUY);
+            return;
+        }
+
+        this.cur_req_id = this.browser_context.add_to_cart(this.task_info, this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
+
+            if(err){
+                console.error(err);
+                this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }else{
+                this.__end_task(common.TASK_STATUS.DONE);
+            }
+        });
+
     }
 
     click_apply_draw_button(size_info){
@@ -128,7 +156,7 @@ class TaskRunner{
                 this.click_apply_draw_button(undefined);
             }else{
                 //TODO add codes for nomal product. // TAST CODE
-                this.__end_task(common.TASK_STATUS.DONE);
+                this.click_buy_button();
             }
         });
     }

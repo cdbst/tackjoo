@@ -57,7 +57,8 @@ class BrowserContext {
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
 
-        //For http req config values;
+        //(TODO : 사용자 인터페이스로부터 입력받은 설정값을 Base로 지정될 수 있도록 기능 추가가 필요함.)
+        //For http req config values; 
         this.__req_retry_interval = 2000; // app 설정으로 부터 지정되어야 할 값임.
         this.__req_retry_cnt = 100;
         this.__req_timout = 0;
@@ -223,12 +224,12 @@ class BrowserContext {
 
                     if(cfg_expected_keys != undefined){
                         if(typeof res.data !== 'object'){
-                            throw new Error('(GET req) expected payload data is not object type' + res.status);
+                            throw new Error('(GET req) expected payload data is not object type');
                         }
                         let data_keys = Object.keys(res.data);
                         let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
                         if(intersection.length == 0){
-                            throw new Error('(GET req) expected payload data has no expected key' + res.status);
+                            throw new Error('(GET req) expected payload data has no expected key');
                         }
                     }
                     
@@ -411,7 +412,7 @@ class BrowserContext {
                 this.is_login = true;
                 __callback(undefined);
                 this.open_main_page();
-            });
+            }, {expected_keys : ['ResponseObject']});
 
         });
     }
@@ -802,7 +803,7 @@ class BrowserContext {
             "sec-fetch-site": "same-origin",
             "user-agent": BrowserContext.USER_AGENT,
             "x-requested-with": "XMLHttpRequest"
-        }
+        };
 
         return this.__request_post(BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload, (err, res) =>{
 
@@ -816,6 +817,12 @@ class BrowserContext {
                 return;
             }
 
+            if('set-cookie' in res.headers){
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    this.__cookie_storage.add_cookie_data(cookie_data);
+                });
+            }
+
             if(('result' in res.data) == false){
                 __callback('apply_draw : recv invalid payload.');
             }
@@ -827,10 +834,76 @@ class BrowserContext {
             }
 
             __callback(undefined, res.data);
-        });
+        }, {expected_keys : ['result']});
     }
 
-    
+    add_to_cart(task_info, product_info, size_info, csrfToken, __callback){
+
+        if(this.__is_cart_queue_empty() == false){
+            this.__enqueue_cart(task_info, product_info, size_info, csrfToken, __callback);
+            return;
+        }
+
+        let payload_obj = {
+            'itemAttributes[FW_SIZE]' : size_info['name'],
+            'SIZE' : size_info['id'],
+            'quantity' : 1,
+            'csrfToken' : csrfToken,
+            'productId' : product_info['product_id']
+        };
+
+        let payload = qureystring.stringify(payload_obj);
+        let cookies = this.__cookie_storage.get_cookie_data();
+
+        let headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cache-control" : "no-cache",
+            "content-length": payload.length, // must be fixed
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "cookie": cookies,
+            "origin": BrowserContext.NIKE_URL,
+            "pragma" : "no-cache",
+            "referer": product_info.url,
+            "sec-ch-ua": BrowserContext.SEC_CA_UA,
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "user-agent": BrowserContext.USER_AGENT,
+            "x-requested-with": "XMLHttpRequest"
+        };
+
+        return this.__request_post(BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload, (err, res) =>{
+
+            if(err){
+                __callback(err);
+                return;
+            }
+
+            if(res.status != 200){
+                __callback('add_to_cart : invalid response status code.' + res.status);
+                return;
+            }
+
+            if('set-cookie' in res.headers){
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    this.__cookie_storage.add_cookie_data(cookie_data);
+                });
+            }
+
+            if(('quantityAdded' in res.data) == false || ('cartItemCount' in res.data) == false){
+                __callback('add_to_cart : recv invalid payload.');
+                return;
+            }
+
+            __callback(undefined, res.data);
+
+        }, {expected_keys : ['quantityAdded', 'cartItemCount']});
+    }
 }
 
 module.exports.BrowserContext = BrowserContext;
