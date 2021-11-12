@@ -5,7 +5,6 @@ const qureystring = require('querystring');
 const product_page_parser = require('./product_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
-const Mutex = require('async-mutex').Mutex;
 
 class BrowserContext {
 
@@ -66,8 +65,6 @@ class BrowserContext {
 
         //requst_queue
         this.request_canceler = {};
-
-        //on cart mutex - 한 계정에서 병렬로 여러 물건을 구매할 수 없음.
     }
 
     __send_fake_sensor_data(__callback){
@@ -841,8 +838,6 @@ class BrowserContext {
     }
 
     add_to_cart(product_info, size_info, csrfToken, __callback){
-
-        //TODO async-mutex 적용 필요.
 
         let payload_obj = {
             'itemAttributes[FW_SIZE]' : size_info['name'],
