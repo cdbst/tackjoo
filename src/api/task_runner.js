@@ -39,11 +39,18 @@ class TaskRunner{
             return undefined;
         }
 
-        if(this.product_info.sell_type == common.SELL_TYPE.draw){
-            return this.product_info.size_info_list.find((size_info) => { return size_info.name == this.task_info.size_name} );
-        }
+        let size_info_list_has_quantity = [];
 
-        let size_info_list_has_quantity = this.product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
+        if(this.product_info.sell_type == common.SELL_TYPE.draw){
+
+            let target_size_info = this.product_info.size_info_list.find((size_info) => { return size_info.name == this.task_info.size_name} );
+            if(target_size_info != undefined) return target_size_info;
+
+            size_info_list_has_quantity = this.product_info.size_info_list;
+
+        }else{
+            size_info_list_has_quantity = this.product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
+        }
 
         if(size_info_list_has_quantity.length == 0){ // 재고가 하나도 없는 상태임.
             return undefined;
@@ -97,16 +104,14 @@ class TaskRunner{
 
     }
 
-    click_apply_draw_button(size_info){
+    click_apply_draw_button(){
 
         if(this.check_stopped()) return;
 
         this.status_channel(common.TASK_STATUS.TRY_TO_DRAW);
 
-        if(size_info == undefined){
-            size_info = this.judge_appropreate_size_info();
-        }
-
+        let size_info = this.judge_appropreate_size_info();
+    
         if(size_info == undefined){
             this.__end_task(common.TASK_STATUS.FAIL);
             return;
