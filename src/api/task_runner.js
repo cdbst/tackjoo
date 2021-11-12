@@ -33,6 +33,10 @@ class TaskRunner{
 
     judge_appropreate_size_info(){
 
+        if(this.product_info.size_info_list == undefined){
+            return undefined;
+        }
+
         let size_info_len = this.product_info.size_info_list.length;
 
         if(size_info_len == 0){
@@ -113,7 +117,7 @@ class TaskRunner{
         let size_info = this.judge_appropreate_size_info();
     
         if(size_info == undefined){
-            this.__end_task(common.TASK_STATUS.FAIL);
+            this.__end_task(common.TASK_STATUS.IMPOSSIBLE_TO_BUY);
             return;
         }
 
