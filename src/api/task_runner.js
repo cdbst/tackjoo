@@ -45,11 +45,18 @@ class TaskRunner{
             return undefined;
         }
 
+        let compare_size = (a, b) => {
+            let _a = parseInt(a.replace(/D/gi, ''));
+            let _b = parseInt(b.replace(/D/gi, ''));
+
+            return _a - _b
+        }
+
         let size_info_list_has_quantity = [];
 
         if(this.product_info.sell_type == common.SELL_TYPE.draw){
 
-            let target_size_info = this.product_info.size_info_list.find((size_info) => { return size_info.name == this.task_info.size_name} );
+            let target_size_info = this.product_info.size_info_list.find((size_info) => { return compare_size(size_info.name, this.task_info.size_name) == 0} );
             if(target_size_info != undefined) return target_size_info;
 
             size_info_list_has_quantity = this.product_info.size_info_list;
@@ -61,25 +68,22 @@ class TaskRunner{
         if(size_info_list_has_quantity.length == 0){ // 재고가 하나도 없는 상태임.
             return undefined;
         }
-
-        let target_size_name = this.task_info.size_name;
         
-        let target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.name == target_size_name });
+        let target_size_info = size_info_list_has_quantity.find((size_info) => { return compare_size(size_info.name, this.task_info.size_name) == 0 });
         if(target_size_info != undefined) return target_size_info;
 
         let min_gap = 9999;
-        let target_size = parseInt(target_size_name);
 
         for(var i = 0; i < size_info_list_has_quantity.length; i++){
             let size_info = size_info_list_has_quantity[i];
-            let size = parseInt(size_info.size_name);
-            let cur_gap = Math.abs(target_size - size);
+            let cur_gap = Math.abs(compare_size(this.task_info.size_name, size_info.name));
 
             if(min_gap > cur_gap){
                 min_gap = cur_gap;
                 target_size_info = size_info;
             }
         }
+
         return target_size_info;
     }
 
