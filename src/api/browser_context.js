@@ -127,7 +127,7 @@ class BrowserContext {
 
             this.__send_fake_sensor_data((err) =>{
 
-                config.headers['cookie'] = this.__cookie_storage.get_cookie_data();
+                config.headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
 
                 axios.post(url, payload, config)
                 .then(res => {
@@ -216,7 +216,7 @@ class BrowserContext {
 
             this.__send_fake_sensor_data((err) =>{
 
-                config.headers['cookie'] = this.__cookie_storage.get_cookie_data();
+                config.headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
 
                 axios.get(url, config)
                 .then(res => {
@@ -323,7 +323,7 @@ class BrowserContext {
             return;
         }
 
-        let cookies = this.__cookie_storage.get_cookie_data();
+        let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
         let config = {
             headers: {
@@ -401,7 +401,7 @@ class BrowserContext {
             };
     
             let payload = qureystring.stringify(payload_obj).replace('_breeze-me', 'breeze-me');
-            let cookies = this.__cookie_storage.get_cookie_data();
+            let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
             let headers = {
                 'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -617,7 +617,7 @@ class BrowserContext {
         let headers = this.__get_open_page_header();
 
         if(this.__cookie_storage.num_of_cookies > 0){
-            headers['cookie'] = this.__cookie_storage.get_cookie_data();
+            headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
         }
 
         this.__request_get(BrowserContext.NIKE_URL + '/kr/ko_kr', headers, undefined, (err, res) =>{
@@ -678,7 +678,7 @@ class BrowserContext {
         this.__cookie_storage.add_cookie_data('oldCartId=none');
 
         let headers = this.__get_open_page_header();
-        headers['cookie'] = this.__cookie_storage.get_cookie_data();
+        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
         
         return this.__request_get(product_url, headers, undefined, (err, res) =>{
 
@@ -726,7 +726,7 @@ class BrowserContext {
 
     get_product_sku_inventory(product_url, product_id, __callback){
 
-        let cookies = this.__cookie_storage.get_cookie_data();
+        let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
         let headers = {
             'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -791,7 +791,7 @@ class BrowserContext {
     open_page(url, __callback){
 
         let headers = this.__get_open_page_header();
-        headers['cookie'] = this.__cookie_storage.get_cookie_data();
+        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
 
         return this.__request_get(url, headers, undefined, (err, res) =>{
 
@@ -838,7 +838,7 @@ class BrowserContext {
         };
 
         let payload = qureystring.stringify(payload_obj);
-        let cookies = this.__cookie_storage.get_cookie_data();
+        let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
         let headers = {
             "authority": BrowserContext.NIKE_DOMAIN_NAME,
@@ -903,7 +903,7 @@ class BrowserContext {
         };
 
         let payload = qureystring.stringify(payload_obj);
-        let cookies = this.__cookie_storage.get_cookie_data();
+        let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
         let headers = {
             "authority": BrowserContext.NIKE_DOMAIN_NAME,

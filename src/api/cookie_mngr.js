@@ -6,7 +6,7 @@ class CookieManager{
 
         this.add_cookie_data = this.add_cookie_data.bind(this);
         this.remove_cookie_data = this.remove_cookie_data.bind(this);
-        this.get_cookie_data = this.get_cookie_data.bind(this);
+        this.get_serialized_cookie_data = this.get_serialized_cookie_data.bind(this);
         this.add_serialized_cookies = this.add_serialized_cookies.bind(this);
         this.get_specific_serialized_cookie = this.get_specific_serialized_cookie.bind(this);
         this.init = this.init.bind(this);
@@ -41,11 +41,12 @@ class CookieManager{
     }
 
     remove_cookie_data(cookie_name){
+        if(cookie_name in this.cookies == false) return;
         delete this.cookies[cookie_name];
         this.num_of_cookies--;
     }
 
-    get_cookie_data(){
+    get_serialized_cookie_data(){
         let serialized = '';
 
         let i = 0;
