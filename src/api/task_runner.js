@@ -28,8 +28,9 @@ class TaskRunner{
 
     __end_task(task_status){
         this.running = false;
-        this.task_end_callback(task_status);
-        // this.browser_context.open_main_page();
+        this.browser_context.open_main_page(() =>{
+            this.task_end_callback(task_status);
+        });
     }
 
     judge_appropreate_size_info(){
@@ -175,6 +176,7 @@ class TaskRunner{
 
         if(this.product_info == undefined) return false;
         if(this.product_info.soldout == undefined || this.product_info.soldout == true) return false;
+        if(this.product_info.sell_type != common.SELL_TYPE.draw && this.product_info.item_attr == undefined) return false;
     
         if(this.product_info.size_info_list.length == 0) return false;
 

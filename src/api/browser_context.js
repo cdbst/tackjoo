@@ -895,12 +895,13 @@ class BrowserContext {
     add_to_cart(product_info, size_info, csrfToken, __callback){
 
         let payload_obj = {
-            'itemAttributes[FW_SIZE]' : size_info['name'],
             'SIZE' : size_info['id'],
             'quantity' : 1,
             'csrfToken' : csrfToken,
             'productId' : product_info['product_id']
         };
+
+        payload_obj[product_info.item_attr] = size_info['name'];
 
         let payload = qureystring.stringify(payload_obj);
         let cookies = this.__cookie_storage.get_serialized_cookie_data();

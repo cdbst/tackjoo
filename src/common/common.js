@@ -54,6 +54,7 @@
     exports.get_size_info_obj_scheme = function (){
         return {
             name : undefined,
+            friendly_name : undefined,
             sku_id : undefined,
             price : undefined,
             quantity : undefined,
@@ -89,6 +90,8 @@
             soldout : undefined,
             product_id : undefined,
             draw_id : undefined,
+            item_attr : undefined,
+            product_options : undefined,
             _id : undefined
         };
     }

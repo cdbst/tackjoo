@@ -215,6 +215,7 @@ function get_product_info_from_product_page ($) {
 
     }else if(sell_type = common.SELL_TYPE.normal){
         
+        parse_normal_product_page($, _product_info);
     
     }else{
         //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
@@ -259,8 +260,51 @@ function parse_draw_product_page($, _product_info){
 function parse_closed_product_page($, _product_info){
     let open_time = parse_ftfs_time_from_product_page($);
 
-    if(open_time == undefined) return undefined;
+    if(open_time == undefined) return false;
     common.update_product_info_obj(_product_info, 'open_time', open_time);
+    return true;
+}
+
+function parse_normal_product_page($, _product_info){
+    let item_attr = parse_item_attr_from_product_page($);
+    common.update_product_info_obj(_product_info, 'item_attr', item_attr);
+
+    let product_options = parse_product_options_from_product_page($);
+    common.update_product_info_obj(_product_info, 'product_options', product_options);
+}
+
+function parse_item_attr_from_product_page($){
+    let el_input_hidden_options = $('.hidden-option');
+
+    if(el_input_hidden_options.length == 0) return undefined;
+
+    let item_attr = undefined;
+
+    el_input_hidden_options.each((idx, input_hidden_option) =>{
+        if('name' in input_hidden_option.attribs == false) return;
+        if(input_hidden_option.attribs.name.includes('itemAttributes') == false) return;
+        item_attr = input_hidden_option.attribs.name;
+    });
+
+    return item_attr;
+}
+
+function parse_product_options_from_product_page($){
+    let el_draw_btn = $('.draw-button');
+    if(el_draw_btn.length == 0) return undefined;
+
+    let el_div_product_options = get_specific_tag_nodes(el_draw_btn[0], ['div']);
+
+    let product_options = [];
+
+    for(var i = 0; i < el_div_product_options.length; i++){
+        let el_div = el_div_product_options[i];
+        if('data-product-options' in el_div.attribs == false) continue;
+        product_options = JSON.parse(el_div.attribs['data-product-options']);
+        break;
+    }
+
+    return product_options;
 }
 
 function parse_draw_time_from_product_page($){
@@ -489,6 +533,31 @@ function update_product_info_as_sku_inventory_info(product_info, sku_inventory_i
         common.update_size_info_obj(size_info_obj, 'price', _price);
         common.update_size_info_obj(size_info_obj, 'quantity', _quantity);
         common.update_size_info_obj(size_info_obj, 'id', _id);
+
+        if(product_info.product_options != undefined){
+
+            for(var i = 0; i < product_info.product_options.length; i++){
+                
+                let product_option = product_info.product_options[i];
+                if(product_option.allowedValues == undefined) continue;
+                
+                let found = false;
+
+                for(var j = 0; product_option.allowedValues.length; j++){
+
+                    let allowed_value = product_option.allowedValues[j];
+
+                    if(allowed_value.id == _id){
+                        common.update_size_info_obj(size_info_obj, 'name', allowed_value.value);
+                        common.update_size_info_obj(size_info_obj, 'friendly_name', allowed_value.friendlyName);
+                        found =  true;
+                        break;
+                    }
+                }
+
+                if(found) break;
+            }
+        }
 
         _size_info_list.push(size_info_obj);
     });
