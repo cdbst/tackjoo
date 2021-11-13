@@ -136,7 +136,8 @@
         TRY_TO_DRAW : 'Try to draw',
         TRY_DO_PAY : 'Try to pay',
         GET_PRODUCT_INFO : 'Try to get product info',
-        IMPOSSIBLE_TO_BUY : 'Maybe Sold Out'
+        IMPOSSIBLE_TO_BUY : 'Maybe Sold Out',
+        ALREADY_EXIST_IN_CART : 'Another product exists in cart'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

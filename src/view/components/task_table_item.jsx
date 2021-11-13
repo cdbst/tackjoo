@@ -180,6 +180,9 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
                 btn_src = TaskTableItem.PLAY_BTN_SRC;
                 break;
+            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
+                btn_src = TaskTableItem.PLAY_BTN_SRC;
+                break;
         }
 
         return btn_src;
@@ -210,6 +213,8 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
                 return true;
+            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
+                return true;
         }
     }
 
@@ -236,6 +241,8 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.GET_PRODUCT_INFO :
                 return true;
             case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
+                return false;
+            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
                 return false;
         }
     }

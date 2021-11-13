@@ -17,7 +17,7 @@ class BrowserContext {
 
         this.__reset_csrfToken = this.__reset_csrfToken.bind(this);
         this.__get_csrfToken = this.__get_csrfToken.bind(this);
-        this.__get_USERID_from_main_page = this.__get_USERID_from_main_page.bind(this);
+        this.__get_USERID_from_page = this.__get_USERID_from_page.bind(this);
         this.__get_sensor_data_server_url_from_main_page = this.__get_sensor_data_server_url_from_main_page.bind(this);
         this.__open_login_modal = this.__open_login_modal.bind(this);
         this.__get_open_page_header = this.__get_open_page_header.bind(this);
@@ -386,6 +386,7 @@ class BrowserContext {
                 'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/',
                 'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
                 'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': "Windows",
                 'sec-fetch-dest': 'empty',
                 'sec-fetch-mode': 'cors',
                 'sec-fetch-site': 'same-origin',
@@ -480,7 +481,7 @@ class BrowserContext {
         return BrowserContext.NIKE_URL + server_url;
     }
 
-    __get_USERID_from_main_page($){
+    __get_USERID_from_page($){
 
         let scripts = $('script:not([src])').get();
         let data_script = undefined;
@@ -538,7 +539,7 @@ class BrowserContext {
             return false;
         }
 
-        let customer_id = this.__get_USERID_from_main_page($);
+        let customer_id = this.__get_USERID_from_page($);
         if(customer_id == undefined){
             return false;
         }
@@ -710,9 +711,11 @@ class BrowserContext {
                 return;
             }
 
-            res.headers['set-cookie'].forEach(cookie_data =>{
-                this.__cookie_storage.add_cookie_data(cookie_data);
-            });
+            if('set-cookie' in res.headers){
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    this.__cookie_storage.add_cookie_data(cookie_data);
+                });
+            }
 
             if((res.data instanceof Object) == false){
                 __callback('get_product_sku_inventory : unexpected data : data is not object type');
