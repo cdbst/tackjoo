@@ -29,7 +29,7 @@ class TaskRunner{
     __end_task(task_status){
         this.running = false;
         this.task_end_callback(task_status);
-        this.browser_context.open_main_page();
+        // this.browser_context.open_main_page();
     }
 
     judge_appropreate_size_info(){

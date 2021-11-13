@@ -263,15 +263,15 @@ class TaskEditModal extends React.Component {
                                     </div>
                                 </div>
                                 <hr/>
-                                <div className="mb-12 row">
-                                    <div className="col-md-2">
-                                        <label className="task-eidt-modal-option-label">Price</label>
-                                    </div>
-                                    <div className="col-md-10">
-                                        <label className="task-eidt-modal-option-label">
-                                            {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
-                                        </label>
-                                    </div>
+                            </div>
+                            <div className="mb-12 row">
+                                <div className="col-md-2">
+                                    <label className="task-eidt-modal-option-label">Price</label>
+                                </div>
+                                <div className="col-md-10">
+                                    <label className="task-eidt-modal-option-label">
+                                        {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
+                                    </label>
                                 </div>
                             </div>
                         </div>
