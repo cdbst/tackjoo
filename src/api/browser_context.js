@@ -17,12 +17,14 @@ class BrowserContext {
 
         this.__reset_csrfToken = this.__reset_csrfToken.bind(this);
         this.__get_csrfToken = this.__get_csrfToken.bind(this);
-        this.__get_USERID_from_page = this.__get_USERID_from_page.bind(this);
+        this.__get_data_script_from_page = this.__get_data_script_from_page.bind(this);
+        this.__get_specific_data_from_page = this.__get_specific_data_from_page.bind(this);
         this.__get_sensor_data_server_url_from_main_page = this.__get_sensor_data_server_url_from_main_page.bind(this);
         this.__open_login_modal = this.__open_login_modal.bind(this);
         this.__get_open_page_header = this.__get_open_page_header.bind(this);
         this.__post_process_open_page = this.__post_process_open_page.bind(this);
         this.__remove_aws_cookies = this.__remove_aws_cookies.bind(this);
+        this.__remove_akam_cookies = this.__remove_akam_cookies.bind(this);
         this.__send_fake_sensor_data = this.__send_fake_sensor_data.bind(this);
         this.cancel_request = this.cancel_request.bind(this);
 
@@ -59,12 +61,23 @@ class BrowserContext {
 
         //(TODO : 사용자 인터페이스로부터 입력받은 설정값을 Base로 지정될 수 있도록 기능 추가가 필요함.)
         //For http req config values; 
-        this.__req_retry_interval = 2000; // app 설정으로 부터 지정되어야 할 값임.
-        this.__req_retry_cnt = 100;
+        this.__req_retry_interval = 1500; // app 설정으로 부터 지정되어야 할 값임.
+        this.__req_retry_cnt = 30;
         this.__req_timout = 0;
 
         //requst_queue
         this.request_canceler = {};
+
+        this.in_progress_login = false;
+    }
+
+    __recorvery_session(__callback){
+
+        this.clear_cookies();
+        this.clear_csrfToken();
+        this.open_main_page(()=>{
+            this.login(__callback);
+        });
     }
 
     __send_fake_sensor_data(__callback){
@@ -140,6 +153,7 @@ class BrowserContext {
                 })
                 .catch(err => {
                     this.__remove_aws_cookies();
+                    this.__remove_akam_cookies();
                     cb(err, retry, undefined);
                 });
 
@@ -238,6 +252,7 @@ class BrowserContext {
                 })
                 .catch(err => {
                     this.__remove_aws_cookies();
+                    this.__remove_akam_cookies();
                     cb(err, retry, undefined);
                 });
             });
@@ -277,6 +292,15 @@ class BrowserContext {
         this.__cookie_storage.remove_cookie_data('AWSALBCORS');
         this.__cookie_storage.remove_cookie_data('AWSALB');
         this.__cookie_storage.remove_cookie_data('AWSALBTGCORS');
+    }
+
+    __remove_akam_cookies(){
+        this.__cookie_storage.remove_cookie_data('_abck');
+        this.__cookie_storage.remove_cookie_data('ak_bmsc');
+        this.__cookie_storage.remove_cookie_data('bm_mi');
+        this.__cookie_storage.remove_cookie_data('bm_sv');
+        this.__cookie_storage.remove_cookie_data('bm_sz');
+        this.__cookie_storage.remove_cookie_data('geoloc');
     }
 
     get_account_info(){
@@ -347,8 +371,15 @@ class BrowserContext {
     }
 
     login(__callback){
+        if(this.in_progress_login){
+            __callback('inprogress login in work.')
+            return;
+        }
+        
+        this.in_progress_login = true;
 
         if(this.is_anonymous()){
+            this.in_progress_login = false;
             __callback('This browser context is anonymous');
             return;
         }
@@ -396,6 +427,8 @@ class BrowserContext {
 
             this.__request_post(BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload, (err, res) =>{
 
+                this.in_progress_login = false;
+
                 if(err){
                     __callback(err);
                     return;
@@ -411,8 +444,7 @@ class BrowserContext {
                 });
                 
                 this.is_login = true;
-                __callback(undefined);
-                this.open_main_page();
+                this.open_main_page(__callback);
             }, {expected_keys : ['ResponseObject']});
 
         });
@@ -438,6 +470,7 @@ class BrowserContext {
         })
         .catch(err => {
             this.__remove_aws_cookies();
+            this.__remove_akam_cookies();
             __callback(err);
         });
     }
@@ -481,7 +514,7 @@ class BrowserContext {
         return BrowserContext.NIKE_URL + server_url;
     }
 
-    __get_USERID_from_page($){
+    __get_data_script_from_page($){
 
         let scripts = $('script:not([src])').get();
         let data_script = undefined;
@@ -498,10 +531,15 @@ class BrowserContext {
             break;
         }
 
+        return data_script;
+    }
+
+    __get_specific_data_from_page(data_script, property){
+
         if(data_script == undefined) return undefined;
 
         let setting_data = data_script.children[0].data;
-        let customer_id = setting_data.split('ID :')[1].split(',')[0].trim();
+        let customer_id = setting_data.split(property)[1].split(',')[0].trim();
 
         return customer_id;
     }
@@ -539,12 +577,24 @@ class BrowserContext {
             return false;
         }
 
-        let customer_id = this.__get_USERID_from_page($);
+        let data_script = this.__get_data_script_from_page($);
+        if(data_script == undefined){
+            return false;
+        }
+
+        let customer_id = this.__get_specific_data_from_page(data_script, 'ID :');
         if(customer_id == undefined){
             return false;
         }
 
         this.__cookie_storage.add_cookie_data('USERID=' + customer_id);
+
+        let is_sign_in = this.__get_specific_data_from_page(data_script, 'ISSIGNIN :');
+        if(is_sign_in == undefined){
+            return false;
+        }
+        is_sign_in = is_sign_in == 'true' ? true : false;
+        this.__cookie_storage.add_cookie_data('ISSIGNIN=' + is_sign_in);
 
         this.sensor_data_server_url = this.__get_sensor_data_server_url_from_main_page($)
         if(this.sensor_data_server_url == undefined){
@@ -624,6 +674,8 @@ class BrowserContext {
     }
 
     open_product_page(product_url, __callback){
+
+        this.__cookie_storage.add_cookie_data('oldCartId=none');
 
         let headers = this.__get_open_page_header();
         headers['cookie'] = this.__cookie_storage.get_cookie_data();
