@@ -484,8 +484,12 @@ function parse_draw_size_info_list_from_product_page($){
             let size_name = el_option.attribs['data-value'];
             if(size_name == undefined) return;
 
+            let friendly_size_name = el_option.attribs['data-friendly-name'];
+            if(friendly_size_name == undefined) return;
+
             let size_info_obj = common.get_size_info_obj_scheme();
             common.update_size_info_obj(size_info_obj, 'name', size_name);
+            common.update_size_info_obj(size_info_obj, 'friendly_name', friendly_size_name);
             common.update_size_info_obj(size_info_obj, 'sku_id', sku_id);
             common.update_size_info_obj(size_info_obj, 'external_id', external_id);
             common.update_size_info_obj(size_info_obj, 'draw_product_xref', the_draw_product_xref);

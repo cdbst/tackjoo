@@ -33,6 +33,7 @@
         return {
             product_info_id : undefined,
             size_name : undefined,
+            friendly_size_name : undefined,
             account_email : undefined,
             account_id : undefined,
             schedule_time : undefined,

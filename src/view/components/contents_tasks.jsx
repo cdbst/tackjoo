@@ -97,7 +97,7 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
-    onCreateNewTask(product_info, size_name, account_id, account_email, schedule_time){
+    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time){
     
         if(schedule_time != undefined){
         
@@ -112,9 +112,12 @@ class ContentsTasks extends React.Component {
             }
         }
 
+        let size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+
         let task_info_obj = common.get_task_info_obj_scheme();
         common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
         common.update_task_info_obj(task_info_obj, 'size_name', size_name);
+        common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
         common.update_task_info_obj(task_info_obj, 'account_email', account_email);
         common.update_task_info_obj(task_info_obj, 'account_id', account_id);
         common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);

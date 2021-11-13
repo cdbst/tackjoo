@@ -253,6 +253,7 @@ class TaskTableItem extends React.Component {
         let product_name = ProductManager.getProductDescName(product_info);
         let open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
+        let display_size_name = this.props.task_info.friendly_size_name == undefined ?  this.props.task_info.size_name : this.props.task_info.friendly_size_name;
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
 
@@ -265,7 +266,7 @@ class TaskTableItem extends React.Component {
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={product_name}>{product_name}</div>
                 </td>
                 <td style={{width : this.props.size_col_width, maxWidth : this.props.size_col_width}}>
-                    <span>{this.props.task_info.size_name}</span>
+                    <span>{display_size_name}</span>
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.task_info.account_email}>{this.props.task_info.account_email}</div>
