@@ -33,10 +33,6 @@ class ProductManager{
         this.getProductInfoList = this.getProductInfoList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
         this.__updateProductInfo = this.__updateProductInfo.bind(this);
-        this.getValueList = this.getValueList.bind(this);
-
-        this.getProductSizeList =this.getProductSizeList.bind(this);
-        this.__getDefaultSizeNameList = this.__getDefaultSizeNameList.bind(this);
 
         this.__product_info_list = [];
         this.__product_info_req_gate = new RequestGate();
@@ -121,13 +117,13 @@ class ProductManager{
         return this.__product_info_list;
     }
 
-    getValueList(product_info_list, attr_name, duplicate = true){
+    static getValueList(product_info_list, attr_name, duplicate = true){
         let value_list = product_info_list.map((product_info) => product_info[attr_name]);
         if(duplicate) return value_list;
         return [...new Set(value_list)];
     }
 
-    getProductSizeList(product_info){
+    static getProductSizeList(product_info){
 
         let size_list = undefined;
 
@@ -139,7 +135,7 @@ class ProductManager{
             }
             
         }else if(product_info != undefined){
-            size_list = this.__getDefaultSizeNameList();
+            size_list = ProductManager.getDefaultSizeNameList();
         }else{
             size_list = [];
         }
@@ -147,7 +143,7 @@ class ProductManager{
         return size_list
     }
 
-    __getDefaultSizeNameList(){
+    static getDefaultSizeNameList(){
         const size_num = 20;
         const base_size = 200;
         let size_names = [];
@@ -186,4 +182,12 @@ class ProductManager{
 
         return has_quantity;
     }
+
+    // static get_friendly_size_name_by_size_name(product_info, size_name){
+
+    // }
+
+    // static get_size_name_by_friendly_name(product_info, friendly_size_name){
+
+    // }
 }
