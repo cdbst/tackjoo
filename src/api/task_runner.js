@@ -101,10 +101,10 @@ class TaskRunner{
             return;
         }
 
-        this.cur_req_id = this.browser_context.add_to_cart(this.product_info, size_info, this.csrfToken, (err, draw_entry_data)=>{
+        this.cur_req_id = this.browser_context.add_to_cart(this.product_info, size_info, this.csrfToken, (err, mutex_release, draw_entry_data)=>{
 
             if(err){
-                console.error(err);
+                mutex_release();
                 this.__end_task(common.TASK_STATUS.FAIL);
                 return;
             }else{
