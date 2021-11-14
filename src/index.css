@@ -10,6 +10,13 @@ body {
     background-color: #32353b !important;
 }
 
+/* Disable input type number arrow buttons */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 /* End To Global */
 .cut-text { 
     text-overflow: ellipsis;
@@ -221,3 +228,15 @@ tbody tr:hover td {
 
 
 /* End to Task Edit Modal */
+
+
+/* Start to Contents Bill */
+.contents-bill-input-label{
+    color: #83f195 !important;
+    font-weight: bold !important;
+}
+
+.contents-bill-input-addr{
+    max-width: 394px;
+}
+/* End to Contents Bill */
