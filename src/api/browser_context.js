@@ -706,6 +706,8 @@ class BrowserContext {
                 return;
             }
 
+            this.__cookie_storage.add_cookie_data('c20=' + product_info.model_id);
+
             if(product_info.sell_type == common.SELL_TYPE.normal){
 
                 this.get_product_sku_inventory(product_url, product_info.product_id, (_err, sku_inventory_info) => {

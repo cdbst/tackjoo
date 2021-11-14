@@ -182,47 +182,57 @@ function get_specific_child_text_nodes (element, text_data = undefined) {
 
 function get_product_info_from_product_page ($) {
 
-    let _product_info = common.get_product_info_obj_scheme();
+    try{
+        let _product_info = common.get_product_info_obj_scheme();
 
-    if($('.product-soldout').length > 0){
-        common.update_product_info_obj(_product_info, 'soldout', true);
+        if($('.product-soldout').length > 0){
+            common.update_product_info_obj(_product_info, 'soldout', true);
+            return _product_info;
+        }else{
+            common.update_product_info_obj(_product_info, 'soldout', false);
+        }
+        
+        let price = parse_price_from_product_page($);
+        if(price == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'price', price);
+    
+        let product_info_script = get_product_info_script_from_product_page($);
+        if(product_info_script == undefined) return undefined;
+    
+        let product_id = parse_product_id_from_product_page(product_info_script);
+        if(product_id == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'product_id', product_id);
+    
+        let model_id = parse_model_id_from_product_page(product_info_script);
+        if(model_id == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'model_id', model_id);
+    
+        let sell_type = parse_sell_type_from_product_page($);
+        common.update_product_info_obj(_product_info, 'sell_type', sell_type);
+    
+        if(sell_type == common.SELL_TYPE.draw){
+    
+            parse_draw_product_page($, _product_info);
+    
+        }else if(sell_type == common.SELL_TYPE.ftfs || sell_type == common.SELL_TYPE.notify){
+            
+            parse_closed_product_page($, _product_info);
+    
+        }else if(sell_type = common.SELL_TYPE.normal){
+            
+            parse_normal_product_page($, _product_info);
+        
+        }else{
+            //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
+            return undefined;
+        }
+    
         return _product_info;
-    }else{
-        common.update_product_info_obj(_product_info, 'soldout', false);
-    }
 
-    
-    let price = parse_price_from_product_page($);
-    if(price == undefined) return undefined;
-    common.update_product_info_obj(_product_info, 'price', price);
+    }catch(e){
 
-    
-    let product_id = parse_product_id_from_product_page($);
-    if(product_id == undefined) return undefined;
-    common.update_product_info_obj(_product_info, 'product_id', product_id);
-
-    
-    let sell_type = parse_sell_type_from_product_page($);
-    common.update_product_info_obj(_product_info, 'sell_type', sell_type);
-
-    if(sell_type == common.SELL_TYPE.draw){
-
-        parse_draw_product_page($, _product_info);
-
-    }else if(sell_type == common.SELL_TYPE.ftfs || sell_type == common.SELL_TYPE.notify){
-        
-        parse_closed_product_page($, _product_info);
-
-    }else if(sell_type = common.SELL_TYPE.normal){
-        
-        parse_normal_product_page($, _product_info);
-    
-    }else{
-        //TODO : _product_info를 return할지 아니면 undefiend를 return할지 좀 더 고민 필요.
         return undefined;
     }
-
-    return _product_info;
 }
 
 function parse_price_from_product_page($){
@@ -405,9 +415,9 @@ function parse_ftfs_time_from_product_page($){
     }
 }
 
-function parse_product_id_from_product_page($){
+function get_product_info_script_from_product_page($){
 
-    let product_id = undefined;
+    let product_info_script = undefined;
     let scripts = $('script:not([src])');
 
     scripts.each((idx, script) =>{
@@ -416,14 +426,32 @@ function parse_product_id_from_product_page($){
 
         let script_code = script.childNodes[0].data;
 
-        if(script_code.includes('categoryInfo =') == false) return;
-        script_code = strip_usless_string(script_code);
-
-        product_id = script_code.split('var productInfo = {')[1].split(',', 1)[0].replace('id : ', '');
+        if(script_code.includes('categoryInfo =')){
+            product_info_script = script;
+        } 
     });
 
+    return product_info_script;
+}
+
+function parse_product_id_from_product_page(product_info_script){
+
+    let script_code = product_info_script.childNodes[0].data;
+    script_code = strip_usless_string(script_code);
+
+    let product_id = script_code.split('var productInfo = {')[1].split(',', 1)[0].replace('id : ', '');
     return product_id;
 }
+
+function parse_model_id_from_product_page(product_info_script){
+
+    let script_code = product_info_script.childNodes[0].data;
+    script_code = strip_usless_string(script_code);
+
+    model_id = script_code.split('model : ')[1].split(',', 1)[0].trim().replace(/\'/gi, '');
+    return model_id;
+}
+
 
 function parse_sell_type_from_product_page($){
 

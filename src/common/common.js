@@ -90,6 +90,7 @@
             size_info_list : [],
             soldout : undefined,
             product_id : undefined,
+            model_id : undefined,
             draw_id : undefined,
             item_attr : undefined,
             product_options : undefined,
