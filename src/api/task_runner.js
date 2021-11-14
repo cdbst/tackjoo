@@ -91,7 +91,6 @@ class TaskRunner{
     }
 
     click_buy_button(){
-        //add cart first..
 
         if(this.check_stopped()) return;
 
@@ -108,12 +107,15 @@ class TaskRunner{
 
             this.cart_ownership_release = mutex_release;
 
-            if(err){
-                this.__end_task(common.TASK_STATUS.FAIL);
-                return;
-            }else{
-                this.__end_task(common.TASK_STATUS.DONE);
-            }
+            this.browser_context.open_checkout_page(this.product_info, (err, csrfToken) =>{
+                
+                if(err){
+                    this.__end_task(common.TASK_STATUS.FAIL);
+                    return;
+                }else{
+                    this.__end_task(common.TASK_STATUS.DONE);
+                }
+            });
         });
 
     }

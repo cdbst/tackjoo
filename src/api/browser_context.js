@@ -48,7 +48,7 @@ class BrowserContext {
         this.get_product_sku_inventory = this.get_product_sku_inventory.bind(this);
         this.get_account_info = this.get_account_info.bind(this);
         this.apply_draw = this.apply_draw.bind(this);
-        this.open_page = this.open_page.bind(this);
+        this.open_checkout_page = this.open_checkout_page.bind(this);
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
@@ -503,6 +503,7 @@ class BrowserContext {
             'pragma': 'no-cache',
             'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
             'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
             'sec-fetch-dest': 'document',
             'sec-fetch-mode': 'navigate',
             'sec-fetch-site': 'none',
@@ -739,41 +740,6 @@ class BrowserContext {
         }, {expected_keys : ['usable', 'skuPricing']});
     }
 
-    open_page(url, __callback){
-
-        let headers = this.__get_open_page_header();
-        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
-
-        return this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers, undefined, (err, res) =>{
-
-            if(err){
-                __callback(err);
-                return;
-            }
-
-            if(res.status != 200){
-                __callback('open_page : response ' + res.status);
-                return;
-            }
-
-            if('set-cookie' in res.headers){
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
-            }
-            
-            const $ = cheerio.load(res.data);
-            const csrfToken = this.__get_csrfToken($);
-
-            if(csrfToken == undefined){
-                __callback('open_page : cannot found csrfToken');
-                return;
-            }
-
-            __callback(undefined, csrfToken, $);
-        }, {need_csrfToken : true});
-    }
-
     apply_draw(product_info, size_info, csrfToken, __callback){
 
         let payload_obj = {
@@ -914,6 +880,39 @@ class BrowserContext {
         });
 
         return _request_id;
+    }
+
+    open_checkout_page(product_info, __callback){
+
+        let headers = this.__get_open_page_header();
+        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['refer'] = product_info.url;
+        headers['upgrade-insecure-requests'] = 1;
+        
+        return this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout', headers, undefined, (err, res) =>{
+
+            if(err){
+                __callback(err, undefined);
+                return;
+            }
+
+            if(res.status != 200){
+                __callback('open_checkout_page : response ' + res.status, undefined);
+                return;
+            }
+
+            const $ = cheerio.load(res.data);
+
+            let result = this.__post_process_open_page(res.headers, $);
+            if(result == false){
+                __callback('open_checkout_page : cannot store informations', undefined);
+                return;
+            }
+
+            __callback(undefined, this.csrfToken)
+
+        }, {need_csrfToken : true});
     }
 }
 
