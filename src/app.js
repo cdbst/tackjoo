@@ -13,6 +13,7 @@ function createWindow() {
             sandbox: true,
             preload: path.join(__dirname, "preload.js")
         },
+        offscreen : true
     });
 
     IpcM.register(win);

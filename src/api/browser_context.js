@@ -30,6 +30,7 @@ class BrowserContext {
 
         this.__request_post = this.__request_post.bind(this);
         this.__request_get = this.__request_get.bind(this);
+        this.__recorver_session = this.__recorver_session.bind(this);
 
 
         this.is_anonymous = this.is_anonymous.bind(this);
@@ -71,7 +72,7 @@ class BrowserContext {
         this.in_progress_login = false;
     }
 
-    __recorvery_session(__callback){
+    __recorver_session(__callback){
 
         this.clear_cookies();
         this.clear_csrfToken();
@@ -344,7 +345,7 @@ class BrowserContext {
                 'user-agent': BrowserContext.USER_AGENT,
                 'content-length': sensor_data.length
             }
-        }
+        };
 
         axios.post(this.sensor_data_server_url, sensor_data, config)
         .then(res => {
