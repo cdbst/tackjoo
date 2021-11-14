@@ -6,16 +6,22 @@ class ContentsBill extends React.Component {
         this.onClickSaveBtn = this.onClickSaveBtn.bind(this);
         this.loadBillInfo = this.loadBillInfo.bind(this);
         this.onClickSearchBtn = this.onClickSearchBtn.bind(this);
+        this.updateAddrSearchReuslt = this.updateAddrSearchReuslt.bind(this);
+        this.onChangeSearchResultItem = this.onChangeSearchResultItem.bind(this);
+        this.onChangeAddr1Value = this.onChangeAddr1Value.bind(this);
+        this.onKeyUpAddr1 = this.onKeyUpAddr1.bind(this);
+        this.update_postcode = this.update_postcode.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
         this.ref_addr1 = React.createRef();
         this.ref_addr2 = React.createRef();
+        this.ref_postcode = React.createRef();
 
         this.__mount = false;
 
         this.state = {
-            postal_num : undefined
+            opt_search_result : []
         };
     }
 
@@ -33,7 +39,7 @@ class ContentsBill extends React.Component {
         let phone_num = this.ref_phone_num.current.value;
         let buyer_addr1 = this.ref_addr1.current.value;
         let buyer_addr2 = this.ref_addr2.current.value;
-        let postal_num = this.state.postal_num;
+        let postal_code = this.ref_postcode.current.value;
 
 
         if(buyer_name == undefined || buyer_name == ''){
@@ -51,7 +57,7 @@ class ContentsBill extends React.Component {
             return;
         }
 
-        if(postal_num == undefined || postal_num == ''){
+        if(postal_code == undefined || postal_code == ''){
             Index.g_sys_msg_q.enqueue('Error', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
@@ -59,6 +65,19 @@ class ContentsBill extends React.Component {
 
     loadBillInfo(){
 
+    }
+
+    onChangeAddr1Value(e){
+        this.update_postcode('');
+    }
+
+    onKeyUpAddr1(e){
+
+        e.preventDefault();
+
+        if(e.key === 'Enter'){
+            this.onClickSearchBtn();
+        }
     }
 
     onClickSearchBtn(){
@@ -76,14 +95,56 @@ class ContentsBill extends React.Component {
                 return;
             }
 
-            //TEST CODE
-            Index.g_sys_msg_q.enqueue('INFO', search_result, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            this.updateAddrSearchReuslt(search_result);
         });
     }
 
-    render() {
+    updateAddrSearchReuslt(search_result){
 
-        let display_postal_num = this.state.postal_num == undefined ? '' : this.state.postal_num
+        let get_addr_item_value = (addr_item, add_postcode = true) =>{
+            let addr_item_val =  addr_item.ko_common + ' ' + addr_item.ko_doro; 
+            if(add_postcode) addr_item_val += ' (' + addr_item.postcode5 + ')';
+            return addr_item_val;
+        }
+
+        let _opt_search_result = search_result.map((addr_item) => 
+            <option key={common.uuidv4()} data-postcode={addr_item.postcode5} value={get_addr_item_value(addr_item, false)}>{get_addr_item_value(addr_item)}</option>
+        );
+
+        if(this.__mount == false) return;
+
+        this.setState(_ => ({
+            opt_search_result : _opt_search_result
+        }));
+    }
+
+    onChangeSearchResultItem(e){
+
+        let selected_idx = e.target.selectedIndex;
+        let selected_opt = e.target[selected_idx];
+
+        let selected_addr_value = selected_opt.value;
+        let selected_addr_postcode = undefined;
+
+        for(var i = 0; i < selected_opt.attributes.length; i++){
+            if(selected_opt.attributes[i]['localName'] == 'data-postcode'){
+                selected_addr_postcode = selected_opt.attributes[i]['nodeValue'];
+            }
+            if(selected_opt.attributes[i]['localName'] == 'value'){
+                selected_addr_value = selected_opt.attributes[i]['nodeValue'];
+            }
+        }
+
+        this.ref_addr1.current.value = selected_addr_value;
+        this.update_postcode(selected_addr_postcode);
+    }
+
+    update_postcode(value){
+        this.ref_postcode.current.value = value;
+        this.ref_postcode.current.innerText  = '(' + value + ')';
+    }
+
+    render() {
 
         return (
             <div className="container-fluid">
@@ -112,9 +173,10 @@ class ContentsBill extends React.Component {
                         <br/>
                         <div className="md-12 row" style={{marginBottom : 5}}>
                             <div className="col-mb-6">
-                                <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">{"배송 주소(" + display_postal_num + ")"}</label>
+                                <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">배송 주소</label>
+                                <label className="form-label contents-bill-input-label" ref={this.ref_postcode}></label>
                                 <div className="input-group col-mb-3">
-                                    <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1}/>
+                                    <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)}/>
                                     <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
                                 </div>
                             </div>
@@ -143,11 +205,8 @@ class ContentsBill extends React.Component {
                         <div className="m2-12 row">
                             <div className="col-md-6">
                                 <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
-                                <select className="form-select select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result">
-                                    <option value="0">Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                <select className="form-select select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
+                                    {this.state.opt_search_result}
                                 </select>
                             </div>
                         </div>
