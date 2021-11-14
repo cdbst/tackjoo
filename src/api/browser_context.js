@@ -136,7 +136,7 @@ class BrowserContext {
             if('request_id' in req_cfg) request_id = req_cfg['request_id'];
         }
 
-        if(request_canceled_check(request_id)){
+        if(this.request_canceled_check(request_id)){
             __callback('request has been canceled.', undefined);
             return;
         }
@@ -147,7 +147,7 @@ class BrowserContext {
 
             this.__send_fake_sensor_data((err) =>{
 
-                if(request_canceled_check(request_id)){
+                if(this.request_canceled_check(request_id)){
                     __callback('request has been canceled.', undefined);
                     return;
                 }
@@ -211,7 +211,7 @@ class BrowserContext {
 
         let req_cb = (err, retry, res) =>{
 
-            if(request_canceled_check(request_id)){
+            if(this.request_canceled_check(request_id)){
                 __callback('request has been canceled.', undefined);
                 return;
             }

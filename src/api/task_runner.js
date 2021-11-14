@@ -24,11 +24,14 @@ class TaskRunner{
         this.csrfToken = undefined;
 
         this.cur_req_id = undefined;
+
+        this.cart_ownership_release = undefined;
     }
 
     __end_task(task_status){
         this.running = false;
         this.browser_context.open_main_page(() =>{
+            if(this.cart_ownership_release != undefined) this.cart_ownership_release();
             this.task_end_callback(task_status);
         });
     }
@@ -103,8 +106,9 @@ class TaskRunner{
 
         this.cur_req_id = this.browser_context.add_to_cart(this.product_info, size_info, this.csrfToken, (err, mutex_release, draw_entry_data)=>{
 
+            this.cart_ownership_release = mutex_release;
+
             if(err){
-                mutex_release();
                 this.__end_task(common.TASK_STATUS.FAIL);
                 return;
             }else{
