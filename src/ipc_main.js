@@ -2,6 +2,7 @@ const IpcMainAccount = require('./ipc_main_account');
 const IpcMainSensor = require('./ipc_main_sensor');
 const IpcMainProduct = require('./ipc_main_product');
 const IpcMainTask = require('./ipc_main_task');
+const IpcMainBilling = require('./ipc_main_billing');
 
 
 function register(win){
@@ -10,6 +11,7 @@ function register(win){
     IpcMainProduct.register();
     IpcMainSensor.register(win);
     IpcMainTask.register();
+    IpcMainBilling.register();
     
 }
 

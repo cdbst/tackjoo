@@ -23,7 +23,8 @@ contextBridge.exposeInMainWorld('electron', {
     getProductInfo : _getProductInfo,
     getLoggedInAccountInfoList : _getLoggedInAccountInfoList,
     playTask: _playTask,
-    pauseTask: _pauseTask
+    pauseTask: _pauseTask,
+    searchAddr: _searchAddr,
 });
 
 let get_sensor_data = undefined;
@@ -220,5 +221,21 @@ function _pauseTask(_task_info, __callback){
         }
 
         __callback(data.err);
+    });
+}
+
+function _searchAddr(_addr, __callback){
+
+    if(_addr == undefined || _addr == ''){
+        __callback('address to search is not set.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({address : _addr});
+    
+    ipcRenderer.send('search-address', ipc_data);
+
+    ipcRenderer.once('search-address-reply' + ipc_data.id, (_event, addr_search_result) => {
+        __callback(addr_search_result.err, addr_search_result.data);
     });
 }

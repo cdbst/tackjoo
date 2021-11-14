@@ -69,6 +69,16 @@ class ContentsBill extends React.Component {
             return;
         }
 
+        window.electron.searchAddr(buyer_addr1, (err, search_result) =>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            //TEST CODE
+            Index.g_sys_msg_q.enqueue('INFO', search_result, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     render() {
@@ -84,45 +94,62 @@ class ContentsBill extends React.Component {
                     </div>
                 </div>
                 <br/>
-                <div className="md-12 row">
-                    <div className="col-md-6">
-                        <label htmlFor="input-buyer-name" className="form-label contents-bill-input-label">받으시는 분</label>
-                        <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name}/>
-                    </div>
-                </div>
-                <br/>
-                <div className="m2-12 row">
-                    <div className="col-md-6">
-                        <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
-                        <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num}/>
-                    </div>
-                </div>
-                <br/>
-                <div className="md-12 row" style={{marginBottom : 5}}>
-                    <div className="col-mb-6">
-                        <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">{"배송 주소(" + display_postal_num + ")"}</label>
-                        <div className="input-group col-mb-3">
-                            <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1}/>
-                            <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
+                <div className="row">
+                    <div className="md-6 col">
+                        <div className="md-12 row">
+                            <div className="col-md-6">
+                                <label htmlFor="input-buyer-name" className="form-label contents-bill-input-label">받으시는 분</label>
+                                <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name}/>
+                            </div>
+                        </div>
+                        <br/>
+                        <div className="m2-12 row">
+                            <div className="col-md-6">
+                                <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
+                                <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num}/>
+                            </div>
+                        </div>
+                        <br/>
+                        <div className="md-12 row" style={{marginBottom : 5}}>
+                            <div className="col-mb-6">
+                                <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">{"배송 주소(" + display_postal_num + ")"}</label>
+                                <div className="input-group col-mb-3">
+                                    <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1}/>
+                                    <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="md-12 row">
+                            <div className="col-mb-6">
+                                <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2}/>
+                            </div>
+                        </div>
+                        <br />
+                        <div className="m2-12 row">
+                            <div className="col-md-6">
+                                <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">결제 방식</label>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-kakaopay" defaultChecked/>
+                                    <label className="form-check-label" htmlFor="opt-checkout-method-kakaopay">카카오페이</label>
+                                </div>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-naverpay" disabled/>
+                                    <label className="form-check-label" htmlFor="opt-checkout-method-naverpay">네이버페이</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="md-12 row">
-                    <div className="col-mb-6">
-                        <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2}/>
-                    </div>
-                </div>
-                <br />
-                <div className="m2-12 row">
-                    <div className="col-md-6">
-                        <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">결제 방식</label>
-                        <div className="form-check">
-                            <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-kakaopay" defaultChecked/>
-                            <label className="form-check-label" htmlFor="opt-checkout-method-kakaopay">카카오페이</label>
-                        </div>
-                        <div className="form-check">
-                            <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-naverpay" disabled/>
-                            <label className="form-check-label" htmlFor="opt-checkout-method-naverpay">네이버페이</label>
+                    <div className="md-6 col">
+                        <div className="m2-12 row">
+                            <div className="col-md-6">
+                                <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
+                                <select className="form-select select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result">
+                                    <option value="0">Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>

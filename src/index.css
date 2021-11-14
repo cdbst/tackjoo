@@ -239,4 +239,12 @@ tbody tr:hover td {
 .contents-bill-input-addr{
     max-width: 394px;
 }
+
+.select-addr-search-result *{
+    color: black !important;
+}
+
+.select-addr-search-result{
+    width: 580px !important;
+}
 /* End to Contents Bill */
