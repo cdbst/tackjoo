@@ -1,7 +1,7 @@
 const cookieMngr = require("./cookie_mngr.js");
 const axios = require('axios');
 const cheerio = require('cheerio');
-const qureystring = require('querystring');
+const qureystring = require('querystring'); // TODO: (중요) 해당 모듈을 사용하지 않는 방법 적용 후 테스트 필요. 대체 방법(new URLSearchParams(payload_obj).toString();)
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
