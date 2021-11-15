@@ -49,6 +49,7 @@ class BrowserContext {
         this.get_account_info = this.get_account_info.bind(this);
         this.apply_draw = this.apply_draw.bind(this);
         this.open_checkout_page = this.open_checkout_page.bind(this);
+        this.open_page = this.open_page.bind(this);
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
@@ -127,12 +128,14 @@ class BrowserContext {
         let cfg_expected_keys = undefined;
         let cfg_need_csrfToken = undefined;
         let request_id = common.uuidv4();
+        let max_redirect = undefined;
         
         if(req_cfg != undefined){
             if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
             if('expected_keys' in req_cfg) cfg_expected_keys = req_cfg['expected_keys'];
             if('need_csrfToken' in req_cfg) cfg_need_csrfToken = req_cfg['need_csrfToken'];
             if('request_id' in req_cfg) request_id = req_cfg['request_id'];
+            if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
         }
 
         if(this.request_canceled_check(request_id)){
@@ -158,6 +161,10 @@ class BrowserContext {
                     url: url,
                     timeout: this.__req_timout,
                     headers : headers
+                }
+
+                if(max_redirect != undefined){
+                    axios_req_cfg.maxRedirects = max_redirect;
                 }
 
                 if(params != undefined){
@@ -199,10 +206,16 @@ class BrowserContext {
 
                     cb(undefined, retry, res);
                 })
-                .catch(err => {
+                .catch(error => {
+
+                    if(cfg_expected_status != undefined && cfg_expected_status.includes(error.response.status)){
+                        cb(undefined, retry, error.response);
+                        return;
+                    }
+
                     this.__remove_aws_cookies();
                     this.__remove_akam_cookies();
-                    cb(err, retry, undefined);
+                    cb(error, retry, undefined);
                 });
 
             });
@@ -261,6 +274,38 @@ class BrowserContext {
     is_anonymous(){
         if(this.email == undefined || this.pwd == undefined || this.id == undefined) return true;
         else return false;
+    }
+
+    open_page(url, __callback){
+
+        let headers = this.__get_open_page_header();
+
+        if(this.__cookie_storage.num_of_cookies > 0){
+            headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
+        }
+
+        this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers, undefined, (err, res) =>{
+
+            if(err){
+                if(__callback) __callback(err);
+                return;
+            }
+
+            if(res.status != 200){
+                if(__callback) __callback('open_main_page : response ' + res.status);
+                return;
+            }
+
+            const $ = cheerio.load(res.data);
+
+            let result = this.__post_process_open_page(res.headers, $);
+            if(result == false){
+                if(__callback) __callback('open_main_page : cannot store informations');
+                return;
+            }
+
+            if(__callback) __callback();
+        },{need_csrfToken : true});
     }
 
     send_sensor_data(sensor_data, __callback){
@@ -914,8 +959,74 @@ class BrowserContext {
         }, {need_csrfToken : true});
     }
 
-    checkout_singleship(){
+    checkout_singleship(billing_info, csrfToken, __callback){
+
+        let payload_obj = {
+            'address.isoCountryAlpha2': 'US',
+            'isSearchAddress': true,
+            'address.fullName': billing_info.buyer_name,
+            'address.phonePrimary.phoneNumber': billing_info.phone_num,
+            'address.addressLine1': billing_info.buyer_addr1,
+            'address.addressLine2': billing_info.buyer_addr2,
+            'address.postalCode': billing_info.postal_code,
+            'selectPersonalMessage': '',
+            'personalMessageText': '',
+            'fulfillmentOptionId': 1,
+            'csrfToken': csrfToken
+        }
+
+        let payload = new URLSearchParams(payload_obj).toString();
+        let cookie = this.__cookie_storage.get_serialized_cookie_data();
         
+        let headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded',
+            'cookie': cookie,
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/launch/checkout',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': 1,
+            'user-agent': BrowserContext.USER_AGENT
+        }
+        
+        return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload, (err, res) =>{
+
+            if(err){
+                __callback(err, undefined);
+                return;
+            }
+
+            if(res.headers != undefined && 'set-cookie' in res.headers){
+
+                res.headers['set-cookie'].forEach(cookie_data =>{
+                    this.__cookie_storage.add_cookie_data(cookie_data);
+                });
+            }
+
+            this.open_page(res.headers.location, (err) =>{
+
+                if(err){
+                    __callback(err, undefined);
+                    return;
+                }
+
+                __callback(err, this.csrfToken);
+            });
+
+
+        },{expected_status : [301, 302, 303, 304], max_redirect : 0});
     }
 }
 

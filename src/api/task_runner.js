@@ -109,13 +109,15 @@ class TaskRunner{
 
             this.cart_ownership_release = mutex_release;
 
-            this.browser_context.open_checkout_page(this.product_info, (err, csrfToken) =>{
+            this.cur_req_id = this.browser_context.open_checkout_page(this.product_info, (err, csrfToken) =>{
                 
                 if(err){
                     this.__end_task(common.TASK_STATUS.FAIL);
                     return;
                 }else{
-                    this.__end_task(common.TASK_STATUS.DONE);
+                    this.cur_req_id = this.browser_context.checkout_singleship(this.billing_info, csrfToken, (err, data) =>{
+                        this.__end_task(common.TASK_STATUS.DONE);
+                    });
                 }
             });
         });
