@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const qureystring = require('querystring');
 const product_page_parser = require('./product_page_parser.js');
+const checkout_page_parser = require('./checkout_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const Mutex = require('async-mutex').Mutex;
@@ -179,9 +180,9 @@ class BrowserContext {
                 .then(res => {
 
                     if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
-                        throw new Error('(POST req) unexpected status code ' + res.status);
+                        throw new Error('unexpected status code ' + res.status);
                     }else if(res.status != 200 && res.status != 201){
-                        throw new Error('(POST req) invalid status code ' + res.status);
+                        throw new Error('invalid status code ' + res.status);
                     }
 
                     if(cfg_need_csrfToken != undefined && cfg_need_csrfToken == true){
@@ -189,18 +190,18 @@ class BrowserContext {
                         let csrfToken = this.__get_csrfToken($);
 
                         if(csrfToken == undefined){
-                            throw new Error('(GET req) GET data has no csrfToken information');   
+                            throw new Error('GET data has no csrfToken information');   
                         }
                     }
 
                     if(cfg_expected_keys != undefined){
                         if(typeof res.data !== 'object'){
-                            throw new Error('(POST req) expected payload data is not object type');
+                            throw new Error('expected payload data is not object type');
                         }
                         let data_keys = Object.keys(res.data);
                         let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
                         if(intersection.length == 0){
-                            throw new Error('(POST req) expected payload data has no expected key');
+                            throw new Error('expected payload data has no expected key');
                         }
                     }
 
@@ -1004,7 +1005,7 @@ class BrowserContext {
         return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload, (err, res) =>{
 
             if(err){
-                __callback(err, undefined);
+                __callback(err);
                 return;
             }
 
@@ -1015,14 +1016,21 @@ class BrowserContext {
                 });
             }
 
+            //location is checkout page.
             this.open_page(res.headers.location, (err, res) =>{
 
                 if(err){
-                    __callback(err, undefined);
+                    __callback(err);
                     return;
                 }
 
-                __callback(err, this.csrfToken);
+                const $ = cheerio.load(res.data);
+
+                let kakaopay_prepare_payload = checkout_page_parser.parse_kakaopay_prepare_payload_from_checkout_page($);
+                if(kakaopay_prepare_payload == undefined){
+                    throw new Error('cannot parse payment payload from checkout page.');
+                }
+                __callback(err, this.csrfToken, kakaopay_prepare_payload);
             });
 
 

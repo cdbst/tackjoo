@@ -114,11 +114,17 @@ class TaskRunner{
                 if(err){
                     this.__end_task(common.TASK_STATUS.FAIL);
                     return;
-                }else{
-                    this.cur_req_id = this.browser_context.checkout_singleship(this.billing_info, csrfToken, (err, data) =>{
-                        this.__end_task(common.TASK_STATUS.DONE);
-                    });
                 }
+
+                this.cur_req_id = this.browser_context.checkout_singleship(this.billing_info, csrfToken, (err, csrfToken, prepare_pay_payload) =>{
+
+                    if(err){
+                        this.__end_task(common.TASK_STATUS.FAIL);
+                        return;
+                    }
+
+                    this.__end_task(common.TASK_STATUS.DONE);
+                });
             });
         });
 
