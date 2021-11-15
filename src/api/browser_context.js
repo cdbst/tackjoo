@@ -304,7 +304,7 @@ class BrowserContext {
                 return;
             }
 
-            if(__callback) __callback();
+            if(__callback) __callback(undefined, res);
         },{need_csrfToken : true});
     }
 
@@ -1015,7 +1015,7 @@ class BrowserContext {
                 });
             }
 
-            this.open_page(res.headers.location, (err) =>{
+            this.open_page(res.headers.location, (err, res) =>{
 
                 if(err){
                     __callback(err, undefined);
