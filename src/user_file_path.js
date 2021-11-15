@@ -5,5 +5,4 @@ const USER_FILE_PATH = {
     BILLING_INFO : path.join(__dirname, 'res', 'data', 'billing_info.dat'), 
 };
 
-
 module.exports.USER_FILE_PATH = USER_FILE_PATH;

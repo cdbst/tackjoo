@@ -25,6 +25,8 @@ contextBridge.exposeInMainWorld('electron', {
     playTask: _playTask,
     pauseTask: _pauseTask,
     searchAddr: _searchAddr,
+    saveBillingInfo: _saveBillingInfo,
+    loadBillingInfo: _loadBillingInfo
 });
 
 let get_sensor_data = undefined;
@@ -237,5 +239,32 @@ function _searchAddr(_addr, __callback){
 
     ipcRenderer.once('search-address-reply' + ipc_data.id, (_event, addr_search_result) => {
         __callback(addr_search_result.err, addr_search_result.data);
+    });
+}
+
+function _saveBillingInfo(_billing_info, __callback){
+
+    if(_billing_info == undefined || typeof _billing_info !== 'object'){
+        __callback('billing info to save is not valid data.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({billing_info : _billing_info});
+    
+    ipcRenderer.send('save-billing-info', ipc_data);
+
+    ipcRenderer.once('save-billing-info-reply' + ipc_data.id, (_event, save_result) => {
+        __callback(save_result.err);
+    });
+}
+
+function _loadBillingInfo(__callback){
+
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('load-billing-info', ipc_data);
+
+    ipcRenderer.once('load-billing-info-reply' + ipc_data.id, (_event, billing_info) => {
+        __callback(billing_info.err, billing_info.data);
     });
 }

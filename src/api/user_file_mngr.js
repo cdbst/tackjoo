@@ -57,12 +57,6 @@ class UserFileManager{
     write(_path, _data, __callback = undefined){
 
         let parent_dir = path.dirname(_path);
-
-        let write_wrapper = function(){
-            this.__write(_path, _data, __callback);
-        }
-        write_wrapper = write_wrapper.bind(this);
-
         this.exists(parent_dir, (err)=>{
 
             if(err){ // if not exists
@@ -71,10 +65,10 @@ class UserFileManager{
                         __callback(err);
                         return;
                     }
-                    write_wrapper();
+                    this.__write(_path, _data, __callback)
                 });
             }else{ // if exists
-                write_wrapper();
+                this.__write(_path, _data, __callback)
             }
         });
 
@@ -91,12 +85,12 @@ class UserFileManager{
     }
 
     __encode_base64(_data){
-        return Buffer.from(_data).toString('base64');
+        return Buffer.from(_data, "utf8").toString('base64');
+        
     }
     
-
     __decode_base64(_data){
-        return Buffer.from(_data, 'base64').toString('ascii')
+        return Buffer.from(_data, 'base64').toString('utf8');
     }
 }
 

@@ -79,7 +79,6 @@ class BrowserContext {
 
         //상품 cart에는 한번에 하나씩의 상품만 추가되어 처리될 수 있음.
         this.on_cart_mutex = new Mutex();
-
     }
 
     __recorver_session(__callback){

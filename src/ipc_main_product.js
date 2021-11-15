@@ -1,9 +1,6 @@
 const {ipcMain} = require("electron");
 const BrowserCxt = require("./api/browser_context.js");
 
-const common = require('./common/common.js');
-const product_page_parser = require('./api/product_page_parser.js');
-
 function register(){
 
     ipcMain.on('get-product-info-list', (event, data) => {

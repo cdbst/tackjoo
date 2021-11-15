@@ -35,6 +35,7 @@ class ContentsBill extends React.Component {
     }
 
     onClickSaveBtn(){
+
         let buyer_name = this.ref_buyer_name.current.value;
         let phone_num = this.ref_phone_num.current.value;
         let buyer_addr1 = this.ref_addr1.current.value;
@@ -61,10 +62,45 @@ class ContentsBill extends React.Component {
             Index.g_sys_msg_q.enqueue('Error', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
+
+        let billing_info = {
+            buyer_name : buyer_name,
+            phone_num : phone_num,
+            buyer_addr1 : buyer_addr1,
+            buyer_addr2 : buyer_addr2,
+            postal_code : postal_code
+        };
+
+        window.electron.saveBillingInfo(billing_info, (err) =>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            Index.g_sys_msg_q.enqueue('Info', 'Billing information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     loadBillInfo(){
 
+        window.electron.loadBillingInfo((err, billing_info) =>{
+            
+            if(this.__mount == false) return;
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            this.ref_buyer_name.current.value = billing_info.buyer_name;
+            this.ref_phone_num.current.value = billing_info.phone_num;
+            this.ref_addr1.current.value = billing_info.buyer_addr1;
+            this.ref_addr2.current.value = billing_info.buyer_addr2;
+            this.update_postcode(billing_info.postal_code);
+
+            Index.g_sys_msg_q.enqueue('Info', 'Billing information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     onChangeAddr1Value(e){
@@ -167,7 +203,7 @@ class ContentsBill extends React.Component {
                         <div className="m2-12 row">
                             <div className="col-md-6">
                                 <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
-                                <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num}/>
+                                <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()}/>
                             </div>
                         </div>
                         <br/>
