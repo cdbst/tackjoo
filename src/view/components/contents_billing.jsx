@@ -4,7 +4,7 @@ class ContentsBilling extends React.Component {
         super(props);
 
         this.onClickSaveBtn = this.onClickSaveBtn.bind(this);
-        this.loadBillInfo = this.loadBillInfo.bind(this);
+        this.loadBillingInfo = this.loadBillingInfo.bind(this);
         this.onClickSearchBtn = this.onClickSearchBtn.bind(this);
         this.updateAddrSearchReuslt = this.updateAddrSearchReuslt.bind(this);
         this.onChangeSearchResultItem = this.onChangeSearchResultItem.bind(this);
@@ -21,13 +21,13 @@ class ContentsBilling extends React.Component {
         this.__mount = false;
 
         this.state = {
-            opt_search_result : []
+            opts_search_result : []
         };
     }
 
     componentDidMount(){
         this.__mount = true;
-        this.loadBillInfo();
+        this.loadBillingInfo();
     }
 
     componentWillUnmount(){
@@ -82,7 +82,7 @@ class ContentsBilling extends React.Component {
         });
     }
 
-    loadBillInfo(){
+    loadBillingInfo(){
 
         window.electron.loadBillingInfo((err, billing_info) =>{
             
@@ -143,14 +143,14 @@ class ContentsBilling extends React.Component {
             return addr_item_val;
         }
 
-        let _opt_search_result = search_result.map((addr_item) => 
+        let _opts_search_result = search_result.map((addr_item) => 
             <option key={common.uuidv4()} data-postcode={addr_item.postcode5} value={get_addr_item_value(addr_item, false)}>{get_addr_item_value(addr_item)}</option>
         );
 
         if(this.__mount == false) return;
 
         this.setState(_ => ({
-            opt_search_result : _opt_search_result
+            opts_search_result : _opts_search_result
         }));
     }
 
@@ -242,7 +242,7 @@ class ContentsBilling extends React.Component {
                             <div className="col-md-6">
                                 <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
                                 <select className="form-select select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
-                                    {this.state.opt_search_result}
+                                    {this.state.opts_search_result}
                                 </select>
                             </div>
                         </div>

@@ -8,7 +8,6 @@ class MainContents extends React.Component {
     render() {
         return (
             <div className="tab-content">
-
                 <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
                     <ContentsTasks />
                 </div>
