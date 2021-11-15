@@ -12,6 +12,7 @@ class TaskRunner{
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
         this.open_product_page = this.open_product_page.bind(this);
         this.is_valid_product_info_to_tasking = this.is_valid_product_info_to_tasking.bind(this);
+        this.is_valid_billing_info_to_tasking = this.is_valid_billing_info_to_tasking.bind(this);
         this.__end_task = this.__end_task.bind(this);
 
         this.browser_context = browser_context;
@@ -205,9 +206,25 @@ class TaskRunner{
         return has_quantity;
     }
 
+    is_valid_billing_info_to_tasking(){
+        if(this.billing_info == undefined) return false;
+        if(typeof this.billing_info !== "object") return false;
+
+        if(this.billing_info.buyer_addr1 == undefined || this.billing_info.buyer_addr1 == '') return false;
+        if(this.billing_info.buyer_name == undefined || this.billing_info.buyer_name == '') return false;
+        if(this.billing_info.phone_num == undefined || this.billing_info.phone_num == '') return false;
+        if(this.billing_info.postal_code == undefined || this.billing_info.postal_code == '') return false;
+
+        return true;
+    }
+
     start(){
         this.running = true;
-        this.open_product_page();
+        if(this.is_valid_billing_info_to_tasking()){
+            this.open_product_page();
+        }else{
+            this.__end_task(common.TASK_STATUS.INVALID_BILLING_INFO);
+        }
     }
 
     stop(){

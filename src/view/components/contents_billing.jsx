@@ -122,7 +122,7 @@ class ContentsBilling extends React.Component {
             if(this.__mount == false) return;
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('Warn', 'Cannot load billing information.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
                 return;
             }
 
