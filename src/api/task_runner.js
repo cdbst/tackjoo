@@ -1,7 +1,7 @@
 const common = require("../common/common.js");
 
 class TaskRunner{
-    constructor(browser_context, task_info, product_info, status_channel, task_end_callback){
+    constructor(browser_context, task_info, product_info, billing_info, status_channel, task_end_callback){
 
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
@@ -17,6 +17,7 @@ class TaskRunner{
         this.browser_context = browser_context;
         this.task_info = task_info;
         this.product_info = product_info;
+        this.billing_info = billing_info;
         this.status_channel = status_channel;
         this.task_end_callback = task_end_callback;
 

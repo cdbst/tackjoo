@@ -25,11 +25,6 @@ class TaskTableItem extends React.Component {
 
         this.retry_cnt_task_play = Index.g_app_config.MAX_RETRY_COUNT_TASK;
 
-        //6. TODO TYPE_OF_TASK_COND 프로토타입
-        // ready, stop, on product page, on cart page, ready to pay, complete
-        // draw일경우 이미 신청된 것이라면 complete 바로 표시.
-        // 각 단계 실행시 나이키 서버의 응답이 지연될 경우 재시도 간격을 얼마로 정할지 ?
-
         let initial_status = undefined;
         let cur_server_time = Index.g_server_clock.getServerTime();
 
@@ -72,7 +67,7 @@ class TaskTableItem extends React.Component {
             return;
         }
 
-        window.electron.playTask(this.props.task_info, product_info, (status) =>{
+        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, (status) =>{
 
             this.setTaskStatus(status, ()=>{
                 this.ref_status_btn.current.disabled = false;
@@ -122,8 +117,6 @@ class TaskTableItem extends React.Component {
 
         let new_status = is_play_btn ? common.TASK_STATUS.PLAY : common.TASK_STATUS.PAUSE;
 
-        // status가 pause 일 때 버튼 클릭시 status를 start 상태로 만들어야함.
-        // status가 pause 가 아닐때 버튼 클릭시 status를 pause로 만들어야한다.
         if(new_status == common.TASK_STATUS.PLAY){
             this.onPlayTask();
         }else if(new_status == common.TASK_STATUS.PAUSE){

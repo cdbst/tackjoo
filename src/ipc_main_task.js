@@ -10,6 +10,7 @@ function register(){
         
         let task_info = data.payload.task_info;
         let product_info = data.payload.product_info;
+        let billing_info = data.payload.billing_info;
 
         let browser_context = UserBrowserCxtMngr.get(task_info.account_id);
         
@@ -20,7 +21,7 @@ function register(){
 
         event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.PLAY, done : false});
 
-        let task_runner = new TaskRunner(browser_context, task_info, product_info, (task_status)=>{
+        let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, (task_status)=>{
             event.reply('play-task-reply' + task_info._id, {status : task_status, done : false});
         }, (task_status) =>{
             TaskRunnerManager.remove(task_runner._id);
