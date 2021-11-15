@@ -1,4 +1,4 @@
-class ContentsBill extends React.Component {
+class ContentsBilling extends React.Component {
 
     constructor(props) {
         super(props);
@@ -187,7 +187,7 @@ class ContentsBill extends React.Component {
                 <br/>
                 <div className="row">
                     <div className="col">
-                        <h4 className="contents-title">Bill Informations</h4>
+                        <h4 className="contents-title">Billing Informations</h4>
                     </div>
                 </div>
                 <br/>

@@ -913,6 +913,10 @@ class BrowserContext {
 
         }, {need_csrfToken : true});
     }
+
+    checkout_singleship(){
+        
+    }
 }
 
 module.exports.BrowserContext = BrowserContext;
