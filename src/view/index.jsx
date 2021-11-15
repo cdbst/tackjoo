@@ -10,7 +10,8 @@ class Index extends React.Component {
     static g_sys_msg_q = new ToastMessageQueue(10000);
     static g_product_mngr = new ProductManager();
     static g_server_clock = new ServerClock();
-    static g_prompt_modal = new PromptModalHandler()
+    static g_prompt_modal = new PromptModalHandler();
+    static g_billing_info = undefined;
 
     constructor(props) {
         super(props);

@@ -229,42 +229,45 @@ class ContentsAccounts extends React.Component {
         let num_of_accounts = this.state.account_info.length;
         let num_of_login_accounts = this.state.account_info.filter((account) => account.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN).length;
         return (
-            <div className="container-fluid">
-                <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
-                <br/>
-                <div className="row">
-                    <div className="col">
-                        <h4 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
+            <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ACCOUNTS}>
+                <div className="container-fluid">
+                    <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h4 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
+                        </div>
+                        <div className="col">
+                            {/* <a>TEST : search item interface</a> */}
+                        </div>
                     </div>
-                    <div className="col">
-                        {/* <a>TEST : search item interface</a> */}
+                    <div className="table-wrapper">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>E-Mail</th>
+                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
+                                <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.account_table_list}
+                        </tbody>
+                    </table>
                     </div>
-                </div>
-                <div className="table-wrapper">
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>E-Mail</th>
-                            <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
-                            <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.account_table_list}
-                    </tbody>
-                </table>
-                </div>
-                <div className="row footer">
-                    <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                        <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
-                            <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
-                        </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
-                            <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Login All
-                        </button>
+                    <div className="row footer">
+                        <div className="d-flex flex-row-reverse bd-highlight align-items-center">
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
+                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
+                                <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Login All
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         );
     }
 }

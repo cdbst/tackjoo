@@ -200,59 +200,60 @@ class ContentsTasks extends React.Component {
     }
 
     render() {
-
-
         return (
-            <div className="container-fluid">
-                <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
-                <br/>
-                <div className="row">
-                    <div className="col">
-                        <h4 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h4>
+            <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.TASKS}>
+                <div className="container-fluid">
+                    <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
+                    <br/>
+                    <div className="row">
+                        <div className="col">
+                            <h4 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h4>
+                        </div>
+                        <div className="col">
+                            {/* <a>TEST : search item interface</a> */}
+                        </div>
                     </div>
-                    <div className="col">
-                        {/* <a>TEST : search item interface</a> */}
+                    <div className="table-wrapper">
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>Type</th>
+                                <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>Product</th>
+                                <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>Size</th>
+                                <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>Account</th>
+                                <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>Open Time</th>
+                                <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>Scheduled Time</th>
+                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
+                                <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.task_table_items}
+                        </tbody>
+                    </table>
                     </div>
-                </div>
-                <div className="table-wrapper">
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>Type</th>
-                            <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>Product</th>
-                            <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>Size</th>
-                            <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>Account</th>
-                            <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>Open Time</th>
-                            <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>Scheduled Time</th>
-                            <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
-                            <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.task_table_items}
-                    </tbody>
-                </table>
-                </div>
-                <div className="row footer">
-                    <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                        <button type="button" className="btn btn-primary btn-footer-inside">
-                            <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> Quick Tasks
-                        </button>
-                        <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
-                            <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> New Task
-                        </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                            <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> Run All
-                        </button>
-                        <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                            <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> Pause All
-                        </button>
-                        <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
-                            <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> Remove All
-                        </button>
+                    <div className="row footer">
+                        <div className="d-flex flex-row-reverse bd-highlight align-items-center">
+                            <button type="button" className="btn btn-primary btn-footer-inside">
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> Quick Tasks
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
+                                <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> New Task
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
+                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> Run All
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
+                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> Pause All
+                            </button>
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> Remove All
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         );
     }
 }
