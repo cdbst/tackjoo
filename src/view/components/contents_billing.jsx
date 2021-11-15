@@ -11,6 +11,9 @@ class ContentsBilling extends React.Component {
         this.onChangeAddr1Value = this.onChangeAddr1Value.bind(this);
         this.onKeyUpAddr1 = this.onKeyUpAddr1.bind(this);
         this.update_postcode = this.update_postcode.bind(this);
+        this.isBillingInfoModified = this.isBillingInfoModified.bind(this);
+        this.getCurrentBillingInfo = this.getCurrentBillingInfo.bind(this);
+        this.setBillingInfoToUI = this.setBillingInfoToUI.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
@@ -31,51 +34,74 @@ class ContentsBilling extends React.Component {
 
         let tab_menu_billing = document.querySelector('#' + MenuBar.MENU_ID.BILLING);
         tab_menu_billing.addEventListener('hide.bs.tab', (event) => {
-            console.log(event);
+            if(this.isBillingInfoModified() == false) return;
+            
+            event.preventDefault();
+
+            Index.g_prompt_modal.popModal('Warning', '이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?', (is_ok)=>{
+
+                if(is_ok == false) return;
+
+                this.setBillingInfoToUI(Index.g_billing_info);
+                let tab_menu_to_show = document.querySelector('#' + event.relatedTarget.id);
+                let el_bs_tab_menu_to_show = bootstrap.Tab.getOrCreateInstance(tab_menu_to_show);
+                el_bs_tab_menu_to_show.show();
+            });
         });
-        
     }
 
     componentWillUnmount(){
         this.__mount = false;
     }
 
+    isBillingInfoModified(){
+        let origin_billing_info = JSON.stringify(Index.g_billing_info);
+        let cur_billing_info = JSON.stringify(this.getCurrentBillingInfo());
+
+        return origin_billing_info != cur_billing_info;
+    }
+
+    getCurrentBillingInfo(){
+        return billing_info = {
+            buyer_name : this.ref_buyer_name.current.value,
+            phone_num : this.ref_phone_num.current.value,
+            buyer_addr1 : this.ref_addr1.current.value,
+            buyer_addr2 : this.ref_addr2.current.value,
+            postal_code : this.ref_postcode.current.value
+        };
+    }
+
+    setBillingInfoToUI(billing_info){
+        this.ref_buyer_name.current.value = billing_info.buyer_name;
+        this.ref_phone_num.current.value = billing_info.phone_num;
+        this.ref_addr1.current.value = billing_info.buyer_addr1;
+        this.ref_addr2.current.value = billing_info.buyer_addr2;
+        this.update_postcode(billing_info.postal_code);
+    }
+
     onClickSaveBtn(){
 
-        let buyer_name = this.ref_buyer_name.current.value;
-        let phone_num = this.ref_phone_num.current.value;
-        let buyer_addr1 = this.ref_addr1.current.value;
-        let buyer_addr2 = this.ref_addr2.current.value;
-        let postal_code = this.ref_postcode.current.value;
+        let billing_info = this.getCurrentBillingInfo();
 
-
-        if(buyer_name == undefined || buyer_name == ''){
+        if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
             Index.g_sys_msg_q.enqueue('Error', '받으실 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        if(phone_num == undefined || phone_num == ''){
+        if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
             Index.g_sys_msg_q.enqueue('Error', '받으실 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        if(buyer_addr1 == undefined || buyer_addr1 == ''){
+        if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
             Index.g_sys_msg_q.enqueue('Error', '받으실 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        if(postal_code == undefined || postal_code == ''){
+        if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
             Index.g_sys_msg_q.enqueue('Error', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
-
-        let billing_info = {
-            buyer_name : buyer_name,
-            phone_num : phone_num,
-            buyer_addr1 : buyer_addr1,
-            buyer_addr2 : buyer_addr2,
-            postal_code : postal_code
-        };
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
 
@@ -100,11 +126,7 @@ class ContentsBilling extends React.Component {
                 return;
             }
 
-            this.ref_buyer_name.current.value = billing_info.buyer_name;
-            this.ref_phone_num.current.value = billing_info.phone_num;
-            this.ref_addr1.current.value = billing_info.buyer_addr1;
-            this.ref_addr2.current.value = billing_info.buyer_addr2;
-            this.update_postcode(billing_info.postal_code);
+            this.setBillingInfoToUI(billing_info);
 
             Index.g_billing_info = billing_info;
 
