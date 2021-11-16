@@ -1,5 +1,5 @@
 const {ipcMain} = require("electron");
-const BrowserCxt = require("./api/browser_context.js");
+const BrowserContext = require("./api/browser_context.js").BrowserContext;
 const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrowserCxtMngr;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
@@ -22,7 +22,7 @@ function register(){
         let account_info = data.payload;
         let ipc_id = data.id;
         
-        let borwser_context = new BrowserCxt.BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        let borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
         borwser_context.open_main_page((err) =>{
 

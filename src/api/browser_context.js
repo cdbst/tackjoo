@@ -14,6 +14,9 @@ class BrowserContext {
     static USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36';
     static SEC_CA_UA = "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\""
 
+    static IAMPORT_URL = 'https://nike-service.iamport.kr';
+    static IAMPORT_DOMAIN_NAME = 'nike-service.iamport.kr';
+
     static REQ_METHOD = {
         GET : 'get',
         POST : 'post'
@@ -33,10 +36,12 @@ class BrowserContext {
         this.__remove_akam_cookies = this.__remove_akam_cookies.bind(this);
         this.__send_fake_sensor_data = this.__send_fake_sensor_data.bind(this);
         this.cancel_request = this.cancel_request.bind(this);
-        this.request_canceled_check = this.request_canceled_check.bind(this);
+        this.__request_canceled_check = this.__request_canceled_check.bind(this);
 
         this.__http_request = this.__http_request.bind(this);
         this.__recorver_session = this.__recorver_session.bind(this);
+        this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
+        this.__set_cookie = this.__set_cookie.bind(this);
 
 
         this.is_anonymous = this.is_anonymous.bind(this);
@@ -58,11 +63,14 @@ class BrowserContext {
         this.pwd = _pwd;
         this.id = _id;
 
+        this.in_progress_login = false;
         this.is_login = false;
 
         this.__cookie_storage = new cookieMngr.CookieManager();
         this.__cookie_storage.add_cookie_data('social_type=comlogin');
         this.__cookie_storage.add_cookie_data('NikeCookie=ok');
+
+        this.__iamport_cookie_storage = new cookieMngr.CookieManager();
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -75,8 +83,7 @@ class BrowserContext {
 
         //requst_queue
         this.request_canceler = {};
-
-        this.in_progress_login = false;
+        
 
         //상품 cart에는 한번에 하나씩의 상품만 추가되어 처리될 수 있음.
         this.on_cart_mutex = new Mutex();
@@ -114,11 +121,32 @@ class BrowserContext {
         this.request_canceler[request_id] = true;
     }
     
-    request_canceled_check(request_id, ){
+    __request_canceled_check(request_id){
         if(request_id in this.request_canceler == false) return false;
         if(this.request_canceler[request_id] == false) return false;
 
         delete this.request_canceler[request_id];
+        return true;
+    }
+
+    __judge_cookie_storage(url){
+        if(url.includes(BrowserContext.NIKE_DOMAIN_NAME)){
+            return this.__cookie_storage;
+        }else if(url.includes(BrowserContext.IAMPORT_DOMAIN_NAME)){
+            return this.__iamport_cookie_storage;
+        }else{
+            return this.__cookie_storage;
+        }
+    }
+
+    __set_cookie(cookie_storage, res){
+
+        if((res.headers == undefined) || ('set-cookie' in res.headers == false)) return false;
+
+        res.headers['set-cookie'].forEach(cookie_data =>{
+            cookie_storage.add_cookie_data(cookie_data);
+        });
+        
         return true;
     }
 
@@ -138,7 +166,7 @@ class BrowserContext {
             if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
         }
 
-        if(this.request_canceled_check(request_id)){
+        if(this.__request_canceled_check(request_id)){
             __callback('request has been canceled.', undefined);
             return;
         }
@@ -149,12 +177,13 @@ class BrowserContext {
 
             this.__send_fake_sensor_data((err) =>{
 
-                if(this.request_canceled_check(request_id)){
+                if(this.__request_canceled_check(request_id)){
                     __callback('request has been canceled.', undefined);
                     return;
                 }
 
-                headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
+                let cookie_storage = this.__judge_cookie_storage(url);
+                headers['cookie'] = cookie_storage.get_serialized_cookie_data();
 
                 let axios_req_cfg = {
                     method: method,
@@ -223,7 +252,7 @@ class BrowserContext {
 
         let req_cb = (err, retry, res) =>{
 
-            if(this.request_canceled_check(request_id)){
+            if(this.__request_canceled_check(request_id)){
                 __callback('request has been canceled.', undefined);
                 return;
             }
@@ -343,10 +372,9 @@ class BrowserContext {
 
             if(res.status == 201 || res.status == 200){
 
-                if('set-cookie' in res.headers){
-                    res.headers['set-cookie'].forEach(cookie_data =>{
-                        this.__cookie_storage.add_cookie_data(cookie_data);
-                    });
+                let result = this.__set_cookie(this.__cookie_storage, res);
+
+                if(result){
                     __callback(undefined);
                 }else{
                     __callback('send_sensor_data - cannot recv akam sensor cookie :' + res.status);    
@@ -432,12 +460,11 @@ class BrowserContext {
                     return;
                 }
 
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
+                this.__set_cookie(this.__cookie_storage, res);
                 
                 this.is_login = true;
                 this.open_main_page(__callback);
+
             }, {expected_keys : ['ResponseObject']});
 
         });
@@ -455,9 +482,7 @@ class BrowserContext {
                 return;
             } 
 
-            res.headers['set-cookie'].forEach(cookie_data =>{
-                this.__cookie_storage.add_cookie_data(cookie_data);
-            });
+            this.__set_cookie(this.__cookie_storage, res);
             
             __callback(undefined);
         })
@@ -759,11 +784,7 @@ class BrowserContext {
                 return;
             }
 
-            if('set-cookie' in res.headers){
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
-            }
+            this.__set_cookie(this.__cookie_storage, res);
 
             if((res.data instanceof Object) == false){
                 __callback('get_product_sku_inventory : unexpected data : data is not object type');
@@ -833,11 +854,7 @@ class BrowserContext {
                 return;
             }
 
-            if('set-cookie' in res.headers){
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
-            }
+            this.__set_cookie(this.__cookie_storage, res);
 
             if(('result' in res.data) == false){
                 __callback('apply_draw : recv invalid payload.');
@@ -906,12 +923,8 @@ class BrowserContext {
                     __callback('add_to_cart : invalid response status code.' + res.status, release);
                     return;
                 }
-    
-                if('set-cookie' in res.headers){
-                    res.headers['set-cookie'].forEach(cookie_data =>{
-                        this.__cookie_storage.add_cookie_data(cookie_data);
-                    });
-                }
+
+                this.__set_cookie(this.__cookie_storage, res);
     
                 if(('quantityAdded' in res.data) == false || ('cartItemCount' in res.data) == false){
                     __callback('add_to_cart : recv invalid payload.', release);
@@ -1008,12 +1021,7 @@ class BrowserContext {
                 return;
             }
 
-            if(res.headers != undefined && 'set-cookie' in res.headers){
-
-                res.headers['set-cookie'].forEach(cookie_data =>{
-                    this.__cookie_storage.add_cookie_data(cookie_data);
-                });
-            }
+            this.__set_cookie(this.__cookie_storage, res);
 
             //location is checkout page.
             this.open_page(res.headers.location, (err, res) =>{
@@ -1029,11 +1037,54 @@ class BrowserContext {
                 if(kakaopay_prepare_payload == undefined){
                     throw new Error('cannot parse payment payload from checkout page.');
                 }
-                __callback(err, this.csrfToken, kakaopay_prepare_payload);
+                __callback(err, kakaopay_prepare_payload);
             });
 
 
         },{expected_status : [301, 302, 303, 304], max_redirect : 0});
+    }
+
+    prepare_kakao_pay(prepare_pay_payload, __callback){
+
+        let payload = new URLSearchParams(prepare_pay_payload).toString();
+
+        let headers = {
+            'authority': BrowserContext.IAMPORT_DOMAIN_NAME,
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.IAMPORT_URL,
+            'pragma': 'no-cache',
+            'referer': 'https://nike-service.iamport.kr/payments/ready/imp35948874/kakaopay/CA00004A62',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.IAMPORT_URL + '/kakaopay_payments/prepare.json', headers, payload, (err, res)=> {
+
+            if(err){
+                __callback(err);
+                return;
+            }
+
+            if(res.data.code != 0){
+                __callback('prepare pay fail : result code is ' + res.data.code + '  msg :' + res.data.msg);
+                return;
+            }
+
+            this.__set_cookie(this.__iamport_cookie_storage, res);
+
+            __callback(undefined, res.data.data.kakaoData);
+        }, {expected_keys : ['data']});
     }
 }
 

@@ -7,6 +7,7 @@ class TaskRunner{
         this.stop = this.stop.bind(this);
         this.check_stopped = this.check_stopped.bind(this);
 
+        this.prepare_to_kakao_pay = this.prepare_to_kakao_pay.bind(this);
         this.click_buy_button = this.click_buy_button.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
         this.judge_appropreate_size_info = this.judge_appropreate_size_info.bind(this);
@@ -92,6 +93,21 @@ class TaskRunner{
         return target_size_info;
     }
 
+    prepare_to_kakao_pay(prepare_pay_payload){
+
+        if(this.check_stopped()) return;
+
+        this.browser_context.prepare_kakao_pay(prepare_pay_payload, (err, kakao_data) =>{
+            if(err){
+                this.__end_task(common.TASK_STATUS.FAIL);
+                return;
+            }
+
+            
+            this.__end_task(common.TASK_STATUS.DONE);
+        });
+    }
+
     click_buy_button(){
 
         if(this.check_stopped()) return;
@@ -116,18 +132,17 @@ class TaskRunner{
                     return;
                 }
 
-                this.cur_req_id = this.browser_context.checkout_singleship(this.billing_info, csrfToken, (err, csrfToken, prepare_pay_payload) =>{
+                this.cur_req_id = this.browser_context.checkout_singleship(this.billing_info, csrfToken, (err, prepare_pay_payload) =>{
 
                     if(err){
                         this.__end_task(common.TASK_STATUS.FAIL);
                         return;
                     }
 
-                    this.__end_task(common.TASK_STATUS.DONE);
+                    this.prepare_to_kakao_pay(prepare_pay_payload);
                 });
             });
         });
-
     }
 
     click_apply_draw_button(){
