@@ -1,7 +1,6 @@
 const cookieMngr = require("./cookie_mngr.js");
 const axios = require('axios');
 const cheerio = require('cheerio');
-const qureystring = require('querystring'); // TODO: (중요) 해당 모듈을 사용하지 않는 방법 적용 후 테스트 필요. 대체 방법(new URLSearchParams(payload_obj).toString();)
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
@@ -393,7 +392,7 @@ class BrowserContext {
                 'csrfToken': this.csrfToken
             };
     
-            let payload = qureystring.stringify(payload_obj).replace('_breeze-me', 'breeze-me');
+            let payload = new URLSearchParams(payload_obj).toString().replace('_breeze-me', 'breeze-me');
             let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
             let headers = {
@@ -799,7 +798,7 @@ class BrowserContext {
             csrfToken: csrfToken
         };
 
-        let payload = qureystring.stringify(payload_obj);
+        let payload = new URLSearchParams(payload_obj).toString();
         let cookies = this.__cookie_storage.get_serialized_cookie_data();
 
         let headers = {
@@ -871,7 +870,7 @@ class BrowserContext {
     
             payload_obj[product_info.item_attr] = size_info['name'];
     
-            let payload = qureystring.stringify(payload_obj);
+            let payload = new URLSearchParams(payload_obj).toString()
             let cookies = this.__cookie_storage.get_serialized_cookie_data();
     
             let headers = {
