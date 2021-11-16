@@ -1,4 +1,5 @@
 const common = require("../common/common.js");
+const {BrowserWindow} = require("electron");
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, status_channel, task_end_callback){
@@ -7,6 +8,7 @@ class TaskRunner{
         this.stop = this.stop.bind(this);
         this.check_stopped = this.check_stopped.bind(this);
 
+        this.open_kakao_pay_window = this.open_kakao_pay_window.bind(this);
         this.prepare_to_kakao_pay = this.prepare_to_kakao_pay.bind(this);
         this.click_buy_button = this.click_buy_button.bind(this);
         this.click_apply_draw_button = this.click_apply_draw_button.bind(this);
@@ -93,6 +95,22 @@ class TaskRunner{
         return target_size_info;
     }
 
+    open_kakao_pay_window(url){
+
+        const win = new BrowserWindow({
+            width: 420,
+            height: 700,
+            resizable : false,
+            titleBarStyle : 'hidden'
+        });
+        
+        win.setMenuBarVisibility(false);
+        win.loadURL(url);
+        
+        //TODO : 결제 결과를 polling하여 결과를 recv하는 기능도 넣어야함.
+        // 여기서 this.__end_task(?); 를 해줘야함 마지막으로..
+    }
+
     prepare_to_kakao_pay(prepare_pay_payload){
 
         if(this.check_stopped()) return;
@@ -103,7 +121,7 @@ class TaskRunner{
                 return;
             }
 
-            
+            this.open_kakao_pay_window(kakao_data.next_redirect_pc_url)
             this.__end_task(common.TASK_STATUS.DONE);
         });
     }
