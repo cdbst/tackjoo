@@ -1,5 +1,5 @@
 const common = require("../common/common.js");
-const {BrowserWindow} = require("electron");
+const ExternalPage = require("./external_page.js").ExternalPage;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, status_channel, task_end_callback){
@@ -97,18 +97,24 @@ class TaskRunner{
 
     open_kakao_pay_window(url){
 
-        const win = new BrowserWindow({
+        let window_opts = {
             width: 420,
             height: 700,
-            resizable : false,
+            //resizable : false,
             titleBarStyle : 'hidden'
+        }
+
+        let kakao_pay_page = new ExternalPage(url, window_opts, (res_pkt)=>{
+            console.log(res_pkt);
         });
-        
-        win.setMenuBarVisibility(false);
-        win.loadURL(url);
+
+        kakao_pay_page.open();
+
         
         //TODO : 결제 결과를 polling하여 결과를 recv하는 기능도 넣어야함.
         // 여기서 this.__end_task(?); 를 해줘야함 마지막으로..
+
+        this.__end_task(common.TASK_STATUS.DONE);
     }
 
     prepare_to_kakao_pay(prepare_pay_payload){
@@ -121,8 +127,7 @@ class TaskRunner{
                 return;
             }
 
-            this.open_kakao_pay_window(kakao_data.next_redirect_pc_url)
-            this.__end_task(common.TASK_STATUS.DONE);
+            this.open_kakao_pay_window(kakao_data.next_redirect_pc_url);
         });
     }
 
