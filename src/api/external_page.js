@@ -33,11 +33,15 @@ class ExternalPage{
 
         this.window.setMenuBarVisibility(false);
         this.window.loadURL(this.url);
-        this.window.webContents.openDevTools(); // TO TEST
+        //this.window.webContents.openDevTools(); // TO TEST
 
         this.window.on('close', (e) => {
-            if(this.disable_exit == false) return;
-            if(this.is_closed) this.window.destroy();
+            if(this.disable_exit == false || this.is_closed){
+                this.window.webContents.debugger.detach();
+                //this.window.destroy();
+                return;
+            } 
+            
             e.preventDefault();
         });
 
@@ -57,20 +61,29 @@ class ExternalPage{
         this.window.webContents.debugger.on('detach', (event, reason) => {
             console.log('Debugger detached due to : ', reason);
         });
-          
-        this.window.webContents.debugger.on('message', (event, method, params) => {
 
-            if (method !== 'Network.responseReceived') return; 
+        var get_res_data = async (request_id) => {
+            const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
+            return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
+        }
 
-            //console.log(params.response.url);
+        this.window.webContents.debugger.on('message', async (event, method, params) => {
+            if(method === 'Fetch.requestPaused') {
+                //var req_data = params.request.postData;
+                var res_data = await get_res_data(params.requestId);
 
-            this.window.webContents.debugger.sendCommand('Network.getResponseBody', { requestId: params.requestId }).then((response) => {
-                //console.log(response);
-                this.res_pkt_subscriber(response);
-            }); 
+                this.res_pkt_subscriber(params, res_data);
+
+                await this.window.webContents.debugger.sendCommand("Fetch.continueRequest", {requestId: params.requestId});
+            }
         });
-          
-        this.window.webContents.debugger.sendCommand('Network.enable');
+
+        this.window.webContents.debugger.sendCommand('Fetch.enable', {
+            patterns: [
+                { requestStage: "Response" }
+            ]}
+        );
+        
         return true;
     }
 
@@ -79,7 +92,6 @@ class ExternalPage{
         if(this.is_closed) return false;
         this.__set_win_state(false);
 
-        this.window.webContents.debugger.detach();
         this.window.close();
         return true;
     }

@@ -104,8 +104,9 @@ class TaskRunner{
             titleBarStyle : 'hidden'
         }
 
-        let kakao_pay_page = new ExternalPage(url, window_opts, (res_pkt)=>{
-            console.log(res_pkt);
+        let kakao_pay_page = new ExternalPage(url, window_opts, (params, response)=>{
+            console.log(params);
+            console.log(response);
         });
 
         kakao_pay_page.open();
