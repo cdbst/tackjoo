@@ -127,8 +127,9 @@ class TaskRunner{
                     kakao_pay_page.close();
                 }else if('status_result' in res_obj){
                     if(res_obj.status_result === 'success'){
-                        kakao_pay_page.close();
-                        this.__end_task(common.TASK_STATUS.DONE);
+                        //TODO : (중요) 적절한 종료 처리 필요.
+                        //kakao_pay_page.close();
+                        //this.__end_task(common.TASK_STATUS.DONE);
                     }
                 }
             }catch(e){
@@ -188,7 +189,15 @@ class TaskRunner{
                         return;
                     }
 
-                    this.prepare_to_kakao_pay(prepare_pay_payload);
+                    this.browser_context.checkout_request((err, data)=>{
+
+                        if(err){
+                            this.__end_task(common.TASK_STATUS.FAIL);
+                            return;
+                        }
+
+                        this.prepare_to_kakao_pay(prepare_pay_payload);
+                    })
                 });
             });
         });

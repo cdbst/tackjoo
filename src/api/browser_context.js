@@ -972,6 +972,56 @@ class BrowserContext {
         }, {need_csrfToken : true});
     }
 
+    checkout_request(__callback){
+
+        let headers = {
+            'accept':' */*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'cookie': this.__cookie_storage.get_serialized_cookie_data(),
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/launch/checkout',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile':' ?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        let params = {
+            pay_method: 'point',
+            gToken: '',
+            _: new Date().getTime()
+        }
+        
+        return this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params, (err, res) =>{
+
+            if(err){
+                __callback(err, undefined);
+                return;
+            }
+
+            if(res.status != 200){
+                __callback('checkout_request : response ' + res.status, undefined);
+                return;
+            }
+
+            if(res.data.isError == true){
+                // TODO : (중요) 여기서 왜 애러가 발생하는지 파악 필요.
+                throw new Error('checkout_request : request pay error');
+                //__callback('checkout_request : request pay error', undefined);
+                //return;
+            }
+
+            __callback(undefined, res.data);
+        }, {expected_keys : ['isError', 'total_amount']});
+
+    }
+
     checkout_singleship(billing_info, csrfToken, __callback){
 
         let payload_obj = {
