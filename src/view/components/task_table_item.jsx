@@ -179,6 +179,9 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.INVALID_BILLING_INFO:
                 btn_src = TaskTableItem.PLAY_BTN_SRC;
                 break;
+            case common.TASK_STATUS.CANCEL_PAY:
+                btn_src = TaskTableItem.PLAY_BTN_SRC;
+                break;
         }
 
         return btn_src;
@@ -213,6 +216,8 @@ class TaskTableItem extends React.Component {
                 return true;
             case common.TASK_STATUS.INVALID_BILLING_INFO:
                 return true;
+            case common.TASK_STATUS.CANCEL_PAY:
+                return true;
         }
     }
 
@@ -243,6 +248,8 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
                 return false;
             case common.TASK_STATUS.INVALID_BILLING_INFO:
+                return false;
+            case common.TASK_STATUS.CANCEL_PAY:
                 return false;
         }
     }

@@ -101,21 +101,46 @@ class TaskRunner{
             width: 420,
             height: 700,
             //resizable : false,
-            titleBarStyle : 'hidden'
+            titleBarStyle : 'hidden',
+            webPreferences: {
+                devTools : true,
+                webSecurity : false,
+                nodeIntegration : false,
+            }
         }
 
         let kakao_pay_page = new ExternalPage(url, window_opts, (params, response)=>{
-            console.log(params);
-            console.log(response);
+
+            if(response == undefined) return;
+
+            try{
+                let res_obj = JSON.parse(response);
+                console.log(res_obj);
+
+                if('expired' in res_obj && res_obj.expired == true){
+                    kakao_pay_page.close();
+                    return;
+                }
+
+                if('cancel_url' in res_obj){
+                    this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
+                    kakao_pay_page.close();
+                }else if('status_result' in res_obj){
+                    if(res_obj.status_result === 'success'){
+                        kakao_pay_page.close();
+                        this.__end_task(common.TASK_STATUS.DONE);
+                    }
+                }
+            }catch(e){
+                //console.log(e);
+            }
+
+            //console.log(params);
+            //console.log(response);
+
         });
 
         kakao_pay_page.open();
-
-        
-        //TODO : 결제 결과를 polling하여 결과를 recv하는 기능도 넣어야함.
-        // 여기서 this.__end_task(?); 를 해줘야함 마지막으로..
-
-        this.__end_task(common.TASK_STATUS.DONE);
     }
 
     prepare_to_kakao_pay(prepare_pay_payload){
@@ -267,6 +292,7 @@ class TaskRunner{
 
     start(){
         this.running = true;
+
         if(this.is_valid_billing_info_to_tasking()){
             this.open_product_page();
         }else{

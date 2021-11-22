@@ -33,7 +33,7 @@ class ExternalPage{
 
         this.window.setMenuBarVisibility(false);
         this.window.loadURL(this.url);
-        //this.window.webContents.openDevTools(); // TO TEST
+        this.window.webContents.openDevTools(); // TO TEST
 
         this.window.on('close', (e) => {
             if(this.disable_exit == false || this.is_closed){
@@ -44,8 +44,16 @@ class ExternalPage{
             
             e.preventDefault();
         });
-
-        this.attach_res_pkt_hooker();
+        
+        if(this.res_pkt_subscriber != undefined){
+            this.attach_res_pkt_hooker();
+        }
+		
+		//FOR TEST
+        this.window.webContents.on('will-navigate', function (event, newUrl) {
+            console.log(newUrl);
+            // More complex code to handle tokens goes here
+        })
         return true;
     }
 
@@ -54,7 +62,7 @@ class ExternalPage{
         try {
             this.window.webContents.debugger.attach('1.3');
         } catch (err) {
-            console.log('Debugger attach failed : ', err);
+            console.error('Debugger attach failed : ', err);
             return false;
         }
           
@@ -63,26 +71,29 @@ class ExternalPage{
         });
 
         var get_res_data = async (request_id) => {
-            const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
-            return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
+            try{
+                const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
+                return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
+            }catch(e){
+                return undefined;
+            }
         }
 
         this.window.webContents.debugger.on('message', async (event, method, params) => {
-            if(method === 'Fetch.requestPaused') {
-                //var req_data = params.request.postData;
-                var res_data = await get_res_data(params.requestId);
 
-                this.res_pkt_subscriber(params, res_data);
+            if(method !== 'Fetch.requestPaused') return;
 
-                await this.window.webContents.debugger.sendCommand("Fetch.continueRequest", {requestId: params.requestId});
-            }
+            //var req_data = params.request.postData;
+            var res_data = await get_res_data(params.requestId);
+            this.res_pkt_subscriber(params, res_data);
+            await this.window.webContents.debugger.sendCommand("Fetch.continueRequest", {requestId: params.requestId}).catch((e)=>{});
         });
 
-        this.window.webContents.debugger.sendCommand('Fetch.enable', {
+        this.window.webContents.debugger.sendCommand('Fetch.enable', { 
             patterns: [
                 { requestStage: "Response" }
-            ]}
-        );
+            ]
+        });
         
         return true;
     }

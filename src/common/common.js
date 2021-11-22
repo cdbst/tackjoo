@@ -143,7 +143,8 @@
         GET_PRODUCT_INFO : '상품 정보를 얻는 중',
         IMPOSSIBLE_TO_BUY : '구매할 수 없는 상품',
         ALREADY_EXIST_IN_CART : '다른 상품 결제 대기 중',
-        INVALID_BILLING_INFO : '결제 정보 누락'
+        INVALID_BILLING_INFO : '결제 정보 누락',
+        CANCEL_PAY : '결제 취소'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);
