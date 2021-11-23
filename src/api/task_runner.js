@@ -201,7 +201,7 @@ class TaskRunner{
                             this.prepare_to_kakao_pay(prepare_pay_payload);
                         });
 
-                    }, 4000) // timeout 걸지 않고 요청시 서버는 에러 응답을 던져준다.
+                    }, 2000) // timeout 걸지 않고 요청시 서버는 에러 응답을 던져준다.
                     
                 });
             });
