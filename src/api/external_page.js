@@ -8,6 +8,7 @@ class ExternalPage{
         this.close = this.close.bind(this);
         this.__set_win_state = this.__set_win_state.bind(this);
         this.attach_res_pkt_hooker = this.attach_res_pkt_hooker.bind(this);
+        this.attach_web_contents_event_hooker = this.attach_web_contents_event_hooker.bind(this);
 
         this.url = url;
         this.browser_window_opts = browser_window_opts;
@@ -16,6 +17,8 @@ class ExternalPage{
         this.window = undefined;
         this.is_closed = true;
         this.is_opened = false;
+
+        this.window_close_event_subscriber = undefined;
     }
 
     __set_win_state(is_open){
@@ -33,14 +36,14 @@ class ExternalPage{
 
         this.window.setMenuBarVisibility(false);
         this.window.loadURL(this.url);
-        this.window.webContents.openDevTools(); // TO TEST
+        //this.window.webContents.openDevTools(); // TO TEST
 
         this.window.on('close', (e) => {
             if(this.disable_exit == false || this.is_closed){
                 this.window.webContents.debugger.detach();
-                //this.window.destroy();
+                if(this.window_close_event_subscriber)this.window_close_event_subscriber();
                 return;
-            } 
+            }
             
             e.preventDefault();
         });
@@ -48,13 +51,18 @@ class ExternalPage{
         if(this.res_pkt_subscriber != undefined){
             this.attach_res_pkt_hooker();
         }
-		
-		//FOR TEST
-        this.window.webContents.on('will-navigate', function (event, newUrl) {
-            console.log(newUrl);
-            // More complex code to handle tokens goes here
-        })
+
         return true;
+    }
+
+    attach_window_close_event_hooker(__callback){
+        this.window_close_event_subscriber = __callback;
+    }
+
+    attach_web_contents_event_hooker(evt_name, __callback){
+        this.window.webContents.on(evt_name, function(event, new_url){
+            __callback.apply(null, arguments)
+        });
     }
 
     attach_res_pkt_hooker(){
