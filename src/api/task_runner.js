@@ -129,7 +129,7 @@ class TaskRunner{
                     if(res_obj.status_result === 'success'){
                         //TODO : (중요) 적절한 종료 처리 필요.
                         //kakao_pay_page.close();
-                        //this.__end_task(common.TASK_STATUS.DONE);
+                        this.__end_task(common.TASK_STATUS.DONE);
                     }
                 }
             }catch(e){
@@ -189,15 +189,20 @@ class TaskRunner{
                         return;
                     }
 
-                    this.browser_context.checkout_request((err, data)=>{
+                    setTimeout(()=>{
 
-                        if(err){
-                            this.__end_task(common.TASK_STATUS.FAIL);
-                            return;
-                        }
+                        this.browser_context.checkout_request((err, data)=>{
 
-                        this.prepare_to_kakao_pay(prepare_pay_payload);
-                    })
+                            if(err){
+                                this.__end_task(common.TASK_STATUS.FAIL);
+                                return;
+                            }
+    
+                            this.prepare_to_kakao_pay(prepare_pay_payload);
+                        });
+
+                    }, 4000) // timeout 걸지 않고 요청시 서버는 에러 응답을 던져준다.
+                    
                 });
             });
         });

@@ -34,7 +34,7 @@ class BrowserContext {
         this.__post_process_open_page = this.__post_process_open_page.bind(this);
         this.__remove_aws_cookies = this.__remove_aws_cookies.bind(this);
         this.__remove_akam_cookies = this.__remove_akam_cookies.bind(this);
-        this.__send_fake_sensor_data = this.__send_fake_sensor_data.bind(this);
+        this.send_fake_sensor_data = this.send_fake_sensor_data.bind(this);
         this.cancel_request = this.cancel_request.bind(this);
         this.__request_canceled_check = this.__request_canceled_check.bind(this);
 
@@ -98,7 +98,7 @@ class BrowserContext {
         });
     }
 
-    __send_fake_sensor_data(__callback){
+    send_fake_sensor_data(__callback){
 
         gen_sensor_data((err, sensor_data)=>{
 
@@ -157,6 +157,7 @@ class BrowserContext {
         let cfg_need_csrfToken = undefined;
         let request_id = common.uuidv4();
         let max_redirect = undefined;
+        let ret_interval = this.__req_retry_interval;
         
         if(req_cfg != undefined){
             if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
@@ -164,6 +165,7 @@ class BrowserContext {
             if('need_csrfToken' in req_cfg) cfg_need_csrfToken = req_cfg['need_csrfToken'];
             if('request_id' in req_cfg) request_id = req_cfg['request_id'];
             if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
+            if('ret_interval' in req_cfg) ret_interval = req_cfg['ret_interval'];
         }
 
         if(this.__request_canceled_check(request_id)){
@@ -175,7 +177,7 @@ class BrowserContext {
 
         let req = (retry, cb) => {
 
-            this.__send_fake_sensor_data((err) =>{
+            this.send_fake_sensor_data((err) =>{
 
                 if(this.__request_canceled_check(request_id)){
                     __callback('request has been canceled.', undefined);
@@ -264,7 +266,7 @@ class BrowserContext {
                 }else{
                     setTimeout(()=>{
                         req(--retry, req_cb);
-                    }, this.__req_retry_interval); 
+                    }, ret_interval); 
                 }
             }else{
                 delete this.request_canceler[request_id];
@@ -1010,15 +1012,8 @@ class BrowserContext {
                 return;
             }
 
-            if(res.data.isError == true){
-                // TODO : (중요) 여기서 왜 애러가 발생하는지 파악 필요.
-                throw new Error('checkout_request : request pay error');
-                //__callback('checkout_request : request pay error', undefined);
-                //return;
-            }
-
             __callback(undefined, res.data);
-        }, {expected_keys : ['isError', 'total_amount']});
+        }, {expected_keys : ['total_amount'], ret_interval : 300});
 
     }
 
