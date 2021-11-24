@@ -137,7 +137,7 @@ class TaskRunner{
             }catch(e){
                 //console.log(e);
             }
-        });
+        }, true);
 
         kakao_pay_page.open();
 
