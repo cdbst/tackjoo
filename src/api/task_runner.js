@@ -117,7 +117,6 @@ class TaskRunner{
 
             try{
                 let res_obj = JSON.parse(response);
-                console.log(res_obj);
 
                 if('expired' in res_obj && res_obj.expired == true){
                     this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
@@ -316,7 +315,6 @@ class TaskRunner{
 
     start(){
         this.running = true;
-
         if(this.is_valid_billing_info_to_tasking()){
             this.open_product_page();
         }else{
