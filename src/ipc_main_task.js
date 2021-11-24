@@ -6,7 +6,7 @@ const common = require("./common/common");
 
 function register(){
     
-    ipcMain.on('play-task', (event, data) =>{
+    ipcMain.on('play-task', async (event, data) =>{
         
         let task_info = data.payload.task_info;
         let product_info = data.payload.product_info;
@@ -21,16 +21,28 @@ function register(){
 
         event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.PLAY, done : false});
 
-        let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, (task_status)=>{
-            event.reply('play-task-reply' + task_info._id, {status : task_status, done : false});
-        }, (task_status) =>{
-            TaskRunnerManager.remove(task_runner._id);
-            event.reply('play-task-reply' + task_info._id, {status : task_status, done : true});
-        });
+        // let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, (task_status)=>{
+        //     event.reply('play-task-reply' + task_info._id, {status : task_status, done : false});
+        // }, (task_status) =>{
+        //     TaskRunnerManager.remove(task_runner._id);
+        //     event.reply('play-task-reply' + task_info._id, {status : task_status, done : true});
+        // });
+
+        let message_cb = (data) =>{
+            console.log(data);
+        };
+
+        let task_runner = new TaskRunner(task_info, product_info, billing_info, message_cb);
 
         TaskRunnerManager.add(task_runner);
 
-        task_runner.start();
+        try{
+            let task = await task_runner.start();
+            event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true});
+        }catch (err){
+            event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
+        }
+        
     });
 
     ipcMain.on('pause-task', (event, data) =>{
@@ -45,7 +57,7 @@ function register(){
 
         task_runner.stop();
         TaskRunnerManager.remove(task_runner.task_info._id);
-        event.reply('pause-task-reply' + task_info._id, {err : undefined});
+        //event.reply('pause-task-reply' + task_info._id, {err : undefined});
     });
 }
 
