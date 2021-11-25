@@ -1,6 +1,6 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("./api/browser_context.js").BrowserContext;
-const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrowserCxtMngr;
+const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
@@ -9,7 +9,7 @@ function register(){
     ipcMain.on('get-logged-in-account-info-list', (event, data) => {
 
         try{
-            let logged_in_browser_contexts = UserBrowserCxtMngr.get_all_logged_in_browser_contexts();
+            let logged_in_browser_contexts = BrowserContextManager.get_all_logged_in_browser_contexts();
             let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
         }catch(e){
@@ -28,9 +28,9 @@ function register(){
 
             if(err == undefined){ // 새로운 유저를 추가하는 것이므로 여기서는 파일을 업데이트 한다.
 
-                UserBrowserCxtMngr.add(borwser_context);
+                BrowserContextManager.add(borwser_context);
 
-                write_user_info_file(UserBrowserCxtMngr, (err) =>{
+                write_user_info_file(BrowserContextManager, (err) =>{
                     event.reply('add-account-reply' + ipc_id, err);
                 });
 
@@ -43,12 +43,12 @@ function register(){
     ipcMain.on('remove-account', (event, data) => {
 
         let _id = data.payload.id;
-        let result = UserBrowserCxtMngr.remove(_id);
+        let result = BrowserContextManager.remove(_id);
 
         if(result == false){
             event.reply('remove-account-reply', 'caanot found browser context.');
         }else{
-            write_user_info_file(UserBrowserCxtMngr, (err) =>{
+            write_user_info_file(BrowserContextManager, (err) =>{
                 event.reply('remove-account-reply' + data.id, err);
             });
         }
@@ -64,7 +64,7 @@ function register(){
     ipcMain.on('login', (event, data) => {
         
         let _id = data.payload.id;
-        let borwser_context = UserBrowserCxtMngr.get(_id);
+        let borwser_context = BrowserContextManager.get(_id);
 
         if(borwser_context == undefined){
             event.reply('login-reply' + data.id, 'cannot found browser context.');
