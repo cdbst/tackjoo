@@ -851,6 +851,8 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
                 console.error(e);
             }
         }
@@ -858,7 +860,7 @@ class BrowserContext {
         return undefined;
     }
 
-    apply_draw(product_info, size_info, csrfToken, __callback){
+    async apply_draw(product_info, size_info, __callback){
 
         let payload_obj = {
             prodId : product_info.product_id,
@@ -869,20 +871,18 @@ class BrowserContext {
             thedrawskuxref : size_info.draw_sku_xref,
             infoAgree: true,
             smsAgree: true,
-            csrfToken: csrfToken
+            csrfToken: this.csrfToken
         };
 
         let payload = new URLSearchParams(payload_obj).toString();
-        let cookies = this.__cookie_storage.get_serialized_cookie_data();
-
+        
         let headers = {
             "authority": BrowserContext.NIKE_DOMAIN_NAME,
             "accept": "application/json, text/javascript, */*; q=0.01",
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "ko,en;q=0.9,en-US;q=0.8",
             "content-length": payload.length, // must be fixed
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "cookie": cookies,
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",    
             "origin": BrowserContext.NIKE_URL,
             "referer": product_info.url,
             "sec-ch-ua": BrowserContext.SEC_CA_UA,
@@ -895,32 +895,38 @@ class BrowserContext {
             "x-requested-with": "XMLHttpRequest"
         };
 
-        return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload, (err, res) =>{
+        for(var i = 0; i < this.__req_retry_cnt; i++){
 
-            if(err){
-                __callback(err);
-                return;
+            try{
+
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload);
+
+                if(res.status != 200){
+                    throw new Error('apply_draw : invalid response status code.' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if(('result' in res.data) == false){
+                    throw new Error('apply_draw : recv invalid payload.');
+                }
+    
+                if(res.data['dupFlag'] == true){
+                    return res.data;
+                }else if(res.data['result'] == false){
+                    throw new Error('apply_draw : draw failed. invalid result : ' + res.data['result']);
+                }
+
+                return res.data;
+
+            }catch(e){
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
+                console.error(e);
             }
+        }
 
-            if(res.status != 200){
-                __callback('apply_draw : invalid response status code.' + res.status);
-                return;
-            }
-
-            this.__set_cookie(this.__cookie_storage, res);
-
-            if(('result' in res.data) == false){
-                __callback('apply_draw : recv invalid payload.');
-            }
-
-            if(res.data['dupFlag'] == true){
-                __callback(undefined, res.data);
-            }else if(res.data['result'] == false){
-                __callback('apply_draw : draw failed.');
-            }
-
-            __callback(undefined, res.data);
-        }, {expected_keys : ['result']});
+        return undefined;
     }
 
     add_to_cart(product_info, size_info, csrfToken, __callback){

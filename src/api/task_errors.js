@@ -39,6 +39,40 @@ class OpenProductPageError extends Error {
     }
 }
 
+class SizeInfoError extends Error {
+
+    constructor(product_info, task_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'SizeInfoError';
+        this.product_info = product_info;
+        this.task_info = task_info;
+    }
+}
+
+class ApplyDrawError extends Error {
+
+    constructor(product_info, size_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'ApplyDrawError';
+        this.product_info = product_info;
+        this.size_info = size_info;
+    }
+}
+
 module.exports.TaskInfoError = TaskInfoError;
 module.exports.ProductInfoError = ProductInfoError;
 module.exports.OpenProductPageError = OpenProductPageError;
+module.exports.SizeInfoError = SizeInfoError;
+module.exports.ApplyDrawError = ApplyDrawError;
