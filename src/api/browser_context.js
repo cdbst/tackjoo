@@ -1,4 +1,4 @@
-const cookieMngr = require("./cookie_mngr.js");
+const CookieManager = require("./cookie_mngr.js").CookieManager;
 const axios = require('axios');
 const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
@@ -22,7 +22,10 @@ class BrowserContext {
         POST : 'post'
     };
 
-    constructor(_email, _pwd, _id){
+    constructor(...args){
+
+        this.__init = this.__init.bind(this);
+        this.__init_by_json = this.__init_by_json.bind(this);
 
         this.__reset_csrfToken = this.__reset_csrfToken.bind(this);
         this.__get_csrfToken = this.__get_csrfToken.bind(this);
@@ -43,7 +46,6 @@ class BrowserContext {
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
 
-
         this.is_anonymous = this.is_anonymous.bind(this);
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
@@ -58,6 +60,21 @@ class BrowserContext {
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
+        
+        if(args.length == 3){
+            this.__init(args[0], args[1], args[2]); // email, pwd, id
+        }else if(args.length == 1){
+            this.__init_by_json(args[0]); //json string.
+        }else if(args.length == 0){
+            this.__init();
+        }else{
+            throw new Error("Cannot initalize BrowserContext instance " + args.join(' '));
+        }
+
+        this.__on_cart_mutex = new Mutex();
+    }
+
+    __init(_email, _pwd, _id){
 
         this.email = _email;
         this.pwd = _pwd;
@@ -65,12 +82,6 @@ class BrowserContext {
 
         this.in_progress_login = false;
         this.is_login = false;
-
-        this.__cookie_storage = new cookieMngr.CookieManager();
-        this.__cookie_storage.add_cookie_data('social_type=comlogin');
-        this.__cookie_storage.add_cookie_data('NikeCookie=ok');
-
-        this.__iamport_cookie_storage = new cookieMngr.CookieManager();
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -81,12 +92,20 @@ class BrowserContext {
         this.__req_retry_cnt = 30;
         this.__req_timout = 0;
 
+        this.__cookie_storage = new CookieManager();
+        this.__cookie_storage.add_cookie_data('social_type=comlogin');
+        this.__cookie_storage.add_cookie_data('NikeCookie=ok');
+
+        this.__iamport_cookie_storage = new CookieManager();
+
         //requst_queue
         this.request_canceler = {};
-        
+    }
 
-        //상품 cart에는 한번에 하나씩의 상품만 추가되어 처리될 수 있음.
-        this.on_cart_mutex = new Mutex();
+    __init_by_json(json){
+        Object.assign(this, json);
+        this.__cookie_storage = new CookieManager(json.__cookie_storage);
+        this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
     }
 
     __recorver_session(__callback){
@@ -876,7 +895,7 @@ class BrowserContext {
 
         let _request_id = common.uuidv4();
 
-        this.on_cart_mutex
+        this.__on_cart_mutex
         .acquire()
         .then((release) => {
             

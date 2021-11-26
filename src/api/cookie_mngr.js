@@ -2,21 +2,33 @@ const cookie = require('cookie');
 
 class CookieManager{
 
-    constructor(){
+    constructor(...args){
 
         this.add_cookie_data = this.add_cookie_data.bind(this);
         this.remove_cookie_data = this.remove_cookie_data.bind(this);
         this.get_serialized_cookie_data = this.get_serialized_cookie_data.bind(this);
         this.add_serialized_cookies = this.add_serialized_cookies.bind(this);
         this.get_specific_serialized_cookie = this.get_specific_serialized_cookie.bind(this);
-        this.init = this.init.bind(this);
+        this.__init = this.__init.bind(this);
+        this.__init_by_json = this.__init_by_json.bind(this);
 
-        this.init();
+        if(args.length == 0){
+            this.__init();
+        }else if(args.length == 1){
+            this.__init(args[0]);
+        }else{
+            throw new Error("Cannot create CookieManager instance " + args.join(' '));
+        }
+        
     }
 
-    init(){
+    __init(){
         this.cookies = {};
         this.num_of_cookies = 0;
+    }
+
+    __init_by_json(json){
+        Object.assign(this, json);
     }
 
     add_cookie_data(cookie_data){
