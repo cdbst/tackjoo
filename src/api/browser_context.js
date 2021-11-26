@@ -42,6 +42,7 @@ class BrowserContext {
         this.__request_canceled_check = this.__request_canceled_check.bind(this);
 
         this.__http_request = this.__http_request.bind(this);
+        this.__http_request2 = this.__http_request2.bind(this);
         this.__recorver_session = this.__recorver_session.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
@@ -61,17 +62,13 @@ class BrowserContext {
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
         
-        if(args.length == 3){
-            this.__init(args[0], args[1], args[2]); // email, pwd, id
+        if(args.length == 3 || args.length == 0){
+            this.__init.apply(null, args); // email, pwd, id
         }else if(args.length == 1){
             this.__init_by_json(args[0]); //json string.
-        }else if(args.length == 0){
-            this.__init();
         }else{
             throw new Error("Cannot initalize BrowserContext instance " + args.join(' '));
         }
-
-        this.__on_cart_mutex = new Mutex();
     }
 
     __init(_email, _pwd, _id){
@@ -87,7 +84,6 @@ class BrowserContext {
         this.sensor_data_server_url = undefined;
 
         //(TODO : 사용자 인터페이스로부터 입력받은 설정값을 Base로 지정될 수 있도록 기능 추가가 필요함.)
-        //For http req config values; 
         this.__req_retry_interval = 1500; // app 설정으로 부터 지정되어야 할 값임.
         this.__req_retry_cnt = 30;
         this.__req_timout = 0;
@@ -97,8 +93,8 @@ class BrowserContext {
         this.__cookie_storage.add_cookie_data('NikeCookie=ok');
 
         this.__iamport_cookie_storage = new CookieManager();
+        this.__on_cart_mutex = new Mutex();
 
-        //requst_queue
         this.request_canceler = {};
     }
 
@@ -106,6 +102,7 @@ class BrowserContext {
         Object.assign(this, json);
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
+        this.__on_cart_mutex = new Mutex();
     }
 
     __recorver_session(__callback){
@@ -295,6 +292,47 @@ class BrowserContext {
 
         req(this.__req_retry_cnt, req_cb);
         return request_id;
+    }
+
+    __http_request2(method, url, headers, params, send_sensor_data = true){
+
+        let cookie_storage = this.__judge_cookie_storage(url);
+        headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+
+        let axios_req_cfg = {
+            method: method,
+            url: url,
+            timeout: this.__req_timout,
+            headers : headers
+        }
+
+        // let max_redirect = undefined;
+        // if(req_cfg != undefined){
+        //     if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
+        // }
+        
+        // if(max_redirect != undefined){
+        //     axios_req_cfg['maxRedirects'] = max_redirect;
+        // }
+
+
+        if(params != undefined){
+            if(method == BrowserContext.REQ_METHOD.POST){
+                axios_req_cfg['data'] = params;
+            }else{
+                axios_req_cfg['params'] = params;
+            }
+        }
+
+        return new Promise((resolve, reject)=>{
+            axios(axios_req_cfg)
+            .then(res => {
+                resolve(res);
+            })
+            .catch(error => {
+                reject(error);
+            });
+        });
     }
 
     __remove_aws_cookies(){
@@ -713,62 +751,57 @@ class BrowserContext {
         });
     }
 
-    open_product_page(product_url, __callback){
+    async open_product_page(product_url){
+
+        let product_info = undefined;
 
         this.__cookie_storage.add_cookie_data('oldCartId=none');
-
         let headers = this.__get_open_page_header();
-        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
-        
-        return this.__http_request(BrowserContext.REQ_METHOD.GET, product_url, headers, undefined, (err, res) =>{
 
-            if(err){
-                __callback(err);
-                return;
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+
+            try{
+
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, product_url, headers, undefined, true);
+
+                if(res.status != 200){
+                    throw new Error('open_product_page : response ' + res.status);
+                }
+
+                const $ = cheerio.load(res.data);
+
+                let result = this.__post_process_open_page(res.headers, $);
+                if(result == false){
+                    throw new Error('open_product_page : cannot store informations');
+                }
+
+                product_info = product_page_parser.get_product_info_from_product_page($);
+                if(product_info == undefined){
+                    throw new Error('open_product_page : Cannot collect product information.');
+                }
+
+                this.__cookie_storage.add_cookie_data('c20=' + product_info.model_id);
+
+                break;
+
+            }catch(e){
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
+                console.error(e);
             }
+        }
 
-            if(res.status != 200){
-                __callback('open_product_page : response ' + res.status);
-                return;
-            }
+        if(product_info == undefined) return undefined;
+        if(product_info.sell_type != common.SELL_TYPE.normal) return product_info;
 
-            const $ = cheerio.load(res.data);
+        let sku_inventory_info = await this.get_product_sku_inventory(product_url, product_info.product_id);
+        if(sku_inventory_info == undefined) return undefined;
 
-            let result = this.__post_process_open_page(res.headers, $);
-            if(result == false){
-                __callback('open_product_page : cannot store informations');
-                return;
-            }
-
-            let product_info = product_page_parser.get_product_info_from_product_page($);
-            if(product_info == undefined){
-                __callback('Cannot collect product information.');
-                return;
-            }
-
-            this.__cookie_storage.add_cookie_data('c20=' + product_info.model_id);
-
-            if(product_info.sell_type == common.SELL_TYPE.normal){
-
-                this.get_product_sku_inventory(product_url, product_info.product_id, (_err, sku_inventory_info) => {
-
-                    if(_err){
-                        __callback(_err, product_info, this.csrfToken);
-                        return;
-                    }
-    
-                    product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
-                    __callback(undefined, product_info, this.csrfToken);
-                });
-            }else{
-                __callback(undefined, product_info, this.csrfToken);
-            }
-        }, {need_csrfToken : true});
+        product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
+        return product_info;
     }
 
-    get_product_sku_inventory(product_url, product_id, __callback){
-
-        let cookies = this.__cookie_storage.get_serialized_cookie_data();
+    async get_product_sku_inventory(product_url, product_id){
 
         let headers = {
             'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -776,7 +809,6 @@ class BrowserContext {
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
             'cache-control': 'no-cache',
-            'cookie' : cookies,
             'pragma': 'no-cache',
             'referer': product_url,
             'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
@@ -793,37 +825,37 @@ class BrowserContext {
             _ : new Date().getTime()
         };
 
-        this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory', headers, params, (err, res) =>{
+        for(var i = 0; i < this.__req_retry_cnt; i++){
 
-            if(err){
-                __callback(err);
-                return;
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory', headers, params);
+
+                if(res.status != 200){
+                    throw new Error('get_product_sku_inventory : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('get_product_sku_inventory : unexpected data : data is not object type');
+                }
+    
+                if(('usable' in res.data) == false){
+                    throw new Error('get_product_sku_inventory : unexpected data : \'unable\' information is not exist.');
+                }
+                
+                if(('skuPricing' in res.data) == false){
+                    throw new Error('get_product_sku_inventory : unexpected data : \'skuPricing\' information is not exist.');
+                }
+
+                return res.data;
+
+            }catch(e){
+                console.error(e);
             }
+        }
 
-            if(res.status != 200){
-                __callback('get_product_sku_inventory : response ' + res.status);
-                return;
-            }
-
-            this.__set_cookie(this.__cookie_storage, res);
-
-            if((res.data instanceof Object) == false){
-                __callback('get_product_sku_inventory : unexpected data : data is not object type');
-                return;
-            }
-
-            if(('usable' in res.data) == false){
-                __callback('get_product_sku_inventory : unexpected data : \'unable\' information is not exist.');
-                return;
-            }
-            
-            if(('skuPricing' in res.data) == false){
-                __callback('get_product_sku_inventory : unexpected data : \'skuPricing\' information is not exist.');
-                return;
-            }
-
-            __callback(undefined, res.data);
-        }, {expected_keys : ['usable', 'skuPricing']});
+        return undefined;
     }
 
     apply_draw(product_info, size_info, csrfToken, __callback){
