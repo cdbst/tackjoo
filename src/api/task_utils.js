@@ -83,7 +83,7 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
     let target_size_info = size_info_list_has_quantity.find((size_info) => { return compare_size(size_info.name, task_info.size_name) == 0 });
     if(target_size_info != undefined) return target_size_info;
 
-    let min_gap = 9999;
+    let min_gap = 999999;
 
     for(var i = 0; i < size_info_list_has_quantity.length; i++){
         let size_info = size_info_list_has_quantity[i];
