@@ -1,5 +1,5 @@
 function send_sensor_data_hooker(sensor_data){
-    window.electron.sendSensorData(sensor_data);
+    //window.electron.sendSensorData(sensor_data);
 }
 
 function get_mouse_event(_element, _pointerX, _pointerY){

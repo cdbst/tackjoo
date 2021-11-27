@@ -1,6 +1,6 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("./api/browser_context.js").BrowserContext;
-const UserBrowserCxtMngr = require("./api/browser_context_mngr.js").userUserBrowserCxtMngr;
+const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
 const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
 
@@ -9,7 +9,7 @@ function register(){
     ipcMain.on('get-logged-in-account-info-list', (event, data) => {
 
         try{
-            let logged_in_browser_contexts = UserBrowserCxtMngr.get_all_logged_in_browser_contexts();
+            let logged_in_browser_contexts = BrowserContextManager.get_all_logged_in_browser_contexts();
             let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
         }catch(e){
@@ -24,31 +24,28 @@ function register(){
         
         let borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
-        borwser_context.open_main_page((err) =>{
-
-            if(err == undefined){ // 새로운 유저를 추가하는 것이므로 여기서는 파일을 업데이트 한다.
-
-                UserBrowserCxtMngr.add(borwser_context);
-
-                write_user_info_file(UserBrowserCxtMngr, (err) =>{
+        (async ()=> {
+            const result = await borwser_context.open_main_page();
+            if(result == false){
+                event.reply('add-account-reply' + ipc_id, 'Cannot open main page');
+            }else{
+                BrowserContextManager.add(borwser_context);
+                write_user_info_file(BrowserContextManager, (err) =>{
                     event.reply('add-account-reply' + ipc_id, err);
                 });
-
-            }else{
-                event.reply('add-account-reply' + ipc_id, err);
             }
-        });
+        })();
     });
 
     ipcMain.on('remove-account', (event, data) => {
 
         let _id = data.payload.id;
-        let result = UserBrowserCxtMngr.remove(_id);
+        let result = BrowserContextManager.remove(_id);
 
         if(result == false){
             event.reply('remove-account-reply', 'caanot found browser context.');
         }else{
-            write_user_info_file(UserBrowserCxtMngr, (err) =>{
+            write_user_info_file(BrowserContextManager, (err) =>{
                 event.reply('remove-account-reply' + data.id, err);
             });
         }
@@ -64,37 +61,35 @@ function register(){
     ipcMain.on('login', (event, data) => {
         
         let _id = data.payload.id;
-        let borwser_context = UserBrowserCxtMngr.get(_id);
+        let borwser_context = BrowserContextManager.get(_id);
 
         if(borwser_context == undefined){
             event.reply('login-reply' + data.id, 'cannot found browser context.');
             return;
         }
 
-        let do_login = function(){
+        (async () =>{
 
-            borwser_context.login((err) =>{
-                event.reply('login-reply' + data.id, err);
-            });
-        }
+            let result;
 
-        if(borwser_context.is_login){
-
-            borwser_context.clear_cookies();
-            borwser_context.clear_csrfToken();
-            borwser_context.open_main_page((err) =>{ // for page refreesh.
-
-                if(err){
-                    event.reply('login-reply' + data.id, 'caanot open nike.com main page.');
+            if(borwser_context.is_login){
+                borwser_context.clear_cookies();
+                borwser_context.clear_csrfToken();
+                result = await borwser_context.open_main_page();
+                if(result == false){
+                    event.reply('login-reply' + data.id, 'fail with openning main page.');
                     return;
                 }
+            }
 
-                do_login();
-            });
+            result = await borwser_context.login();
+            if(result){
+                event.reply('login-reply' + data.id, undefined);
+            }else{
+                event.reply('login-reply' + data.id, 'login fail');
+            }
 
-        }else{
-            do_login();
-        }
+        })();
     });
 }
 

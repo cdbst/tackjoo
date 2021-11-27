@@ -18,6 +18,18 @@
         });
     }
 
+    exports.async_sleep = function(time_out) {
+        return new Promise((resolve, reject) =>{
+            try{
+                setTimeout(()=>{
+                    resolve();
+                }, time_out);
+            }catch(e){
+                reject(e);
+            }
+        });
+    }
+
     exports.merge_object = function (target, source) {
         //console.log(source);
 
