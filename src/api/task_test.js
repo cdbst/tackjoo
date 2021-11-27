@@ -54,6 +54,8 @@ async function main(browser_context, task_info, product_info, billing_info){
 
         //TODO add codes for nomal product. // TAST CODE
         //click_buy_button();
+
+        process.exit(0);
     }
     
 }
@@ -63,7 +65,7 @@ async function main(browser_context, task_info, product_info, billing_info){
 
 
 //TEST CODE
-setInterval(()=>{
-    console.log("TEST~~~~~~");
-    //parentPort.postMessage('~~~~TEST');
-}, 3000);
+// setInterval(()=>{
+//     console.log("TEST~~~~~~");
+//     //parentPort.postMessage('~~~~TEST');
+// }, 3000);

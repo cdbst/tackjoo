@@ -43,7 +43,6 @@ class BrowserContext {
 
         this.__http_request = this.__http_request.bind(this);
         this.__http_request2 = this.__http_request2.bind(this);
-        this.__recorver_session = this.__recorver_session.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
 
@@ -103,15 +102,6 @@ class BrowserContext {
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
         this.__on_cart_mutex = new Mutex();
-    }
-
-    __recorver_session(__callback){
-
-        this.clear_cookies();
-        this.clear_csrfToken();
-        this.open_main_page(()=>{
-            this.login(__callback);
-        });
     }
 
     async send_fake_sensor_data(){
@@ -292,8 +282,12 @@ class BrowserContext {
             await this.send_fake_sensor_data();
         }
 
+        if(headers == undefined) headers = {};
+
         let cookie_storage = this.__judge_cookie_storage(url);
-        headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+        if(cookie_storage.num_of_cookies > 0){
+            headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+        }
 
         let axios_req_cfg = {
             method: method,
@@ -378,7 +372,7 @@ class BrowserContext {
             }
 
             if(res.status != 200){
-                if(__callback) __callback('open_main_page : response ' + res.status);
+                if(__callback) __callback('open_page : response ' + res.status);
                 return;
             }
 
@@ -386,7 +380,7 @@ class BrowserContext {
 
             let result = this.__post_process_open_page(res.headers, $);
             if(result == false){
-                if(__callback) __callback('open_main_page : cannot store informations');
+                if(__callback) __callback('open_page : cannot store informations');
                 return;
             }
 
@@ -438,107 +432,108 @@ class BrowserContext {
         }
     }
 
-    login(__callback){
+    async login(__callback){
         if(this.in_progress_login){
-            __callback('inprogress login in work.')
-            return;
+            console.error('inprogress login in work.')
+            return false;
         }
-        
+
         this.in_progress_login = true;
 
         if(this.is_anonymous()){
             this.in_progress_login = false;
-            __callback('This browser context is anonymous');
-            return;
+            console.error('This browser context is anonymous');
+            return false;
         }
 
-        this.__open_login_modal(err =>{
+        let result = await this.__open_login_modal();
+        if(result == false){
+            console.warn('Cannot open login modal.'); 
+        }
 
-            if(err) console.warn(err); // 이것은 그냥 경고 처리만 일단 하는 것으로 함.
+        let payload_obj = {
+            'locale': 'ko_KR',
+            'dynamicForm': 'login',
+            'templatePath': '/authentication/login',
+            'userId': '',
+            'j_username': this.email,
+            'j_password': this.pwd,
+            'breeze-me': 'on',
+            '_breeze-me': 'off',
+            'csrfToken': this.csrfToken
+        };
 
-            let payload_obj = {
-                'locale': 'ko_KR',
-                'dynamicForm': 'login',
-                'templatePath': '/authentication/login',
-                'userId': '',
-                'j_username': this.email,
-                'j_password': this.pwd,
-                'breeze-me': 'on',
-                '_breeze-me': 'off',
-                'csrfToken': this.csrfToken
-            };
-    
-            let payload = new URLSearchParams(payload_obj).toString().replace('_breeze-me', 'breeze-me');
-            let cookies = this.__cookie_storage.get_serialized_cookie_data();
+        let payload = new URLSearchParams(payload_obj).toString().replace('_breeze-me', 'breeze-me');
 
-            let headers = {
-                'authority': BrowserContext.NIKE_DOMAIN_NAME,
-                'accept': 'application/json, text/javascript, */*; q=0.01',
-                'accept-encoding': 'gzip, deflate, br',
-                'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                'cache-control': 'no-cache',
-                'content-length': payload.length,
-                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'cookie': cookies,
-                'origin': BrowserContext.NIKE_URL,
-                'pragma': 'no-cache',
-                'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/',
-                'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': "Windows",
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-                'user-agent': BrowserContext.USER_AGENT,
-                'x-requested-with': 'XMLHttpRequest'
-            };
+        let headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/',
+            'sec-ch-ua': '"Chromium";v="90", " Not A;Brand";v="99", "Whale";v="2"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
 
-            
-            this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload, (err, res) =>{
-
-                this.in_progress_login = false;
-
-                if(err){
-                    __callback(err);
-                    return;
-                }
-
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload);
+                
                 if(res.data.ResponseObject.isError == 'true'){
-                    __callback('login fail - response server data is error status.');
-                    return;
+                    throw new Error('login fail - response server data is error status.');
                 }
-
+    
                 this.__set_cookie(this.__cookie_storage, res);
                 
+                this.in_progress_login = false;
                 this.is_login = true;
-                this.open_main_page(__callback);
+                await this.open_main_page(__callback);
+                return true;
 
-            }, {expected_keys : ['ResponseObject']});
+            }catch(e){
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
+                console.error(e);
+            }
+        }
 
-        });
+        this.in_progress_login = false;
+        return false;
     }
 
-    __open_login_modal(__callback){
+    async __open_login_modal(){
 
         let url = BrowserContext.NIKE_URL +'/kr/ko_kr/dynamicformpage?name=login&dataType=model&_=' + new Date().getTime();
 
-        axios.get(url)
-        .then(res => {
-            
+        try{
+            const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, url, undefined);
+
             if(res.status != 200){
-                __callback('__open_login_modal : res status is ' + url.status);
-                return;
+                throw new Error('__open_login_modal : res status is ' + res.status);
             } 
 
             this.__set_cookie(this.__cookie_storage, res);
-            
-            __callback(undefined);
-        })
-        .catch(err => {
+
+            return true;
+
+        }catch(e){
             this.__remove_aws_cookies();
             this.__remove_akam_cookies();
-            __callback(err);
-        });
+            console.error(e);
+        }
+        
+        return false;
     }
 
     logout(){
@@ -679,36 +674,35 @@ class BrowserContext {
         this.csrfToken = undefined;
     }
 
-    open_main_page(__callback = undefined){
+    async open_main_page(){
 
         let headers = this.__get_open_page_header();
 
-        if(this.__cookie_storage.num_of_cookies > 0){
-            headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_main_page : response ' + res.status);
+                }
+    
+                const $ = cheerio.load(res.data);
+    
+                let result = this.__post_process_open_page(res.headers, $);
+                if(result == false){
+                    throw new Error('open_main_page : cannot store page informations');
+                }
+    
+                return true;
+
+            }catch(e){
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
+                console.error(e);
+            }
         }
 
-        this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr', headers, undefined, (err, res) =>{
-
-            if(err){
-                if(__callback) __callback(err);
-                return;
-            }
-
-            if(res.status != 200){
-                if(__callback) __callback('open_main_page : response ' + res.status);
-                return;
-            }
-
-            const $ = cheerio.load(res.data);
-
-            let result = this.__post_process_open_page(res.headers, $);
-            if(result == false){
-                if(__callback) __callback('open_main_page : cannot store informations');
-                return;
-            }
-
-            if(__callback) __callback();
-        },{need_csrfToken : true});
+        return false;
     }
 
     open_feed_page(__callback){

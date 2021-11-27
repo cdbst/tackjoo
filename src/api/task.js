@@ -36,10 +36,10 @@ class TaskRunner{
 
     __end_task(task_status){
         this.running = false;
-        this.browser_context.open_main_page(() =>{
-            if(this.cart_ownership_release != undefined) this.cart_ownership_release();
-            this.task_end_callback(task_status);
-        });
+        await this.browser_context.open_main_page();
+        if(this.cart_ownership_release != undefined) this.cart_ownership_release();    
+        this.task_end_callback(task_status);
+        
     }
 
     judge_appropreate_size_info(){
