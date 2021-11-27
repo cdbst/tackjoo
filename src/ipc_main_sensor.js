@@ -1,4 +1,4 @@
-const {ipcMain, BrowserWindow} = require("electron");
+const {ipcMain} = require("electron");
 const util = require("./ipc_main_util.js");
 const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
 const {isMainThread} = require('worker_threads');
@@ -11,11 +11,9 @@ function register(_win){
     ipcMain.on('send_sensor_data', (event, data) =>{
         
         let sensor_data = data.payload.sensor_data;
-
         let browser_context_list = BrowserContextManager.get_all_browser_contexts();
 
         browser_context_list.forEach((browser_context) =>{
-
             try{
                 browser_context.send_sensor_data(sensor_data);
             }catch(e){
