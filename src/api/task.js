@@ -1,4 +1,4 @@
-const {Worker, parentPort, workerData} = require('worker_threads');
+const {parentPort, workerData} = require('worker_threads');
 const common = require("../common/common.js");
 const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
