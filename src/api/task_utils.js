@@ -133,6 +133,8 @@ module.exports.open_checkout_page = async(browser_context, product_info) =>{
 
 class MainThreadApiCaller{
 
+    //TODO: recv가 안불려지는 경우가 있는지 추가 검토.
+
     constructor(parent_port){
         this.call = this.call.bind(this);
 
