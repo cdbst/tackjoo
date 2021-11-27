@@ -126,7 +126,7 @@ module.exports.prepare_kakaopay = async(browser_context, prepare_pay_payload) =>
 }
 
 module.exports.open_checkout_page = async(browser_context, product_info) =>{
-    const result = browser_context.open_checkout_page(product_info);
+    const result = await browser_context.open_checkout_page(product_info);
     return result;
 }
 
