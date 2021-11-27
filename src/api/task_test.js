@@ -3,7 +3,7 @@ const common = require("../common/common.js");
 const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
-const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, ApplyDrawError} = require('./task_errors.js');
+const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError} = require('./task_errors.js');
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
@@ -43,7 +43,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
         parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_DRAW));
-        let draw_entry_data = TaskUtils.apply_draw(product_info, size_info);
+        let draw_entry_data = TaskUtils.apply_draw(browser_context, product_info, size_info);
         if(draw_entry_data == undefined){
             throw new ApplyDrawError(product_info, size_info, "Fail with appling THE DRAW");
         }
@@ -51,9 +51,22 @@ async function main(browser_context, task_info, product_info, billing_info){
         process.exit(0);
 
     }else{
+        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_DO_PAY));
+        let res_data = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
+        if(res_data == undefined){
+            throw new AddToCartError(product_info, size_info, "Fail with add to cart");
+        }
 
-        //TODO add codes for nomal product. // TAST CODE
-        //click_buy_button();
+        let kakaopay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
+        if(kakaopay_prepare_payload == undefined){
+            throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship")
+        }
+
+        await common.async_sleep(3000);
+        let checkout_result = await TaskUtils.checkout_request(browser_context);
+        if(checkout_result == undefined){
+            throw new CheckOutRequestError(billing_info, "Fail with checkout singleship")
+        }
 
         process.exit(0);
     }

@@ -684,7 +684,7 @@ class BrowserContext {
     }
 
     clear_cookies(){
-        this.__cookie_storage.init();
+        this.__cookie_storage.reset();
     }
     
     clear_csrfToken(){
@@ -921,73 +921,62 @@ class BrowserContext {
         return undefined;
     }
 
-    add_to_cart(product_info, size_info, csrfToken, __callback){
+    async add_to_cart(product_info, size_info){
 
-        let _request_id = common.uuidv4();
+        let payload_obj = {
+            'SIZE' : size_info['id'],
+            'quantity' : 1,
+            'csrfToken' : this.csrfToken,
+            'productId' : product_info['product_id']
+        };
 
-        this.__on_cart_mutex
-        .acquire()
-        .then((release) => {
-            
-            let payload_obj = {
-                'SIZE' : size_info['id'],
-                'quantity' : 1,
-                'csrfToken' : csrfToken,
-                'productId' : product_info['product_id']
-            };
-    
-            payload_obj[product_info.item_attr] = size_info['name'];
-    
-            let payload = new URLSearchParams(payload_obj).toString()
-            let cookies = this.__cookie_storage.get_serialized_cookie_data();
-    
-            let headers = {
-                "authority": BrowserContext.NIKE_DOMAIN_NAME,
-                "accept": "application/json, text/javascript, */*; q=0.01",
-                "accept-encoding": "gzip, deflate, br",
-                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-                "cache-control" : "no-cache",
-                "content-length": payload.length, // must be fixed
-                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "cookie": cookies,
-                "origin": BrowserContext.NIKE_URL,
-                "pragma" : "no-cache",
-                "referer": product_info.url,
-                "sec-ch-ua": BrowserContext.SEC_CA_UA,
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": "Windows",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-                "user-agent": BrowserContext.USER_AGENT,
-                "x-requested-with": "XMLHttpRequest"
-            };
-    
-            this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload, (err, res) =>{
-    
-                if(err){
-                    __callback(err, release);
-                    return;
-                }
-    
+        payload_obj[product_info.item_attr] = size_info['name'];
+
+        let payload = new URLSearchParams(payload_obj).toString()
+
+        let headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cache-control" : "no-cache",
+            "content-length": payload.length, // must be fixed
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "origin": BrowserContext.NIKE_URL,
+            "pragma" : "no-cache",
+            "referer": product_info.url,
+            "sec-ch-ua": BrowserContext.SEC_CA_UA,
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "user-agent": BrowserContext.USER_AGENT,
+            "x-requested-with": "XMLHttpRequest"
+        };
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload);
+
                 if(res.status != 200){
-                    __callback('add_to_cart : invalid response status code.' + res.status, release);
-                    return;
+                    throw new Error('add_to_cart : invalid response status code.' + res.status);
                 }
-
+    
                 this.__set_cookie(this.__cookie_storage, res);
     
                 if(('quantityAdded' in res.data) == false || ('cartItemCount' in res.data) == false){
-                    __callback('add_to_cart : recv invalid payload.', release);
-                    return;
+                    throw new Error('add_to_cart : recv invalid payload.');
                 }
     
-                __callback(undefined, release, res.data);
-    
-            }, {expected_keys : ['quantityAdded', 'cartItemCount'], request_id : _request_id});
-        });
+                return res.data;
 
-        return _request_id;
+            }catch(e){
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
     }
 
     open_checkout_page(product_info, __callback){
@@ -1023,7 +1012,7 @@ class BrowserContext {
         }, {need_csrfToken : true});
     }
 
-    checkout_request(__callback){
+    async checkout_request(){
 
         let headers = {
             'accept':' */*',
@@ -1048,25 +1037,30 @@ class BrowserContext {
             gToken: '',
             _: new Date().getTime()
         }
-        
-        return this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params, (err, res) =>{
 
-            if(err){
-                __callback(err, undefined);
-                return;
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params);
+
+                if(res.status != 200){
+                    throw new Error('checkout_request : invalid response status : ' + res.status);
+                }
+
+                if('total_amount' in res.data == false){
+                    throw new Error('checkout_request : invalid response data ');
+                }
+
+                return res.data;
+
+            }catch(e){
+                this.__post_process_req_fail(e, 300);
             }
+        }
 
-            if(res.status != 200){
-                __callback('checkout_request : response ' + res.status, undefined);
-                return;
-            }
-
-            __callback(undefined, res.data);
-        }, {expected_keys : ['total_amount'], ret_interval : 300});
-
+        return undefined;
     }
 
-    checkout_singleship(billing_info, csrfToken, __callback){
+    async checkout_singleship(billing_info){
 
         let payload_obj = {
             'address.isoCountryAlpha2': 'US',
@@ -1079,11 +1073,10 @@ class BrowserContext {
             'selectPersonalMessage': '',
             'personalMessageText': '',
             'fulfillmentOptionId': 1,
-            'csrfToken': csrfToken
+            'csrfToken': this.csrfToken
         }
 
         let payload = new URLSearchParams(payload_obj).toString();
-        let cookie = this.__cookie_storage.get_serialized_cookie_data();
         
         let headers = {
             'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -1093,7 +1086,6 @@ class BrowserContext {
             'cache-control': 'no-cache',
             'content-length': payload.length,
             'content-type': 'application/x-www-form-urlencoded',
-            'cookie': cookie,
             'origin': BrowserContext.NIKE_URL,
             'pragma': 'no-cache',
             'referer': BrowserContext.NIKE_URL + '/kr/launch/checkout',
@@ -1107,21 +1099,14 @@ class BrowserContext {
             'upgrade-insecure-requests': 1,
             'user-agent': BrowserContext.USER_AGENT
         }
-        
-        return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload, (err, res) =>{
 
-            if(err){
-                __callback(err);
-                return;
-            }
+        for(var i = 0; i < this.__req_retry_cnt; i++){
 
-            this.__set_cookie(this.__cookie_storage, res);
+            try{
+                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload);
 
-            //location is checkout page.
-            this.open_page(res.headers.location, (err, res) =>{
-
-                if(err){
-                    __callback(err);
+                if(res.status != 200){
+                    __callback('checkout_singleship : response invalid status : ' + res.status, undefined);
                     return;
                 }
 
@@ -1129,13 +1114,17 @@ class BrowserContext {
 
                 let kakaopay_prepare_payload = checkout_page_parser.parse_kakaopay_prepare_payload_from_checkout_page($);
                 if(kakaopay_prepare_payload == undefined){
-                    throw new Error('cannot parse payment payload from checkout page.');
+                    throw new Error('checkout_singleship : cannot parse payment payload from checkout page.');
                 }
-                __callback(err, kakaopay_prepare_payload);
-            });
+                
+                return kakaopay_prepare_payload;
 
+            }catch(e){
+                this.__post_process_req_fail(e);
+            }
+        }
 
-        },{expected_status : [301, 302, 303, 304], max_redirect : 0});
+        return undefined;
     }
 
     prepare_kakao_pay(prepare_pay_payload, __callback){

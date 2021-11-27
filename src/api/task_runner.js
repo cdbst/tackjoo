@@ -65,6 +65,8 @@ class TaskRunner{
     }
 
     start(){
+        
+        //TODO : 같은 browser context 일경우, Mutex 적용. async mutex.
 
         return new Promise((resolve, reject)=>{
             

@@ -71,8 +71,56 @@ class ApplyDrawError extends Error {
     }
 }
 
+class AddToCartError extends Error {
+
+    constructor(product_info, size_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'AddToCartError';
+        this.product_info = product_info;
+        this.size_info = size_info;
+    }
+}
+
+class CheckOutSingleShipError extends Error {
+
+    constructor(billing_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'CheckOutSingleShipError';
+        this.billing_info = billing_info;
+    }
+}
+
+class CheckOutRequestError extends Error {
+
+    constructor(...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'CheckOutRequestError';
+    }
+}
+
 module.exports.TaskInfoError = TaskInfoError;
 module.exports.ProductInfoError = ProductInfoError;
 module.exports.OpenProductPageError = OpenProductPageError;
 module.exports.SizeInfoError = SizeInfoError;
 module.exports.ApplyDrawError = ApplyDrawError;
+module.exports.AddToCartError = AddToCartError;
+module.exports.CheckOutSingleShipError = CheckOutSingleShipError;
+module.exports.CheckOutRequestError = CheckOutRequestError;

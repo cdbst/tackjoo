@@ -100,10 +100,26 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
 }
 
 
-module.exports.apply_draw = async(product_info, size_info) =>{
+module.exports.apply_draw = async(browser_context, product_info, size_info) =>{
 
     let draw_entry_data = await browser_context.apply_draw(product_info, size_info);
     return draw_entry_data;
+}
+
+module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
+
+    let res_data = await browser_context.add_to_cart(product_info, size_info);
+    return res_data;
+}
+
+module.exports.checkout_singleship = async(browser_context, billing_info) =>{
+    let kakaopay_prepare_payload = await browser_context.checkout_singleship(billing_info);
+    return kakaopay_prepare_payload;
+};
+
+module.exports.checkout_request = async(browser_context) =>{
+    let checkout_result = await browser_context.checkout_request();
+    return checkout_result;
 }
 
 

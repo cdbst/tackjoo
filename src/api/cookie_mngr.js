@@ -11,11 +11,12 @@ class CookieManager{
         this.get_specific_serialized_cookie = this.get_specific_serialized_cookie.bind(this);
         this.__init = this.__init.bind(this);
         this.__init_by_json = this.__init_by_json.bind(this);
+        this.reset = this.reset.bind(this);
 
         if(args.length == 0){
             this.__init();
         }else if(args.length == 1){
-            this.__init(args[0]);
+            this.__init_by_json(args[0]);
         }else{
             throw new Error("Cannot create CookieManager instance " + args.join(' '));
         }
@@ -29,6 +30,10 @@ class CookieManager{
 
     __init_by_json(json){
         Object.assign(this, json);
+    }
+
+    reset(){
+        this.__init();
     }
 
     add_cookie_data(cookie_data){
