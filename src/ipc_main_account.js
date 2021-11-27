@@ -24,20 +24,17 @@ function register(){
         
         let borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
-        borwser_context.open_main_page((err) =>{
-
-            if(err == undefined){ // 새로운 유저를 추가하는 것이므로 여기서는 파일을 업데이트 한다.
-
+        (async ()=> {
+            const result = await borwser_context.open_main_page();
+            if(result == false){
+                event.reply('add-account-reply' + ipc_id, 'Cannot open main page');
+            }else{
                 BrowserContextManager.add(borwser_context);
-
                 write_user_info_file(BrowserContextManager, (err) =>{
                     event.reply('add-account-reply' + ipc_id, err);
                 });
-
-            }else{
-                event.reply('add-account-reply' + ipc_id, err);
             }
-        });
+        })();
     });
 
     ipcMain.on('remove-account', (event, data) => {
@@ -71,30 +68,28 @@ function register(){
             return;
         }
 
-        let do_login = function(){
+        (async () =>{
 
-            borwser_context.login((err) =>{
-                event.reply('login-reply' + data.id, err);
-            });
-        }
+            let result;
 
-        if(borwser_context.is_login){
-
-            borwser_context.clear_cookies();
-            borwser_context.clear_csrfToken();
-            borwser_context.open_main_page((err) =>{ // for page refreesh.
-
-                if(err){
-                    event.reply('login-reply' + data.id, 'caanot open nike.com main page.');
+            if(borwser_context.is_login){
+                borwser_context.clear_cookies();
+                borwser_context.clear_csrfToken();
+                result = await borwser_context.open_main_page();
+                if(result == false){
+                    event.reply('login-reply' + data.id, 'fail with openning main page.');
                     return;
                 }
+            }
 
-                do_login();
-            });
+            result = await borwser_context.login();
+            if(result){
+                event.reply('login-reply' + data.id, undefined);
+            }else{
+                event.reply('login-reply' + data.id, 'login fail');
+            }
 
-        }else{
-            do_login();
-        }
+        })();
     });
 }
 

@@ -1,6 +1,7 @@
-const {ipcMain} = require("electron");
+const {ipcMain, BrowserWindow} = require("electron");
 const util = require("./ipc_main_util.js");
 const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
+const {isMainThread} = require('worker_threads');
 
 let g_win = undefined;
 
@@ -14,30 +15,42 @@ function register(_win){
         let browser_context_list = BrowserContextManager.get_all_browser_contexts();
 
         browser_context_list.forEach((browser_context) =>{
-            browser_context.send_sensor_data(sensor_data, (err)=>{
-                if(err){
-                    console.warn(err);
-                }
-            });
+
+            try{
+                browser_context.send_sensor_data(sensor_data);
+            }catch(e){
+                console.warn(e);
+            }
         });
     });
 }
 
-function gen_sensor_data(__callback){
+function gen_sensor_data(){
 
-    if(g_win == undefined){
-        __callback('Error : IpcMainSensor module is not registered.', undefined);
-        return;
-    }
+    return new Promise((resolve, reject) =>{
 
-    let data = util.get_ipc_data();
-
-    g_win.webContents.send('gen-sensor-data', data);
-
-    ipcMain.once('gen-sensor-data-reply' + data.id, (event, data) => {
-        __callback(undefined, data.payload.sensor_data);
+        if(isMainThread){
+            if(g_win == undefined){
+                reject('Error : IpcMainSensor module is not registered.');
+            }
+        
+            let data = util.get_ipc_data();
+            g_win.webContents.send('gen-sensor-data', data);
+        
+            ipcMain.once('gen-sensor-data-reply' + data.id, (event, data) => {
+                resolve(data.payload.sensor_data);
+            });
+        }else{
+            (async () => {
+                try{
+                    let sensor_data = await global.MainThreadApiCaller.call('gen_sensor_data', undefined);
+                    resolve(sensor_data);
+                }catch(e){
+                    reject(e);
+                }
+            })();
+        }
     });
-    
 }
 
 module.exports.register = register;

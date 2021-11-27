@@ -2,6 +2,7 @@ const { Worker, isMainThread, parentPort, workerData } = require('worker_threads
 const path = require('path');
 const TaskCommon = require('./task_common.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
+const ExternalPage = require("./external_page.js").ExternalPage;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, message_cb){
@@ -11,6 +12,7 @@ class TaskRunner{
         this.on_message = this.on_message.bind(this);
         this.gen_sensor_data = this.gen_sensor_data.bind(this);
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
+        this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
 
 
         this.browser_context = browser_context;
@@ -62,6 +64,64 @@ class TaskRunner{
     async gen_sensor_data(){
         let sensor_data = await gen_sensor_data();
         return sensor_data;
+    }
+
+    open_kakaopay_window(url){
+
+        let window_opts = {
+            width: 420,
+            height: 700,
+            resizable : false,
+            minimizable : false,
+            //titleBarStyle : 'hidden',
+            webPreferences: {
+                webSecurity : false,
+                nodeIntegration : false,
+            },
+            title : this.product_info.name + ' : ' + this.product_info.price
+        }
+
+        let kakao_pay_page = new ExternalPage(url, window_opts, (params, response)=>{
+
+            if(response == undefined) return;
+
+            try{
+                let res_obj = JSON.parse(response);
+
+                if('expired' in res_obj && res_obj.expired == true){
+                    //this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
+                    kakao_pay_page.close();
+                    return;
+                }
+
+                if('cancel_url' in res_obj){
+                    //this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
+                    kakao_pay_page.close();
+                }
+                // else if('status_result' in res_obj){
+                //     if(res_obj.status_result === 'success'){
+                //         this.__end_task(common.TASK_STATUS.DONE);
+                //     }
+                // }
+            }catch(e){
+                //console.log(e);
+            }
+
+        }, true);
+
+        kakao_pay_page.open();
+
+        kakao_pay_page.attach_window_close_event_hooker(()=>{
+            //this.__end_task(common.TASK_STATUS.CANCEL_PAY);
+        });
+
+        //결제 완료시 창을 닫기위한 용도로 추가함.
+        kakao_pay_page.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
+            if(url.includes('https://nike-service.iamport.kr/kakaopay_payments/success')){
+                kakao_pay_page.close();
+                //this.__end_task(common.TASK_STATUS.DONE);
+            }
+        });
     }
 
     start(){

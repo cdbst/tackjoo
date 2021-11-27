@@ -37,13 +37,10 @@ class BrowserContext {
         this.__post_process_open_page = this.__post_process_open_page.bind(this);
         this.__remove_aws_cookies = this.__remove_aws_cookies.bind(this);
         this.__remove_akam_cookies = this.__remove_akam_cookies.bind(this);
-        this.send_fake_sensor_data = this.send_fake_sensor_data.bind(this);
-        this.cancel_request = this.cancel_request.bind(this);
-        this.__request_canceled_check = this.__request_canceled_check.bind(this);
+        this.__send_fake_sensor_data = this.__send_fake_sensor_data.bind(this);
         this.__post_process_req_fail = this.__post_process_req_fail.bind(this);
-
+        
         this.__http_request = this.__http_request.bind(this);
-        this.__http_request2 = this.__http_request2.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
 
@@ -67,7 +64,7 @@ class BrowserContext {
         }else if(args.length == 1){
             this.__init_by_json(args[0]); //json string.
         }else{
-            throw new Error("Cannot initalize BrowserContext instance " + args.join(' '));
+            throw new Error("Cannot initalize BrowserContext instance " + args.join(', '));
         }
     }
 
@@ -93,22 +90,17 @@ class BrowserContext {
         this.__cookie_storage.add_cookie_data('NikeCookie=ok');
 
         this.__iamport_cookie_storage = new CookieManager();
-        this.__on_cart_mutex = new Mutex();
-
-        this.request_canceler = {};
     }
 
     __init_by_json(json){
         Object.assign(this, json);
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
-        this.__on_cart_mutex = new Mutex();
     }
 
-    async send_fake_sensor_data(){
+    async __send_fake_sensor_data(){
 
         try{
-
             const sensor_data = await gen_sensor_data();
             await this.send_sensor_data(sensor_data);
             return true;
@@ -117,18 +109,6 @@ class BrowserContext {
             console.error(e);
             return false;
         }
-    }
-
-    cancel_request(request_id){
-        this.request_canceler[request_id] = true;
-    }
-    
-    __request_canceled_check(request_id){
-        if(request_id in this.request_canceler == false) return false;
-        if(this.request_canceler[request_id] == false) return false;
-
-        delete this.request_canceler[request_id];
-        return true;
     }
 
     async __post_process_req_fail(error, sleep){
@@ -172,135 +152,10 @@ class BrowserContext {
         return true;
     }
 
-    __http_request(method, url, headers, params, __callback, req_cfg = undefined){
-
-        let cfg_expected_status = undefined;
-        let cfg_expected_keys = undefined;
-        let cfg_need_csrfToken = undefined;
-        let request_id = common.uuidv4();
-        let max_redirect = undefined;
-        let ret_interval = this.__req_retry_interval;
-        
-        if(req_cfg != undefined){
-            if('expected_status' in req_cfg) cfg_expected_status = req_cfg['expected_status'];
-            if('expected_keys' in req_cfg) cfg_expected_keys = req_cfg['expected_keys'];
-            if('need_csrfToken' in req_cfg) cfg_need_csrfToken = req_cfg['need_csrfToken'];
-            if('request_id' in req_cfg) request_id = req_cfg['request_id'];
-            if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
-            if('ret_interval' in req_cfg) ret_interval = req_cfg['ret_interval'];
-        }
-
-        if(this.__request_canceled_check(request_id)){
-            __callback('request has been canceled.', undefined);
-            return;
-        }
-
-        this.request_canceler[request_id] = false;
-
-        let req = (retry, cb) => {
-
-            
-            if(this.__request_canceled_check(request_id)){
-                __callback('request has been canceled.', undefined);
-                return;
-            }
-
-            let cookie_storage = this.__judge_cookie_storage(url);
-            headers['cookie'] = cookie_storage.get_serialized_cookie_data();
-
-            let axios_req_cfg = {
-                method: method,
-                url: url,
-                timeout: this.__req_timout,
-                headers : headers
-            }
-
-            if(max_redirect != undefined){
-                axios_req_cfg.maxRedirects = max_redirect;
-            }
-
-            if(params != undefined){
-                if(method == BrowserContext.REQ_METHOD.POST){
-                    axios_req_cfg['data'] = params;
-                }else{
-                    axios_req_cfg['params'] = params;
-                }
-            }
-            
-            axios(axios_req_cfg)
-            .then(res => {
-
-                if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
-                    throw new Error('unexpected status code ' + res.status);
-                }else if(res.status != 200 && res.status != 201){
-                    throw new Error('invalid status code ' + res.status);
-                }
-
-                if(cfg_need_csrfToken != undefined && cfg_need_csrfToken == true){
-                    const $ = cheerio.load(res.data);
-                    let csrfToken = this.__get_csrfToken($);
-
-                    if(csrfToken == undefined){
-                        throw new Error('GET data has no csrfToken information');   
-                    }
-                }
-
-                if(cfg_expected_keys != undefined){
-                    if(typeof res.data !== 'object'){
-                        throw new Error('expected payload data is not object type');
-                    }
-                    let data_keys = Object.keys(res.data);
-                    let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
-                    if(intersection.length == 0){
-                        throw new Error('expected payload data has no expected key');
-                    }
-                }
-
-                cb(undefined, retry, res);
-            })
-            .catch(error => {
-
-                if(cfg_expected_status != undefined && cfg_expected_status.includes(error.response.status)){
-                    cb(undefined, retry, error.response);
-                    return;
-                }
-
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                cb(error, retry, undefined);
-            });
-        }
-
-        let req_cb = (err, retry, res) =>{
-
-            if(this.__request_canceled_check(request_id)){
-                __callback('request has been canceled.', undefined);
-                return;
-            }
-
-            if(err){
-                if(retry == 0){
-                    delete this.request_canceler[request_id];
-                    __callback(err, undefined);
-                }else{
-                    setTimeout(()=>{
-                        req(--retry, req_cb);
-                    }, ret_interval); 
-                }
-            }else{
-                delete this.request_canceler[request_id];
-                __callback(undefined, res);
-            }
-        }
-
-        req(this.__req_retry_cnt, req_cb);
-        return request_id;
-    }
-
-    async __http_request2(method, url, headers, params, send_sensor_data = true){
+    async __http_request(method, url, headers, params, send_sensor_data = true){
 
         if(send_sensor_data){
-            await this.send_fake_sensor_data();
+            await this.__send_fake_sensor_data();
         }
 
         if(headers == undefined) headers = {};
@@ -317,16 +172,6 @@ class BrowserContext {
             headers : headers
         }
 
-        // let max_redirect = undefined;
-        // if(req_cfg != undefined){
-        //     if('max_redirect' in req_cfg) max_redirect = req_cfg['max_redirect'];
-        // }
-        
-        // if(max_redirect != undefined){
-        //     axios_req_cfg['maxRedirects'] = max_redirect;
-        // }
-
-
         if(params != undefined){
             if(method == BrowserContext.REQ_METHOD.POST){
                 axios_req_cfg['data'] = params;
@@ -334,8 +179,6 @@ class BrowserContext {
                 axios_req_cfg['params'] = params;
             }
         }
-
-
 
         return new Promise((resolve, reject)=>{
             axios(axios_req_cfg)
@@ -377,36 +220,28 @@ class BrowserContext {
         else return false;
     }
 
-    open_page(url, __callback){
+    async open_page(url, __callback){
 
         let headers = this.__get_open_page_header();
 
-        if(this.__cookie_storage.num_of_cookies > 0){
-            headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+
+            try{
+
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers);
+    
+                if(res.status != 200){
+                    throw new Error('open_page : response ' + res.status);
+                }
+    
+                return res;
+
+            }catch(e){
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
         }
 
-        this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers, undefined, (err, res) =>{
-
-            if(err){
-                if(__callback) __callback(err);
-                return;
-            }
-
-            if(res.status != 200){
-                if(__callback) __callback('open_page : response ' + res.status);
-                return;
-            }
-
-            const $ = cheerio.load(res.data);
-
-            let result = this.__post_process_open_page(res.headers, $);
-            if(result == false){
-                if(__callback) __callback('open_page : cannot store informations');
-                return;
-            }
-
-            if(__callback) __callback(undefined, res);
-        },{need_csrfToken : true});
+        return undefined;
     }
 
     async send_sensor_data(sensor_data){
@@ -435,7 +270,7 @@ class BrowserContext {
 
         try{
 
-            const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, this.sensor_data_server_url, headers, sensor_data, false);
+            const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, this.sensor_data_server_url, headers, sensor_data, false);
 
             if(res.status == 201 || res.status == 200){
 
@@ -509,7 +344,7 @@ class BrowserContext {
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload);
                 
                 if(res.data.ResponseObject.isError == 'true'){
                     throw new Error('login fail - response server data is error status.');
@@ -536,7 +371,7 @@ class BrowserContext {
         let url = BrowserContext.NIKE_URL +'/kr/ko_kr/dynamicformpage?name=login&dataType=model&_=' + new Date().getTime();
 
         try{
-            const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, url, undefined);
+            const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, url, undefined);
 
             if(res.status != 200){
                 throw new Error('__open_login_modal : res status is ' + res.status);
@@ -697,7 +532,7 @@ class BrowserContext {
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr', headers);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr', headers);
 
                 if(res.status != 200){
                     throw new Error('open_main_page : response ' + res.status);
@@ -720,33 +555,34 @@ class BrowserContext {
         return false;
     }
 
-    open_feed_page(__callback){
+    async open_feed_page(){
 
         let headers = this.__get_open_page_header();
 
-        this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/', headers, undefined, (err, res) =>{
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                let res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/', headers);
 
-            if(err){
-                __callback(err);
-                return;
+                if(res.status != 200){
+                    throw new Error('open_feed_page : response ' + res.status);
+                }
+    
+                const $ = cheerio.load(res.data);
+    
+                const result = this.__post_process_open_page(res.headers, $);
+                if(!result){
+                    throw new Error('open_feed_page : cannot store informations');
+                }
+    
+                const product_list = product_page_parser.get_product_list_info_from_feed_page($);
+                return product_list;
+
+            }catch(e){
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
+        }
 
-            if(res.status != 200){
-                __callback('open_feed_page : response ' + res.status);
-                return;
-            }
-
-            const $ = cheerio.load(res.data);
-
-            let result = this.__post_process_open_page(res.headers, $);
-            if(!result){
-                __callback('open_feed_page : cannot store informations');
-                return;
-            }
-
-            let product_list = product_page_parser.get_product_list_info_from_feed_page($);
-            __callback(undefined, product_list);
-        });
+        return undefined;
     }
 
     async open_product_page(product_url){
@@ -760,7 +596,7 @@ class BrowserContext {
 
             try{
 
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, product_url, headers, undefined, true);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, product_url, headers, undefined, true);
 
                 if(res.status != 200){
                     throw new Error('open_product_page : response ' + res.status);
@@ -824,7 +660,7 @@ class BrowserContext {
         for(var i = 0; i < this.__req_retry_cnt; i++){
 
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory', headers, params);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory', headers, params);
 
                 if(res.status != 200){
                     throw new Error('get_product_sku_inventory : response ' + res.status);
@@ -893,7 +729,7 @@ class BrowserContext {
 
             try{
 
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry', headers, payload);
 
                 if(res.status != 200){
                     throw new Error('apply_draw : invalid response status code.' + res.status);
@@ -957,7 +793,7 @@ class BrowserContext {
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload);
 
                 if(res.status != 200){
                     throw new Error('add_to_cart : invalid response status code.' + res.status);
@@ -979,37 +815,36 @@ class BrowserContext {
         return undefined;
     }
 
-    open_checkout_page(product_info, __callback){
+    async open_checkout_page(product_info){
 
         let headers = this.__get_open_page_header();
-        headers['cookie'] = this.__cookie_storage.get_serialized_cookie_data();
         headers['sec-fetch-site'] = 'same-origin';
         headers['refer'] = product_info.url;
         headers['upgrade-insecure-requests'] = 1;
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_checkout_page : response ' + res.status);
+                }
+    
+                const $ = cheerio.load(res.data);
+    
+                let result = this.__post_process_open_page(res.headers, $);
+                if(result == false){
+                    throw new Error('open_checkout_page : cannot store page informations');                    
+                }
+
+                return true;
+
+            }catch(e){
+                this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
         
-        return this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout', headers, undefined, (err, res) =>{
-
-            if(err){
-                __callback(err, undefined);
-                return;
-            }
-
-            if(res.status != 200){
-                __callback('open_checkout_page : response ' + res.status, undefined);
-                return;
-            }
-
-            const $ = cheerio.load(res.data);
-
-            let result = this.__post_process_open_page(res.headers, $);
-            if(result == false){
-                __callback('open_checkout_page : cannot store informations', undefined);
-                return;
-            }
-
-            __callback(undefined, this.csrfToken)
-
-        }, {need_csrfToken : true});
+        return false;
     }
 
     async checkout_request(){
@@ -1040,7 +875,7 @@ class BrowserContext {
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params);
 
                 if(res.status != 200){
                     throw new Error('checkout_request : invalid response status : ' + res.status);
@@ -1103,7 +938,7 @@ class BrowserContext {
         for(var i = 0; i < this.__req_retry_cnt; i++){
 
             try{
-                const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload);
 
                 if(res.status != 200){
                     __callback('checkout_singleship : response invalid status : ' + res.status, undefined);
@@ -1120,14 +955,14 @@ class BrowserContext {
                 return kakaopay_prepare_payload;
 
             }catch(e){
-                this.__post_process_req_fail(e);
+                this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
         return undefined;
     }
 
-    prepare_kakao_pay(prepare_pay_payload, __callback){
+    async prepare_kakaopay(prepare_pay_payload){
 
         let payload = new URLSearchParams(prepare_pay_payload).toString();
 
@@ -1152,22 +987,28 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        return this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.IAMPORT_URL + '/kakaopay_payments/prepare.json', headers, payload, (err, res)=> {
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.IAMPORT_URL + '/kakaopay_payments/prepare.json', headers, payload);
 
-            if(err){
-                __callback(err);
-                return;
+                if('data' in res.data == false){
+                    throw new Error('prepare_kakaopay : invalid response data : `data` is not in response payload');
+                }
+
+                if(res.data.code != 0){
+                    throw new Error('prepare_kakaopay : prepare pay fail - result code is ' + res.data.code + '  msg :' + res.data.msg);
+                }
+
+                this.__set_cookie(this.__iamport_cookie_storage, res);
+
+                return res.data.data.kakaoData;
+
+            }catch(e){
+                this.__post_process_req_fail(e, this.__req_retry_interval);
             }
+        }
 
-            if(res.data.code != 0){
-                __callback('prepare pay fail : result code is ' + res.data.code + '  msg :' + res.data.msg);
-                return;
-            }
-
-            this.__set_cookie(this.__iamport_cookie_storage, res);
-
-            __callback(undefined, res.data.data.kakaoData);
-        }, {expected_keys : ['data']});
+        return undefined;
     }
 }
 

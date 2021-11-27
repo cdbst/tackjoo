@@ -3,7 +3,9 @@ const common = require("../common/common.js");
 const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
-const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError} = require('./task_errors.js');
+const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
+    ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
+    PrepareKakaoPayError, OpenCheckOutPageError} = require('./task_errors.js');
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
@@ -42,6 +44,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
+        // STEP5 : Apply THE DRAW.
         parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_DRAW));
         let draw_entry_data = TaskUtils.apply_draw(browser_context, product_info, size_info);
         if(draw_entry_data == undefined){
@@ -51,34 +54,47 @@ async function main(browser_context, task_info, product_info, billing_info){
         process.exit(0);
 
     }else{
+
+        // STEP5 : Add product to cart.
         parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_DO_PAY));
-        let res_data = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
+        const res_data = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
         if(res_data == undefined){
             throw new AddToCartError(product_info, size_info, "Fail with add to cart");
         }
 
-        let kakaopay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
+        // STEP6 : open checkout page
+        const open_checkout_page_result = await TaskUtils.open_checkout_page(browser_context, product_info);
+        if(open_checkout_page_result == false){
+            throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
+        }
+
+        // STEP7 : chekcout singleship (registering buyer address info)
+        const kakaopay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
         if(kakaopay_prepare_payload == undefined){
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship")
         }
 
+        // STEP8 : Click checkout button (결제 버튼 클릭)
         await common.async_sleep(3000);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
         if(checkout_result == undefined){
-            throw new CheckOutRequestError(billing_info, "Fail with checkout singleship")
+            throw new CheckOutRequestError("Fail with checkout singleship")
+        }
+
+        // STEP9 : prepare kakaopay
+        const kakao_data = await TaskUtils.prepare_kakaopay(browser_context, kakaopay_prepare_payload);
+        if(kakao_data == undefined){
+            throw new PrepareKakaoPayError(kakaopay_prepare_payload, "Fail with prepare kakaopay")
+        }
+
+        // STEP10 : open kakaopay checkout window
+        try{
+            await global.MainThreadApiCaller.call('open_kakaopay_window', [kakao_data.next_redirect_pc_url]);
+        }catch(e){
+            console.error(e);
         }
 
         process.exit(0);
     }
     
 }
-
-
-
-
-
-//TEST CODE
-// setInterval(()=>{
-//     console.log("TEST~~~~~~");
-//     //parentPort.postMessage('~~~~TEST');
-// }, 3000);

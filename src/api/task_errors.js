@@ -71,6 +71,21 @@ class ApplyDrawError extends Error {
     }
 }
 
+class OpenCheckOutPageError extends Error {
+
+    constructor(product_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        
+        this.name = 'OpenCheckOutPageError';
+        this.product_info = product_info;
+    }
+}
+
 class AddToCartError extends Error {
 
     constructor(product_info, size_info, ...params) {
@@ -116,6 +131,20 @@ class CheckOutRequestError extends Error {
     }
 }
 
+class PrepareKakaoPayError extends Error {
+
+    constructor(kakaopay_prepare_payload, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        this.kakaopay_prepare_payload = kakaopay_prepare_payload;
+        this.name = 'PrepareKakaoPayError';
+    }
+}
+
 module.exports.TaskInfoError = TaskInfoError;
 module.exports.ProductInfoError = ProductInfoError;
 module.exports.OpenProductPageError = OpenProductPageError;
@@ -124,3 +153,5 @@ module.exports.ApplyDrawError = ApplyDrawError;
 module.exports.AddToCartError = AddToCartError;
 module.exports.CheckOutSingleShipError = CheckOutSingleShipError;
 module.exports.CheckOutRequestError = CheckOutRequestError;
+module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
+module.exports.OpenCheckOutPageError = OpenCheckOutPageError;

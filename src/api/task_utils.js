@@ -35,16 +35,6 @@ module.exports.is_valid_product_info_to_tasking = (product_info) =>{
     return has_quantity;
 }
 
-module.exports.open_product_page = async (browser_context, product_info) => {
-
-    let new_product_info = await browser_context.open_product_page(product_info.url);
-    if(new_product_info == undefined){
-        return undefined;
-    }
-    return common.merge_object(product_info, new_product_info);
-};
-
-
 module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
 
     if(product_info.size_info_list == undefined){
@@ -99,27 +89,45 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
     return target_size_info;
 }
 
+module.exports.open_product_page = async (browser_context, product_info) => {
+
+    const new_product_info = await browser_context.open_product_page(product_info.url);
+    if(new_product_info == undefined){
+        return undefined;
+    }
+    return common.merge_object(product_info, new_product_info);
+};
 
 module.exports.apply_draw = async(browser_context, product_info, size_info) =>{
 
-    let draw_entry_data = await browser_context.apply_draw(product_info, size_info);
+    const draw_entry_data = await browser_context.apply_draw(product_info, size_info);
     return draw_entry_data;
 }
 
 module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
 
-    let res_data = await browser_context.add_to_cart(product_info, size_info);
+    const res_data = await browser_context.add_to_cart(product_info, size_info);
     return res_data;
 }
 
 module.exports.checkout_singleship = async(browser_context, billing_info) =>{
-    let kakaopay_prepare_payload = await browser_context.checkout_singleship(billing_info);
+    const kakaopay_prepare_payload = await browser_context.checkout_singleship(billing_info);
     return kakaopay_prepare_payload;
 };
 
 module.exports.checkout_request = async(browser_context) =>{
-    let checkout_result = await browser_context.checkout_request();
+    const checkout_result = await browser_context.checkout_request();
     return checkout_result;
+}
+
+module.exports.prepare_kakaopay = async(browser_context, prepare_pay_payload) =>{
+    const kakao_data = await browser_context.prepare_kakaopay(prepare_pay_payload);
+    return kakao_data;
+}
+
+module.exports.open_checkout_page = async(browser_context, product_info) =>{
+    const result = browser_context.open_checkout_page(product_info);
+    return result;
 }
 
 

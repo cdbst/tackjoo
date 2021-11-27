@@ -7,22 +7,29 @@ function register(){
 
         let browser_context = new BrowserContext();
 
-        browser_context.open_feed_page((_err, product_list_info)=>{
-            event.reply('get-product-info-list-reply' + data.id, {err : _err, data : product_list_info});
-        });
+        (async () => {
+            const product_info_list = await browser_context.open_feed_page();
+            if(product_info_list == undefined){
+                event.reply('get-product-info-list-reply' + data.id, {err : 'Cannot open product feed page', data : undefined});
+            }else{
+                event.reply('get-product-info-list-reply' + data.id, {err : undefined, data : product_info_list});
+            }
+        })();
     });
 
     ipcMain.on('get-product-info', async (event, data) => {
 
         let browser_context = new BrowserContext();
-        let product_url = data.payload.product_url;
-
-        try{
-            let product_info = await browser_context.open_product_page(product_url);
-            event.reply('get-product-info-reply' + data.id, {err : undefined, data : product_info});
-        }catch(e){
-            event.reply('get-product-info-reply' + data.id, {err : e, data : undefined});
-        }
+        const product_url = data.payload.product_url;
+        
+        (async () => {
+            const product_info = await browser_context.open_product_page(product_url);
+            if(product_info == undefined){
+                event.reply('get-product-info-reply' + data.id, {err : 'Cannot open product page', data : undefined});
+            }else{
+                event.reply('get-product-info-reply' + data.id, {err : undefined, data : product_info});
+            }
+        })();
     });
 
 }
