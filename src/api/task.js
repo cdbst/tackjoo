@@ -5,7 +5,7 @@ const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaopayWindowError} = require('./task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError} = require('./task_errors.js');
 
 process.on('unhandledRejection', (err) => {
     throw err;

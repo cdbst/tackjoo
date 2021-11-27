@@ -145,7 +145,7 @@ class PrepareKakaoPayError extends Error {
     }
 }
 
-class OpenKakaopayWindowError extends Error {
+class OpenKakaoPayWindowError extends Error {
 
     constructor(kakao_data, ...params) {
       
@@ -155,7 +155,7 @@ class OpenKakaopayWindowError extends Error {
             Error.captureStackTrace(this, OpenProductPageError);
         }
         this.kakao_data = kakao_data;
-        this.name = 'OpenKakaopayWindowError';
+        this.name = 'OpenKakaoPayWindowError';
     }
 }
 
@@ -169,4 +169,4 @@ module.exports.CheckOutSingleShipError = CheckOutSingleShipError;
 module.exports.CheckOutRequestError = CheckOutRequestError;
 module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
 module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
-module.exports.OpenKakaopayWindowError = OpenKakaopayWindowError;
+module.exports.OpenKakaoPayWindowError = OpenKakaoPayWindowError;
