@@ -40,6 +40,7 @@ class BrowserContext {
         this.send_fake_sensor_data = this.send_fake_sensor_data.bind(this);
         this.cancel_request = this.cancel_request.bind(this);
         this.__request_canceled_check = this.__request_canceled_check.bind(this);
+        this.__post_process_req_fail = this.__post_process_req_fail.bind(this);
 
         this.__http_request = this.__http_request.bind(this);
         this.__http_request2 = this.__http_request2.bind(this);
@@ -128,6 +129,26 @@ class BrowserContext {
 
         delete this.request_canceler[request_id];
         return true;
+    }
+
+    async __post_process_req_fail(error, sleep){
+        this.__remove_aws_cookies();
+        this.__remove_akam_cookies();
+        console.error(error);
+
+        return new Promise((resolve, reject) =>{
+            try{
+                if(sleep == undefined){
+                    resolve();
+                }else{
+                    setTimeout(()=>{
+                        resolve();
+                    }, sleep)
+                }
+            }catch(e){
+                reject(e);
+            }
+        });
     }
 
     __judge_cookie_storage(url){
@@ -502,9 +523,7 @@ class BrowserContext {
                 return true;
 
             }catch(e){
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                console.error(e);
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
@@ -528,9 +547,7 @@ class BrowserContext {
             return true;
 
         }catch(e){
-            this.__remove_aws_cookies();
-            this.__remove_akam_cookies();
-            console.error(e);
+            await this.__post_process_req_fail(e, this.__req_retry_interval);
         }
         
         return false;
@@ -696,9 +713,7 @@ class BrowserContext {
                 return true;
 
             }catch(e){
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                console.error(e);
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
@@ -768,9 +783,7 @@ class BrowserContext {
                 break;
 
             }catch(e){
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                console.error(e);
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
@@ -834,9 +847,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                console.error(e);
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
@@ -903,9 +914,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
-                this.__remove_aws_cookies();
-                this.__remove_akam_cookies();
-                console.error(e);
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 
