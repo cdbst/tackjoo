@@ -1,11 +1,15 @@
-const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
+const {Worker, parentPort, workerData} = require('worker_threads');
 const common = require("../common/common.js");
 const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError} = require('./task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaopayWindowError} = require('./task_errors.js');
+
+process.on('unhandledRejection', (err) => {
+    throw err;
+});
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
@@ -75,8 +79,6 @@ async function main(browser_context, task_info, product_info, billing_info){
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
 
-        throw new CheckOutSingleShipError(billing_info, "TEST ERROR");
-
         // STEP8 : Click checkout button (결제 버튼 클릭)
         await common.async_sleep(3000);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
@@ -94,7 +96,7 @@ async function main(browser_context, task_info, product_info, billing_info){
         try{
             await global.MainThreadApiCaller.call('open_kakaopay_window', [kakao_data.next_redirect_pc_url]);
         }catch(e){
-            console.error(e);
+            throw e;
         }
 
         process.exit(0);

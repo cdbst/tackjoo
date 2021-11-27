@@ -145,6 +145,20 @@ class PrepareKakaoPayError extends Error {
     }
 }
 
+class OpenKakaopayWindowError extends Error {
+
+    constructor(kakao_data, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, OpenProductPageError);
+        }
+        this.kakao_data = kakao_data;
+        this.name = 'OpenKakaopayWindowError';
+    }
+}
+
 module.exports.TaskInfoError = TaskInfoError;
 module.exports.ProductInfoError = ProductInfoError;
 module.exports.OpenProductPageError = OpenProductPageError;
@@ -155,3 +169,4 @@ module.exports.CheckOutSingleShipError = CheckOutSingleShipError;
 module.exports.CheckOutRequestError = CheckOutRequestError;
 module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
 module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
+module.exports.OpenKakaopayWindowError = OpenKakaopayWindowError;
