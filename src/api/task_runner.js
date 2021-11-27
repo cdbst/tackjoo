@@ -135,7 +135,7 @@ class TaskRunner{
             this.resolve = resolve;
             this.reject = reject;
             
-            this.worker = new Worker(path.join(__dirname, 'task_test.js'), {
+            this.worker = new Worker(path.join(__dirname, 'task.js'), {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
                     task_info : this.task_info,
