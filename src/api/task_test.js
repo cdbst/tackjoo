@@ -16,6 +16,7 @@ global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
 main(browser_context, task_info, product_info, billing_info);
 
+
 async function main(browser_context, task_info, product_info, billing_info){
 
     // STEP1 : Check validation of Task Information.
@@ -71,14 +72,16 @@ async function main(browser_context, task_info, product_info, billing_info){
         // STEP7 : chekcout singleship (registering buyer address info)
         const kakaopay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
         if(kakaopay_prepare_payload == undefined){
-            throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship")
+            throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
+
+        throw new CheckOutSingleShipError(billing_info, "TEST ERROR");
 
         // STEP8 : Click checkout button (결제 버튼 클릭)
         await common.async_sleep(3000);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
         if(checkout_result == undefined){
-            throw new CheckOutRequestError("Fail with checkout singleship")
+            throw new CheckOutRequestError("Fail with checkout request")
         }
 
         // STEP9 : prepare kakaopay
@@ -96,5 +99,4 @@ async function main(browser_context, task_info, product_info, billing_info){
 
         process.exit(0);
     }
-    
 }

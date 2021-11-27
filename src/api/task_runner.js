@@ -14,7 +14,6 @@ class TaskRunner{
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
 
-
         this.browser_context = browser_context;
         this.task_info = task_info;
         this.product_info = product_info;

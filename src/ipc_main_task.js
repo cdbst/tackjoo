@@ -37,7 +37,7 @@ function register(){
         TaskRunnerManager.add(task_runner);
 
         try{
-            let task = await task_runner.start();
+            await task_runner.start();
             event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true});
         }catch (err){
             event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
