@@ -9,6 +9,7 @@ class TaskRunner{
 
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
+        this.end_task = this.end_task.bind(this);
         this.on_message = this.on_message.bind(this);
         this.gen_sensor_data = this.gen_sensor_data.bind(this);
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
@@ -21,6 +22,10 @@ class TaskRunner{
 
         this.message_cb = message_cb;
         this.worker = undefined;
+
+        this.resolve = undefined;
+        this.reject = undefined;
+        this.pay_window = undefined;
     }
 
     on_recv_api_call(data){
@@ -76,11 +81,12 @@ class TaskRunner{
             webPreferences: {
                 webSecurity : false,
                 nodeIntegration : false,
+                nativeWindowOpen : true
             },
             title : this.product_info.name + ' : ' + this.product_info.price
         }
 
-        let kakao_pay_page = new ExternalPage(url, window_opts, (params, response)=>{
+        this.pay_window = new ExternalPage(url, window_opts, (params, response)=>{
 
             if(response == undefined) return;
 
@@ -88,14 +94,13 @@ class TaskRunner{
                 let res_obj = JSON.parse(response);
 
                 if('expired' in res_obj && res_obj.expired == true){
-                    //this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
-                    kakao_pay_page.close();
+                    this.end_task(new Error('Kakaopay connection is expired'));
                     return;
                 }
 
                 if('cancel_url' in res_obj){
-                    //this.__end_task(common.TASK_STATUS.CANCEL_PAY); // 결제 취소
-                    kakao_pay_page.close();
+                    this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
+                    return;
                 }
                 // else if('status_result' in res_obj){
                 //     if(res_obj.status_result === 'success'){
@@ -108,17 +113,16 @@ class TaskRunner{
 
         }, true);
 
-        kakao_pay_page.open();
+        this.pay_window.open();
 
-        kakao_pay_page.attach_window_close_event_hooker(()=>{
-            //this.__end_task(common.TASK_STATUS.CANCEL_PAY);
+        this.pay_window.attach_window_close_event_hooker(()=>{
+            this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
         });
 
         //결제 완료시 창을 닫기위한 용도로 추가함.
-        kakao_pay_page.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
+        this.pay_window.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
             if(url.includes('https://nike-service.iamport.kr/kakaopay_payments/success')){
-                kakao_pay_page.close();
-                //this.__end_task(common.TASK_STATUS.DONE);
+                this.end_task();
             }
         });
     }
@@ -126,8 +130,10 @@ class TaskRunner{
     start(){
         
         //TODO : 같은 browser context 일경우, Mutex 적용. async mutex.
-
         return new Promise((resolve, reject)=>{
+
+            this.resolve = resolve;
+            this.reject = reject;
             
             this.worker = new Worker(path.join(__dirname, 'task_test.js'), {
                 workerData : {
@@ -141,21 +147,39 @@ class TaskRunner{
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{
-                reject(err);
+                this.end_task(err);
             });
 
             this.worker.on('exit', (code) => {
                 if (code !== 0){
-                    reject(new Error(`Worker stopped with exit code ${code}`));
+                    this.end_task(new Error(`Worker stopped with exit code ${code}`));
                 }else{
-                    resolve();
+                    if(this.pay_window == undefined) this.end_task();
                 }
             });
         });
     }
 
     stop(){
-        if(this.worker != undefined) this.worker.terminate();
+        if(this.worker != undefined){
+            this.worker.terminate();
+        }
+        if(this.pay_window != undefined){
+            this.pay_window.close();
+            this.pay_window = undefined;
+        }
+    }
+
+    end_task(error){
+        if(this.pay_window != undefined){
+            this.pay_window.close();
+            this.pay_window = undefined;
+        }
+        if(error){
+            this.reject(error);
+        }else{
+            this.resolve();
+        }
     }
 }
 
