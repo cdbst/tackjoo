@@ -114,23 +114,18 @@ class BrowserContext {
         });
     }
 
-    send_fake_sensor_data(__callback){
+    async send_fake_sensor_data(){
 
-        gen_sensor_data((err, sensor_data)=>{
+        try{
 
-            if(err){
-                __callback(err);
-                return;
-            }
+            const sensor_data = await gen_sensor_data();
+            await this.send_sensor_data(sensor_data);
+            return true;
 
-            this.send_sensor_data(sensor_data, (err) =>{
-                if(err){
-                    __callback(err);
-                }else{
-                    __callback();
-                }
-            });
-        });
+        }catch(e){
+            console.error(e);
+            return false;
+        }
     }
 
     cancel_request(request_id){
@@ -193,78 +188,75 @@ class BrowserContext {
 
         let req = (retry, cb) => {
 
-            this.send_fake_sensor_data((err) =>{
+            
+            if(this.__request_canceled_check(request_id)){
+                __callback('request has been canceled.', undefined);
+                return;
+            }
 
-                if(this.__request_canceled_check(request_id)){
-                    __callback('request has been canceled.', undefined);
+            let cookie_storage = this.__judge_cookie_storage(url);
+            headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+
+            let axios_req_cfg = {
+                method: method,
+                url: url,
+                timeout: this.__req_timout,
+                headers : headers
+            }
+
+            if(max_redirect != undefined){
+                axios_req_cfg.maxRedirects = max_redirect;
+            }
+
+            if(params != undefined){
+                if(method == BrowserContext.REQ_METHOD.POST){
+                    axios_req_cfg['data'] = params;
+                }else{
+                    axios_req_cfg['params'] = params;
+                }
+            }
+            
+            axios(axios_req_cfg)
+            .then(res => {
+
+                if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
+                    throw new Error('unexpected status code ' + res.status);
+                }else if(res.status != 200 && res.status != 201){
+                    throw new Error('invalid status code ' + res.status);
+                }
+
+                if(cfg_need_csrfToken != undefined && cfg_need_csrfToken == true){
+                    const $ = cheerio.load(res.data);
+                    let csrfToken = this.__get_csrfToken($);
+
+                    if(csrfToken == undefined){
+                        throw new Error('GET data has no csrfToken information');   
+                    }
+                }
+
+                if(cfg_expected_keys != undefined){
+                    if(typeof res.data !== 'object'){
+                        throw new Error('expected payload data is not object type');
+                    }
+                    let data_keys = Object.keys(res.data);
+                    let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
+                    if(intersection.length == 0){
+                        throw new Error('expected payload data has no expected key');
+                    }
+                }
+
+                cb(undefined, retry, res);
+            })
+            .catch(error => {
+
+                if(cfg_expected_status != undefined && cfg_expected_status.includes(error.response.status)){
+                    cb(undefined, retry, error.response);
                     return;
                 }
 
-                let cookie_storage = this.__judge_cookie_storage(url);
-                headers['cookie'] = cookie_storage.get_serialized_cookie_data();
-
-                let axios_req_cfg = {
-                    method: method,
-                    url: url,
-                    timeout: this.__req_timout,
-                    headers : headers
-                }
-
-                if(max_redirect != undefined){
-                    axios_req_cfg.maxRedirects = max_redirect;
-                }
-
-                if(params != undefined){
-                    if(method == BrowserContext.REQ_METHOD.POST){
-                        axios_req_cfg['data'] = params;
-                    }else{
-                        axios_req_cfg['params'] = params;
-                    }
-                }
-                
-                axios(axios_req_cfg)
-                .then(res => {
-
-                    if(cfg_expected_status != undefined && cfg_expected_status.includes(res.status) == false){
-                        throw new Error('unexpected status code ' + res.status);
-                    }else if(res.status != 200 && res.status != 201){
-                        throw new Error('invalid status code ' + res.status);
-                    }
-
-                    if(cfg_need_csrfToken != undefined && cfg_need_csrfToken == true){
-                        const $ = cheerio.load(res.data);
-                        let csrfToken = this.__get_csrfToken($);
-
-                        if(csrfToken == undefined){
-                            throw new Error('GET data has no csrfToken information');   
-                        }
-                    }
-
-                    if(cfg_expected_keys != undefined){
-                        if(typeof res.data !== 'object'){
-                            throw new Error('expected payload data is not object type');
-                        }
-                        let data_keys = Object.keys(res.data);
-                        let intersection = cfg_expected_keys.filter(x => data_keys.includes(x));
-                        if(intersection.length == 0){
-                            throw new Error('expected payload data has no expected key');
-                        }
-                    }
-
-                    cb(undefined, retry, res);
-                })
-                .catch(error => {
-
-                    if(cfg_expected_status != undefined && cfg_expected_status.includes(error.response.status)){
-                        cb(undefined, retry, error.response);
-                        return;
-                    }
-
-                    this.__remove_aws_cookies();
-                    this.__remove_akam_cookies();
-                    cb(error, retry, undefined);
-                });
-
+                this.__remove_aws_cookies();
+                this.__remove_akam_cookies();
+                cb(error, retry, undefined);
             });
         }
 
@@ -294,7 +286,11 @@ class BrowserContext {
         return request_id;
     }
 
-    __http_request2(method, url, headers, params, send_sensor_data = true){
+    async __http_request2(method, url, headers, params, send_sensor_data = true){
+
+        if(send_sensor_data){
+            await this.send_fake_sensor_data();
+        }
 
         let cookie_storage = this.__judge_cookie_storage(url);
         headers['cookie'] = cookie_storage.get_serialized_cookie_data();
@@ -323,6 +319,8 @@ class BrowserContext {
                 axios_req_cfg['params'] = params;
             }
         }
+
+
 
         return new Promise((resolve, reject)=>{
             axios(axios_req_cfg)
@@ -396,57 +394,48 @@ class BrowserContext {
         },{need_csrfToken : true});
     }
 
-    send_sensor_data(sensor_data, __callback){
+    async send_sensor_data(sensor_data){
 
         if(this.sensor_data_server_url == undefined){
-            __callback("This browser context has no sensor data server url " + this.email);
-            return;
+            throw new Error("This browser context has no sensor data server url " + this.email);
         }
 
-        let cookies = this.__cookie_storage.get_serialized_cookie_data();
+        let headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            "accept": "*/*",
+            "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cache-control": "no-cache",
+            "content-type": "text/plain;charset=UTF-8",
+            "pragma": "no-cache",
+            "sec-ch-ua": BrowserContext.SEC_CA_UA,
+            "sec-ch-ua-mobile": "?0",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "origin": BrowserContext.NIKE_URL,
+            "referer": BrowserContext.NIKE_URL + "/kr/ko_kr",
+            'user-agent': BrowserContext.USER_AGENT,
+            'content-length': sensor_data.length
+        }
 
-        let config = {
-            headers: {
-                "authority": BrowserContext.NIKE_DOMAIN_NAME,
-                "accept": "*/*",
-                "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-                "cache-control": "no-cache",
-                "content-type": "text/plain;charset=UTF-8",
-                "pragma": "no-cache",
-                "sec-ch-ua": BrowserContext.SEC_CA_UA,
-                "sec-ch-ua-mobile": "?0",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-                "cookie": cookies,
-                "origin": BrowserContext.NIKE_URL,
-                "referer": BrowserContext.NIKE_URL + "/kr/ko_kr",
-                'user-agent': BrowserContext.USER_AGENT,
-                'content-length': sensor_data.length
-            }
-        };
+        try{
 
-        axios.post(this.sensor_data_server_url, sensor_data, config)
-        .then(res => {
+            const res = await this.__http_request2(BrowserContext.REQ_METHOD.POST, this.sensor_data_server_url, headers, sensor_data, false);
 
             if(res.status == 201 || res.status == 200){
 
                 let result = this.__set_cookie(this.__cookie_storage, res);
-
-                if(result){
-                    __callback(undefined);
-                }else{
-                    __callback('send_sensor_data - cannot recv akam sensor cookie :' + res.status);    
+                if(result == false){
+                    throw new Error('send_sensor_data - fail with recving akam sensor cookies :' + res.status);    
                 }
 
             }else{
-                __callback('send_sensor_data - response invalid status code :' + res.status);
+                throw new Error('send_sensor_data - response invalid status code :' + res.status);
             }
 
-        })
-        .catch(error => {
-            __callback(error);
-        });
+        }catch(e){
+            throw e;
+        }
     }
 
     login(__callback){

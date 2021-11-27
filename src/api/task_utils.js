@@ -1,4 +1,5 @@
 const common = require("../common/common.js");
+const TaskCommon = require('./task_common.js');
 
 module.exports.is_valid_billing_info_to_tasking = (billing_info) =>{
     if(billing_info == undefined) return false;
@@ -105,3 +106,36 @@ module.exports.apply_draw = async(product_info, size_info) =>{
     return draw_entry_data;
 }
 
+
+class MainThreadApiCaller{
+
+    constructor(parent_port){
+        this.call = this.call.bind(this);
+
+        this.parent_port = parent_port;
+        this.pending_queue = {};
+
+        this.parent_port.on('message', (message)=>{
+            if(message.id in this.pending_queue == false) return;
+            this.pending_queue[message.id](message.err, message.data);
+            delete this.pending_queue[message.id];
+        });
+    }
+
+    call(func, params){
+        return new Promise((resolve, reject) =>{
+            let req_id = common.uuidv4();
+            let recv_cb = (err, data) =>{
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(data);
+                }
+            }
+            this.pending_queue[req_id] = recv_cb;
+            this.parent_port.postMessage(TaskCommon.gen_api_call_payload(req_id, func, params));
+        });
+    }
+}
+
+module.exports.MainThreadApiCaller = MainThreadApiCaller;

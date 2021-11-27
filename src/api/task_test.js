@@ -1,5 +1,6 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 const common = require("../common/common.js");
+const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, ApplyDrawError} = require('./task_errors.js');
@@ -8,6 +9,8 @@ const browser_context = new BrowserContext(JSON.parse(workerData.browser_context
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
+
+global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
 main(browser_context, task_info, product_info, billing_info);
 
@@ -19,7 +22,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     }
     
     // STEP2 : Check validation of Task Information.
-    parentPort.postMessage(common.TASK_STATUS.ON_PAGE);
+    parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.ON_PAGE));
     
     product_info = await TaskUtils.open_product_page(browser_context, product_info);
     if(product_info == undefined){
@@ -39,7 +42,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
-        parentPort.postMessage(common.TASK_STATUS.TRY_TO_DRAW);
+        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_DRAW));
         let draw_entry_data = TaskUtils.apply_draw(product_info, size_info);
         if(draw_entry_data == undefined){
             throw new ApplyDrawError(product_info, size_info, "Fail with appling THE DRAW");
@@ -50,7 +53,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     }else{
 
         //TODO add codes for nomal product. // TAST CODE
-        click_buy_button();
+        //click_buy_button();
     }
     
 }

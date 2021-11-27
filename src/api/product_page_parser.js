@@ -357,7 +357,7 @@ function parse_model_id_from_product_page(product_info_script){
     let script_code = product_info_script.childNodes[0].data;
     script_code = strip_usless_string(script_code);
 
-    model_id = script_code.split('model : ')[1].split(',', 1)[0].trim().replace(/\'/gi, '');
+    let model_id = script_code.split('model : ')[1].split(',', 1)[0].trim().replace(/\'/gi, '');
     return model_id;
 }
 
