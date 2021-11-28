@@ -137,15 +137,13 @@ class TaskTableItem extends React.Component {
 
     getStatusBtnSrc(){
 
-        let btn_src;
-
-        if(this.isPossibleToPlay()){
-            btn_src = TaskTableItem.PLAY_BTN_SRC;
+        if(this.state.status == common.TASK_STATUS.READY){
+            return TaskTableItem.PLAY_BTN_SRC;
+        }else if(this.isPossibleToPlay()){
+            return TaskTableItem.PLAY_BTN_SRC;
         }else{
-            btn_src = TaskTableItem.PAUSE_BTN_SRC;
+            return TaskTableItem.PAUSE_BTN_SRC;
         }
-
-        return btn_src;
     }
 
     isPossibleToPlay(){
