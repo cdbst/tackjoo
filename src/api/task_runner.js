@@ -90,7 +90,7 @@ class TaskRunner{
             title : this.product_info.name + ' : ' + this.product_info.price
         }
 
-        this.pay_window = new ExternalPage(url, window_opts, (params, response)=>{
+        const res_pkt_hooker = (params, response)=>{
 
             if(response == undefined) return;
 
@@ -114,9 +114,9 @@ class TaskRunner{
             }catch(e){
                 //console.log(e);
             }
+        };
 
-        }, true);
-
+        this.pay_window = new ExternalPage(url, window_opts, res_pkt_hooker, true);
         this.pay_window.open();
 
         this.pay_window.attach_window_close_event_hooker(()=>{
@@ -167,10 +167,9 @@ class TaskRunner{
     }
 
     close_pay_window(){
-        if(this.pay_window != undefined){
-            this.pay_window.close();
-            this.pay_window = undefined;
-        }
+        if(this.pay_window == undefined) return;
+        this.pay_window.close();
+        this.pay_window = undefined;
     }
 
     stop(){
