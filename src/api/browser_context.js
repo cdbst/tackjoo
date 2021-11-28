@@ -10,7 +10,7 @@ const Mutex = require('async-mutex').Mutex;
 class BrowserContext {
 
     static NIKE_DOMAIN_NAME = 'www.nike.com';
-    static NIKE_URL = 'https://www.nike.com';
+    static NIKE_URL = common.NIKE_URL;
     static USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36';
     static SEC_CA_UA = "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\""
 

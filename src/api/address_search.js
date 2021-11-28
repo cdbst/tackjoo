@@ -1,4 +1,5 @@
 const axios = require('axios');
+const common = require('../common/common.js');
 
 const ADDR_SEARCH_API_URL = 'https://api.poesis.kr/post/search.php';
 
@@ -18,9 +19,9 @@ function search_address(address, __callback){
         'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
         'cache-control': 'no-cache',
-        'origin': 'https://www.nike.com',
+        'origin': common.NIKE_URL,
         'pragma': 'no-cache',
-        'referer': 'https://www.nike.com/',
+        'referer': common.NIKE_URL,
         'sec-ch-ua': '"Chromium";v="94", " Not A;Brand";v="99", "Whale";v="2"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': "Windows",

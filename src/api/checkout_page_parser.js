@@ -58,8 +58,8 @@ function set_const_kakaopay_prepare_payload(payload){
     let channel = 'pc';
     let provider = 'kakaopay';
     let pay_method = 'card';
-    let origin = 'https://www.nike.com/kr/launch/checkout';
-    let m_redirect_url = 'https://www.nike.com/kr/launch/checkout/iamport-checkout/hosted/return';
+    let origin = common.NIKE_URL + '/kr/launch/checkout';
+    let m_redirect_url = common.NIKE_URL + '/kr/launch/checkout/iamport-checkout/hosted/return';
     let notice_url = 'https://bill-breeze.nike.co.kr/kr/ko_kr/checkout/iamport-checkout/notification';
 
     let const_payload = {

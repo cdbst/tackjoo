@@ -137,51 +137,12 @@ class TaskTableItem extends React.Component {
 
     getStatusBtnSrc(){
 
-        let btn_src = '';
+        let btn_src;
 
-        switch(this.state.status){
-            case common.TASK_STATUS.READY : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.PAUSE : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.PLAY : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.FAIL : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.DONE : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ON_PAGE : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ADD_TO_CART : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.TRY_TO_DRAW : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.TRY_DO_PAY : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.GET_PRODUCT_INFO :
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.CANCEL_PAY:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
+        if(this.isPossibleToPlay()){
+            btn_src = TaskTableItem.PLAY_BTN_SRC;
+        }else{
+            btn_src = TaskTableItem.PAUSE_BTN_SRC;
         }
 
         return btn_src;
@@ -206,52 +167,21 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.TRY_TO_DRAW : 
                 return false;
-            case common.TASK_STATUS.TRY_DO_PAY : 
+            case common.TASK_STATUS.TRY_TO_PAY : 
+                return false;
+            case common.TASK_STATUS.READY_TO_PAY :
                 return false;
             case common.TASK_STATUS.GET_PRODUCT_INFO :
                 return false;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                return true;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                return true;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                return true;
-            case common.TASK_STATUS.CANCEL_PAY:
-                return true;
+            case common.TASK_STATUS.WAITING_FOR_OTHER_TASK:
+                return false;
         }
     }
 
     isPossibleToPause(){
-        switch(this.state.status){
-            case common.TASK_STATUS.READY : 
-                return false;
-            case common.TASK_STATUS.PAUSE : 
-                return false;
-            case common.TASK_STATUS.PLAY : 
-                return true;
-            case common.TASK_STATUS.FAIL : 
-                return false;
-            case common.TASK_STATUS.DONE : 
-                return false;
-            case common.TASK_STATUS.ON_PAGE : 
-                return true;
-            case common.TASK_STATUS.ADD_TO_CART : 
-                return true;
-            case common.TASK_STATUS.TRY_TO_DRAW : 
-                return true;
-            case common.TASK_STATUS.TRY_DO_PAY : 
-                return true;
-            case common.TASK_STATUS.GET_PRODUCT_INFO :
-                return true;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                return false;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                return false;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                return false;
-            case common.TASK_STATUS.CANCEL_PAY:
-                return false;
-        }
+
+        if(this.state.status == common.TASK_STATUS.READY) return false;
+        else return !this.isPossibleToPlay();
     }
 
     render(){

@@ -30,6 +30,7 @@ function register(){
         (async () => {
 
             try{
+                event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.WAITING_FOR_OTHER_TASK, done : false});
                 await TaskRunnerManager.add(task_runner);
                 await task_runner.start();
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true});
