@@ -11,7 +11,8 @@ function createWindow() {
         minHeight : 960,
         webPreferences: {
             sandbox: true,
-            preload: path.join(__dirname, "preload.js")
+            preload: path.join(__dirname, "preload.js"),
+            backgroundThrottling: false
         },
         offscreen : true
     });
