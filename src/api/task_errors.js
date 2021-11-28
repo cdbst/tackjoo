@@ -12,6 +12,20 @@ class TaskInfoError extends Error {
     }
 }
 
+class TaskCanceledError extends Error {
+    constructor(task_runner, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, TaskInfoError);
+        }
+
+        this.name = 'TaskCanceledError';
+        this.task_runner = task_runner;
+    }
+}
+
 class ProductInfoError extends Error {
     constructor(product_info, ...params) {
       
@@ -170,3 +184,4 @@ module.exports.CheckOutRequestError = CheckOutRequestError;
 module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
 module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
 module.exports.OpenKakaoPayWindowError = OpenKakaoPayWindowError;
+module.exports.TaskCanceledError = TaskCanceledError;

@@ -3,6 +3,7 @@ const path = require('path');
 const TaskCommon = require('./task_common.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const ExternalPage = require("./external_page.js").ExternalPage;
+const {TaskCanceledError} = require("./task_errors.js");
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, message_cb){
@@ -14,6 +15,7 @@ class TaskRunner{
         this.gen_sensor_data = this.gen_sensor_data.bind(this);
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
+        this.close_pay_window = this.close_pay_window.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -21,7 +23,9 @@ class TaskRunner{
         this.billing_info = billing_info;
 
         this.message_cb = message_cb;
+        this.running = false;
         this.worker = undefined;
+        this.canceled = false;
 
         this.resolve = undefined;
         this.reject = undefined;
@@ -128,7 +132,10 @@ class TaskRunner{
     }
 
     start(){
-        
+        if(this.canceled){
+            throw new TaskCanceledError(this, 'Task is canceled.');
+        }
+        this.running = true;
         //TODO : 같은 browser context 일경우, Mutex 적용. async mutex.
         return new Promise((resolve, reject)=>{
 
@@ -160,26 +167,30 @@ class TaskRunner{
         });
     }
 
-    stop(){
-        if(this.worker != undefined){
-            this.worker.terminate();
-        }
+    close_pay_window(){
         if(this.pay_window != undefined){
             this.pay_window.close();
             this.pay_window = undefined;
         }
     }
 
-    end_task(error){
-        if(this.pay_window != undefined){
-            this.pay_window.close();
-            this.pay_window = undefined;
+    stop(){
+        this.canceled = true;
+        if(this.worker != undefined){
+            this.worker.terminate();
         }
+        this.close_pay_window();
+        this.running = false;
+    }
+
+    end_task(error){
+        this.close_pay_window();
         if(error){
             this.reject(error);
         }else{
             this.resolve();
         }
+        this.running = false;
     }
 }
 
