@@ -190,17 +190,12 @@ class TaskRunner{
 
     async end_task(error){
         this.close_pay_window();
-
-        this.browser_context.open_main_page().then((_result)=>{
-            if(error){
-                this.reject(error);
-            }else{
-                this.resolve();
-            }
-            this.running = false;
-        }).catch((e)=>{
-            console.error(e);
-        });
+        if(error){
+            this.reject(error);
+        }else{
+            this.resolve();
+        }
+        this.running = false;
     }
 }
 
