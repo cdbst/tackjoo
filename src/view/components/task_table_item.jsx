@@ -15,6 +15,7 @@ class TaskTableItem extends React.Component {
         this.onPauseTask = this.onPauseTask.bind(this);
         this.setTaskStatus = this.setTaskStatus.bind(this);
         this.getStatusBtnSrc = this.getStatusBtnSrc.bind(this);
+        this.getStatusFontColor = this.getStatusFontColor.bind(this);
 
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
@@ -135,6 +136,23 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    getStatusFontColor(){
+
+        if(this.state.status == common.TASK_STATUS.DONE){
+            return '#0dcaf0'; //blue
+        }else if(this.state.status == common.TASK_STATUS.FAIL){
+            return '#dc3545'; //red
+        }else if(this.state.status == common.TASK_STATUS.READY){
+            return '#ffc107'; //yellow
+        }else if(this.state.status == common.TASK_STATUS.PAUSE){
+            return '#dc3545'; //red
+        }else if(this.isPossibleToPlay()){
+            return '#ffffff'; //white
+        }else{
+            return '#83f195'; //green
+        }
+    }
+
     getStatusBtnSrc(){
 
         if(this.state.status == common.TASK_STATUS.READY){
@@ -191,6 +209,7 @@ class TaskTableItem extends React.Component {
         let display_size_name = this.props.task_info.friendly_size_name == undefined ?  this.props.task_info.size_name : this.props.task_info.friendly_size_name;
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
+        let status_text_color = this.getStatusFontColor(this.state.status);
 
         return(
             <tr>
@@ -212,8 +231,8 @@ class TaskTableItem extends React.Component {
                 <td style={{width : this.props.scheduled_time_col_width, maxWidth : this.props.scheduled_time_col_width}}>
                     <span>{schedule_time_str}</span>
                 </td>
-                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
-                    <span>{this.state.status}</span>
+                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}} >
+                    <span className='task-status-text' style={{'--text-color' : status_text_color}}>{this.state.status}</span>
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
