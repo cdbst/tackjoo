@@ -16,6 +16,7 @@ class TaskRunner{
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
         this.close_pay_window = this.close_pay_window.bind(this);
+        this.sync_browser_context = this.sync_browser_context.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -56,7 +57,10 @@ class TaskRunner{
                 this.worker.postMessage(TaskCommon.gen_api_call_res_payload(data.id, e, undefined));
             }
         }
+    }
 
+    sync_browser_context(browser_context_json){
+        this.browser_context.__init_by_json(JSON.parse(browser_context_json));
     }
 
     on_message(data){
@@ -66,6 +70,8 @@ class TaskRunner{
 
         }else if(data.type == TaskCommon.TASK_MSG_TYPE.API_CALL){
             this.on_recv_api_call(data);
+        }else if(data.type == TaskCommon.TASK_MSG_TYPE.SYNC_BROWSER_CONTEXT){
+            this.sync_browser_context(data.browser_context)
         }
     }
 
@@ -184,17 +190,12 @@ class TaskRunner{
 
     async end_task(error){
         this.close_pay_window();
-
-        this.browser_context.open_main_page().then((_result)=>{
-            if(error){
-                this.reject(error);
-            }else{
-                this.resolve();
-            }
-            this.running = false;
-        }).catch((e)=>{
-            console.error(e);
-        });
+        if(error){
+            this.reject(error);
+        }else{
+            this.resolve();
+        }
+        this.running = false;
     }
 }
 

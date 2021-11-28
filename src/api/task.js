@@ -7,19 +7,22 @@ const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError,
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
     PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError} = require('./task_errors.js');
 
-process.on('unhandledRejection', (err) => {
-    throw err;
-});
-
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
 
+process.on('unhandledRejection', (err) => {
+    throw err;
+});
+
+process.on('exit', () => {
+    parentPort.postMessage(TaskCommon.gen_browser_context_sync_payload(browser_context));
+});
+
 global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
 main(browser_context, task_info, product_info, billing_info);
-
 
 async function main(browser_context, task_info, product_info, billing_info){
 
