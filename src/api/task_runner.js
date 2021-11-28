@@ -56,7 +56,7 @@ class TaskRunner{
                 this.worker.postMessage(TaskCommon.gen_api_call_res_payload(data.id, e, undefined));
             }
         }
-        
+
     }
 
     on_message(data){
@@ -90,6 +90,8 @@ class TaskRunner{
             title : this.product_info.name + ' : ' + this.product_info.price
         }
 
+        let pay_done = false;
+
         const res_pkt_hooker = (params, response)=>{
 
             if(response == undefined) return;
@@ -120,12 +122,13 @@ class TaskRunner{
         this.pay_window.open();
 
         this.pay_window.attach_window_close_event_hooker(()=>{
-            this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
+            if(pay_done == false)this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
         });
 
         //결제 완료시 창을 닫기위한 용도로 추가함.
         this.pay_window.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
             if(url.includes('https://nike-service.iamport.kr/kakaopay_payments/success')){
+                pay_done = true;
                 this.end_task();
             }
         });
@@ -179,14 +182,19 @@ class TaskRunner{
         this.running = false;
     }
 
-    end_task(error){
+    async end_task(error){
         this.close_pay_window();
-        if(error){
-            this.reject(error);
-        }else{
-            this.resolve();
-        }
-        this.running = false;
+
+        this.browser_context.open_main_page().then((_result)=>{
+            if(error){
+                this.reject(error);
+            }else{
+                this.resolve();
+            }
+            this.running = false;
+        }).catch((e)=>{
+            console.error(e);
+        });
     }
 }
 

@@ -225,10 +225,15 @@ tbody tr:hover td {
 #schedule-time-input{
     width: 310px !important;
 }
-
-
 /* End to Task Edit Modal */
 
+/* Start to Task Table Item */
+.task-status-text{
+    color: var(--text-color) !important;
+    font-weight: bold;
+}
+
+/* End to Task Table Item */
 
 /* Start to Contents Bill */
 .contents-bill-input-label{

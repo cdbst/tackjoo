@@ -143,20 +143,18 @@
     exports.NIKE_URL = 'https://www.nike.com';
     exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW', notify :'Notify Me'};
     exports.TASK_STATUS = {
-        READY : '준비', //아직 open time이 전이라 play 할 수 없는 상태임.
-        PAUSE : '중지',
+        READY : '준비중', //아직 open time이 전이라 play 할 수 없는 상태임.
+        PAUSE : '중지됨',
         PLAY : '시작됨',
+        WAITING_FOR_OTHER_TASK : '다른 작업 기다리는 중',
         FAIL : '실패',
         DONE : '작업 완료',
         ON_PAGE : '상품 페이지 여는 중',
-        ADD_TO_CART : '상품을 카트에 넣는 중',
+        ADD_TO_CART : '카트에 넣는 중',
         TRY_TO_DRAW : 'THE DRAW 준비 중',
-        TRY_DO_PAY : '결제 시도 중',
         GET_PRODUCT_INFO : '상품 정보를 얻는 중',
-        IMPOSSIBLE_TO_BUY : '구매할 수 없는 상품',
-        ALREADY_EXIST_IN_CART : '다른 상품 결제 대기 중',
-        INVALID_BILLING_INFO : '결제 정보 누락',
-        CANCEL_PAY : '결제 취소'
+        TRY_TO_PAY : '결제 시도 중',
+        READY_TO_PAY : '결제 대기 중'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

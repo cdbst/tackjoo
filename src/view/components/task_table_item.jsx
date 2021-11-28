@@ -15,6 +15,7 @@ class TaskTableItem extends React.Component {
         this.onPauseTask = this.onPauseTask.bind(this);
         this.setTaskStatus = this.setTaskStatus.bind(this);
         this.getStatusBtnSrc = this.getStatusBtnSrc.bind(this);
+        this.getStatusFontColor = this.getStatusFontColor.bind(this);
 
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
@@ -135,56 +136,32 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    getStatusFontColor(){
+
+        if(this.state.status == common.TASK_STATUS.DONE){
+            return '#0dcaf0'; //blue
+        }else if(this.state.status == common.TASK_STATUS.FAIL){
+            return '#dc3545'; //red
+        }else if(this.state.status == common.TASK_STATUS.READY){
+            return '#ffc107'; //yellow
+        }else if(this.state.status == common.TASK_STATUS.PAUSE){
+            return '#dc3545'; //red
+        }else if(this.isPossibleToPlay()){
+            return '#ffffff'; //white
+        }else{
+            return '#83f195'; //green
+        }
+    }
+
     getStatusBtnSrc(){
 
-        let btn_src = '';
-
-        switch(this.state.status){
-            case common.TASK_STATUS.READY : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.PAUSE : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.PLAY : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.FAIL : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.DONE : 
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ON_PAGE : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ADD_TO_CART : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.TRY_TO_DRAW : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.TRY_DO_PAY : 
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.GET_PRODUCT_INFO :
-                btn_src = TaskTableItem.PAUSE_BTN_SRC;
-                break;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
-            case common.TASK_STATUS.CANCEL_PAY:
-                btn_src = TaskTableItem.PLAY_BTN_SRC;
-                break;
+        if(this.state.status == common.TASK_STATUS.READY){
+            return TaskTableItem.PLAY_BTN_SRC;
+        }else if(this.isPossibleToPlay()){
+            return TaskTableItem.PLAY_BTN_SRC;
+        }else{
+            return TaskTableItem.PAUSE_BTN_SRC;
         }
-
-        return btn_src;
     }
 
     isPossibleToPlay(){
@@ -206,52 +183,21 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.TRY_TO_DRAW : 
                 return false;
-            case common.TASK_STATUS.TRY_DO_PAY : 
+            case common.TASK_STATUS.TRY_TO_PAY : 
+                return false;
+            case common.TASK_STATUS.READY_TO_PAY :
                 return false;
             case common.TASK_STATUS.GET_PRODUCT_INFO :
                 return false;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                return true;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                return true;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                return true;
-            case common.TASK_STATUS.CANCEL_PAY:
-                return true;
+            case common.TASK_STATUS.WAITING_FOR_OTHER_TASK:
+                return false;
         }
     }
 
     isPossibleToPause(){
-        switch(this.state.status){
-            case common.TASK_STATUS.READY : 
-                return false;
-            case common.TASK_STATUS.PAUSE : 
-                return false;
-            case common.TASK_STATUS.PLAY : 
-                return true;
-            case common.TASK_STATUS.FAIL : 
-                return false;
-            case common.TASK_STATUS.DONE : 
-                return false;
-            case common.TASK_STATUS.ON_PAGE : 
-                return true;
-            case common.TASK_STATUS.ADD_TO_CART : 
-                return true;
-            case common.TASK_STATUS.TRY_TO_DRAW : 
-                return true;
-            case common.TASK_STATUS.TRY_DO_PAY : 
-                return true;
-            case common.TASK_STATUS.GET_PRODUCT_INFO :
-                return true;
-            case common.TASK_STATUS.IMPOSSIBLE_TO_BUY :
-                return false;
-            case common.TASK_STATUS.ALREADY_EXIST_IN_CART:
-                return false;
-            case common.TASK_STATUS.INVALID_BILLING_INFO:
-                return false;
-            case common.TASK_STATUS.CANCEL_PAY:
-                return false;
-        }
+
+        if(this.state.status == common.TASK_STATUS.READY) return false;
+        else return !this.isPossibleToPlay();
     }
 
     render(){
@@ -263,6 +209,7 @@ class TaskTableItem extends React.Component {
         let display_size_name = this.props.task_info.friendly_size_name == undefined ?  this.props.task_info.size_name : this.props.task_info.friendly_size_name;
 
         let status_btn = this.getStatusBtnSrc(this.state.status);
+        let status_text_color = this.getStatusFontColor(this.state.status);
 
         return(
             <tr>
@@ -284,8 +231,8 @@ class TaskTableItem extends React.Component {
                 <td style={{width : this.props.scheduled_time_col_width, maxWidth : this.props.scheduled_time_col_width}}>
                     <span>{schedule_time_str}</span>
                 </td>
-                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
-                    <span>{this.state.status}</span>
+                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}} >
+                    <span className='task-status-text' style={{'--text-color' : status_text_color}}>{this.state.status}</span>
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
