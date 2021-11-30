@@ -313,6 +313,7 @@ class TaskEditModalSelectItem extends React.Component {
         super(props);
         this.onChangeOption = this.onChangeOption.bind(this);
         this.getOptionItems = this.getOptionItems.bind(this);
+        this.setDisable = this.setDisable.bind(this);
 
         this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
         this.getSelectedOptionKey = this.getSelectedOptionKey.bind(this);
