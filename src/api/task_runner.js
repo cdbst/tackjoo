@@ -144,7 +144,7 @@ class TaskRunner{
         if(this.canceled) throw new TaskCanceledError(this, 'Task is canceled.');
 
         this.running = true;
-        //TODO : 같은 browser context 일경우, Mutex 적용. async mutex.
+
         return new Promise((resolve, reject)=>{
 
             this.resolve = resolve;

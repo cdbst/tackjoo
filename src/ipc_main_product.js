@@ -23,6 +23,7 @@ function register(){
         const product_url = data.payload.product_url;
         
         (async () => {
+
             const product_info = await browser_context.open_product_page(product_url);
             if(product_info == undefined){
                 event.reply('get-product-info-reply' + data.id, {err : 'Cannot open product page', data : undefined});

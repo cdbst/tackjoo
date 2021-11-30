@@ -214,8 +214,16 @@ tbody tr:hover td {
 
 /* Start to Task Edit Modal */
 .tesk-edit-modal-product-img{
-    width: 300px !important;
     height: 300px !important;
+    width: 300px !important;
+}
+
+.tesk-edit-modal-loding-div{
+    height: 300px !important;
+}
+
+.tesk-edit-modal-spinner-product{
+    color: #83f195 !important;
 }
 
 .task-eidt-modal-option-label{
