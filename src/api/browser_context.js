@@ -888,7 +888,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
-                this.__post_process_req_fail(e, 300);
+                this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 

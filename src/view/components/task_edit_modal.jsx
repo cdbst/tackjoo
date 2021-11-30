@@ -14,6 +14,7 @@ class TaskEditModal extends React.Component {
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
         this.getLoggedInAccountInfoList = this.getLoggedInAccountInfoList.bind(this);
+        this.setLoadingStatus = this.setLoadingStatus.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
@@ -28,6 +29,10 @@ class TaskEditModal extends React.Component {
         this.ref_options_type = React.createRef();
         this.ref_options_product = React.createRef();
         this.ref_options_account = React.createRef();
+        
+        this.ref_ok_btn = React.createRef();
+        this.ref_loading_div = React.createRef();
+        this.ref_product_img = React.createRef();
 
         this.schedule_time_input_instance = undefined;
     }
@@ -66,6 +71,14 @@ class TaskEditModal extends React.Component {
         });
     }
 
+    setLoadingStatus(on = true){
+        this.ref_ok_btn.current.disabled = on;
+        this.ref_options_type.current.setDisable(on);
+        this.ref_options_product.current.setDisable(on);
+        this.ref_loading_div.current.style.setProperty('display', on ? 'flex' : 'none', 'important');
+        this.ref_product_img.current.style.setProperty('display', on ? 'none' : '', 'important');
+    }
+
     onModalClosed(e){
     }
 
@@ -95,7 +108,12 @@ class TaskEditModal extends React.Component {
             return;
         }
 
+        this.setLoadingStatus(true);
+
         Index.g_product_mngr.getProductInfo(selected_product._id, (err, product_info) =>{
+
+            this.setLoadingStatus(false);
+
             if(err){
                 Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 if(__callback) __callback(err, undefined);
@@ -217,7 +235,10 @@ class TaskEditModal extends React.Component {
                         <div className="modal-body">
                             <div className="mb-12 row" style={{marginBottom : 30}}>
                                 <div className="text-center">
-                                    <img className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
+                                    <div ref={this.ref_loading_div} className="tesk-edit-modal-loding-div d-flex align-items-center justify-content-center">
+                                        <div className="spinner-border tesk-edit-modal-spinner-product" role="status"/>    
+                                    </div>
+                                    <img ref={this.ref_product_img} className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
                                 </div>
                             </div>
                             <div className="mb-12 row">
@@ -277,7 +298,7 @@ class TaskEditModal extends React.Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>OK</button>
+                            <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>OK</button>
                         </div>
                     </div>
                 </div>
@@ -337,6 +358,10 @@ class TaskEditModalSelectItem extends React.Component {
 
     getSelectedOptionValue(){
         return this.ref_options.current.value;
+    }
+
+    setDisable(option){
+        this.ref_options.current.disabled = option;
     }
 
     render(){
