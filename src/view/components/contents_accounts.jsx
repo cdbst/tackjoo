@@ -25,6 +25,7 @@ class ContentsAccounts extends React.Component {
 
         let account_info = [];
         let table_items = this.getTableItems(account_info);
+        this.table_item_ref_list = {};
 
         this.state = {
             account_info : account_info,
@@ -182,8 +183,12 @@ class ContentsAccounts extends React.Component {
 
         if(modal) Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
+        this.table_item_ref_list[account_to_login.id].current.setLoginStatus(true);
+
         window.electron.login(_id, (err) =>{
             
+            this.table_item_ref_list[account_to_login.id].current.setLoginStatus(false);
+
             if(err){
                 Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
                 return;
@@ -212,17 +217,27 @@ class ContentsAccounts extends React.Component {
         let remove_handler = this.removeAccount;
         let login_handler = this.loginAccount;
 
-        return account_info.map((account) => 
-            <AccountsTableItem 
-                key={account.email} 
-                data={account} 
-                h_remove={remove_handler} 
-                h_login={login_handler}
-                e_mail_col_width={this.email_col_width}
-                status_col_width={this.status_col_width}
-                actions_col_width={this.actions_col_width}
-            />
-        );
+        let account_table_list = [];
+        this.table_item_ref_list = {};
+
+        account_info.forEach((account) =>{
+            this.table_item_ref_list[account.id] = React.createRef();
+
+            account_table_list.push(
+                <AccountsTableItem 
+                    ref={this.table_item_ref_list[account.id]}
+                    key={account.email} 
+                    data={account} 
+                    h_remove={remove_handler} 
+                    h_login={login_handler}
+                    e_mail_col_width={this.email_col_width}
+                    status_col_width={this.status_col_width}
+                    actions_col_width={this.actions_col_width}
+                />
+            );
+        })
+
+        return account_table_list;
     }
 
     render() {
