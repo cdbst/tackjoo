@@ -13,28 +13,24 @@ function register(){
             let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
         }catch(e){
-            event.reply('get-logged-in-account-info-list-reply' + data.id, {err : e, data : undefined});
+            event.reply('get-logged-in-account-info-list-reply' + data.id, {err : 'invalid exception has been occurred', data : undefined});
         }
     });
 
     ipcMain.on('add-account', (event, data) => {
 
         let account_info = data.payload;
-        let ipc_id = data.id;
-        
         let borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
 
-        (async ()=> {
-            const result = await borwser_context.open_main_page();
-            if(result == false){
-                event.reply('add-account-reply' + ipc_id, 'Cannot open main page');
-            }else{
-                BrowserContextManager.add(borwser_context);
-                write_user_info_file(BrowserContextManager, (err) =>{
-                    event.reply('add-account-reply' + ipc_id, err);
-                });
-            }
-        })();
+        try{
+            BrowserContextManager.add(borwser_context);
+            write_user_info_file(BrowserContextManager, (err) =>{
+                event.reply('add-account-reply' + data.id, err);
+            });
+        }catch(e){
+            event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
+        }
+        
     });
 
     ipcMain.on('remove-account', (event, data) => {
@@ -43,19 +39,29 @@ function register(){
         let result = BrowserContextManager.remove(_id);
 
         if(result == false){
-            event.reply('remove-account-reply', 'caanot found browser context.');
-        }else{
+            event.reply('remove-account-reply' + data.id, 'caanot found browser context.');
+            return;
+        }
+
+        try{
             write_user_info_file(BrowserContextManager, (err) =>{
                 event.reply('remove-account-reply' + data.id, err);
             });
+        }catch(e){
+            event.reply('remove-account-reply' + data.id, 'invalid exception has been occurred while removing account information');
         }
     });
 
     ipcMain.on('get-account-info', (event, data) => {
 
-        read_user_info_file((_err, _data) =>{
-            event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
-        });
+        try{
+            read_user_info_file((_err, _data) =>{
+                event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
+            });
+        }catch(e){
+            event.reply('get-account-info-reply' + data.id, {err : 'invalid exception has been occurred while getting account information', data : undefined});
+        }
+
     });
 
     ipcMain.on('login', (event, data) => {
@@ -75,11 +81,12 @@ function register(){
             if(borwser_context.is_login){
                 borwser_context.clear_cookies();
                 borwser_context.clear_csrfToken();
-                result = await borwser_context.open_main_page();
-                if(result == false){
-                    event.reply('login-reply' + data.id, 'fail with openning main page.');
-                    return;
-                }
+            }
+
+            result = await borwser_context.open_main_page();
+            if(result == false){
+                event.reply('login-reply' + data.id, 'fail with openning main page.');
+                return;
             }
 
             result = await borwser_context.login();
