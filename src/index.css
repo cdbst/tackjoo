@@ -10,6 +10,11 @@ body {
     background-color: #32353b !important;
 }
 
+.div-top-to-bottom {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 /* Disable input type number arrow buttons */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
