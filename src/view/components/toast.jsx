@@ -65,9 +65,11 @@ class Toast extends React.Component {
 
     render() {
         return (
-            <div aria-live="polite" aria-atomic="true" className="position-relative" >
-                <div className="toast-container position-absolute top-0 end-0 p-3">
-                    {this.state.toast_items}
+            <div aria-live="polite" aria-atomic="true" className="d-flex w-100" >
+                <div className="toast-container position-absolute p-3 bottom-0 start-0">
+                    <div className="div-top-to-bottom">
+                        {this.state.toast_items}
+                    </div>
                 </div>
             </div>
         );
@@ -84,7 +86,7 @@ class ToastItem extends React.Component {
         let hdr_class_name = "toast-header-" + this.props.type;
         
         return(
-            <div className="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" id={this.props.id} data-bs-delay={delay}>
+            <div className="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" id={this.props.id} data-bs-delay={delay} style={{marginTop:"5px"}}>
                 <div className={"toast-header " + hdr_class_name}>
                 
                     <strong className="me-auto">{this.props.title}</strong>
