@@ -262,13 +262,13 @@ class TaskEditModal extends React.Component {
                             <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
                                 <div className="mb-12 row" >
                                     <div className="col-md-2">
-                                        <label className="task-eidt-modal-option-label">Open</label>
+                                        <label className="task-edit-modal-option-label">Open</label>
                                     </div>
                                     <div className="col-md-4">
                                         <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
                                     </div>
                                     <div className="col-md-2 ">
-                                        <label className="task-eidt-modal-option-label">Close</label> 
+                                        <label className="task-edit-modal-option-label">Close</label> 
                                     </div>
                                     <div className="col-md-4">
                                         <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
@@ -277,7 +277,7 @@ class TaskEditModal extends React.Component {
                                 <hr/>
                                 <div className="mb-12 row">
                                     <div className="col-md-2">
-                                        <label className="task-eidt-modal-option-label">Schedule</label>
+                                        <label className="task-edit-modal-option-label">Schedule</label>
                                     </div>
                                     <div className="col-md-10">
                                         <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
@@ -287,10 +287,10 @@ class TaskEditModal extends React.Component {
                             </div>
                             <div className="mb-12 row">
                                 <div className="col-md-2">
-                                    <label className="task-eidt-modal-option-label">Price</label>
+                                    <label className="task-edit-modal-option-label">Price</label>
                                 </div>
                                 <div className="col-md-10">
-                                    <label className="task-eidt-modal-option-label">
+                                    <label className="task-edit-modal-option-label">
                                         {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                     </label>
                                 </div>
@@ -370,8 +370,8 @@ class TaskEditModalSelectItem extends React.Component {
 
         return(
             <div className="row">
-                <div className="col-md-3 text-left task-eidt-modal-option-label">
-                    <label className="col-sm-2 col-form-label font-weight-bold task-eidt-modal-option-label">{this.props.label}</label>
+                <div className="col-md-3 text-left task-edit-modal-option-label">
+                    <label className="col-sm-2 col-form-label font-weight-bold task-edit-modal-option-label">{this.props.label}</label>
                 </div>
                 <div className="col-md-9">
                     <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>

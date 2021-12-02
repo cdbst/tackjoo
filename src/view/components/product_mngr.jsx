@@ -144,8 +144,8 @@ class ProductManager{
     }
 
     static getDefaultSizeNameList(){
-        const size_num = 20;
-        const base_size = 200;
+        const size_num = 55;
+        const base_size = 50;
         let size_names = [];
 
         for(var i = 0; i < size_num; i++){
