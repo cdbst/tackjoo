@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Mutex = require('async-mutex').Mutex;
 
 class UserFileManager{
 
@@ -12,11 +13,17 @@ class UserFileManager{
         this.mkdir = this.mkdir.bind(this);
         this.__encode_base64 = this.__encode_base64.bind(this);
         this.__decode_base64 = this.__decode_base64.bind(this);
+
+        this.file_mutex = new Mutex();
     }
 
-    read(_path, __callback){
+    async read(_path, __callback){
+
+        const release = await this.file_mutex.acquire();
 
         fs.readFile(_path, 'utf8', (err, data) => {
+
+            release();
 
             if(err){
                 __callback(err, undefined);
@@ -57,29 +64,32 @@ class UserFileManager{
     write(_path, _data, __callback = undefined){
 
         let parent_dir = path.dirname(_path);
-        this.exists(parent_dir, (err)=>{
+        this.exists(parent_dir, async (err)=>{
 
             if(err){ // if not exists
-                this.mkdir(parent_dir, (err)=>{
+                this.mkdir(parent_dir, async (err)=>{
                     if(err){
                         __callback(err);
                         return;
                     }
-                    this.__write(_path, _data, __callback)
+                    await this.__write(_path, _data, __callback)
                 });
             }else{ // if exists
-                this.__write(_path, _data, __callback)
+                await this.__write(_path, _data, __callback)
             }
         });
 
     }
 
-    __write(_path, _data, __callback){
+    async __write(_path, _data, __callback){
 
         const data = JSON.stringify(_data);
         const encoded_data = this.__encode_base64(data);
 
+        const release = await this.file_mutex.acquire();
+
         fs.writeFile(_path, encoded_data, (err) =>{ 
+            release();
             __callback(err);
         });
     }
