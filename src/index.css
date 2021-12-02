@@ -195,9 +195,11 @@ tbody tr:hover td {
 
 /* Start To Text Area */
 .form-select{
-    background: #32353b !important;
+    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
+    background-color: #32353b !important;
     border: solid #a3a3a3 !important;
     border-width: 1px !important;
+    color: white !important;
 }
 
 .form-select > option {
@@ -254,6 +256,7 @@ tbody tr:hover td {
 }
 
 #schedule-time-input{
+    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
     width: 310px !important;
     color: white !important;
 }
