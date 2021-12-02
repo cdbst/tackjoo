@@ -5,6 +5,7 @@ html *
     color: white !important;
     font-family: Arial !important;
 }
+
 body {
     height: 100% !important;
     background-color: #32353b !important;
@@ -129,18 +130,18 @@ tbody tr:hover td {
 
 /* Start to Scroll style */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(200,200,200,1);
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background-color:#fff;
-    -webkit-box-shadow: inset 0 0 6px rgba(90,90,90,0.7);
+    border-radius: 8px;
+    background-color:#83f195;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.7);
 }
 /* END to Scroll style */
 
@@ -170,7 +171,10 @@ tbody tr:hover td {
 }
 
 .modal-select, .modal-select-option{
-    color: black !important;
+    background: #32353b !important;
+    color: white !important;
+    border: solid #dee2e6 !important;
+    border-width: 1px !important;
 }
 
 .btn-inner-modal{
@@ -181,10 +185,26 @@ tbody tr:hover td {
 
 /* Start To text input */
 .form-control{
-    color: black !important;
+    background: #32353b !important;
+    color: white !important;
+    border: solid #a3a3a3 !important;
+    border-width: 1px !important;
     width: 450px !important;
 }
 /* End To text input */
+
+/* Start To Text Area */
+.form-select{
+    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
+    background-color: #32353b !important;
+    border: solid #a3a3a3 !important;
+    border-width: 1px !important;
+    color: white !important;
+}
+
+.form-select > option {
+    color: white !important;
+}
 
 
 /* Start to toast */
@@ -231,12 +251,14 @@ tbody tr:hover td {
     color: #83f195 !important;
 }
 
-.task-eidt-modal-option-label{
+.task-edit-modal-option-label{
     color: #ffc107 !important;
 }
 
 #schedule-time-input{
+    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
     width: 310px !important;
+    color: white !important;
 }
 /* End to Task Edit Modal */
 
