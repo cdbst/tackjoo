@@ -55,7 +55,7 @@ async function main(browser_context, task_info, product_info, billing_info){
 
         // STEP5 : Apply THE DRAW.
         parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_DRAW));
-        let draw_entry_data = TaskUtils.apply_draw(browser_context, product_info, size_info);
+        let draw_entry_data = await TaskUtils.apply_draw(browser_context, product_info, size_info);
         if(draw_entry_data == undefined){
             throw new ApplyDrawError(product_info, size_info, "Fail with appling THE DRAW");
         }

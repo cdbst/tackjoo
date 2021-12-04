@@ -108,10 +108,8 @@ class TaskTableItem extends React.Component {
     }
 
     onClickStatusBtn(is_play_btn){
-        
-        let cur_server_time = Index.g_server_clock.getServerTime();
 
-        if(this.state.status == common.TASK_STATUS.READY && this.props.task_info.schedule_time > cur_server_time){
+        if(this.state.status == common.TASK_STATUS.READY && this.isPossibleToPlay() == false){
             Index.g_sys_msg_q.enqueue('Error', 'Cannot start this task before open time.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
             return;
         }
@@ -167,8 +165,9 @@ class TaskTableItem extends React.Component {
     isPossibleToPlay(){
         switch(this.state.status){
             case common.TASK_STATUS.READY : 
-                let cur_server_time = Index.g_server_clock.getServerTime();
-                return this.props.task_info.schedule_time <= cur_server_time;
+                const cur_server_time = Index.g_server_clock.getServerTime();
+                const product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+                return product_info.open_time <= cur_server_time;
             case common.TASK_STATUS.PAUSE : 
                 return true;
             case common.TASK_STATUS.PLAY : 
