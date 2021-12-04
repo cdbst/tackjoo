@@ -1,5 +1,5 @@
 const CookieManager = require("./cookie_mngr.js").CookieManager;
-const axios = require('axios');
+const axios = require('axios-proxy-fix');
 const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
@@ -164,12 +164,22 @@ class BrowserContext {
             headers['cookie'] = cookie_storage.get_serialized_cookie_data();
         }
 
+        // const proxy = {
+        //     host: '150.109.123.176',
+        //     port: 7890,
+        //     // auth: {
+        //     //     username: 'pakd123',
+        //     //     password: '9826486qQ!'
+        //     // }
+        // }
+
         let axios_req_cfg = {
             method: method,
             url: url,
             timeout: this.__req_timout,
-            headers : headers
-        }
+            headers : headers,
+            //proxy : proxy
+        };
 
         if(params != undefined){
             if(method == BrowserContext.REQ_METHOD.POST){

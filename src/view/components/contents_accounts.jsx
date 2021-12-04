@@ -15,7 +15,6 @@ class ContentsAccounts extends React.Component {
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
-        this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
@@ -145,20 +144,6 @@ class ContentsAccounts extends React.Component {
         });
     }
 
-    showAccountEditModal(_email, _pwd){
-
-        let el_pwd_inpt = document.getElementById(this.EL_ID_MODAL_INPUT_PWD);
-        let el_email_input = document.getElementById(this.EL_ID_MODAL_INPUT_EMAIL);
-
-        //Idd Item Needed;
-        el_email_input.value = _email;
-        el_pwd_inpt.value = _pwd
-
-        let el_modal = document.getElementById(this.account_edit_modal_el_id);
-        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
-        bs_obj_modal.show();
-    }
-
     onClickLoginAll(e){
         this.state.account_info.forEach((account)=>{
             this.loginAccount(account.id, false);
@@ -246,7 +231,6 @@ class ContentsAccounts extends React.Component {
         return (
             <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ACCOUNTS}>
                 <div className="container-fluid">
-                    <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
                     <br/>
                     <div className="row">
                         <div className="col">
