@@ -1,9 +1,9 @@
-const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+const { Worker } = require('worker_threads');
 const path = require('path');
 const TaskCommon = require('./task_common.js');
 const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
 const ExternalPage = require("./external_page.js").ExternalPage;
-const {TaskCanceledError} = require("./task_errors.js");
+const { TaskCanceledError } = require("./task_errors.js");
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, message_cb){
@@ -17,6 +17,7 @@ class TaskRunner{
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
+        this.send_message = this.send_message.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -63,15 +64,14 @@ class TaskRunner{
         this.browser_context.__init_by_json(JSON.parse(browser_context_json));
     }
 
+    send_message(message){
+        this.message_cb(message);
+    }
+
     on_message(data){
 
-        if(data.type == TaskCommon.TASK_MSG_TYPE.MESSAGE){
-            this.message_cb(data.message);
-
-        }else if(data.type == TaskCommon.TASK_MSG_TYPE.API_CALL){
+        if(data.type == TaskCommon.TASK_MSG_TYPE.API_CALL){
             this.on_recv_api_call(data);
-        }else if(data.type == TaskCommon.TASK_MSG_TYPE.SYNC_BROWSER_CONTEXT){
-            this.sync_browser_context(data.browser_context)
         }
     }
 

@@ -1,6 +1,5 @@
 const {parentPort, workerData} = require('worker_threads');
 const common = require("../common/common.js");
-const TaskCommon = require('./task_common.js');
 const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
@@ -17,7 +16,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('exit', () => {
-    parentPort.postMessage(TaskCommon.gen_browser_context_sync_payload(browser_context));
+    global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
 });
 
 global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
@@ -32,8 +31,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     }
     
     // STEP2 : Check validation of Task Information.
-    parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.ON_PAGE));
-    
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
     product_info = await TaskUtils.open_product_page(browser_context, product_info);
     if(product_info == undefined){
         throw new OpenProductPageError("Cannot open product page info");
@@ -45,7 +43,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     }
 
     // STEP4 : Judge product size to checkout.
-    parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.GET_PRODUCT_INFO));
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
     const size_info = TaskUtils.judge_appropreate_size_info(product_info, task_info);
     if(size_info == undefined){
         throw new SizeInfoError(product_info, task_info, "Cannot found to proudct size information");
@@ -54,7 +52,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
         // STEP5 : Apply THE DRAW.
-        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_DRAW));
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_DRAW]);
         let draw_entry_data = await TaskUtils.apply_draw(browser_context, product_info, size_info);
         if(draw_entry_data == undefined){
             throw new ApplyDrawError(product_info, size_info, "Fail with appling THE DRAW");
@@ -65,7 +63,7 @@ async function main(browser_context, task_info, product_info, billing_info){
     }else{
 
         // STEP5 : Add product to cart.
-        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.ADD_TO_CART));
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ADD_TO_CART]);
         const res_data = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
         if(res_data == undefined){
             throw new AddToCartError(product_info, size_info, "Fail with add to cart");
@@ -84,7 +82,7 @@ async function main(browser_context, task_info, product_info, billing_info){
         }
 
         // STEP8 : Click checkout button (결제 버튼 클릭)
-        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.TRY_TO_PAY));
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
         await common.async_sleep(3000);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
         if(checkout_result == undefined){
@@ -98,7 +96,7 @@ async function main(browser_context, task_info, product_info, billing_info){
         }
 
         // STEP10 : open kakaopay checkout window
-        parentPort.postMessage(TaskCommon.gen_message_payload(common.TASK_STATUS.READY_TO_PAY));
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
         try{
             await global.MainThreadApiCaller.call('open_kakaopay_window', [kakao_data.next_redirect_pc_url]);
         }catch(e){
