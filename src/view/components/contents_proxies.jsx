@@ -25,6 +25,8 @@ class ContentsProxies extends React.Component {
         this.__checkProxyInfoValues = this.__checkProxyInfoValues.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
 
+        this.__saveProxyInfo = this.__saveProxyInfo.bind(this);
+
         this.__mount = false;
         this.__proxy_info_list = [];
 
@@ -83,6 +85,16 @@ class ContentsProxies extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
+
+        window.electron.loadProxyInfo((err, proxy_info_list)=>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('WARN', 'Cannot load proxy information file', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 3000);
+                return;
+            }
+
+            this.__proxy_info_list = proxy_info_list;
+            this.__updateTableItems();
+        });
     }
 
     componentWillUnmount(){
@@ -90,6 +102,7 @@ class ContentsProxies extends React.Component {
     }
 
     __updateTableItems(){
+        if(this.__mount == false) return;
         const table_items = this.__getTableItems(this.__proxy_info_list);
         this.setState(_ => ({
             proxy_table_list : table_items
@@ -121,7 +134,8 @@ class ContentsProxies extends React.Component {
     onClickRemoveProxyInfo(_id){
         this.__removeProxyInfo(_id);
         this.__updateTableItems();
-        //TODO save to file
+
+        this.__saveProxyInfo();
     }
 
     __checkProxyInfoValues(ip, port, alias){
@@ -143,12 +157,20 @@ class ContentsProxies extends React.Component {
         return true;
     }
 
+    __saveProxyInfo(){
+        window.electron.saveProxyInfo(this.__proxy_info_list, (err)=>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('WARN', 'Cannot save proxy info', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            }
+        });
+    }
+
     onModifyProxyInfo(ip, port, id, pwd, alias, _id){
         if(this.__checkProxyInfoValues(ip, port, alias) == false) return;
         this.__modifyProxyInfo(_id, ip, port, id, pwd, alias);
         this.__updateTableItems();
 
-        //TODO save to file
+        this.__saveProxyInfo();
     }
 
     onCreateProxyInfo(ip, port, id, pwd, alias){
@@ -156,7 +178,7 @@ class ContentsProxies extends React.Component {
         this.__addProxyInfo(ip, port, id, pwd, alias);
         this.__updateTableItems();
 
-        //TODO save to file
+        this.__saveProxyInfo();
     }
 
     __openProxyEditModal(proxy_info){
@@ -182,6 +204,7 @@ class ContentsProxies extends React.Component {
     }
 
     onClickAddProxyBulk(){
+        //TODO 기능 구현 필요.
         console.log('onClickAddProxyBulk');
     }
 
