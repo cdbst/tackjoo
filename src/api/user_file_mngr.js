@@ -104,4 +104,4 @@ class UserFileManager{
     }
 }
 
-module.exports.UserFileManager = UserFileManager;
+module.exports.UserFileManager = new UserFileManager();
