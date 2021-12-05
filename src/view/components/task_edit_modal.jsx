@@ -280,7 +280,7 @@ class TaskEditModal extends React.Component {
                                         <label className="task-edit-modal-option-label">Schedule</label>
                                     </div>
                                     <div className="col-md-10">
-                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
+                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
                                     </div>
                                 </div>
                                 <hr/>

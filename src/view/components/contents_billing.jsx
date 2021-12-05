@@ -228,14 +228,14 @@ class ContentsBilling extends React.Component {
                             <div className="md-12 row">
                                 <div className="col-md-6">
                                     <label htmlFor="input-buyer-name" className="form-label contents-bill-input-label">받으시는 분</label>
-                                    <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name}/>
+                                    <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name} style={{'--width' : '450px'}}/>
                                 </div>
                             </div>
                             <br/>
                             <div className="m2-12 row">
                                 <div className="col-md-6">
                                     <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
-                                    <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()}/>
+                                    <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()} style={{'--width' : '450px'}}/>
                                 </div>
                             </div>
                             <br/>
@@ -244,14 +244,14 @@ class ContentsBilling extends React.Component {
                                     <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">배송 주소</label>
                                     <label className="form-label contents-bill-input-label" ref={this.ref_postcode}></label>
                                     <div className="input-group col-mb-3">
-                                        <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)}/>
+                                        <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)} style={{'--width' : '450px'}}/>
                                         <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
                                     </div>
                                 </div>
                             </div>
                             <div className="md-12 row">
                                 <div className="col-mb-6">
-                                    <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2}/>
+                                    <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2} style={{'--width' : '450px'}}/>
                                 </div>
                             </div>
                             <br />

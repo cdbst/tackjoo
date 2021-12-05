@@ -64,7 +64,7 @@ class AccountEditModal extends React.Component {
                                 <form onSubmit={(e)=>{e.preventDefault();}}> 
                                     <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">Email</label>
                                     <div className="col-sm-10">
-                                        <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} />
+                                        <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} style={{'--width' : '450px'}}/>
                                     </div>
                                 </form>
                             </div>
@@ -72,7 +72,7 @@ class AccountEditModal extends React.Component {
                                 <form onSubmit={this.onSubmitAccountInfo.bind(this)}> 
                                     <label htmlFor={this.EL_ID_MODAL_INPUT_PWD} className="col-sm-2 col-form-label font-weight-bold" >Password</label>
                                     <div className="col-sm-10">
-                                        <input type="password" name="password" autoComplete="on" className="form-control" id={this.EL_ID_MODAL_INPUT_PWD} />
+                                        <input type="password" name="password" autoComplete="on" className="form-control" id={this.EL_ID_MODAL_INPUT_PWD} style={{'--width' : '450px'}}/>
                                     </div>
                                 </form>
                             </div>
