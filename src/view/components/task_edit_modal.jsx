@@ -215,8 +215,8 @@ class TaskEditModal extends React.Component {
 
         let size_list = ProductManager.getProductSizeList(this.state.selected_product);
 
-        let logged_in_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
-        let logged_in_account_id_list = this.state.account_info_list.map((account_info) => account_info.id);
+        let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+        let account_id_list = this.state.account_info_list.map((account_info) => account_info.id);
 
         let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
         let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time, true);
@@ -261,7 +261,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
+                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
                                 </div>
                             </div>
                             <hr/>
