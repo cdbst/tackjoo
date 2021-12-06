@@ -20,11 +20,7 @@ class TaskTableItem extends React.Component {
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
 
-        this.__mount = false;
-
         this.ref_status_btn = React.createRef();
-
-        this.retry_cnt_task_play = Index.g_app_config.MAX_RETRY_COUNT_TASK;
 
         let initial_status = undefined;
         let cur_server_time = Index.g_server_clock.getServerTime();
@@ -38,6 +34,8 @@ class TaskTableItem extends React.Component {
         this.state = {
             status : initial_status
         };
+
+        this.__mount = false;
     }
 
     componentDidMount(){
@@ -176,6 +174,8 @@ class TaskTableItem extends React.Component {
                 return true;
             case common.TASK_STATUS.DONE : 
                 return true;
+            case common.TASK_STATUS.TRY_TO_LOGIN :
+                return false;
             case common.TASK_STATUS.ON_PAGE : 
                 return false;
             case common.TASK_STATUS.ADD_TO_CART : 

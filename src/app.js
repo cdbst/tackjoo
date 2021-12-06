@@ -22,7 +22,6 @@ function createWindow() {
     win.webContents.openDevTools();
     win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, "index.html"));
-
 }
 
 app.whenReady().then(() => {

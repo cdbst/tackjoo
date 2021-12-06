@@ -4,19 +4,21 @@ const TaskUtils = require('./task_utils.js');
 const BrowserContext = require('./browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError} = require('./task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./task_errors.js');
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
 
+browser_context.proxy_info = task_info.proxy_info;
+
 process.on('unhandledRejection', (err) => {
     throw err;
 });
 
 process.on('exit', () => {
-    global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
+    //global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
 });
 
 global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
@@ -28,6 +30,13 @@ async function main(browser_context, task_info, product_info, billing_info){
     // STEP1 : Check validation of Task Information.
     if(TaskUtils.is_valid_billing_info_to_tasking(billing_info) == false){
         throw new TaskInfoError(task_info, "TaskInfo is not valid to tasking");
+    }
+
+    // STEP1.5 : Check validation of Task Information.
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
+    const login_result = await TaskUtils.login(browser_context);
+    if(login_result == undefined){
+        throw new LoginError(browser_context, "Cannot open product page info");
     }
     
     // STEP2 : Check validation of Task Information.

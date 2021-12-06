@@ -94,7 +94,7 @@ class ProxyEditModal extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <br/>
+                            <hr/>
                             <div className="row">
                                 <div className="col-md-6">
                                     <div className="row">
@@ -109,7 +109,7 @@ class ProxyEditModal extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <br/>
+                            <hr/>
                             <div className="row">
                                 <div className="col-md-12">
                                     <form onSubmit={this.onSubmitProxyInfo.bind(this)}>

@@ -97,7 +97,7 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
-    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time){
+    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time, proxy_info){
     
         if(schedule_time != undefined){
         
@@ -121,10 +121,9 @@ class ContentsTasks extends React.Component {
         common.update_task_info_obj(task_info_obj, 'account_email', account_email);
         common.update_task_info_obj(task_info_obj, 'account_id', account_id);
         common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+        common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
         common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
-        common.update_task_info_obj(task_info_obj, 'retry_cnt', Index.g_app_config.MAX_RETRY_COUNT_TASK);
 
-    
         if(this.__checkTaskDuplicated(task_info_obj)){
             Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
             return;
