@@ -48,16 +48,14 @@ class ContentsAccounts extends React.Component {
 
         Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-        window.electron.getAccountInfo(_account_info => {
+        window.electron.getAccountInfo( (err, _account_info_list) => {
 
-            if(_account_info.err) {
+            if(err) {
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
-                let file_loaded_account_info = _account_info.data.accounts;
-                
-                for(var i = 0; i < file_loaded_account_info.length; i++){
-                    let account = file_loaded_account_info[i];
-                    this.addAccount(account.email, account.pwd, false); // modal disable.
+                for(var i = 0; i < _account_info_list.accounts.length; i++){
+                    let account = _account_info_list.accounts[i];
+                    this.addAccount(account.email, account.pwd, account.id, false); // modal disable.
                 }
             }
         });
@@ -83,7 +81,7 @@ class ContentsAccounts extends React.Component {
         };
     }
 
-    addAccount(_email, _pwd, modal = true){
+    addAccount(_email, _pwd, _id, modal = true){
 
         if(_email == '' || _pwd == ''){
             Index.g_sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
@@ -99,7 +97,7 @@ class ContentsAccounts extends React.Component {
             return;
         }
         
-        let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+        let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT, _id);
 
         window.electron.addAccount(account.email, account.pwd, account.id, (err) =>{
 

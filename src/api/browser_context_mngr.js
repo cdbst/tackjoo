@@ -55,7 +55,8 @@ class BrowserContextManager{
             let browser_context = this._browser_contexts_dict[id];
             accounts_info.push({
                 email : browser_context.email,
-                pwd : browser_context.pwd
+                pwd : browser_context.pwd,
+                id : id
             });
         });
 
