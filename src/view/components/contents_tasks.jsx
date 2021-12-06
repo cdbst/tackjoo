@@ -1,22 +1,6 @@
 
 class ContentsTasks extends React.Component {
 
-    //status 종류 =====
-    //stop (아무 것도 안하는 상태)
-    //ready (대기중인 상태로 얼마나 있다가 작업이 시작되는지 표시해야함)
-    //running (돌아가고 있는 상황 - 현재 어떤 작업이 진행되고 있는세 보다 자세하게 표현되면 좋겠음.)
-    //complete (물품 구매가 완료된 상태)
-
-    //action 종류
-    //멈춤 또는 진행 버튼
-    //편집 버튼
-    //제거 버튼
-
-
-    //footer buttn
-    //Quick Task : 로그인된 모든 Account에 대한 드로우, 선착순 물건에 대한 구매/예약 대기 Task를 생성한다.
-
-
     constructor(props) {
         super(props);
 
@@ -47,8 +31,8 @@ class ContentsTasks extends React.Component {
         this.size_col_width = 53;
         this.account_col_width = 210;
         this.proxy_col_width = 140;
-        this.open_time_col_width = 180;
-        this.scheduled_time_col_width = 180;
+        this.open_time_col_width = 190;
+        this.scheduled_time_col_width = 190;
         this.status_col_width = 220;
         this.action_col_width = 145.5;
 

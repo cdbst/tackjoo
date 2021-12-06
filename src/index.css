@@ -36,6 +36,11 @@ input::-webkit-inner-spin-button {
     font-weight: bold;
 }
 
+.contents-sub-title {
+    color : #ffc107 !important;
+    font-weight: bold;
+}
+
 /* End To Contents Title */
 
 
