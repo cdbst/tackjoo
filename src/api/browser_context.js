@@ -345,7 +345,14 @@ class BrowserContext {
             return false;
         }
 
-        let result = await this.__open_login_modal();
+        let result = await this.open_main_page();
+        if(result == false){
+            this.in_progress_login = false;
+            console.error('Cannot open main page.'); 
+            return false;
+        }
+
+        result = await this.__open_login_modal();
         if(result == false){
             console.warn('Cannot open login modal.'); 
         }
@@ -397,7 +404,6 @@ class BrowserContext {
                 
                 this.in_progress_login = false;
                 this.is_login = true;
-                await this.open_main_page();
                 return true;
 
             }catch(e){

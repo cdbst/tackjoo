@@ -150,7 +150,7 @@ function _getAccountInfo(__callback){
     ipcRenderer.send('get-account-info', ipc_data);
 
     ipcRenderer.once('get-account-info-reply' + ipc_data.id, (event, account_info) => {
-        __callback(account_info);
+        __callback(account_info.err, account_info.data);
     });
 }
 

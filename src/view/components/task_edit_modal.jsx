@@ -13,7 +13,6 @@ class TaskEditModal extends React.Component {
 
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
-        this.getLoggedInAccountInfoList = this.getLoggedInAccountInfoList.bind(this);
         this.setLoadingStatus = this.setLoadingStatus.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
@@ -22,7 +21,7 @@ class TaskEditModal extends React.Component {
         this.state = {
             filtered_product_info_list : this.product_info_list,
             selected_product : undefined,
-            logged_in_account_info_list : [],
+            account_info_list : [],
             proxy_info_list : []
         };
 
@@ -60,25 +59,28 @@ class TaskEditModal extends React.Component {
 
     onModalshown(e){
 
-        this.getLoggedInAccountInfoList((_error, _logged_in_account_info_list) =>{
+        window.electron.getAccountInfo( (err, __account_info_list) => {
 
             this.product_info_list = Index.g_product_mngr.getProductInfoList();
+            let account_info_list = undefined;
 
-            this.setState({filtered_product_info_list : this.product_info_list, logged_in_account_info_list : _logged_in_account_info_list}, () => {
-                this.onChangeType(
-                    this.ref_options_type.current.getSelectedOptionValue(),
-                    this.ref_options_product.current.getSelectedOptionKey()
-                );
+            if(err){
+                account_info_list = [];
+            }else{
+                account_info_list = __account_info_list.accounts;
+            }
+
+            window.electron.loadProxyInfo((err, proxy_info_list) =>{
+
+                if(err) proxy_info_list = [''];
+
+                this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
+                    this.onChangeType(
+                        this.ref_options_type.current.getSelectedOptionValue(),
+                        this.ref_options_product.current.getSelectedOptionKey()
+                    );
+                });
             });
-        });
-
-        window.electron.loadProxyInfo((err, proxy_info_list) =>{
-
-            if(err) proxy_info_list = [''];
-
-            this.setState(_ => ({
-                proxy_info_list : proxy_info_list
-            }));
         });
     }
 
@@ -91,23 +93,6 @@ class TaskEditModal extends React.Component {
     }
 
     onModalClosed(e){
-    }
-
-    getLoggedInAccountInfoList(__callback){
-
-        window.electron.getLoggedInAccountInfoList((error, logged_in_account_info_list) =>{
-            if(error){
-                Index.g_sys_msg_q.enqueue('Error', 'Cannot gathering logged in account informations.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                __callback(error, undefined);
-                return;
-            }
-
-            if(logged_in_account_info_list.length == 0){
-                Index.g_sys_msg_q.enqueue('Warn', 'Logged in accounts are not exist.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            }
-
-            __callback(undefined, logged_in_account_info_list);
-        });
     }
 
     onChangeProduct(selected_key, __callback = undefined){
@@ -230,8 +215,8 @@ class TaskEditModal extends React.Component {
 
         let size_list = ProductManager.getProductSizeList(this.state.selected_product);
 
-        let logged_in_account_email_list = this.state.logged_in_account_info_list.map((account_info) => account_info.email);
-        let logged_in_account_id_list = this.state.logged_in_account_info_list.map((account_info) => account_info._id);
+        let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+        let account_id_list = this.state.account_info_list.map((account_info) => account_info.id);
 
         let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
         let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time, true);
@@ -240,9 +225,9 @@ class TaskEditModal extends React.Component {
 
         if(open_time_str != '') this.schedule_time_input_instance.setDate(open_time_str, false);
 
-        let porxy_alias_list = ProxyManager.getPropertyList('alias', this.state.proxy_info_list);
+        let porxy_alias_list = this.state.proxy_info_list.map((proxy_info => proxy_info.alias));
         porxy_alias_list.unshift('');
-        let porxy__id_list = ProxyManager.getPropertyList('_id', this.state.proxy_info_list);
+        let porxy__id_list = this.state.proxy_info_list.map((proxy_info => proxy_info._id));
         porxy__id_list.unshift('');
 
         return (
@@ -276,7 +261,7 @@ class TaskEditModal extends React.Component {
                                     <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={logged_in_account_email_list} option_keys={logged_in_account_id_list}/>
+                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
                                 </div>
                             </div>
                             <hr/>
