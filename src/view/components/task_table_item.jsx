@@ -210,6 +210,8 @@ class TaskTableItem extends React.Component {
         let status_btn = this.getStatusBtnSrc(this.state.status);
         let status_text_color = this.getStatusFontColor(this.state.status);
 
+        const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
+
         return(
             <tr>
                 <td style={{width : this.props.type_col_width, maxWidth : this.props.type_col_width}}>
@@ -223,6 +225,9 @@ class TaskTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.task_info.account_email}>{this.props.task_info.account_email}</div>
+                </td>
+                <td style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}}>
+                    <div className="cut-text" style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}} title={proxy_alias}>{proxy_alias}</div>
                 </td>
                 <td style={{width : this.props.open_time_col_width, maxWidth : this.props.open_time_col_width}}>
                     <span>{open_time_str}</span>
