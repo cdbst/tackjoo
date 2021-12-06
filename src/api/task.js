@@ -10,8 +10,10 @@ const browser_context = new BrowserContext(JSON.parse(workerData.browser_context
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
+const settings_info = workerData.settings_info;
 
 browser_context.proxy_info = task_info.proxy_info;
+browser_context.update_settings(settings_info);
 
 process.on('unhandledRejection', (err) => {
     throw err;

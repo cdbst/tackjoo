@@ -66,7 +66,7 @@ class TaskTableItem extends React.Component {
             return;
         }
 
-        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, (status) =>{
+        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, Index.g_settings_info.settings_info, (status) =>{
 
             this.setTaskStatus(status, ()=>{
                 this.ref_status_btn.current.disabled = false;

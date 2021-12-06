@@ -6,7 +6,7 @@ const ExternalPage = require("./external_page.js").ExternalPage;
 const { TaskCanceledError } = require("./task_errors.js");
 
 class TaskRunner{
-    constructor(browser_context, task_info, product_info, billing_info, message_cb){
+    constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
 
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
@@ -23,6 +23,7 @@ class TaskRunner{
         this.task_info = task_info;
         this.product_info = product_info;
         this.billing_info = billing_info;
+        this.settings_info = settings_info;
 
         this.message_cb = message_cb;
         this.running = false;
@@ -156,6 +157,7 @@ class TaskRunner{
                     task_info : this.task_info,
                     product_info : this.product_info,
                     billing_info : this.billing_info,
+                    settings_info : this.settings_info
                 }
             });
     
