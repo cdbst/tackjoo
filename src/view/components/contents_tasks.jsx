@@ -46,7 +46,7 @@ class ContentsTasks extends React.Component {
         this.type_col_width = 124.5;
         this.size_col_width = 53;
         this.account_col_width = 210;
-        this.proxy_col_width = 120;
+        this.proxy_col_width = 140;
         this.open_time_col_width = 180;
         this.scheduled_time_col_width = 180;
         this.status_col_width = 220;

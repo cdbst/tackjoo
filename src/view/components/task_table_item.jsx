@@ -211,6 +211,7 @@ class TaskTableItem extends React.Component {
         let status_text_color = this.getStatusFontColor(this.state.status);
 
         const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
+        const proxy_ip = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.ip;
 
         return(
             <tr>
@@ -227,7 +228,7 @@ class TaskTableItem extends React.Component {
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.task_info.account_email}>{this.props.task_info.account_email}</div>
                 </td>
                 <td style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}}>
-                    <div className="cut-text" style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}} title={proxy_alias}>{proxy_alias}</div>
+                    <div className="cut-text" style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}} title={proxy_alias}>{proxy_ip}</div>
                 </td>
                 <td style={{width : this.props.open_time_col_width, maxWidth : this.props.open_time_col_width}}>
                     <span>{open_time_str}</span>
