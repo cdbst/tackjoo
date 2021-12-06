@@ -89,6 +89,12 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
     return target_size_info;
 }
 
+module.exports.login = async (browser_context) => {
+
+    const result = await browser_context.login();
+    return result;
+}
+
 module.exports.open_product_page = async (browser_context, product_info) => {
 
     const new_product_info = await browser_context.open_product_page(product_info.url);
@@ -96,7 +102,7 @@ module.exports.open_product_page = async (browser_context, product_info) => {
         return undefined;
     }
     return common.merge_object(product_info, new_product_info);
-};
+}
 
 module.exports.apply_draw = async(browser_context, product_info, size_info) =>{
 

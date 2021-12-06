@@ -26,7 +26,9 @@ contextBridge.exposeInMainWorld('electron', {
     pauseTask: _pauseTask,
     searchAddr: _searchAddr,
     saveBillingInfo: _saveBillingInfo,
-    loadBillingInfo: _loadBillingInfo
+    loadBillingInfo: _loadBillingInfo,
+    saveProxyInfo : _saveProxyInfo,
+    loadProxyInfo : _loadProxyInfo
 });
 
 let get_sensor_data = undefined;
@@ -266,5 +268,30 @@ function _loadBillingInfo(__callback){
 
     ipcRenderer.once('load-billing-info-reply' + ipc_data.id, (_event, billing_info) => {
         __callback(billing_info.err, billing_info.data);
+    });
+}
+
+function _saveProxyInfo(proxy_info, __callback){
+
+    if(proxy_info == undefined || typeof proxy_info !== 'object'){
+        __callback('proxy info to save is not valid data.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({proxy_info : proxy_info});
+    ipcRenderer.send('save-proxy-info', ipc_data);
+
+    ipcRenderer.once('save-proxy-info-reply' + ipc_data.id, (_event, save_result) => {
+        __callback(save_result.err);
+    });
+}
+
+function _loadProxyInfo(__callback){
+
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-proxy-info', ipc_data);
+
+    ipcRenderer.once('load-proxy-info-reply' + ipc_data.id, (_event, proxy_info) => {
+        __callback(proxy_info.err, proxy_info.data);
     });
 }

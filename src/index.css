@@ -189,7 +189,7 @@ tbody tr:hover td {
     color: white !important;
     border: solid #a3a3a3 !important;
     border-width: 1px !important;
-    width: 450px !important;
+    width: var(--width) !important;
 }
 /* End To text input */
 

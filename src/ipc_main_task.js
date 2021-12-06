@@ -28,7 +28,6 @@ function register(){
         let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, message_cb);
 
         (async () => {
-
             try{
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.WAITING_FOR_OTHER_TASK, done : false});
                 await TaskRunnerManager.add(task_runner);
@@ -39,7 +38,6 @@ function register(){
             }finally{
                 TaskRunnerManager.remove(task_runner.task_info._id);
             }
-
         })();
     });
 

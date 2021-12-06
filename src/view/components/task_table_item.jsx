@@ -20,11 +20,7 @@ class TaskTableItem extends React.Component {
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
 
-        this.__mount = false;
-
         this.ref_status_btn = React.createRef();
-
-        this.retry_cnt_task_play = Index.g_app_config.MAX_RETRY_COUNT_TASK;
 
         let initial_status = undefined;
         let cur_server_time = Index.g_server_clock.getServerTime();
@@ -38,6 +34,8 @@ class TaskTableItem extends React.Component {
         this.state = {
             status : initial_status
         };
+
+        this.__mount = false;
     }
 
     componentDidMount(){
@@ -176,6 +174,8 @@ class TaskTableItem extends React.Component {
                 return true;
             case common.TASK_STATUS.DONE : 
                 return true;
+            case common.TASK_STATUS.TRY_TO_LOGIN :
+                return false;
             case common.TASK_STATUS.ON_PAGE : 
                 return false;
             case common.TASK_STATUS.ADD_TO_CART : 
@@ -210,6 +210,9 @@ class TaskTableItem extends React.Component {
         let status_btn = this.getStatusBtnSrc(this.state.status);
         let status_text_color = this.getStatusFontColor(this.state.status);
 
+        const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
+        const proxy_ip = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.ip;
+
         return(
             <tr>
                 <td style={{width : this.props.type_col_width, maxWidth : this.props.type_col_width}}>
@@ -223,6 +226,9 @@ class TaskTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.task_info.account_email}>{this.props.task_info.account_email}</div>
+                </td>
+                <td style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}}>
+                    <div className="cut-text" style={{width : this.props.proxy_col_width, maxWidth : this.props.proxy_col_width}} title={proxy_alias}>{proxy_ip}</div>
                 </td>
                 <td style={{width : this.props.open_time_col_width, maxWidth : this.props.open_time_col_width}}>
                     <span>{open_time_str}</span>

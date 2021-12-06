@@ -23,12 +23,14 @@ class TaskEditModal extends React.Component {
             filtered_product_info_list : this.product_info_list,
             selected_product : undefined,
             logged_in_account_info_list : [],
-        }
+            proxy_info_list : []
+        };
 
         this.ref_options_size = React.createRef();
         this.ref_options_type = React.createRef();
         this.ref_options_product = React.createRef();
         this.ref_options_account = React.createRef();
+        this.ref_options_proxy = React.createRef();
         
         this.ref_ok_btn = React.createRef();
         this.ref_loading_div = React.createRef();
@@ -68,6 +70,15 @@ class TaskEditModal extends React.Component {
                     this.ref_options_product.current.getSelectedOptionKey()
                 );
             });
+        });
+
+        window.electron.loadProxyInfo((err, proxy_info_list) =>{
+
+            if(err) proxy_info_list = [''];
+
+            this.setState(_ => ({
+                proxy_info_list : proxy_info_list
+            }));
         });
     }
 
@@ -166,19 +177,19 @@ class TaskEditModal extends React.Component {
             return;
         }
 
-        let selected_size = this.ref_options_size.current.getSelectedOptionValue();
+        const selected_size = this.ref_options_size.current.getSelectedOptionValue();
         if(selected_size == undefined || selected_size == ''){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (size is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        let selected_account_id = this.ref_options_account.current.getSelectedOptionKey();
+        const selected_account_id = this.ref_options_account.current.getSelectedOptionKey();
         if(selected_account_id == undefined || selected_account_id == ''){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        let selected_account_email = this.ref_options_account.current.getSelectedOptionValue();
+        const selected_account_email = this.ref_options_account.current.getSelectedOptionValue();
         if(selected_account_email == undefined || selected_account_email == ''){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
@@ -195,11 +206,16 @@ class TaskEditModal extends React.Component {
             selected_schedule = selected_schedule[0];
         }
 
-        this.props.h_create_task(this.state.selected_product, selected_size, selected_account_id, selected_account_email, selected_schedule);
+        const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
+        let selected_proxy_info = undefined;
+        if(selected_proxy_id != ''){
+            selected_proxy_info = this.state.proxy_info_list.find((proxy_info) => { return proxy_info._id == selected_proxy_id });
+        }
+        
+        this.props.h_create_task(this.state.selected_product, selected_size, selected_account_id, selected_account_email, selected_schedule, selected_proxy_info);
         
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        
         bs_obj_modal.hide();
     }
 
@@ -223,6 +239,11 @@ class TaskEditModal extends React.Component {
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
 
         if(open_time_str != '') this.schedule_time_input_instance.setDate(open_time_str, false);
+
+        let porxy_alias_list = ProxyManager.getPropertyList('alias', this.state.proxy_info_list);
+        porxy_alias_list.unshift('');
+        let porxy__id_list = ProxyManager.getPropertyList('_id', this.state.proxy_info_list);
+        porxy__id_list.unshift('');
 
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -280,19 +301,18 @@ class TaskEditModal extends React.Component {
                                         <label className="task-edit-modal-option-label">Schedule</label>
                                     </div>
                                     <div className="col-md-10">
-                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control"/>
+                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
                                     </div>
                                 </div>
                                 <hr/>
                             </div>
                             <div className="mb-12 row">
-                                <div className="col-md-2">
-                                    <label className="task-edit-modal-option-label">Price</label>
-                                </div>
-                                <div className="col-md-10">
-                                    <label className="task-edit-modal-option-label">
-                                        {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
-                                    </label>
+                                <label className="col-sm-2 col-form-label font-weight-bold task-edit-modal-option-label">Price</label>
+                                <label className="col-sm-4 col-form-label font-weight-bold task-edit-modal-option-label">
+                                    {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
+                                </label>
+                                <div className="col-md-6">
+                                    <TaskEditModalSelectItem ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>

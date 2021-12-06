@@ -45,10 +45,11 @@ class ContentsTasks extends React.Component {
     __setupColumnsWidth(){
         this.type_col_width = 124.5;
         this.size_col_width = 53;
-        this.account_col_width = 240;
+        this.account_col_width = 210;
+        this.proxy_col_width = 140;
         this.open_time_col_width = 180;
         this.scheduled_time_col_width = 180;
-        this.status_col_width = 180;
+        this.status_col_width = 220;
         this.action_col_width = 145.5;
 
         let cols_width_without_product_col = this.type_col_width + 
@@ -97,7 +98,7 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
-    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time){
+    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time, proxy_info){
     
         if(schedule_time != undefined){
         
@@ -121,10 +122,9 @@ class ContentsTasks extends React.Component {
         common.update_task_info_obj(task_info_obj, 'account_email', account_email);
         common.update_task_info_obj(task_info_obj, 'account_id', account_id);
         common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+        common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
         common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
-        common.update_task_info_obj(task_info_obj, 'retry_cnt', Index.g_app_config.MAX_RETRY_COUNT_TASK);
 
-    
         if(this.__checkTaskDuplicated(task_info_obj)){
             Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
             return;
@@ -188,6 +188,7 @@ class ContentsTasks extends React.Component {
                     product_col_width={this.product_col_width}
                     size_col_width={this.size_col_width}
                     account_col_width={this.account_col_width}
+                    proxy_col_width={this.proxy_col_width}
                     open_time_col_width={this.open_time_col_width}
                     scheduled_time_col_width={this.scheduled_time_col_width}
                     status_col_width={this.status_col_width}
@@ -221,6 +222,7 @@ class ContentsTasks extends React.Component {
                                 <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>Product</th>
                                 <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>Size</th>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>Account</th>
+                                <th scope="col" style={{width : this.proxy_col_width, maxWidth : this.proxy_col_width}}>Proxy</th>
                                 <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>Open Time</th>
                                 <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>Scheduled Time</th>
                                 <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>

@@ -50,8 +50,8 @@
             account_id : undefined,
             schedule_time : undefined,
             status: undefined,
-            _id : undefined,
-            retry_cnt : undefined,
+            proxy_info : undefined,
+            _id : undefined
         };
     }
 
@@ -149,10 +149,11 @@
         WAITING_FOR_OTHER_TASK : '다른 작업 기다리는 중',
         FAIL : '실패',
         DONE : '작업 완료',
+        TRY_TO_LOGIN : '로그인 하는 중',
         ON_PAGE : '상품 페이지 여는 중',
         ADD_TO_CART : '카트에 넣는 중',
         TRY_TO_DRAW : 'THE DRAW 준비 중',
-        GET_PRODUCT_INFO : '상품 정보를 얻는 중',
+        GET_PRODUCT_INFO : '상품 정보 얻는 중',
         TRY_TO_PAY : '결제 시도 중',
         READY_TO_PAY : '결제 대기 중'
     };

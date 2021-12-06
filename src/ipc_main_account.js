@@ -1,8 +1,8 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("./api/browser_context.js").BrowserContext;
 const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
-const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
+const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
 
 function register(){
 
@@ -24,7 +24,9 @@ function register(){
 
         try{
             BrowserContextManager.add(borwser_context);
-            write_user_info_file(BrowserContextManager, (err) =>{
+
+            const file_data = BrowserContextManager.get_file_data();
+            UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
                 event.reply('add-account-reply' + data.id, err);
             });
         }catch(e){
@@ -44,7 +46,8 @@ function register(){
         }
 
         try{
-            write_user_info_file(BrowserContextManager, (err) =>{
+            const file_data = BrowserContextManager.get_file_data();
+            UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
                 event.reply('remove-account-reply' + data.id, err);
             });
         }catch(e){
@@ -55,7 +58,7 @@ function register(){
     ipcMain.on('get-account-info', (event, data) => {
 
         try{
-            read_user_info_file((_err, _data) =>{
+            UserFileManager.read(USER_FILE_PATH.USER_INFO, (_err, _data) =>{
                 event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
             });
         }catch(e){
@@ -97,25 +100,6 @@ function register(){
             }
 
         })();
-    });
-}
-
-function write_user_info_file(_browser_context_mngr, __callback){
-
-    let file_data = _browser_context_mngr.get_file_data();
-    let ufm = new UserFileManager();
-
-    ufm.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
-        __callback(err);
-    });
-}
-
-function read_user_info_file(__callback){
-
-    let ufm = new UserFileManager();
-
-    ufm.read(USER_FILE_PATH.USER_INFO, (err, data) =>{
-        __callback(err, data);
     });
 }
 

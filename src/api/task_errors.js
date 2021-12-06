@@ -18,7 +18,7 @@ class TaskCanceledError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, TaskInfoError);
+            Error.captureStackTrace(this, TaskCanceledError);
         }
 
         this.name = 'TaskCanceledError';
@@ -37,6 +37,20 @@ class ProductInfoError extends Error {
         
         this.name = 'ProductInfoError';
         this.product_info = product_info;
+    }
+}
+
+class LoginError extends Error {
+    constructor(browser_context, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, LoginError);
+        }
+        
+        this.name = 'LoginError';
+        this.browser_context = browser_context;
     }
 }
 
@@ -60,7 +74,7 @@ class SizeInfoError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, SizeInfoError);
         }
         
         this.name = 'SizeInfoError';
@@ -76,7 +90,7 @@ class ApplyDrawError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, ApplyDrawError);
         }
         
         this.name = 'ApplyDrawError';
@@ -92,7 +106,7 @@ class OpenCheckOutPageError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, OpenCheckOutPageError);
         }
         
         this.name = 'OpenCheckOutPageError';
@@ -107,7 +121,7 @@ class AddToCartError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, AddToCartError);
         }
         
         this.name = 'AddToCartError';
@@ -123,7 +137,7 @@ class CheckOutSingleShipError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, CheckOutSingleShipError);
         }
         
         this.name = 'CheckOutSingleShipError';
@@ -138,7 +152,7 @@ class CheckOutRequestError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, CheckOutRequestError);
         }
         
         this.name = 'CheckOutRequestError';
@@ -152,7 +166,7 @@ class PrepareKakaoPayError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, PrepareKakaoPayError);
         }
         this.kakaopay_prepare_payload = kakaopay_prepare_payload;
         this.name = 'PrepareKakaoPayError';
@@ -166,7 +180,7 @@ class OpenKakaoPayWindowError extends Error {
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenProductPageError);
+            Error.captureStackTrace(this, OpenKakaoPayWindowError);
         }
         this.kakao_data = kakao_data;
         this.name = 'OpenKakaoPayWindowError';
@@ -185,3 +199,4 @@ module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
 module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
 module.exports.OpenKakaoPayWindowError = OpenKakaoPayWindowError;
 module.exports.TaskCanceledError = TaskCanceledError;
+module.exports.LoginError = LoginError;

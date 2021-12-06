@@ -1,5 +1,5 @@
 const CookieManager = require("./cookie_mngr.js").CookieManager;
-const axios = require('axios');
+const axios = require('axios-proxy-fix');
 const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
@@ -40,6 +40,7 @@ class BrowserContext {
         this.__post_process_req_fail = this.__post_process_req_fail.bind(this);
         
         this.__http_request = this.__http_request.bind(this);
+        this.__get_proxy_cfg = this.__get_proxy_cfg.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
 
@@ -78,6 +79,8 @@ class BrowserContext {
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
+
+        this.proxy_info = undefined;
 
         //(TODO : 사용자 인터페이스로부터 입력받은 설정값을 Base로 지정될 수 있도록 기능 추가가 필요함.)
         this.__req_retry_interval = 1500; // app 설정으로 부터 지정되어야 할 값임.
@@ -151,6 +154,43 @@ class BrowserContext {
         return true;
     }
 
+    __get_proxy_cfg(){
+
+        // const proxy = {
+        //     host: 'xxx.xxx.xxx.xxx',
+        //     port: xxx,
+        //     // auth: {
+        //     //     username: 'xxx',
+        //     //     password: 'xx'
+        //     // }
+        // }
+
+        if(this.proxy_info == undefined) return undefined;
+
+        let proxy_cfg = {
+            host: this.proxy_info.ip,
+            port: this.proxy_info.port
+        }
+
+        let auth_cfg = undefined;
+
+        if(this.proxy_info.id != '' && this.proxy_info.id != undefined){
+            auth_cfg = {
+                username : this.proxy_info.id
+            }
+        } 
+        
+        if(auth_cfg != undefined && this.proxy_info.pwd != undefined){
+            auth_cfg.password = this.proxy_info.pwd
+        }
+
+        if(auth_cfg != undefined){
+            proxy_cfg.auth = auth_cfg
+        }
+
+        return proxy_cfg;
+    }
+
     async __http_request(method, url, headers, params, send_sensor_data = true){
 
         if(send_sensor_data){
@@ -168,9 +208,14 @@ class BrowserContext {
             method: method,
             url: url,
             timeout: this.__req_timout,
-            headers : headers
-        }
+            headers : headers,
+        };
 
+        let proxy_cfg = this.__get_proxy_cfg();
+        if(proxy_cfg != undefined){
+            axios_req_cfg.proxy = proxy_cfg;
+        }
+        
         if(params != undefined){
             if(method == BrowserContext.REQ_METHOD.POST){
                 axios_req_cfg['data'] = params;
@@ -226,7 +271,6 @@ class BrowserContext {
         for(var i = 0; i < this.__req_retry_cnt; i++){
 
             try{
-
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers);
     
                 if(res.status != 200){
@@ -287,7 +331,7 @@ class BrowserContext {
         }
     }
 
-    async login(__callback){
+    async login(){
         if(this.in_progress_login){
             console.error('inprogress login in work.')
             return false;
@@ -353,7 +397,7 @@ class BrowserContext {
                 
                 this.in_progress_login = false;
                 this.is_login = true;
-                await this.open_main_page(__callback);
+                await this.open_main_page();
                 return true;
 
             }catch(e){

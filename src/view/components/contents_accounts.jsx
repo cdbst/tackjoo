@@ -20,7 +20,6 @@ class ContentsAccounts extends React.Component {
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
 
-
         this.account_edit_modal_el_id = "edit-account-modal";
 
         let account_info = [];
@@ -235,7 +234,7 @@ class ContentsAccounts extends React.Component {
                     actions_col_width={this.actions_col_width}
                 />
             );
-        })
+        });
 
         return account_table_list;
     }

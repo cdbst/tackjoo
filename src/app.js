@@ -5,9 +5,9 @@ const IpcM = require('./ipc_main');
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1440,
+        width: 1560,
         height: 960,
-        minWidth : 1440,
+        minWidth : 1560,
         minHeight : 960,
         webPreferences: {
             sandbox: true,
@@ -22,7 +22,6 @@ function createWindow() {
     win.webContents.openDevTools();
     win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, "index.html"));
-
 }
 
 app.whenReady().then(() => {
