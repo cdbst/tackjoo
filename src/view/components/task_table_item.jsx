@@ -66,7 +66,7 @@ class TaskTableItem extends React.Component {
             return;
         }
 
-        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, (status) =>{
+        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, Index.g_settings_info.settings_info, (status) =>{
 
             this.setTaskStatus(status, ()=>{
                 this.ref_status_btn.current.disabled = false;
@@ -141,6 +141,8 @@ class TaskTableItem extends React.Component {
         }else if(this.state.status == common.TASK_STATUS.READY){
             return '#ffc107'; //yellow
         }else if(this.state.status == common.TASK_STATUS.PAUSE){
+            return '#dc3545'; //red
+        }else if(this.state.status == common.TASK_STATUS.TRY_TO_RETRY){
             return '#dc3545'; //red
         }else if(this.isPossibleToPlay()){
             return '#ffffff'; //white

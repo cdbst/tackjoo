@@ -14,6 +14,7 @@ class ContentsBilling extends React.Component {
         this.isBillingInfoModified = this.isBillingInfoModified.bind(this);
         this.getCurrentBillingInfo = this.getCurrentBillingInfo.bind(this);
         this.setBillingInfoToUI = this.setBillingInfoToUI.bind(this);
+        this.registerOnHideTabEvent = this.registerOnHideTabEvent.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
@@ -31,7 +32,11 @@ class ContentsBilling extends React.Component {
     componentDidMount(){
         this.__mount = true;
         this.loadBillingInfo();
+        this.registerOnHideTabEvent();
+        
+    }
 
+    registerOnHideTabEvent(){
         let tab_menu_billing = document.querySelector('#' + MenuBar.MENU_ID.BILLING);
         tab_menu_billing.addEventListener('hide.bs.tab', (event) => {
             if(this.isBillingInfoModified() == false) return;

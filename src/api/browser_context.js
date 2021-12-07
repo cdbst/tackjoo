@@ -58,6 +58,8 @@ class BrowserContext {
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
+
+        this.update_settings = this.update_settings.bind(this);
         
         if(args.length == 3 || args.length == 0){
             this.__init.apply(null, args); // email, pwd, id
@@ -81,12 +83,13 @@ class BrowserContext {
         this.sensor_data_server_url = undefined;
 
         this.proxy_info = undefined;
+        this.settings_info = undefined;
 
-        //(TODO : 사용자 인터페이스로부터 입력받은 설정값을 Base로 지정될 수 있도록 기능 추가가 필요함.)
         this.__req_retry_interval = 1500; // app 설정으로 부터 지정되어야 할 값임.
         this.__req_retry_cnt = 30;
         this.__req_timout = 0;
-
+        
+        
         this.__cookie_storage = new CookieManager();
         this.__cookie_storage.add_cookie_data('social_type=comlogin');
         this.__cookie_storage.add_cookie_data('NikeCookie=ok');
@@ -98,6 +101,15 @@ class BrowserContext {
         Object.assign(this, json);
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
+    }
+
+    update_settings(settings_info){
+
+        this.settings_info = settings_info;
+    
+        this.__req_retry_interval = this.settings_info.http_req_ret_interval * 1000;
+        this.__req_retry_cnt = this.settings_info.http_req_ret_cnt + 1;
+        this.__req_timout = this.settings_info.http_req_timeout * 1000;
     }
 
     async __send_fake_sensor_data(){

@@ -11,6 +11,7 @@ function register(){
         let task_info = data.payload.task_info;
         let product_info = data.payload.product_info;
         let billing_info = data.payload.billing_info;
+        let settings_info = data.payload.settings_info;
 
         let browser_context = BrowserContextManager.get(task_info.account_id);
         
@@ -25,7 +26,7 @@ function register(){
             event.reply('play-task-reply' + task_info._id, {status : status_data, done : false});
         };
 
-        let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, message_cb);
+        let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, settings_info, message_cb);
 
         (async () => {
             try{

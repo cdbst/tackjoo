@@ -28,7 +28,9 @@ contextBridge.exposeInMainWorld('electron', {
     saveBillingInfo: _saveBillingInfo,
     loadBillingInfo: _loadBillingInfo,
     saveProxyInfo : _saveProxyInfo,
-    loadProxyInfo : _loadProxyInfo
+    loadProxyInfo : _loadProxyInfo,
+    saveSettingsInfo : _saveSettingsInfo,
+    loadSettingsInfo : _loadSettingsInfo
 });
 
 let get_sensor_data = undefined;
@@ -189,9 +191,9 @@ function _getLoggedInAccountInfoList(__callback){
 
 let task_ipc_handler_map = {};
 
-function _playTask(_task_info, _product_info, _billing_info, __callback){
+function _playTask(_task_info, _product_info, _billing_info, _settings_info, __callback){
     
-    let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info, billing_info : _billing_info});
+    let ipc_data = get_ipc_data({task_info : _task_info, product_info : _product_info, billing_info : _billing_info, settings_info : _settings_info});
 
     let task_evt_handler = (_event, data) => {
 
@@ -293,5 +295,30 @@ function _loadProxyInfo(__callback){
 
     ipcRenderer.once('load-proxy-info-reply' + ipc_data.id, (_event, proxy_info) => {
         __callback(proxy_info.err, proxy_info.data);
+    });
+}
+
+function _saveSettingsInfo(settings_info, __callback){
+
+    if(settings_info == undefined || typeof settings_info !== 'object'){
+        __callback('proxy info to save is not valid data.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({settings_info : settings_info});
+    ipcRenderer.send('save-settings-info', ipc_data);
+
+    ipcRenderer.once('save-settings-info-reply' + ipc_data.id, (_event, save_result) => {
+        __callback(save_result.err);
+    });
+}
+
+function _loadSettingsInfo(__callback){
+
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-settings-info', ipc_data);
+
+    ipcRenderer.once('load-settings-info-reply' + ipc_data.id, (_event, settings_info) => {
+        __callback(settings_info.err, settings_info.data);
     });
 }

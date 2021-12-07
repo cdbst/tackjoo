@@ -10,11 +10,24 @@ const browser_context = new BrowserContext(JSON.parse(workerData.browser_context
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
+const settings_info = workerData.settings_info;
 
 browser_context.proxy_info = task_info.proxy_info;
+browser_context.update_settings(settings_info);
+
+let remain_ret_cnt = settings_info.task_ret_cnt;
+const task_ret_interval = settings_info.task_ret_interval * 1000;
 
 process.on('unhandledRejection', (err) => {
-    throw err;
+    if(remain_ret_cnt > 0){
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
+        remain_ret_cnt--;
+        common.async_sleep(task_ret_interval).then(()=>{
+            main(browser_context, task_info, product_info, billing_info);
+        });
+    }else{
+        throw err;
+    }
 });
 
 process.on('exit', () => {

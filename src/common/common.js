@@ -150,6 +150,7 @@
         FAIL : '실패',
         DONE : '작업 완료',
         TRY_TO_LOGIN : '로그인 하는 중',
+        TRY_TO_RETRY : '재시도 하는 중',
         ON_PAGE : '상품 페이지 여는 중',
         ADD_TO_CART : '카트에 넣는 중',
         TRY_TO_DRAW : 'THE DRAW 준비 중',
