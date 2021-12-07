@@ -12,7 +12,8 @@ class AppSettings{
             http_req_ret_cnt : 30,
             http_req_ret_interval : 1.5,
             http_req_timeout : 0,
-            task_ret_cnt : 0
+            task_ret_cnt : 0,
+            task_ret_interval : 1
         }
     }
 

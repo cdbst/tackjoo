@@ -108,7 +108,7 @@ class BrowserContext {
         this.settings_info = settings_info;
     
         this.__req_retry_interval = this.settings_info.http_req_ret_interval * 1000;
-        this.__req_retry_cnt = this.settings_info.http_req_ret_cnt;
+        this.__req_retry_cnt = this.settings_info.http_req_ret_cnt + 1;
         this.__req_timout = this.settings_info.http_req_timeout * 1000;
     }
 

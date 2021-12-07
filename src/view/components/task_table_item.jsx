@@ -142,6 +142,8 @@ class TaskTableItem extends React.Component {
             return '#ffc107'; //yellow
         }else if(this.state.status == common.TASK_STATUS.PAUSE){
             return '#dc3545'; //red
+        }else if(this.state.status == common.TASK_STATUS.TRY_TO_RETRY){
+            return '#dc3545'; //red
         }else if(this.isPossibleToPlay()){
             return '#ffffff'; //white
         }else{

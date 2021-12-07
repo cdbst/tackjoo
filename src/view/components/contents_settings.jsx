@@ -5,13 +5,15 @@ class ContentsSettings extends React.Component {
         HTTP_REQ_RET_CNT : 'http-req-ret-cnt-input',
         HTTP_REQ_TIMEOUT : 'http-req-timeout-input',
         TASK_RET_COUNT : 'task-ret-cnt-input',
+        TASK_RET_INTERVAL : 'task-ret-interval-input'
     }
 
     static OPTION_TEXT = {
         HTTP_REQ_RET_INTERVAL : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1.5)',
-        HTTP_REQ_RET_CNT : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 최대 몇 회의 재시도 할지 설정합니다. (기본 값 : 30)',
-        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 요청을 최대 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력) ',
-        TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0 회)',
+        HTTP_REQ_RET_CNT : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 회 재시도 할지 설정합니다. (기본 값 : 30)',
+        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 요청을 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력) ',
+        TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
+        TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)'
     }
 
     constructor(props) {
@@ -92,6 +94,9 @@ class ContentsSettings extends React.Component {
 
         let task_ret_cnt = settings_info.task_ret_cnt == undefined ? '' : settings_info.task_ret_cnt;
         this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_COUNT, task_ret_cnt);
+
+        let task_ret_interval = settings_info.task_ret_interval == undefined ? '' : settings_info.task_ret_interval;
+        this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_INTERVAL, task_ret_interval);
     }
 
     getCurrentSettingsInfo(){
@@ -108,11 +113,15 @@ class ContentsSettings extends React.Component {
         let task_ret_cnt = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_COUNT);
         task_ret_cnt = task_ret_cnt  == '' ? undefined : parseInt(task_ret_cnt);
 
+        let task_ret_interval = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_INTERVAL);
+        task_ret_interval = task_ret_interval  == '' ? undefined : parseFloat(task_ret_interval);
+
         return {
             http_req_ret_cnt : http_req_ret_cnt,
             http_req_ret_interval : http_req_ret_interval,
             http_req_timeout : http_req_timeout,
             task_ret_cnt : task_ret_cnt,
+            task_ret_interval : task_ret_interval
         }
     }
 
@@ -145,6 +154,7 @@ class ContentsSettings extends React.Component {
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr /> <br />
                             <SettingsSubTitle sub_title="<Tast 설정>" /> <br />
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
+                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
                         </div>
                         <div className="col-md-4">
                         </div>
