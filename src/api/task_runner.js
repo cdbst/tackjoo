@@ -1,7 +1,7 @@
 const { Worker } = require('worker_threads');
 const path = require('path');
 const TaskCommon = require('./task_common.js');
-const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
+const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const ExternalPage = require("./external_page.js").ExternalPage;
 const { TaskCanceledError } = require("./task_errors.js");
 

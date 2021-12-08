@@ -3,7 +3,7 @@ const axios = require('axios-proxy-fix');
 const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
-const gen_sensor_data = require("../ipc_main_sensor.js").gen_sensor_data;
+const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 
 class BrowserContext {

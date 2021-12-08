@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "build": "electron-packager . \"SNKRS Bot KR\"",
-    "start": "electron ./app.js"
+    "start": "electron ./app.js --platform win32 --arch x64 --out dist --prune"
   },
   "repository": {
     "type": "git",

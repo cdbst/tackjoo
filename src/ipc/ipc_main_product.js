@@ -1,5 +1,5 @@
 const {ipcMain} = require("electron");
-const BrowserContext = require("./api/browser_context.js").BrowserContext;
+const BrowserContext = require("../api/browser_context.js").BrowserContext;
 
 function register(){
 

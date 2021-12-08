@@ -1,4 +1,4 @@
-const common = require('./common/common.js');
+const common = require('../common/common.js');
 
 /**
  * 
