@@ -1,8 +1,8 @@
 const {ipcMain} = require("electron");
-const BrowserContext = require("./api/browser_context.js").BrowserContext;
-const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
-const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
-const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
+const BrowserContext = require("../api/browser_context.js").BrowserContext;
+const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
+const USER_FILE_PATH = require('../utils/user_file_path.js').USER_FILE_PATH;
+const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
 
 function register(){
 

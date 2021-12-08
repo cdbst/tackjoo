@@ -5,23 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Chrome - Electron UI",
-            "request": "launch",
-            "type": "pwa-chrome",
-            "url": "http://127.0.0.1:5500/src/index.html",
-            "webRoot": "${workspaceFolder}"
-        },
-        {
-            "name": "Electron - APP",
-            "type": "node",
-            "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
-            "program": "${workspaceRoot}/src/app.js"
-        },
-        {
             "name": "Tester BackEnd",
-            "program": "${workspaceFolder}/tester/test_app.js",
+            "program": "${workspaceFolder}/test_app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

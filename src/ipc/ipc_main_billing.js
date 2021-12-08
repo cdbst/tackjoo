@@ -1,7 +1,7 @@
 const {ipcMain} = require("electron");
-const USER_FILE_PATH = require('./user_file_path.js').USER_FILE_PATH;
-const search_address = require('./api/address_search').search_address;
-const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
+const USER_FILE_PATH = require('../utils/user_file_path.js').USER_FILE_PATH;
+const search_address = require('../api/address_search').search_address;
+const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
 
 function register(){
 

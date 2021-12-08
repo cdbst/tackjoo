@@ -132,6 +132,7 @@ class ContentsSettings extends React.Component {
 
         Index.g_settings_info.saveAppSettings((error) =>{
             if(error) Index.g_sys_msg_q.enqueue('ERROR', 'Cannot save settings information to file.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            else Index.g_sys_msg_q.enqueue('Info', 'Settings information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 

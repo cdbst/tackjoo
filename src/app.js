@@ -1,7 +1,7 @@
 const { app, BrowserWindow} = require("electron");
 
 const path = require("path");
-const IpcM = require('./ipc_main');
+const IpcM = require('./ipc/ipc_main');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -19,7 +19,7 @@ function createWindow() {
 
     IpcM.register(win);
 
-    win.webContents.openDevTools();
+    //win.webContents.openDevTools();
     win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, "index.html"));
 }

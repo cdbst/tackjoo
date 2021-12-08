@@ -1,8 +1,8 @@
 const {ipcMain} = require("electron");
-const BrowserContextManager = require("./api/browser_context_mngr.js").BrowserContextManager;
-const TaskRunner = require("./api/task_runner").TaskRunner;
-const TaskRunnerManager = require("./api/task_runner_mngr").taskRunnerManager;
-const common = require("./common/common");
+const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
+const TaskRunner = require("../api/task_runner").TaskRunner;
+const TaskRunnerManager = require("../api/task_runner_mngr").taskRunnerManager;
+const common = require("../common/common");
 
 function register(){
     
