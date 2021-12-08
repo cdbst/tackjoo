@@ -4,7 +4,7 @@
   "description": "Nike SNKRS BOT for korean",
   "main": "app.js",
   "scripts": {
-    "prebuild": "cd .. && npx babel ./src/view --out-dir ./src --presets react-app/prod",
+    "prebuild": "npx babel --watch ./view --out-dir ./ --presets react-app/prod",
     "build": "electron-packager . \"SNKRS Bot KR\" --platform win32 --arch x64 --out ../dist --prune",
     "postbuild": "npx asar pack \"../dist/SNKRS Bot KR-win32-x64/resources/app\" \"../dist/SNKRS Bot KR-win32-x64/resources/app.asar\" && rmdir /s /q \"../dist/SNKRS Bot KR-win32-x64/resources/app\"",
     "start": "electron ./app.js"
