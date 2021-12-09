@@ -9,7 +9,7 @@ NIKE SNKR BOT
 
 ## dev env setting
 + Start babel preprocessor before editing code (for convert jsx to js)
-  + npx babel --watch ./src/view --out-dir ./src --presets react-app/prod
+  + npx babel --watch ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod
 
 ## dev tools for vs code exts
 + Debugger for chome(firefox, edge ..)
