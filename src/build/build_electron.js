@@ -1,6 +1,6 @@
 const packager = require('electron-packager');
-//const asar = require('asar');
 const path = require('path');
+var package_json = require('../package.json');
 
 const options = {
     platform : 'win32',
@@ -8,12 +8,10 @@ const options = {
     out : path.resolve(path.join('.', 'dist', 'package')),
     prune : true,
     asar : true,
-    appVersion : '0.1.0',
+    appVersion : package_json.version,
     dir : path.resolve(path.join('.', 'dist')),
     overwrite : true
 };
-
-bundle();
 
 async function bundle() {
     try{
@@ -23,15 +21,6 @@ async function bundle() {
     }catch(e){
         console.log(e);
     }
-}
-
-async function pack_asar(package_path){
-    const src = path.join(package_path, 'resources', 'app');
-    const dest = path.join(package_path, 'resources', 'app.asar');
-
-    await asar.createPackageWithOptions(src, dest, {
-        unpackDir : "**/{res}"
-    });
 }
 
 module.exports.bundle = bundle;
