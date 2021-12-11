@@ -12,4 +12,5 @@ const build_electron = require('./build_electron');
     build_renderer.bundle();
     console.log('#step4 > waiting for bundling electron package..');
     await build_electron.bundle();
+    console.log('# complete !!');
 })();

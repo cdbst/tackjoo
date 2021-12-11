@@ -14,7 +14,7 @@ const package_dirs = [
     'common',
     'lib',
     'node_modules',
-    'res',
+    'res'
 ];
 
 function prebuild(){
