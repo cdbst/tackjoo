@@ -9,9 +9,7 @@ var uglify = require('gulp-uglify');
 const includes = ['./index.js', './components'];
 
 const scripts = get_script_file();
-const result = build_scripts(scripts);
-
-process.exit(result == true ? 0 : 1);
+build_scripts(scripts);
 
 function get_script_file(){
     const html_file = fs.readFileSync('./index.html');
