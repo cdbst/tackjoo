@@ -15,6 +15,7 @@ class ContentsBilling extends React.Component {
         this.getCurrentBillingInfo = this.getCurrentBillingInfo.bind(this);
         this.setBillingInfoToUI = this.setBillingInfoToUI.bind(this);
         this.registerOnHideTabEvent = this.registerOnHideTabEvent.bind(this);
+        this.getDefaultBillingInfo = this.getDefaultBillingInfo.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
@@ -33,7 +34,16 @@ class ContentsBilling extends React.Component {
         this.__mount = true;
         this.loadBillingInfo();
         this.registerOnHideTabEvent();
-        
+    }
+
+    getDefaultBillingInfo(){
+        return {
+            buyer_name: '',
+            phone_num: '',
+            buyer_addr1: '',
+            buyer_addr2: '',
+            postal_code: ''
+        }
     }
 
     registerOnHideTabEvent(){
@@ -72,11 +82,14 @@ class ContentsBilling extends React.Component {
             phone_num : this.ref_phone_num.current.value,
             buyer_addr1 : this.ref_addr1.current.value,
             buyer_addr2 : this.ref_addr2.current.value,
-            postal_code : this.ref_postcode.current.value
+            postal_code : this.ref_postcode.current.value == undefined ? '' : this.ref_postcode.current.value
         };
     }
 
     setBillingInfoToUI(billing_info){
+
+        if(billing_info == undefined) return;
+
         this.ref_buyer_name.current.value = billing_info.buyer_name;
         this.ref_phone_num.current.value = billing_info.phone_num;
         this.ref_addr1.current.value = billing_info.buyer_addr1;
@@ -128,6 +141,7 @@ class ContentsBilling extends React.Component {
 
             if(err){
                 Index.g_sys_msg_q.enqueue('Warn', 'Cannot load billing information.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_billing_info = this.getDefaultBillingInfo();
                 return;
             }
 
@@ -247,7 +261,7 @@ class ContentsBilling extends React.Component {
                             <div className="md-12 row" style={{marginBottom : 5}}>
                                 <div className="col-mb-6">
                                     <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">배송 주소</label>
-                                    <label className="form-label contents-bill-input-label" ref={this.ref_postcode}></label>
+                                    <label className="form-label contents-bill-input-label" ref={this.ref_postcode} ></label>
                                     <div className="input-group col-mb-3">
                                         <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)} style={{'--width' : '450px'}}/>
                                         <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>

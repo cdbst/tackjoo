@@ -1,10 +1,10 @@
 const {parentPort, workerData} = require('worker_threads');
-const common = require("../common/common.js");
-const TaskUtils = require('./task_utils.js');
-const BrowserContext = require('./browser_context.js').BrowserContext;
+const common = require("./common/common.js");
+const TaskUtils = require('./api/task_utils.js');
+const BrowserContext = require('./api/browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./api/task_errors.js');
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;

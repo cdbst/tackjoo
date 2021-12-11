@@ -4,6 +4,8 @@ const TaskCommon = require('./task_common.js');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const ExternalPage = require("./external_page.js").ExternalPage;
 const { TaskCanceledError } = require("./task_errors.js");
+const { app } = require('electron');
+const FileCache = require('./file_cache').FileCache;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -150,15 +152,21 @@ class TaskRunner{
 
             this.resolve = resolve;
             this.reject = reject;
+            const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
+            let task_js_contents = FileCache.get(task_js_path);
+            if(task_js_contents == undefined){
+                task_js_contents = FileCache.cache(task_js_path);
+            }
             
-            this.worker = new Worker(path.join(__dirname, 'task.js'), {
+            this.worker = new Worker(task_js_contents, {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
                     task_info : this.task_info,
                     product_info : this.product_info,
                     billing_info : this.billing_info,
                     settings_info : this.settings_info
-                }
+                },
+                eval : true
             });
     
             this.worker.on('message', this.on_message);
