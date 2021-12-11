@@ -8,8 +8,10 @@ var uglify = require('gulp-uglify');
 
 const includes = ['./index.js', './components'];
 
-const scripts = get_script_file();
-build_scripts(scripts);
+function bundle(){
+    const scripts = get_script_file();
+    build_scripts(scripts);
+}
 
 function get_script_file(){
     const html_file = fs.readFileSync('./index.html');
@@ -44,3 +46,5 @@ function build_scripts(scripts) {
         console.error(e);
     }
 }
+
+module.exports.bundle = bundle;

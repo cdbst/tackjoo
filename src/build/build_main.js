@@ -1,14 +1,11 @@
 const path = require('path');
 const esbuild = require('esbuild');
 
-bundle();
-
 function bundle(){
     esbuild.build({
-        entryPoints: ['app.js'],
+        entryPoints: ['app.js', 'task.js'],
         bundle: true,
-        outfile: path.join('dist', 'app.min.js'),
-        //outdir: 'dist',
+        outdir: 'dist',
         minify: true,
         platform: 'node',
         //target : 'node14.17.0',
@@ -20,3 +17,4 @@ function bundle(){
 }
 
 
+module.exports.bundle = bundle;
