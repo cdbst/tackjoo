@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const target_files = [
+const package_files = [
     'index.css',
     'package.json',
     'package-lock.json',
@@ -9,7 +9,7 @@ const target_files = [
     'task.js'
 ];
 
-const target_dirs = [
+const package_dirs = [
     'akam',
     'common',
     'lib',
@@ -17,19 +17,21 @@ const target_dirs = [
     'res',
 ];
 
-cleanup();
-copy_target_files();
+function prebuild(){
+    cleanup();
+    copy_package_files();
+}
 
 function cleanup(){
 
-    target_files.forEach((file) =>{
+    package_files.forEach((file) =>{
         const __path = path.join('dist', file);
         if(fs.existsSync(__path)){
             fs.unlinkSync(__path);
         }
     });
 
-    target_dirs.forEach((dir) =>{
+    package_dirs.forEach((dir) =>{
         const __path = path.join('dist', dir);
         if(fs.existsSync(__path)){
             fs.rmSync(__path, { recursive: true, force: true });
@@ -37,12 +39,12 @@ function cleanup(){
     });
 }
 
-function copy_target_files(){
-    target_files.forEach((file) =>{
+function copy_package_files(){
+    package_files.forEach((file) =>{
         copyFileSync(file, path.join('dist', file));
     });
 
-    target_dirs.forEach((dir) =>{
+    package_dirs.forEach((dir) =>{
         copyFolderRecursiveSync(dir, path.join('dist'));
     });
 }
@@ -83,3 +85,5 @@ function copyFolderRecursiveSync( source, target ) {
         } );
     }
 }
+
+module.exports.prebuild = prebuild;

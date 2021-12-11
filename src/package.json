@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
-    "build": "electron-packager . \"SNKRS Bot KR\" --platform win32 --arch x64 --out ../dist --prune",
-    "postbuild": "npx asar pack \"../dist/SNKRS Bot KR-win32-x64/resources/app\" \"../dist/SNKRS Bot KR-win32-x64/resources/app.asar\" --unpack-dir \"{view}\"",
+    "build": "node ./build/bundle.js",
     "start": "electron ./app.js"
   },
   "repository": {
