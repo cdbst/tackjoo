@@ -9,7 +9,7 @@ function bundle(){
         bundle: true,
         outfile: path.join('dist', 'app.min.js'),
         //outdir: 'dist',
-        //minify: true,
+        minify: true,
         platform: 'node',
         //target : 'node14.17.0',
         external: ['electron']
