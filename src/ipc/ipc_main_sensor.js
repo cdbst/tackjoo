@@ -1,7 +1,10 @@
-const {ipcMain} = require("electron");
 const util = require("./ipc_main_util.js");
 const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
 const {isMainThread} = require('worker_threads');
+
+let ipcMain = undefined;
+if(isMainThread) ipcMain = require("electron").ipcMain;
+
 
 let g_win = undefined;
 
