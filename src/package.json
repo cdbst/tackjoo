@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
-    "build": "node ./build/bundle.js",
-    "prestart" : "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
+    "build": "node ./build/build.js",
+    "prestart": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "start": "electron ./app.js"
   },
   "repository": {
@@ -39,6 +39,7 @@
     "babel-preset-react-app": "^3.1.2",
     "electron": "^14.0.1",
     "electron-packager": "^15.4.0",
+    "electron-winstaller": "^5.0.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
