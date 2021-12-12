@@ -23,8 +23,8 @@ const build_electron_v2 = require('./build_electron_v2');
     }
 
     console.log('#step4 > waiting for bundling electron package..');
-    //const outputs = await build_electron_v2.build();
-    const outputs = await build_electron.bundle();
+    const outputs = await build_electron_v2.build();
+    //const outputs = await build_electron.bundle();
     if(outputs == undefined){
         console.log('# build fail !! - bundling electron package');
         process.exit(1);
