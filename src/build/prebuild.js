@@ -5,8 +5,7 @@ const package_files = [
     'index.css',
     'package.json',
     'package-lock.json',
-    'preload.js',
-    'task.js'
+    'preload.js'
 ];
 
 const package_dirs = [
@@ -16,6 +15,12 @@ const package_dirs = [
     'node_modules',
     'res'
 ];
+
+const cleanup_files = [
+    'index.min.js',
+    'app.js',
+    'task.js',
+]
 
 const cleanup_dirs = [
     'package',
@@ -47,6 +52,13 @@ function cleanup(){
         const __path = path.join('dist', dir);
         if(fs.existsSync(__path)){
             fs.rmSync(__path, { recursive: true, force: true });
+        }
+    });
+
+    cleanup_files.forEach((file) =>{
+        const __path = path.join('dist', file);
+        if(fs.existsSync(__path)){
+            fs.unlinkSync(__path);
         }
     });
 }

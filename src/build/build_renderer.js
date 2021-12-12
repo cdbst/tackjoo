@@ -10,7 +10,7 @@ const includes = ['./index.js', './components'];
 
 function bundle(){
     const scripts = get_script_file();
-    build_scripts(scripts);
+    return build_scripts(scripts);
 }
 
 function get_script_file(){
@@ -44,6 +44,7 @@ function build_scripts(scripts) {
         .pipe(gulp.dest('dist'));
     }catch(e){
         console.error(e);
+        return undefined;
     }
 }
 
