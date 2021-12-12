@@ -3,6 +3,8 @@ const builder = require('electron-builder');
 const Platform = builder.Platform;
 const package_json = require('../package.json');
 
+const app_icon_path = path.join(path.join('.', 'build', 'icon.ico')); //base path : /src/dist/
+
 async function build(){
     try {
         const result = await builder.build({
@@ -11,9 +13,14 @@ async function build(){
             config: {
                 asar : true,
                 appId : package_json.appid,
-                // extraFiles : {
-                //     from
-                // }
+                copyright : package_json.copyright,
+                win: {
+                    icon : app_icon_path
+                },
+                nsis : {
+                    installerIcon : app_icon_path,
+                    uninstallerIcon : app_icon_path
+                }
             }
         });
 

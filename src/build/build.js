@@ -1,7 +1,7 @@
 const prebuild = require('./prebuild').prebuild;
 const build_main = require('./build_main');
 const build_renderer = require('./build_renderer');
-const build_electron = require('./build_electron');
+//const build_electron = require('./build_electron');
 const build_electron_v2 = require('./build_electron_v2');
 
 (async()=>{
