@@ -42,9 +42,7 @@ class MenuBar extends React.Component {
         return (
             <div>
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
-                    <li className="nav-item disabled" tabIndex="-1">
-                        <a className="nav-link" >SNKRS BOT</a>
-                    </li>
+                    
                     <li className="nav-item" role="presentation">
                         <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">Tasks</a>
                     </li>

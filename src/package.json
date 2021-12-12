@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Nike SNKRS BOT for korean",
   "appid": "com.cdbst.snkrsbotkr",
+  "copyright" : "Copyright on cdbst all right reserved.",
   "main": "app.js",
   "scripts": {
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
