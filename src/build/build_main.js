@@ -1,19 +1,22 @@
-const path = require('path');
 const esbuild = require('esbuild');
 
-function bundle(){
-    esbuild.build({
-        entryPoints: ['app.js', 'task.js'],
-        bundle: true,
-        outdir: 'dist',
-        minify: true,
-        platform: 'node',
-        //target : 'node14.17.0',
-        external: ['electron']
-    }).catch((e) => {
-        console.error(e);
-        process.exit(1)
-    });
+async function bundle(){
+    
+    try{
+        await esbuild.build({
+            entryPoints: ['app.js', 'task.js'],
+            bundle: true,
+            outdir: 'dist',
+            minify: true,
+            platform: 'node',
+            //target : 'node14.17.0',
+            external: ['electron']
+        });
+        return true;
+    }catch(err){
+        console.error(err);
+        return false;
+    }
 }
 
 
