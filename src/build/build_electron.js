@@ -1,6 +1,7 @@
 const packager = require('electron-packager');
 const path = require('path');
-var package_json = require('../package.json');
+const package_json = require('../package.json');
+const zip = require('electron-installer-zip');
 
 const options = {
     platform : 'win32',
@@ -17,10 +18,29 @@ async function bundle() {
     try{
         const package_path = await packager(options);
         console.log(`Electron app bundles created:\n${package_path.join("\n")}`);
-        //await pack_asar(package_path[0]);
-    }catch(e){
-        console.log(e);
+        const zip_path = await do_zip(package_path[0])
+        return package_path.push(zip_path);
+    }catch(err){
+        console.log(err);
+        return undefined;
     }
+}
+
+async function do_zip(package_path){
+
+    const opts = {
+        dir: package_path,
+        out: path.resolve(path.join('.', 'dist', 'package', package_json.name + package_json.version + '.zip')),
+    }
+
+    return new Promise((resolve, rejects) =>{
+        zip(opts, (err, res) => {
+            if (err) {
+                rejects(err);
+            }
+            resolve(res);
+        });
+    });
 }
 
 module.exports.bundle = bundle;

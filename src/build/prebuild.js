@@ -17,6 +17,11 @@ const package_dirs = [
     'res'
 ];
 
+const cleanup_dirs = [
+    'package',
+    'dist'
+]
+
 function prebuild(){
     cleanup();
     copy_package_files();
@@ -32,6 +37,13 @@ function cleanup(){
     });
 
     package_dirs.forEach((dir) =>{
+        const __path = path.join('dist', dir);
+        if(fs.existsSync(__path)){
+            fs.rmSync(__path, { recursive: true, force: true });
+        }
+    });
+
+    cleanup_dirs.forEach((dir) =>{
         const __path = path.join('dist', dir);
         if(fs.existsSync(__path)){
             fs.rmSync(__path, { recursive: true, force: true });

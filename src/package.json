@@ -2,6 +2,7 @@
   "name": "snkrsbotkr",
   "version": "1.0.0",
   "description": "Nike SNKRS BOT for korean",
+  "appid": "com.cdbst.snkrsbotkr",
   "main": "app.js",
   "scripts": {
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
@@ -29,17 +30,18 @@
     "axios": "^0.24.0",
     "axios-proxy-fix": "^0.16.3",
     "cheerio": "^1.0.0-rc.10",
-    "cookie": "^0.4.1",
-    "copyfiles": "^2.4.1",
-    "esbuild": "^0.12.28"
+    "cookie": "^0.4.1"
   },
   "devDependencies": {
     "asar": "^3.1.0",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
     "electron": "^14.0.1",
+    "electron-builder": "^22.14.5",
+    "electron-installer-zip": "^0.1.2",
     "electron-packager": "^15.4.0",
     "electron-winstaller": "^5.0.0",
+    "esbuild": "^0.12.28",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
