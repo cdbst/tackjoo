@@ -5,6 +5,7 @@ const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
+const log = require('electron-log');
 
 class BrowserContext {
 
@@ -119,8 +120,8 @@ class BrowserContext {
             await this.send_sensor_data(sensor_data);
             return true;
 
-        }catch(e){
-            console.error(e);
+        }catch(err){
+            log.info(common.get_log_str('browser_context.js', '__send_fake_sensor_data', err));
             return false;
         }
     }

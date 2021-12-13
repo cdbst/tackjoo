@@ -4,8 +4,9 @@ const log = require('electron-log');
 const path = require("path");
 const IpcM = require('./ipc/ipc_main');
 const common = require('./common/common');
+const app_cfg = require('./app_config');
 
-set_log_config();
+app_cfg.set_log('info', false);
 
 function create_window() {
     try{
@@ -31,12 +32,6 @@ function create_window() {
     }catch(e){
         log.error(common.get_log_str('app.js', 'create_window', e.message));
     }
-}
-
-function set_log_config(){
-    const APP_DATA_PATH = require('./user_file_path').APP_DATA_PATH;
-    const cur_date = common.get_formatted_date_str(new Date());
-    log.transports.file.resolvePath = () => path.join(APP_DATA_PATH, 'logs', (cur_date + '.log'));
 }
 
 app.whenReady().then(() => {
