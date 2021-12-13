@@ -7,7 +7,8 @@ const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError,
     PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./api/task_errors.js');
 
 const log = require('electron-log');
-log.transports.file.resolvePath = () => workerData.log_path;
+const app_cfg = require('./app_config');
+app_cfg.set_log('info', false, workerData.log_path);
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;

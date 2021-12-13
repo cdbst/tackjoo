@@ -16,7 +16,7 @@ function register(){
             let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
         }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'get-logged-in-account-info-list-callback', err.message));
+            log.error(common.get_log_str('ipc_main_account.js', 'get-logged-in-account-info-list-callback', err));
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : 'invalid exception has been occurred', data : undefined});
         }
     });
@@ -34,7 +34,7 @@ function register(){
                 event.reply('add-account-reply' + data.id, err);
             });
         }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err.message));
+            log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err));
             event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
         }
         
@@ -56,7 +56,7 @@ function register(){
                 event.reply('remove-account-reply' + data.id, err);
             });
         }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'remove-account-callback', err.message));
+            log.error(common.get_log_str('ipc_main_account.js', 'remove-account-callback', err));
             event.reply('remove-account-reply' + data.id, 'invalid exception has been occurred while removing account information');
         }
     });
@@ -68,7 +68,7 @@ function register(){
                 event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
             });
         }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'get-account-info-callback', err.message));
+            log.error(common.get_log_str('ipc_main_account.js', 'get-account-info-callback', err));
             event.reply('get-account-info-reply' + data.id, {err : 'invalid exception has been occurred while getting account information', data : undefined});
         }
 

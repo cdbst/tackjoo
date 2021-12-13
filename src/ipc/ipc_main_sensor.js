@@ -5,6 +5,8 @@ const {isMainThread} = require('worker_threads');
 let ipcMain = undefined;
 if(isMainThread) ipcMain = require("electron").ipcMain;
 
+const log = require('electron-log');
+const common = require('../common/common');
 
 let g_win = undefined;
 
@@ -19,8 +21,8 @@ function register(_win){
         browser_context_list.forEach((browser_context) =>{
             try{
                 browser_context.send_sensor_data(sensor_data);
-            }catch(e){
-                console.warn(e);
+            }catch(err){
+                if(err) log.warn(common.get_log_str('ipc_main_sensor.js', 'send_sensor_data-callback', err));
             }
         });
     });
@@ -46,8 +48,9 @@ function gen_sensor_data(){
                 try{
                     let sensor_data = await global.MainThreadApiCaller.call('gen_sensor_data', undefined);
                     resolve(sensor_data);
-                }catch(e){
-                    reject(e);
+                }catch(err){
+                    log.error(common.get_log_str('ipc_main_sensor.js', 'global.MainThreadApiCaller-gen_sensor_data', err));
+                    reject(err);
                 }
             })();
         }

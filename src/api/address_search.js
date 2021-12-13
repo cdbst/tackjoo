@@ -1,5 +1,6 @@
 const axios = require('axios');
 const common = require('../common/common.js');
+const log = require('electron-log');
 
 const ADDR_SEARCH_API_URL = 'https://api.poesis.kr/post/search.php';
 
@@ -40,13 +41,15 @@ function search_address(address, __callback){
     .then(function (res) {
 
         if(res.data.error != ''){
-            __callback(res.error, undefined);
+            log.error(common.get_log_str('address_search.js', 'search_address', 'invalid res data with error : ' + res.data.error));
+            __callback(res.data.error, undefined);
             return;
         }
 
         __callback(undefined, res.data.results);
     })
     .catch(function (error) {
+        log.error(common.get_log_str('address_search.js', 'search_address', error));
         __callback(error, undefined);
     })
 }

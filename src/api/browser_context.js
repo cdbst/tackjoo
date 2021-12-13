@@ -5,6 +5,7 @@ const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
+const log = require('electron-log');
 
 class BrowserContext {
 
@@ -119,8 +120,8 @@ class BrowserContext {
             await this.send_sensor_data(sensor_data);
             return true;
 
-        }catch(e){
-            console.error(e);
+        }catch(err){
+            log.info(common.get_log_str('browser_context.js', '__send_fake_sensor_data', err));
             return false;
         }
     }
@@ -140,6 +141,7 @@ class BrowserContext {
                     }, sleep)
                 }
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', '__post_process_req_fail-Promise-catch', e));
                 reject(e);
             }
         });
@@ -292,6 +294,7 @@ class BrowserContext {
                 return res;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -302,6 +305,7 @@ class BrowserContext {
     async send_sensor_data(sensor_data){
 
         if(this.sensor_data_server_url == undefined){
+            log.verbose(common.get_log_str('browser_context.js', 'send_sensor_data', 'sensor_data_server_url is not set condition'));
             throw new Error("This browser context has no sensor data server url " + this.email);
         }
 
@@ -339,13 +343,14 @@ class BrowserContext {
             }
 
         }catch(e){
+            log.warn(common.get_log_str('browser_context.js', 'send_sensor_data', e));
             throw e;
         }
     }
 
     async login(){
         if(this.in_progress_login){
-            console.error('inprogress login in work.')
+            log.info(common.get_log_str('browser_context.js', 'login', 'inprogress login in work'));
             return false;
         }
 
@@ -353,20 +358,20 @@ class BrowserContext {
 
         if(this.is_anonymous()){
             this.in_progress_login = false;
-            console.error('This browser context is anonymous');
+            log.info(common.get_log_str('browser_context.js', 'login', 'This browser context is anonymous'));
             return false;
         }
 
         let result = await this.open_main_page();
         if(result == false){
             this.in_progress_login = false;
-            console.error('Cannot open main page.'); 
+            log.error(common.get_log_str('browser_context.js', 'login', 'Cannot open main page'));
             return false;
         }
 
         result = await this.__open_login_modal();
         if(result == false){
-            console.warn('Cannot open login modal.'); 
+            log.warn(common.get_log_str('browser_context.js', 'login', 'Cannot open login modal'));
         }
 
         let payload_obj = {
@@ -419,6 +424,7 @@ class BrowserContext {
                 return true;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'login', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -443,6 +449,7 @@ class BrowserContext {
             return true;
 
         }catch(e){
+            log.error(common.get_log_str('browser_context.js', '__open_login_modal', e));
             await this.__post_process_req_fail(e, this.__req_retry_interval);
         }
         
@@ -534,7 +541,6 @@ class BrowserContext {
             'sec-fetch-site': 'none',
             'sec-fetch-user': '?1',
             'upgrade-insecure-requests': 1,
-            //'connection': 'keep-alive',
             'user-agent': BrowserContext.USER_AGENT
         }
     }
@@ -609,6 +615,7 @@ class BrowserContext {
                 return true;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_main_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -639,6 +646,7 @@ class BrowserContext {
                 return product_list;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_feed_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -680,6 +688,7 @@ class BrowserContext {
                 break;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_product_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -744,6 +753,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'get_product_sku_inventory', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -811,6 +821,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'apply_draw', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -869,6 +880,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'add_to_cart', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -901,6 +913,7 @@ class BrowserContext {
                 return true;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_checkout_page', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -949,6 +962,7 @@ class BrowserContext {
                 return res.data;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'checkout_request', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -1016,6 +1030,7 @@ class BrowserContext {
                 return kakaopay_prepare_payload;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'checkout_singleship', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
@@ -1065,6 +1080,7 @@ class BrowserContext {
                 return res.data.data.kakaoData;
 
             }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'prepare_kakaopay', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

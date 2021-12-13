@@ -125,7 +125,7 @@ class TaskRunner{
                 //     }
                 // }
             }catch(e){
-                //console.log(e);
+                log.warn(common.get_log_str('task_runner.js', 'res_pkt_hooker-callback', e));
             }
         };
 
@@ -180,6 +180,7 @@ class TaskRunner{
 
             this.worker.on('exit', (code) => {
                 if (code !== 0){
+                    log.warn(common.get_log_str('task_runner.js', 'exit-callback', `Worker stopped with exit code ${code}`));
                     this.end_task(new Error(`Worker stopped with exit code ${code}`));
                 }else{
                     if(this.pay_window == undefined) this.end_task();

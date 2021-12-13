@@ -3,6 +3,7 @@ const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserC
 const TaskRunner = require("../api/task_runner").TaskRunner;
 const TaskRunnerManager = require("../api/task_runner_mngr").taskRunnerManager;
 const common = require("../common/common");
+const log = require('electron-log');
 
 function register(){
     
@@ -16,6 +17,7 @@ function register(){
         let browser_context = BrowserContextManager.get(task_info.account_id);
         
         if(browser_context == undefined){
+            log.error(common.get_log_str('ipc_main_task.js', 'play-task-callback', 'cannot found browser context'));
             event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
             return;
         }
@@ -35,6 +37,7 @@ function register(){
                 await task_runner.start();
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true});
             }catch (err){
+                log.error(common.get_log_str('ipc_main_task.js', 'play-task-callback', err));
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
             }finally{
                 TaskRunnerManager.remove(task_runner.task_info._id);

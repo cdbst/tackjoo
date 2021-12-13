@@ -1,4 +1,6 @@
 const { BrowserWindow } = require("electron");
+const common = require("../common/common.js");
+const log = require('electron-log');
 
 class ExternalPage{
     
@@ -67,15 +69,15 @@ class ExternalPage{
 
     attach_res_pkt_hooker(){
 
-        try {
+        try{
             this.window.webContents.debugger.attach('1.3');
-        } catch (err) {
-            console.error('Debugger attach failed : ', err);
+        }catch(err){
+            log.error(common.get_log_str('external_page.js', 'attach_res_pkt_hooker', err));
             return false;
         }
           
         this.window.webContents.debugger.on('detach', (event, reason) => {
-            console.log('Debugger detached due to : ', reason);
+            log.verbose(common.get_log_str('external_page.js', 'attach_res_pkt_hooker', 'Debugger detached due to : ', reason));
         });
 
         var get_res_data = async (request_id) => {
@@ -83,6 +85,7 @@ class ExternalPage{
                 const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
                 return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
             }catch(e){
+                log.verbose(common.get_log_str('external_page.js', 'attach_res_pkt_hooker-get_res_data', e));
                 return undefined;
             }
         }
