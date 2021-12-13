@@ -85,7 +85,7 @@ class ExternalPage{
                 const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
                 return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
             }catch(e){
-                log.warn(common.get_log_str('external_page.js', 'attach_res_pkt_hooker-get_res_data', e));
+                log.verbose(common.get_log_str('external_page.js', 'attach_res_pkt_hooker-get_res_data', e));
                 return undefined;
             }
         }
