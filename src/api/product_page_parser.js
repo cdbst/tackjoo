@@ -1,5 +1,6 @@
 const common = require('../common/common.js');
 const parser_common = require('./page_parser_common');
+const log = require('electron-log');
 
 function strip_usless_string(string){
     return string.replace(/(\t|\n)/gi, '').trim();
@@ -139,7 +140,7 @@ function get_product_info_from_product_page ($) {
         return _product_info;
 
     }catch(e){
-
+        log.error(common.get_log_str('product_page_parser.js', 'get_product_info_from_product_page', e));
         return undefined;
     }
 }
@@ -156,6 +157,7 @@ function parse_price_from_product_page($){
         return price_info_text[0].data.trim();
         
     }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_price_from_product_page', e));
         return undefined;
     }
 }
@@ -273,6 +275,7 @@ function parse_draw_time_from_product_page($){
         }
 
     }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_draw_time_from_product_page', e));
         return undefined;
     }
 }
@@ -320,6 +323,7 @@ function parse_ftfs_time_from_product_page($){
         return new Date(open_year, open_month, open_date, open_hour, open_min, 0, 0);
 
     }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_ftfs_time_from_product_page', e));
         return undefined;
     }
 }
@@ -438,6 +442,7 @@ function parse_draw_size_info_list_from_product_page($){
         return size_info_list;
         
     }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_draw_size_info_list_from_product_page', e));
         return size_info_list;
     }
     

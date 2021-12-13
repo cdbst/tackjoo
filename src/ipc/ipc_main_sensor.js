@@ -23,7 +23,6 @@ function register(_win){
                 browser_context.send_sensor_data(sensor_data);
             }catch(err){
                 if(err) log.warn(common.get_log_str('ipc_main_sensor.js', 'send_sensor_data-callback', err));
-                console.warn(err);
             }
         });
     });
