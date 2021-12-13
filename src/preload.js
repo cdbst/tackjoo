@@ -1,16 +1,6 @@
 const { contextBridge } = require('electron');
 const { ipcRenderer } = require('electron');
-
-// window.addEventListener('DOMContentLoaded', () => {
-//     const replaceText = (selector, text) => {
-//       const element = document.getElementById(selector);
-//       if (element) element.innerText = text;
-//     }
-  
-//     for (const type of ['chrome', 'node', 'electron']) {
-//       replaceText(`${type}-version`, process.versions[type]);
-//     }
-// });
+const { get_ipc_data } = require('./ipc/ipc_util');
 
 contextBridge.exposeInMainWorld('electron', {
     sendSensorData : _sendSensorData,
@@ -59,23 +49,6 @@ ipcRenderer.on('gen-sensor-data', (event, _data) => {
  * 
  * Custom APIs for IPCs (Process : Renderer process -> Main process -> Renderer process)
  */
-
-function get_ipc_id() {
-
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-}
-
-function get_ipc_data(_payload = undefined){
-
-    _payload = _payload == undefined ? {} : _payload;
-
-    return {
-        payload : _payload,
-        id : get_ipc_id()
-    }
-}
 
 function _sendSensorData(_sensor_data){
 

@@ -1,4 +1,4 @@
-const util = require("./ipc_main_util.js");
+const util = require("./ipc_util.js");
 const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
 const {isMainThread} = require('worker_threads');
 

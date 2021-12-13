@@ -4,8 +4,7 @@ const path = require('path');
 const package_files = [
     'index.css',
     'package.json',
-    'package-lock.json',
-    'preload.js'
+    'package-lock.json'
 ];
 
 const package_dirs = [
@@ -20,6 +19,7 @@ const cleanup_files = [
     'index.min.js',
     'app.js',
     'task.js',
+    'preload.js'
 ]
 
 const cleanup_dirs = [
