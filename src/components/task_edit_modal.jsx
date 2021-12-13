@@ -72,7 +72,7 @@ class TaskEditModal extends React.Component {
 
             window.electron.loadProxyInfo((err, proxy_info_list) =>{
 
-                if(err) proxy_info_list = [''];
+                if(err) proxy_info_list = [];
 
                 this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
                     this.onChangeType(
@@ -329,15 +329,18 @@ class TaskEditModalSelectItem extends React.Component {
 
     getOptionItems(items, keys = undefined){
         
-        let key_list = keys == undefined ? [...Array(items.length).keys()] : keys;
-
         let idx = 0;
+
+        if(keys == undefined){
+            keys = items.map(() => common.uuidv4());
+        }
+
         return items.map((item) => 
             <option
                 className="modal-select-option"
-                key={key_list[idx]}
+                key={keys[idx]}
                 value={item}
-                data-key={key_list[idx++]}
+                data-key={keys[idx++]}
             >
             {item}
             </option>
