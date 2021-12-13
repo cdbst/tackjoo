@@ -4,6 +4,9 @@ const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserC
 const USER_FILE_PATH = require('../user_file_path.js').USER_FILE_PATH;
 const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
 
+const log = require('electron-log');
+const common = require('../common/common');
+
 function register(){
 
     ipcMain.on('get-logged-in-account-info-list', (event, data) => {
@@ -12,7 +15,8 @@ function register(){
             let logged_in_browser_contexts = BrowserContextManager.get_all_logged_in_browser_contexts();
             let logged_in_account_info_list = logged_in_browser_contexts.map((browser_context) => browser_context.get_account_info());
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : undefined, data : logged_in_account_info_list}); 
-        }catch(e){
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_account.js', 'get-logged-in-account-info-list-callback', err.message));
             event.reply('get-logged-in-account-info-list-reply' + data.id, {err : 'invalid exception has been occurred', data : undefined});
         }
     });
@@ -29,7 +33,8 @@ function register(){
             UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
                 event.reply('add-account-reply' + data.id, err);
             });
-        }catch(e){
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err.message));
             event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
         }
         
@@ -50,7 +55,8 @@ function register(){
             UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
                 event.reply('remove-account-reply' + data.id, err);
             });
-        }catch(e){
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_account.js', 'remove-account-callback', err.message));
             event.reply('remove-account-reply' + data.id, 'invalid exception has been occurred while removing account information');
         }
     });
@@ -61,7 +67,8 @@ function register(){
             UserFileManager.read(USER_FILE_PATH.USER_INFO, (_err, _data) =>{
                 event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
             });
-        }catch(e){
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_account.js', 'get-account-info-callback', err.message));
             event.reply('get-account-info-reply' + data.id, {err : 'invalid exception has been occurred while getting account information', data : undefined});
         }
 
@@ -73,22 +80,22 @@ function register(){
         let borwser_context = BrowserContextManager.get(_id);
 
         if(borwser_context == undefined){
-            event.reply('login-reply' + data.id, 'cannot found browser context.');
+            log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'cannot found browser context'));
+            event.reply('login-reply' + data.id, 'cannot found browser context');
             return;
         }
 
         (async () =>{
-
-            let result;
 
             if(borwser_context.is_login){
                 borwser_context.clear_cookies();
                 borwser_context.clear_csrfToken();
             }
 
-            result = await borwser_context.open_main_page();
+            let = result = await borwser_context.open_main_page();
             if(result == false){
-                event.reply('login-reply' + data.id, 'fail with openning main page.');
+                log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'fail with openning main page'));
+                event.reply('login-reply' + data.id, 'fail with openning main page');
                 return;
             }
 
@@ -96,6 +103,7 @@ function register(){
             if(result){
                 event.reply('login-reply' + data.id, undefined);
             }else{
+                log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'login fail'));
                 event.reply('login-reply' + data.id, 'login fail');
             }
 
