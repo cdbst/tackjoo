@@ -30,11 +30,12 @@ function create_window() {
         win.setMenuBarVisibility(false);
         win.loadFile(path.join(__dirname, "index.html"));
     }catch(e){
-        log.error(common.get_log_str('app.js', 'create_window', e.message));
+        log.error(common.get_log_str('app.js', 'create_window', e));
     }
 }
 
 app.whenReady().then(() => {
+    log.info(common.get_log_str('app.js', 'whenReady', 'App start'));
     create_window();
 
     app.on("activate", () => {
