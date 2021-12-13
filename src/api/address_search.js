@@ -40,7 +40,7 @@ function search_address(address, __callback){
     .then(function (res) {
 
         if(res.data.error != ''){
-            __callback(res.error, undefined);
+            __callback(res.data.error, undefined);
             return;
         }
 
