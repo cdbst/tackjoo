@@ -140,6 +140,10 @@
         return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
     }
 
+    exports.get_log_str = function(module_name, function_name, message){
+        return `[${module_name}] [${function_name}] ${message}`;
+    }
+
     exports.NIKE_URL = 'https://www.nike.com';
     exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW', notify :'Notify Me'};
     exports.TASK_STATUS = {

@@ -6,6 +6,8 @@ const ExternalPage = require("./external_page.js").ExternalPage;
 const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
 const FileCache = require('./file_cache').FileCache;
+const common = require('../common/common');
+const log = require('electron-log');
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -145,7 +147,6 @@ class TaskRunner{
 
     start(){
         if(this.canceled) throw new TaskCanceledError(this, 'Task is canceled.');
-
         this.running = true;
 
         return new Promise((resolve, reject)=>{
@@ -164,7 +165,8 @@ class TaskRunner{
                     task_info : this.task_info,
                     product_info : this.product_info,
                     billing_info : this.billing_info,
-                    settings_info : this.settings_info
+                    settings_info : this.settings_info,
+                    log_path : log.transports.file.resolvePath()
                 },
                 eval : true
             });
@@ -172,6 +174,7 @@ class TaskRunner{
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{
+                log.warn(common.get_log_str('task_runner.js', 'error-callback', err.message));
                 this.end_task(err);
             });
 

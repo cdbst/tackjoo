@@ -6,6 +6,9 @@ const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError,
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
     PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./api/task_errors.js');
 
+const log = require('electron-log');
+log.transports.file.resolvePath = () => workerData.log_path;
+
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
 let product_info = workerData.product_info;
@@ -19,6 +22,9 @@ let remain_ret_cnt = settings_info.task_ret_cnt;
 const task_ret_interval = settings_info.task_ret_interval * 1000;
 
 process.on('unhandledRejection', (err) => {
+
+    log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
+
     if(remain_ret_cnt > 0){
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         remain_ret_cnt--;
@@ -30,8 +36,9 @@ process.on('unhandledRejection', (err) => {
     }
 });
 
-process.on('exit', () => {
+process.on('exit', (code) => {
     //global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
+    log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
 });
 
 global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
@@ -39,6 +46,8 @@ global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 main(browser_context, task_info, product_info, billing_info);
 
 async function main(browser_context, task_info, product_info, billing_info){
+
+    log.info(common.get_log_str('task.js', 'main', 'task start'));
 
     // STEP1 : Check validation of Task Information.
     if(TaskUtils.is_valid_billing_info_to_tasking(billing_info) == false){
