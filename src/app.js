@@ -35,7 +35,7 @@ function create_window() {
 }
 
 app.whenReady().then(() => {
-    log.info(common.get_log_str('app.js', 'whenReady', 'App start'));
+    log.info(common.get_log_str('app.js', 'whenReady', '=======App start'));
     create_window();
 
     app.on("activate", () => {
@@ -46,6 +46,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+    log.info(common.get_log_str('app.js', 'window-all-closed-callback', '=======App close'));
     if (process.platform !== "darwin") {
         app.quit();
     }
