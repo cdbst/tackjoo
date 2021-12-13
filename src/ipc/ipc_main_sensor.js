@@ -49,7 +49,7 @@ function gen_sensor_data(){
                     let sensor_data = await global.MainThreadApiCaller.call('gen_sensor_data', undefined);
                     resolve(sensor_data);
                 }catch(err){
-                    if(err) log.error(common.get_log_str('ipc_main_sensor.js', 'global.MainThreadApiCaller-gen_sensor_data', err));
+                    log.error(common.get_log_str('ipc_main_sensor.js', 'global.MainThreadApiCaller-gen_sensor_data', err));
                     reject(err);
                 }
             })();
