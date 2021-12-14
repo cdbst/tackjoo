@@ -48,6 +48,9 @@ class MenuBar extends React.Component {
                         <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">Tasks</a>
                     </li>
                     <li className="nav-item" role="presentation">
+                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">DRAW</a>
+                    </li>
+                    <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">Accounts</a>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -58,9 +61,6 @@ class MenuBar extends React.Component {
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">THEDRAW</a>
                     </li>
                     <ul className="nav justify-content-end" style={{width:'calc(100% - 560px)'}}>
                         <li className="nav-item">
