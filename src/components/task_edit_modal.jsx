@@ -249,19 +249,19 @@ class TaskEditModal extends React.Component {
                             </div>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
+                                    <Options ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
+                                    <Options ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
                             <hr/>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_size} label="Size" options={size_list}/>
+                                    <Options ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
+                                    <Options ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
                                 </div>
                             </div>
                             <hr/>
@@ -297,7 +297,7 @@ class TaskEditModal extends React.Component {
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
                                 <div className="col-md-6">
-                                    <TaskEditModalSelectItem ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
+                                    <Options ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>
@@ -306,83 +306,6 @@ class TaskEditModal extends React.Component {
                             <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>OK</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        );
-    }
-}
-
-class TaskEditModalSelectItem extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.onChangeOption = this.onChangeOption.bind(this);
-        this.getOptionItems = this.getOptionItems.bind(this);
-        this.setDisable = this.setDisable.bind(this);
-
-        this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
-        this.getSelectedOptionKey = this.getSelectedOptionKey.bind(this);
-
-
-        this.ref_options = React.createRef();
-    }
-
-    getOptionItems(items, keys = undefined){
-        
-        if(keys == undefined) keys = [...Object.keys(items)];
-
-        let idx = 0;
-
-        return items.map((item) => 
-            <option
-                className="modal-select-option"
-                key={keys[idx]}
-                value={item}
-                data-key={keys[idx++]}
-            >
-            {item}
-            </option>
-        );
-    }
-
-    onChangeOption(e){
-
-        const selected_idx = e.target.options.selectedIndex;
-        const selected_key = e.target.options[selected_idx].getAttribute('data-key');
-        
-        let data_to_pass = this.props.option_keys == undefined ? e.target.value : selected_key;
-
-        if(this.props.h_on_change != undefined) this.props.h_on_change(data_to_pass);
-    }
-
-    getSelectedOptionKey(){
-
-        if(this.props.option_keys == undefined) return undefined;
-
-        let selected_idx = this.ref_options.current.selectedIndex;
-        return this.props.option_keys[selected_idx];
-    }
-
-    getSelectedOptionValue(){
-        return this.ref_options.current.value;
-    }
-
-    setDisable(option){
-        this.ref_options.current.disabled = option;
-    }
-
-    render(){
-        let option_items = this.getOptionItems(this.props.options, this.props.option_keys);
-
-        return(
-            <div className="row">
-                <div className="col-md-3 text-left task-edit-modal-option-label">
-                    <label className="col-sm-2 col-form-label font-weight-bold task-edit-modal-option-label">{this.props.label}</label>
-                </div>
-                <div className="col-md-9">
-                    <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
-                        {option_items}
-                    </select>
                 </div>
             </div>
         );

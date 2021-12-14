@@ -7,6 +7,7 @@ class ContentsTheDraw extends React.Component {
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickClenup = this.onClickClenup.bind(this);
         this.onClickLoad = this.onClickLoad.bind(this);
+        this.onChangeAccount = this.onChangeAccount.bind(this);
 
 
         this.state = {
@@ -38,11 +39,15 @@ class ContentsTheDraw extends React.Component {
     }
 
     onClickClenup(){
-
+        console.log('onClickClenup');
     }
 
     onClickLoad(){
-        
+        console.log('onClickLoad');
+    }
+
+    onChangeAccount(account){
+        console.log(account);
     }
 
     render() {
@@ -51,13 +56,19 @@ class ContentsTheDraw extends React.Component {
             <div className="tab-pane fade" id="thedraw" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.THEDRAW}>
                 <div className="container-fluid">
                     <br/>
-                    <div className="row">
-                        <div className="col">
+                    <div className="row" style={{marginBottom:'15px'}}>
+                        <div className="col-md-3">
                             <h4 className="contents-title">THE DRAW</h4>
                         </div>
-                        <div className="col">
-                            {/* <a>TEST : search item interface</a> */}
+                        <div className="col-md-3">
+                            <Options label="계정" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
                         </div>
+                        <div className="col-md-3">
+                            <Options label="상품명" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                        </div>
+                        <div className="col-md-3">
+                            <Options label="당첨여부" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                        </div>                        
                     </div>
                     <div className="table-wrapper">
                     <table className="table table-hover">
