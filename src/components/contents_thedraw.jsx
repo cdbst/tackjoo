@@ -1,4 +1,3 @@
-
 class ContentsTheDraw extends React.Component {
 
     constructor(props) {
@@ -50,25 +49,66 @@ class ContentsTheDraw extends React.Component {
         console.log(account);
     }
 
+    __getTableItems(draw_item_list){
+
+        return draw_item_list.map((draw_item) =>
+            <TheDrawTableItem
+                account_col_width = {this.account_col_width}
+                product_size_col_width = {this.product_size_col_width}
+                product_price_col_width = {this.product_price_col_width}
+                draw_date_col_width = {this.draw_date_col_width}
+                draw_result_col_width = {this.draw_result_col_width}
+                actions_col_width = {this.actions_col_width}
+                product_col_width = {this.product_col_width}
+                draw_item = {draw_item}
+                key={draw_item._id}
+            />
+        );
+    }
+
+    __getDummyDrawItem(){
+        return {
+            account_info : {
+                email : 'aaaa@gmail.com',
+                pwd : '123456',
+                id : common.uuidv4()
+            },
+            product_name : 'DUNK AA',
+            prouduct_size : '230',
+            prouduct_price : '180,000',
+            draw_date : '2020-10-11',
+            draw_result : '당첨',
+            _id : common.uuidv4()
+        }
+    }
+
     render() {
+        let draw_item_list = [];
+        draw_item_list.push(this.__getDummyDrawItem());
+        draw_item_list.push(this.__getDummyDrawItem());
+
+        let draw_item_table_list = this.__getTableItems(draw_item_list);
 
         return (
             <div className="tab-pane fade" id="thedraw" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.THEDRAW}>
                 <div className="container-fluid">
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                             <h4 className="contents-title">THE DRAW</h4>
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                             <Options label="계정" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
                         </div>
+                        <div className="col-md-2">
+                            <Options label="상품" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                        </div>
                         <div className="col-md-3">
-                            <Options label="상품명" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                            <Options label="응모일시" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
                         </div>
                         <div className="col-md-3">
                             <Options label="당첨여부" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
-                        </div>                        
+                        </div>
                     </div>
                     <div className="table-wrapper">
                     <table className="table table-hover">
@@ -84,8 +124,7 @@ class ContentsTheDraw extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* "table items" */}
-                            {this.state.proxy_table_list}
+                            {draw_item_table_list}
                         </tbody>
                     </table>
                     </div>
