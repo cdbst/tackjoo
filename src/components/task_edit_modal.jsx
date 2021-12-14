@@ -329,11 +329,9 @@ class TaskEditModalSelectItem extends React.Component {
 
     getOptionItems(items, keys = undefined){
         
-        let idx = 0;
+        if(keys == undefined) keys = [...Object.keys(items)];
 
-        if(keys == undefined){
-            keys = items.map(() => common.uuidv4());
-        }
+        let idx = 0;
 
         return items.map((item) => 
             <option
