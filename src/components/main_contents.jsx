@@ -13,6 +13,7 @@ class MainContents extends React.Component {
                 <ContentsBilling />
                 <ContentsProxies />
                 <ContentsSettings />
+                <ContentsTheDraw />
             </div>
         );
     }
