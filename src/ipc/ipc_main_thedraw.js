@@ -12,15 +12,20 @@ function register(){
             try{
                 const browser_context_list = BrowserContextManager.get_all_browser_contexts();
                 const errors = [];
+                const thedraw_item_list = [];
     
-                for(var i = 0; browser_context_list.length; i++){
+                for(var i = 0; i < browser_context_list.length; i++){
                     const browser_context = browser_context_list[i];
     
-                    let error = await get_the_draw_list_info(browser_context);
-                    if(error != undefined) errors.push(error);
+                    const {error, data} = await get_the_draw_list_info(browser_context);
+                    if(error != undefined){
+                        errors.push(error);
+                    }else{
+                        thedraw_item_list.push.apply(thedraw_item_list, data);
+                    }
                 }
     
-                event.reply('load-thedraw-item-list-reply' + data.id, {err : errors.join('\n'), data : undefined});
+                event.reply('load-thedraw-item-list-reply' + data.id, {err : errors.join('\n'), data : thedraw_item_list});
     
             }catch(err){
                 log.error(common.get_log_str('ipc_main_proxy.js', 'load-thedraw-item-list-callback', err));

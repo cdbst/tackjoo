@@ -25,11 +25,10 @@ function register(){
     ipcMain.on('load-settings-info', (event, data) => {
 
         try{
-            let ipc_id = data.id;
 
-            UserFileManager.read(USER_FILE_PATH.SETTINGS_INFO, (err, data) =>{
+            UserFileManager.read(USER_FILE_PATH.SETTINGS_INFO, (err, settings_info_data) =>{
                 if(err) log.error(common.get_log_str('ipc_main_settings.js', 'UserFileManager.read-callback', err));
-                event.reply('load-settings-info-reply' + ipc_id, {err : err, data : data});
+                event.reply('load-settings-info-reply' + data.id, {err : err, data : settings_info_data});
             });
         }catch(err){
             log.error(common.get_log_str('ipc_main_settings.js', 'load-settings-info-callback', err));

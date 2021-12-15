@@ -40,9 +40,9 @@ function register(){
     ipcMain.on('load-billing-info', (event, data) => {
 
         try{
-            UserFileManager.read(USER_FILE_PATH.BILLING_INFO, (err, data) =>{
+            UserFileManager.read(USER_FILE_PATH.BILLING_INFO, (err, billing_info_data) =>{
                 if(err) log.error(common.get_log_str('ipc_main_billing.js', 'UserFileManager.read-callback', err));
-                event.reply('load-billing-info-reply' + data.id, {err : err, data : data});
+                event.reply('load-billing-info-reply' + data.id, {err : err, data : billing_info_data});
             });
         }catch(err){
             log.error(common.get_log_str('ipc_main_billing.js', 'load-billing-info-callback', err));

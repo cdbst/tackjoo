@@ -20,11 +20,10 @@ function parse_thedraw_item_list($, browser_context){
             //step2 get product name and link
             const el_span_product_title = parser_common.get_specific_tag_nodes(el, [], ['tit']);
             if(el_span_product_title.length == 0) return;
-            const el_a_product_link = el_span_product_title[0].children[1];
+            const el_a_product_link = common.NIKE_URL + el_span_product_title[0].children[1];
 
             const product_link = el_a_product_link.attribs.href;
             const product_name = el_a_product_link.children[0].data;
-            //step2-1 get product link
 
             //step3 get product size
             const el_span_product_opt = parser_common.get_specific_tag_nodes(el, [], ['opt']);
@@ -42,9 +41,6 @@ function parse_thedraw_item_list($, browser_context){
 
             let draw_result = el_span_draw_result[0].children[0].data;
             draw_result = parser_common.strip_usless_string(draw_result);
-            
-            //step6 settingup account info(email, passwd)
-            //
 
             let thedraw_item = common.get_thedraw_item_obj_scheme();
             common.update_thedraw_item_obj(thedraw_item, 'product_name', product_name);
