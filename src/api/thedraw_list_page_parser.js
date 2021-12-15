@@ -20,9 +20,9 @@ function parse_thedraw_item_list($, browser_context){
             //step2 get product name and link
             const el_span_product_title = parser_common.get_specific_tag_nodes(el, [], ['tit']);
             if(el_span_product_title.length == 0) return;
-            const el_a_product_link = common.NIKE_URL + el_span_product_title[0].children[1];
+            const el_a_product_link = el_span_product_title[0].children[1];
 
-            const product_link = el_a_product_link.attribs.href;
+            const product_link = common.NIKE_URL + el_a_product_link.attribs.href;
             const product_name = el_a_product_link.children[0].data;
 
             //step3 get product size

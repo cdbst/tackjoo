@@ -1108,7 +1108,7 @@ class BrowserContext {
     
                 const $ = cheerio.load(res.data);
                 const the_draw_item_list = thedraw_list_page_parser.parse_thedraw_item_list($, this);
-                return the_draw_item_list; // return the draw item list;
+                return the_draw_item_list.length == 0 ? undefined :  the_draw_item_list; // return the draw item list;
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'open_draw_list_page', e));
