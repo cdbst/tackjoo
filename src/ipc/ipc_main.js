@@ -5,7 +5,7 @@ const IpcMainTask = require('./ipc_main_task');
 const IpcMainBilling = require('./ipc_main_billing');
 const IpcMainProxy = require('./ipc_main_proxy');
 const IpcMainSettings = require('./ipc_main_settings');
-
+const IpcMainTheDraw = require('./ipc_main_thedraw');
 
 function register(win){
     // IPC Responses
@@ -16,6 +16,7 @@ function register(win){
     IpcMainBilling.register();
     IpcMainProxy.register();
     IpcMainSettings.register();
+    IpcMainTheDraw.register();
 }
 
 module.exports.register = register;

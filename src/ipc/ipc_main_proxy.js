@@ -10,12 +10,12 @@ function register(){
     ipcMain.on('save-proxy-info', (event, data) => {
 
         try{
-            let ipc_id = data.id;
+
             let proxy_info = data.payload.proxy_info;
             
             UserFileManager.write(USER_FILE_PATH.PROXY_INFO, proxy_info, (err) =>{
                 if(err) log.error(common.get_log_str('ipc_main_proxy.js', 'UserFileManager.write-callback', err));
-                event.reply('save-proxy-info-reply' + ipc_id, {err : err});
+                event.reply('save-proxy-info-reply' + data.id, {err : err});
             });
 
         }catch(err){
@@ -35,7 +35,7 @@ function register(){
             });
         }catch(err){
             log.error(common.get_log_str('ipc_main_proxy.js', 'load-proxy-info-callback', err));
-            event.reply('load-proxy-info-reply' + ipc_id, {err : err.message});
+            event.reply('load-proxy-info-reply' + data.id, {err : err.message});
         }
     });
 
