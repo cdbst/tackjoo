@@ -239,7 +239,7 @@ class TaskTableItem extends React.Component {
                     <span>{schedule_time_str}</span>
                 </td>
                 <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}} >
-                    <span className='task-status-text' style={{'--text-color' : status_text_color}}>{this.state.status}</span>
+                    <span className='custom-color-text' style={{'--text-color' : status_text_color}}>{this.state.status}</span>
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>

@@ -5,6 +5,7 @@ class TheDrawTableItem extends React.Component {
 
         this.onClickGoLinkBtn = this.onClickGoLinkBtn.bind(this);
         this.onPopAccountInfo = this.onPopAccountInfo.bind(this);
+        this.getDrawResultFontColor = this.getDrawResultFontColor.bind(this);
 
         this.__mount = false;
     }
@@ -25,50 +26,40 @@ class TheDrawTableItem extends React.Component {
         console.log('onPopAccountInfo');
     }
 
+    getDrawResultFontColor(){
+
+        if(this.props.draw_item.draw_result == '당첨'){
+            return '#0dcaf0'; //blue
+        }else if(this.props.draw_item.draw_result == '미당첨'){
+            return '#dc3545'; //red
+        }else{
+            return '#ffffff'; //white
+        }
+    }
+
     render(){
 
-        // account_col_width = {this.account_col_width}
-        // product_size_col_width = {this.product_size_col_width}
-        // product_price_col_width = {this.product_price_col_width}
-        // draw_date_col_width = {this.draw_date_col_width}
-        // draw_result_col_width = {this.draw_result_col_width}
-        // actions_col_width = {this.actions_col_width}
-        // product_col_width = {this.product_col_width}
-        // key={draw_item.id}
-
-        // {
-        //     account_info : {
-        //         email : 'aaaa@gmail.com',
-        //         pwd : '123456',
-        //         id : common.uuidv4()
-        //     },
-        //     product_name : 'DUNK AA',
-        //     prouduct_size : '230',
-        //     prouduct_price : '180,000',
-        //     draw_date : '2020-10-11',
-        //     draw_result : '당첨',
-        //     _id : common.uuidv4()
-        // }
+        const draw_result_font_color = this.getDrawResultFontColor();
 
         return(
             <tr>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
-                    <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.draw_item.account_info.email}>{this.props.draw_item.account_info.email}</div>
+                    <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.draw_item.account_email}>{this.props.draw_item.account_email}</div>
                 </td>
-                <td style={{width : this.props.product_col_width, maxWidth : this.props.product_col_width}}>
-                    <div className="cut-text" style={{width : this.props.product_col_width, maxWidth : this.props.product_col_width}} title={this.props.draw_item.product_name}>{this.props.draw_item.product_name}</div>
+                <td style={{width : this.props.product_name_col_width, maxWidth : this.props.product_name_col_width}}>
+                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.draw_item.product_name}>{this.props.draw_item.product_name}</div>
                 </td>
                 <td style={{width : this.props.product_size_col_width, maxWidth : this.props.product_size_col_width}}>
-                    <span>{this.props.draw_item.prouduct_size}</span>
+                    <span>{this.props.draw_item.product_size}</span>
                 </td>
                 <td style={{width : this.props.product_price_col_width, maxWidth : this.props.product_price_col_width}}>
-                    <span>{this.props.draw_item.prouduct_price}</span>
+                    <span>{this.props.draw_item.product_price}</span>
                 </td>
                 <td style={{width : this.props.draw_date_col_width, maxWidth : this.props.draw_date_col_width}}>
-                    <span>{this.props.draw_item.draw_date}</span>
+                    <span>{common.get_formatted_date_str(this.props.draw_item.draw_date)}</span>
                 </td>
                 <td style={{width : this.props.draw_result_col_width, maxWidth : this.props.draw_result_col_width}}>
-                    <span>{this.props.draw_item.draw_result}</span>
+                    <span className='custom-color-text' style={{'--text-color' : draw_result_font_color}}>{this.props.draw_item.draw_result}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

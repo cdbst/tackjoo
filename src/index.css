@@ -16,6 +16,11 @@ body {
     flex-direction: column-reverse;
 }
 
+.custom-color-text{
+    color: var(--text-color) !important;
+    font-weight: bold;
+}
+
 /* Disable input type number arrow buttons */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -267,13 +272,7 @@ tbody tr:hover td {
 }
 /* End to Task Edit Modal */
 
-/* Start to Task Table Item */
-.task-status-text{
-    color: var(--text-color) !important;
-    font-weight: bold;
-}
 
-/* End to Task Table Item */
 
 /* Start to Contents Bill */
 .contents-bill-input-label{

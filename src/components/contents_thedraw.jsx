@@ -8,9 +8,8 @@ class ContentsTheDraw extends React.Component {
         this.onClickLoad = this.onClickLoad.bind(this);
         this.onChangeAccount = this.onChangeAccount.bind(this);
 
-
         this.state = {
-           thedraw_item_list : []
+           draw_table_item_list : []
         };
 
         this.__mount = false;
@@ -26,7 +25,7 @@ class ContentsTheDraw extends React.Component {
         this.draw_date_col_width = 240;
         this.draw_result_col_width = 120;
         this.actions_col_width = 240;
-        this.product_col_width = 'calc( 100% - ' + (this.account_col_width + this.draw_date_col_width + this.draw_result_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
+        this.product_name_col_width = 'calc( 100% - ' + (this.account_col_width + this.draw_date_col_width + this.draw_result_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -53,6 +52,12 @@ class ContentsTheDraw extends React.Component {
             if(thedraw_item_list.length == 0) return;
 
             console.log(thedraw_item_list);
+            const draw_table_item_list = this.__getTableItems(thedraw_item_list);
+
+            this.setState(_ => ({
+                draw_table_item_list : draw_table_item_list
+            }));
+
         });
     }
 
@@ -70,7 +75,7 @@ class ContentsTheDraw extends React.Component {
                 draw_date_col_width = {this.draw_date_col_width}
                 draw_result_col_width = {this.draw_result_col_width}
                 actions_col_width = {this.actions_col_width}
-                product_col_width = {this.product_col_width}
+                product_name_col_width = {this.product_name_col_width}
                 draw_item = {draw_item}
                 key={draw_item._id}
             />
@@ -94,11 +99,6 @@ class ContentsTheDraw extends React.Component {
     }
 
     render() {
-        let draw_item_list = [];
-        draw_item_list.push(this.__getDummyDrawItem());
-        draw_item_list.push(this.__getDummyDrawItem());
-
-        let draw_item_table_list = this.__getTableItems(draw_item_list);
 
         return (
             <div className="tab-pane fade" id="thedraw" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.THEDRAW}>
@@ -126,7 +126,7 @@ class ContentsTheDraw extends React.Component {
                         <thead>
                             <tr>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정명</th>
-                                <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>상품명</th>
+                                <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.draw_date_col_width, maxWidth : this.draw_date_col_width}}>응모일시</th>
@@ -135,7 +135,7 @@ class ContentsTheDraw extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {draw_item_table_list}
+                            {this.state.draw_table_item_list}
                         </tbody>
                     </table>
                     </div>
