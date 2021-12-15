@@ -3,6 +3,7 @@ const axios = require('axios-proxy-fix');
 const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
+const thedraw_list_page_parser = require('./thedraw_list_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -56,6 +57,7 @@ class BrowserContext {
         this.apply_draw = this.apply_draw.bind(this);
         this.open_checkout_page = this.open_checkout_page.bind(this);
         this.open_page = this.open_page.bind(this);
+        this.open_draw_list_page = this.open_draw_list_page.bind(this);
 
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
@@ -348,7 +350,7 @@ class BrowserContext {
         }
     }
 
-    async login(){
+    async login(retry = true){
         if(this.in_progress_login){
             log.info(common.get_log_str('browser_context.js', 'login', 'inprogress login in work'));
             return false;
@@ -426,6 +428,8 @@ class BrowserContext {
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'login', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
+
+                if(retry == false) return false;
             }
         }
 
@@ -1082,6 +1086,35 @@ class BrowserContext {
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'prepare_kakaopay', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async open_draw_list_page(){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/theDrawList', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_draw_list_page : response ' + res.status);
+                }
+    
+                const $ = cheerio.load(res.data);
+
+                const the_draw_item_list = thedraw_list_page_parser.parse_thedraw_item_list($, this);
+    
+                return the_draw_item_list; // return the draw item list;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_draw_list_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
 

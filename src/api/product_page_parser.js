@@ -2,15 +2,11 @@ const common = require('../common/common.js');
 const parser_common = require('./page_parser_common');
 const log = require('electron-log');
 
-function strip_usless_string(string){
-    return string.replace(/(\t|\n)/gi, '').trim();
-}
-
 function get_sell_type(sell_type_string){
 
     let sell_type = undefined;
 
-    let text = strip_usless_string(sell_type_string).toLowerCase();
+    let text = parser_common.strip_usless_string(sell_type_string).toLowerCase();
 
     if(text.includes(common.SELL_TYPE.normal.toLowerCase())){
         sell_type = common.SELL_TYPE.normal;
@@ -350,7 +346,7 @@ function get_product_info_script_from_product_page($){
 function parse_product_id_from_product_page(product_info_script){
 
     let script_code = product_info_script.childNodes[0].data;
-    script_code = strip_usless_string(script_code);
+    script_code = parser_common.strip_usless_string(script_code);
 
     let product_id = script_code.split('var productInfo = {')[1].split(',', 1)[0].replace('id : ', '');
     return product_id;
@@ -359,7 +355,7 @@ function parse_product_id_from_product_page(product_info_script){
 function parse_model_id_from_product_page(product_info_script){
 
     let script_code = product_info_script.childNodes[0].data;
-    script_code = strip_usless_string(script_code);
+    script_code = parser_common.strip_usless_string(script_code);
 
     let model_id = script_code.split('model : ')[1].split(',', 1)[0].trim().replace(/\'/gi, '');
     return model_id;

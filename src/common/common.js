@@ -41,6 +41,29 @@
         return target;
     }
 
+    exports.get_thedraw_item_obj_scheme = function (){
+        return {
+            product_name : undefined,
+            product_size : undefined,
+            product_price : undefined,
+            product_link : undefined,
+            draw_result : undefined,
+            draw_date : undefined,
+            account_email : undefined,
+            account_pwd : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_thedraw_item_obj = function(thedraw_item, key, value){
+        if(key in this.get_thedraw_item_obj_scheme() == false){
+            throw 'thedraw item object is not includes property : ' + key;
+        }
+
+        thedraw_item[key] = value;
+        return thedraw_item;
+    }
+
     exports.get_task_info_obj_scheme = function (){
         return {
             product_info_id : undefined,

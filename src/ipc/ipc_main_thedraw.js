@@ -20,7 +20,7 @@ function register(){
                     if(error != undefined) errors.push(error);
                 }
     
-                event.reply('load-thedraw-item-list-reply' + data.id, {err : undefined, data : undefined});
+                event.reply('load-thedraw-item-list-reply' + data.id, {err : errors.join('\n'), data : undefined});
     
             }catch(err){
                 log.error(common.get_log_str('ipc_main_proxy.js', 'load-thedraw-item-list-callback', err));
