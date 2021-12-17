@@ -6,11 +6,25 @@ class ContentsTheDraw extends React.Component {
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickClenup = this.onClickClenup.bind(this);
         this.onClickLoad = this.onClickLoad.bind(this);
-        this.onChangeAccount = this.onChangeAccount.bind(this);
+        this.onChangeOption = this.onChangeOption.bind(this);
+        this.setContents = this.setContents.bind(this);
+        this.clearContents = this.clearContents.bind(this);
+        this.setFilters = this.setFilters.bind(this);
+
+        this.thedraw_item_list = [];
 
         this.state = {
-           draw_table_item_list : []
+           draw_table_item_list : [],
+           opt_list_product_name : [],
+           opt_list_account_email : [],
+           opt_list_draw_date : [],
+           opt_list_draw_result : [],
         };
+
+        this.__ref_sel_product_name = React.createRef();
+        this.__ref_sel_account_name = React.createRef();
+        this.__ref_sel_draw_date = React.createRef();
+        this.__ref_sel_draw_result = React.createRef();
 
         this.__mount = false;
         this.__setupColumnsWidth();
@@ -45,24 +59,75 @@ class ContentsTheDraw extends React.Component {
 
         window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
 
-            if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            }
-
+            if(err) Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             if(thedraw_item_list.length == 0) return;
 
-            console.log(thedraw_item_list);
-            const draw_table_item_list = this.__getTableItems(thedraw_item_list);
+            this.thedraw_item_list = thedraw_item_list;
+            this.setFilters(this.thedraw_item_list);
 
-            this.setState(_ => ({
-                draw_table_item_list : draw_table_item_list
-            }));
-
+            this.clearContents(()=>{
+                this.setContents(this.thedraw_item_list);
+            });
         });
     }
 
-    onChangeAccount(account){
-        console.log(account);
+    setFilters(thedraw_item_list){
+
+        let product_name_list = common.getValuesFromObjList(thedraw_item_list, 'product_name');
+        product_name_list.unshift('');
+        let account_email_list = common.getValuesFromObjList(thedraw_item_list, 'account_email');
+        account_email_list.unshift('');
+        let draw_date_list = common.getValuesFromObjList(thedraw_item_list, 'draw_date', common.get_formatted_date_str);
+        draw_date_list.unshift('');
+        let draw_result_list = common.getValuesFromObjList(thedraw_item_list, 'draw_result');
+        draw_result_list.unshift('');
+
+        this.setState(_ => ({
+            opt_list_product_name : product_name_list,
+            opt_list_account_email : account_email_list,
+            opt_list_draw_date : draw_date_list,
+            opt_list_draw_result : draw_result_list,
+        }));
+    }
+
+    setContents(thedraw_item_list){
+        
+        let draw_table_item_list = this.__getTableItems(thedraw_item_list);
+
+        this.setState(_ => ({
+            draw_table_item_list : draw_table_item_list,
+        }));
+    }
+
+    clearContents(__callback){
+        
+        this.setState({
+            draw_table_item_list : [],
+        }, () => {
+            if(__callback)__callback();
+        });
+    }
+
+    onChangeOption(){
+        
+        const cur_sel_product_name = this.__ref_sel_product_name.current.getSelectedOptionValue();
+        const cur_sel_account_email = this.__ref_sel_account_name.current.getSelectedOptionValue();
+        const cur_sel_draw_date = this.__ref_sel_draw_date.current.getSelectedOptionValue();
+        const cur_sel_draw_result = this.__ref_sel_draw_result.current.getSelectedOptionValue();
+
+        const filtered_thedraw_item_list = this.thedraw_item_list.filter((draw_item) =>{
+            if( (cur_sel_product_name == '' || cur_sel_product_name == draw_item.product_name) &&
+                (cur_sel_account_email == '' || cur_sel_account_email == draw_item.account_email) &&
+                (cur_sel_draw_date == '' || cur_sel_draw_date == common.get_formatted_date_str(draw_item.draw_date)) &&
+                (cur_sel_draw_result == '' || cur_sel_draw_result == draw_item.draw_result)
+            ){
+                return true;
+            }else{
+                return false;
+            }
+        });
+
+        this.setContents(filtered_thedraw_item_list);
     }
 
     __getTableItems(draw_item_list){
@@ -82,22 +147,6 @@ class ContentsTheDraw extends React.Component {
         );
     }
 
-    __getDummyDrawItem(){
-        return {
-            account_info : {
-                email : 'aaaa@gmail.com',
-                pwd : '123456',
-                id : common.uuidv4()
-            },
-            product_name : 'DUNK AA',
-            prouduct_size : '230',
-            prouduct_price : '180,000',
-            draw_date : '2020-10-11',
-            draw_result : '당첨',
-            _id : common.uuidv4()
-        }
-    }
-
     render() {
 
         return (
@@ -109,16 +158,16 @@ class ContentsTheDraw extends React.Component {
                             <h4 className="contents-title">THE DRAW</h4>
                         </div>
                         <div className="col-md-2">
-                            <Options label="계정" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                            <Options ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <Options label="상품" options={['abb', 'cdd']} label_col_class="col-md-2" select_col_class="col-md-10"/>
+                            <Options ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <Options label="응모일시" options={['abb', 'cdd']} />
+                            <Options ref={this.__ref_sel_draw_date} label="응모일시" options={this.state.opt_list_draw_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-2">
-                            <Options label="당첨여부" options={['당첨', '미당첨']} label_col_class="col-md-5" select_col_class="col-md-7"/>
+                            <Options ref={this.__ref_sel_draw_result} label="당첨여부" options={this.state.opt_list_draw_result} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                     </div>
                     <div className="table-wrapper">
@@ -142,7 +191,7 @@ class ContentsTheDraw extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoad.bind(this)}>
-                                <img src="./res/img/cloud-arrow-down-fill.svg" style={{width:24, height:24}}/> 불러오기
+                                <img src="./res/img/cloud-arrow-down-fill.svg" style={{width:24, height:24}}/> 결과확인
                             </button>
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
