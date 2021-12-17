@@ -59,11 +59,13 @@ class Options extends React.Component {
 
     render(){
         let option_items = this.getOptionItems(this.props.options, this.props.option_keys);
+        let class_label_col_size = this.props.label_col_class == undefined ? 'col-md-3' : this.props.label_col_class;
+        let class_select_col_size = this.props.select_col_class == undefined ? 'col-md-9' : this.props.select_col_class;
 
         return(
             <div className="row">
-                <label className="col-md-3 col-form-label font-weight-bold task-edit-modal-option-label">{this.props.label}</label>
-                <div className="col-md-9">
+                <label className={class_label_col_size + " col-form-label font-weight-bold task-edit-modal-option-label"}>{this.props.label}</label>
+                <div className={class_select_col_size}>
                     <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
                         {option_items}
                     </select>

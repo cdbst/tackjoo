@@ -111,14 +111,14 @@ class ContentsTheDraw extends React.Component {
                         <div className="col-md-2">
                             <Options label="계정" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
                         </div>
+                        <div className="col-md-3">
+                            <Options label="상품" options={['abb', 'cdd']} label_col_class="col-md-2" select_col_class="col-md-10"/>
+                        </div>
+                        <div className="col-md-3">
+                            <Options label="응모일시" options={['abb', 'cdd']} />
+                        </div>
                         <div className="col-md-2">
-                            <Options label="상품" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
-                        </div>
-                        <div className="col-md-3">
-                            <Options label="응모일시" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
-                        </div>
-                        <div className="col-md-3">
-                            <Options label="당첨여부" options={['abb', 'cdd']} h_on_change={this.onChangeAccount.bind(this)}/>
+                            <Options label="당첨여부" options={['당첨', '미당첨']} label_col_class="col-md-5" select_col_class="col-md-7"/>
                         </div>
                     </div>
                     <div className="table-wrapper">
