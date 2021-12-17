@@ -6,6 +6,7 @@ class TheDrawTableItem extends React.Component {
         this.onClickGoLinkBtn = this.onClickGoLinkBtn.bind(this);
         this.onPopAccountInfo = this.onPopAccountInfo.bind(this);
         this.getDrawResultFontColor = this.getDrawResultFontColor.bind(this);
+        this.getAccountInfoTag = this.getAccountInfoTag.bind(this);
 
         this.__mount = false;
     }
@@ -22,8 +23,38 @@ class TheDrawTableItem extends React.Component {
         window.electron.openExternalWebPage(this.props.draw_item.product_link);
     }
 
+    getAccountInfoTag(){
+        
+        const id_btn_cpy_email = "button-copy-thedraw-item-email-" + this.props.draw_item._id;
+        const id_btn_cpy_pwd = "button-copy-thedraw-item-pwd-" + this.props.draw_item._id;
+
+        const email = this.props.draw_item.account_email;
+        const pwd = this.props.draw_item.account_pwd;
+
+        const on_click_copy_btn = function(value){
+            Index.g_sys_msg_q.enqueue('알림', '클립보드에 저장되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+            window.electron.writeTextToClipboard(value);
+        }
+
+        const on_click_copy_btn_email = on_click_copy_btn.bind(null, email);
+        const on_click_copy_btn_pwd = on_click_copy_btn.bind(null, pwd);
+
+        return(
+            <div>
+                <div className="input-group mb-3">
+                    <input type="text" className="form-control" value={email} aria-describedby={id_btn_cpy_email} disabled/>
+                    <button className="btn btn-primary btn-outline-secondary" type="button" id={id_btn_cpy_email} onClick={on_click_copy_btn_email}>복사</button>
+                </div>
+                <div className="input-group mb-3">
+                    <input type="password" className="form-control" value={pwd} aria-describedby={id_btn_cpy_pwd} disabled/>
+                    <button className="btn btn-primary btn-outline-secondary" type="button" id={id_btn_cpy_pwd} onClick={on_click_copy_btn_pwd}>복사</button>
+                </div>
+            </div>
+        );
+    }
+
     onPopAccountInfo(){
-        Index.g_prompt_modal.popModal('계정 정보', <div>{this.props.draw_item.account_email}<br/>{this.props.draw_item.account_pwd}</div>, ()=>{});
+        Index.g_prompt_modal.popModal('계정 정보', this.getAccountInfoTag(), ()=>{});
     }
 
     getDrawResultFontColor(){

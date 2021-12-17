@@ -22,7 +22,8 @@ contextBridge.exposeInMainWorld('electron', {
     saveSettingsInfo : _saveSettingsInfo,
     loadSettingsInfo : _loadSettingsInfo,
     loadTheDrawItemList : _loadTheDrawItemList,
-    openExternalWebPage : _openExternalWebPage
+    openExternalWebPage : _openExternalWebPage,
+    writeTextToClipboard : _writeTextToClipboard
 });
 
 let get_sensor_data = undefined;
@@ -311,4 +312,9 @@ function _loadTheDrawItemList(__callback){
 function _openExternalWebPage(url){
     let ipc_data = get_ipc_data({url : url});
     ipcRenderer.send('open-external-webpage', ipc_data);
+}
+
+function _writeTextToClipboard(text){
+    let ipc_data = get_ipc_data({text : text});
+    ipcRenderer.send('write-text-to-clipboard', ipc_data);
 }
