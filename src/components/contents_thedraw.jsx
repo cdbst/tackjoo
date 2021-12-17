@@ -51,11 +51,10 @@ class ContentsTheDraw extends React.Component {
     }
 
     onClickClenup(){
-        console.log('onClickClenup');
+        this.clearContents();
     }
 
     onClickLoad(){
-        console.log('onClickLoad');
 
         window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
 

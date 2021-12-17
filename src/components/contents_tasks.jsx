@@ -48,7 +48,7 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRemoveAll(){
-        Index.g_prompt_modal.popModal('Remove All Task Items', 'Are you sure want to remove all of task items?', (is_ok)=>{
+        Index.g_prompt_modal.popModal('Remove All Task Items', <p>Are you sure want to remove all of task items?</p>, (is_ok)=>{
             if(is_ok == false) return;
 
             let paused_remain = this.table_item_refs.length;

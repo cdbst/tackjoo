@@ -23,7 +23,7 @@ class TheDrawTableItem extends React.Component {
     }
 
     onPopAccountInfo(){
-        console.log('onPopAccountInfo');
+        Index.g_prompt_modal.popModal('계정 정보', <div>{this.props.draw_item.account_email}<br/>{this.props.draw_item.account_pwd}</div>, ()=>{});
     }
 
     getDrawResultFontColor(){
