@@ -19,7 +19,7 @@ class TheDrawTableItem extends React.Component {
     }
 
     onClickGoLinkBtn(){
-        console.log('onClickGoLinkBtn');
+        window.electron.openExternalWebPage(this.props.draw_item.product_link);
     }
 
     onPopAccountInfo(){
