@@ -37,7 +37,7 @@ function register(){
 
         (async () => {
             try{
-                await IPRequestLock.accquire(proxy_ip, proxy_port)
+                await IPRequestLock.accquire(proxy_ip, proxy_port);
                 await TaskRunnerManager.add(task_runner);
                 await task_runner.start();
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true});
