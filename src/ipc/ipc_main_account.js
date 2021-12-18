@@ -114,7 +114,7 @@ function register(){
             try{
                 await IPRequestLock.accquire(undefined, undefined);
 
-                let = result = await borwser_context.open_main_page();
+                let result = await borwser_context.open_main_page();
                 if(result == false){
                     log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'fail with openning main page'));
                     event.reply('login-reply' + data.id, 'fail with openning main page');
@@ -128,7 +128,7 @@ function register(){
                     log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'login fail'));
                     event.reply('login-reply' + data.id, 'login fail');
                 }
-                
+
             }catch(err){
                 log.error(common.get_log_str('ipc_main_account.js', 'login-callback', err));
                 event.reply('login-reply' + data.id, err.message);
