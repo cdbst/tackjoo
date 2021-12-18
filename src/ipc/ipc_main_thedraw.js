@@ -17,7 +17,7 @@ function register(){
                 for(var i = 0; i < browser_context_list.length; i++){
                     const browser_context = browser_context_list[i];
     
-                    const {error, data} = await get_the_draw_list_info(browser_context);
+                    const {error, data} = await get_thedraw_list_info(browser_context);
                     if(error != undefined){
                         errors.push(error);
                     }else{
@@ -35,7 +35,7 @@ function register(){
     });
 }
 
-async function get_the_draw_list_info(browser_context){
+async function get_thedraw_list_info(browser_context){
 
     let result = await browser_context.login(false);
     if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
