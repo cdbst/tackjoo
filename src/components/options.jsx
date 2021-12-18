@@ -1,4 +1,4 @@
-class Options extends React.Component {
+class LabelSelect extends React.Component {
 
     constructor(props) {
         super(props);
@@ -8,7 +8,6 @@ class Options extends React.Component {
 
         this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
         this.getSelectedOptionKey = this.getSelectedOptionKey.bind(this);
-
 
         this.ref_options = React.createRef();
     }

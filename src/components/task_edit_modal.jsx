@@ -254,19 +254,19 @@ class TaskEditModal extends React.Component {
                             </div>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <Options ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
+                                    <LabelSelect ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <Options ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
+                                    <LabelSelect ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
                             <hr/>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <Options ref={this.ref_options_size} label="Size" options={size_list}/>
+                                    <LabelSelect ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <Options ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
+                                    <LabelSelect ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
                                 </div>
                             </div>
                             <hr/>
@@ -302,7 +302,7 @@ class TaskEditModal extends React.Component {
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
                                 <div className="col-md-6">
-                                    <Options ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
+                                    <LabelSelect ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>
