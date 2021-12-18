@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const package_files = [
+    'font.css',
     'index.css',
     'package.json',
     'package-lock.json'
