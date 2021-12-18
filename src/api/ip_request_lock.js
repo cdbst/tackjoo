@@ -3,7 +3,7 @@ const { Semaphore } = require("async-mutex");
 class IPRequestLock{
 
     constructor(){
-        this.__max_num_http_req = 2;
+        this.__max_num_http_req = 3;
         this.__ip_semaphore_dict = {}
     }
 
