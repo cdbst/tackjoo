@@ -12,7 +12,7 @@ class ContentsSettings extends React.Component {
     static OPTION_TEXT = {
         HTTP_REQ_RET_INTERVAL : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1.5)',
         HTTP_REQ_RET_CNT : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 회 재시도 할지 설정합니다. (기본 값 : 30)',
-        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 요청을 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력)',
+        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 응답을 최대 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력)',
         HTTP_MAX_REQ_WITHIN_SAME_IP : 'HTTP 요청시 하나의 IP에서 동시에 몇개의 요청까지 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
         TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)'
