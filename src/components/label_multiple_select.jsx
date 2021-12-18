@@ -27,9 +27,7 @@ class LabelMultipleSelect extends React.Component {
     }
 
     onChangeOption(e){
-
         const values = this.getSelectedOptionValues();
-        console.log(values);
         if(this.props.h_on_change != undefined) this.props.h_on_change(values);
     }
 
