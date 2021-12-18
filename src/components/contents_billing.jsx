@@ -53,7 +53,7 @@ class ContentsBilling extends React.Component {
             
             event.preventDefault();
 
-            Index.g_prompt_modal.popModal('Warning', <p>이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?</p>, (is_ok)=>{
+            Index.g_prompt_modal.popModal('경고', <p>이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?</p>, (is_ok)=>{
 
                 if(is_ok == false) return;
 
@@ -99,34 +99,34 @@ class ContentsBilling extends React.Component {
         let billing_info = this.getCurrentBillingInfo();
 
         if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
-            Index.g_sys_msg_q.enqueue('Error', '받으실 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으실 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
-            Index.g_sys_msg_q.enqueue('Error', '받으실 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으실 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
-            Index.g_sys_msg_q.enqueue('Error', '받으실 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으실 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
-            Index.g_sys_msg_q.enqueue('Error', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
             Index.g_billing_info = billing_info;
-            Index.g_sys_msg_q.enqueue('Info', 'Billing information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('안내', 'Billing information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -137,7 +137,7 @@ class ContentsBilling extends React.Component {
             if(this.__mount == false) return;
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Warn', 'Cannot load billing information.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_sys_msg_q.enqueue('경고', '결제 정보가 아직 없거나 읽을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
                 Index.g_billing_info = this.getDefaultBillingInfo();
                 return;
             }
@@ -146,7 +146,7 @@ class ContentsBilling extends React.Component {
 
             Index.g_billing_info = billing_info;
 
-            Index.g_sys_msg_q.enqueue('Info', 'Billing information has been loaded successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -167,14 +167,14 @@ class ContentsBilling extends React.Component {
         let buyer_addr1 = this.ref_addr1.current.value;
 
         if(buyer_addr1 == undefined || buyer_addr1 == ''){
-            Index.g_sys_msg_q.enqueue('Error', '검색할 주소를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '검색할 주소를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         window.electron.searchAddr(buyer_addr1, (err, search_result) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
@@ -235,7 +235,7 @@ class ContentsBilling extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">Billing Informations</h4>
+                            <h4 className="contents-title">결제정보</h4>
                         </div>
                     </div>
                     <br/>
@@ -298,8 +298,8 @@ class ContentsBilling extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center" onClick={this.onClickSaveBtn.bind(this)}>
-                            <button type="button" className="btn btn-warning btn-footer-inside">
-                                <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> Save
+                            <button type="button" className="btn btn-primary btn-footer-inside">
+                                <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> 저장하기
                             </button>
                         </div>
                     </div>
