@@ -30,7 +30,7 @@ class ContentsTasks extends React.Component {
 
     __setupColumnsWidth(){
         this.type_col_width = 124.5;
-        this.size_col_width = 53;
+        this.size_col_width = 65;
         this.account_col_width = 210;
         this.proxy_col_width = 140;
         this.open_time_col_width = 190;
@@ -50,7 +50,7 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRemoveAll(){
-        Index.g_prompt_modal.popModal('Remove All Task Items', <p>Are you sure want to remove all of task items?</p>, (is_ok)=>{
+        Index.g_prompt_modal.popModal('경고', <p>모든 작업을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
 
             let paused_remain = this.table_item_refs.length;
@@ -110,7 +110,7 @@ class ContentsTasks extends React.Component {
 
         window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
             if(err){
-                Index.g_sys_msg_q.enqueue('에러', 'Task를 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+                Index.g_sys_msg_q.enqueue('에러', '작업을 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
                 return;
             }
 
@@ -131,7 +131,7 @@ class ContentsTasks extends React.Component {
             common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
 
             if(this.__checkTaskDuplicated(task_info_obj)){
-                Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+                Index.g_sys_msg_q.enqueue('에러', `중복된 작업은 생성할 수 없습니다. ${product_info.name}(${account_email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
                 return;
             }
 
@@ -214,7 +214,7 @@ class ContentsTasks extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">{"Tasks (" + this.task_list.length +")"}</h4>
+                            <h4 className="contents-title">{"작업 (" + this.task_list.length +")"}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -224,15 +224,15 @@ class ContentsTasks extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>Type</th>
-                                <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>Product</th>
-                                <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>Size</th>
-                                <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>Account</th>
-                                <th scope="col" style={{width : this.proxy_col_width, maxWidth : this.proxy_col_width}}>Proxy</th>
-                                <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>Open Time</th>
-                                <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>Scheduled Time</th>
-                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
-                                <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>Actions</th>
+                                <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>구매방식</th>
+                                <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>상품명</th>
+                                <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>사이즈</th>
+                                <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정</th>
+                                <th scope="col" style={{width : this.proxy_col_width, maxWidth : this.proxy_col_width}}>프록시</th>
+                                <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>판매일정</th>
+                                <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
+                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
+                                <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,16 +243,16 @@ class ContentsTasks extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
-                                <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> New Task
+                                <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> Run All
+                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> Pause All
+                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
                             </button>
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
-                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> Remove All
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
                         </div>
                     </div>

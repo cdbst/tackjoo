@@ -268,7 +268,7 @@ class ContentsAccounts extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
-                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 계정추가
+                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
                                 <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> 전체로그인
