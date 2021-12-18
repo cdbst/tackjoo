@@ -40,7 +40,7 @@ class ContentsSettings extends React.Component {
     loadAppSettings(){
         Index.g_settings_info.loadAppSettings((error, settings_info) =>{
             if(error){
-                Index.g_sys_msg_q.enqueue('WARN', 'Cannot load settings information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_sys_msg_q.enqueue('경고', '앱 설정 정보가 아직 없거나 읽을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
                 this.setCurrentSettingsInfo(Index.g_settings_info.settings_info);
             }else{
                 this.setCurrentSettingsInfo(settings_info);
@@ -69,7 +69,7 @@ class ContentsSettings extends React.Component {
             
             event.preventDefault();
 
-            Index.g_prompt_modal.popModal('Warning', <p>이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?</p>, (is_ok)=>{
+            Index.g_prompt_modal.popModal('경고', <p>이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?</p>, (is_ok)=>{
 
                 if(is_ok == false) return;
 
@@ -140,8 +140,8 @@ class ContentsSettings extends React.Component {
         Index.g_settings_info.updateSettings(settings_info);
 
         Index.g_settings_info.saveAppSettings((error) =>{
-            if(error) Index.g_sys_msg_q.enqueue('ERROR', 'Cannot save settings information to file.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            else Index.g_sys_msg_q.enqueue('Info', 'Settings information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(error) Index.g_sys_msg_q.enqueue('에러', '앱 설정 정보 저장에 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            else Index.g_sys_msg_q.enqueue('안내', '앱 설정 정보 저장에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -152,7 +152,7 @@ class ContentsSettings extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">Settings</h4>
+                            <h4 className="contents-title">설정</h4>
                         </div>
                     </div>
                     <br/>
@@ -173,7 +173,7 @@ class ContentsSettings extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center" onClick={this.onClickSaveBtn.bind(this)}>
                             <button type="button" className="btn btn-warning btn-footer-inside">
-                                <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> Save
+                                <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> 저장하기
                             </button>
                         </div>
                     </div>

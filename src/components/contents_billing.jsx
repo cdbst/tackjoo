@@ -121,12 +121,12 @@ class ContentsBilling extends React.Component {
         window.electron.saveBillingInfo(billing_info, (err) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', '결제정보 저장에 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
             Index.g_billing_info = billing_info;
-            Index.g_sys_msg_q.enqueue('안내', 'Billing information has been saved successfully.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('안내', '결제정보 저장에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
