@@ -101,7 +101,7 @@ class TaskEditModal extends React.Component {
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
 
         if(selected_product == undefined){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot found product info.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '제품 정보를 읽는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -112,14 +112,14 @@ class TaskEditModal extends React.Component {
             this.setLoadingStatus(false);
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 if(__callback) __callback(err, undefined);
                 return;
             }
 
             //TODO : Normal product type임에도 불구하고 size_info_list를 취득하지 못한 경우 어떻게 처리할 것인가?
             if(product_info.size_info_list.length == 0){
-                Index.g_sys_msg_q.enqueue('Warning', 'This product has no size information yet. So, Task will buy similar size that you select.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 7000);
+                Index.g_sys_msg_q.enqueue('경고', '해당 상품은 아직 사이즈 정보가 없습니다. 사이즈를 선택하면, 같거나 가장 유사한 사이즈로 구매를 진행합니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }
 
             if(__callback){
@@ -141,7 +141,7 @@ class TaskEditModal extends React.Component {
         });
 
         if(_filtered_product_info_list.length == 0){
-            Index.g_sys_msg_q.enqueue('Error', type_name + " has no product information.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', type_name + " 제품 정보를 찾을수 없습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -159,19 +159,19 @@ class TaskEditModal extends React.Component {
     onSubmitTaskInfo(){
 
         if(this.state.selected_product == undefined){
-            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (invalid product information.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', "상품이 선택되지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         const selected_size_list = this.ref_options_size.current.getSelectedOptionValues();
         if(selected_size_list.length == 0){
-            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (size is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', "사이즈가 선택되지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         let selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
         if(selected_account_email_list.length == 0){
-            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -184,7 +184,7 @@ class TaskEditModal extends React.Component {
         if(this.state.selected_product.sell_type != common.SELL_TYPE.normal){
             selected_schedule = this.schedule_time_input_instance.selectedDates;
             if(selected_schedule.length == 0){
-                Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', "작업 예약(시작) 시간을 설정하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
             selected_schedule = selected_schedule[0];
@@ -240,7 +240,7 @@ class TaskEditModal extends React.Component {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <div className="mb-12 row" style={{marginBottom : 30}}>
+                            <div className="row" style={{marginBottom : 30}}>
                                 <div className="text-center">
                                     <div ref={this.ref_loading_div} className="tesk-edit-modal-loding-div d-flex align-items-center justify-content-center">
                                         <div className="spinner-border tesk-edit-modal-spinner-product" role="status"/>    
@@ -248,63 +248,63 @@ class TaskEditModal extends React.Component {
                                     <img ref={this.ref_product_img} className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
                                 </div>
                             </div>
-                            <div className="mb-12 row">
+                            <div className="row">
                                 <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_type} label="Type" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
+                                    <LabelSelect ref={this.ref_options_type} label="유형" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_product} label="Product" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
+                                    <LabelSelect ref={this.ref_options_product} label="상품" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
                             </div>
                             <hr/>
-                            <div className="mb-12 row">
-                                <div className="col-md-4">
-                                    <LabelMultipleSelect ref={this.ref_options_size} label="Size" options={size_list}/>
+                            <div className="row">
+                                <div className="col-md-5">
+                                    <LabelMultipleSelect ref={this.ref_options_size} label="사이즈" options={size_list}/>
                                 </div>
-                                <div className="col-md-8">
-                                    <LabelMultipleSelect ref={this.ref_options_account} label="Account" options={account_email_list}/>
+                                <div className="col-md-7">
+                                    <LabelMultipleSelect ref={this.ref_options_account} label="계정" options={account_email_list}/>
                                 </div>
                             </div>
                             <hr/>
                             <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
-                                <div className="mb-12 row" >
+                                <div className="row" >
                                     <div className="col-md-2">
-                                        <label className="task-edit-modal-option-label">Open</label>
+                                        <label className="task-edit-modal-option-label">시작</label>
                                     </div>
                                     <div className="col-md-4">
                                         <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
                                     </div>
                                     <div className="col-md-2 ">
-                                        <label className="task-edit-modal-option-label">Close</label> 
+                                        <label className="task-edit-modal-option-label">종료</label> 
                                     </div>
                                     <div className="col-md-4">
                                         <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
                                     </div>
                                 </div>
                                 <hr/>
-                                <div className="mb-12 row">
-                                    <div className="col-md-2">
-                                        <label className="task-edit-modal-option-label">Schedule</label>
+                                <div className="row">
+                                    <div className="col-md-3">
+                                        <label className="task-edit-modal-option-label">예약시간</label>
                                     </div>
-                                    <div className="col-md-10">
+                                    <div className="col-md-9">
                                         <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
                                     </div>
                                 </div>
                                 <hr/>
                             </div>
-                            <div className="mb-12 row">
-                                <label className="col-sm-2 col-form-label font-weight-bold task-edit-modal-option-label">Price</label>
+                            <div className="row">
+                                <label className="col-md-2 col-form-label font-weight-bold task-edit-modal-option-label">가격</label>
                                 <label className="col-sm-4 col-form-label font-weight-bold task-edit-modal-option-label">
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
                                 <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_proxy} label="Proxy" options={porxy_alias_list} option_keys={porxy__id_list}/>
+                                    <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>OK</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
+                            <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>생성</button>
                         </div>
                     </div>
                 </div>
