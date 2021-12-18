@@ -14,6 +14,7 @@ class ContentsTasks extends React.Component {
         this.__updateTaskTalbeItems = this.__updateTaskTalbeItems.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
+        this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
 
         this.task_list = [];
         this.table_item_refs = [];
@@ -82,19 +83,28 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
+    __adjectScheduleTime(schedule_time){
+        //스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
+        if(product_info.open_time != undefined && product_info.open_time > schedule_time){
+            schedule_time = product_info.open_time;
+        }
+
+        //스케쥴 time이 end time보다 미래의 시간이라면 작업을 수행할 수 없기 때문에 스케쥴 time을 open time으로 변경한다.
+        if(product_info.end_time != undefined && product_info.end_time < schedule_time){
+            schedule_time = product_info.open_time;
+        }
+
+        return schedule_time;
+    }
+
     onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time, proxy_info){
+
+        if(account_id == ''){ // 모든 계정으로 task 생성.
+
+        }
     
         if(schedule_time != undefined){
-        
-            //스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
-            if(product_info.open_time != undefined && product_info.open_time > schedule_time){
-                schedule_time = product_info.open_time;
-            }
-    
-            //스케쥴 time이 end time보다 미래의 시간이라면 작업을 수행할 수 없기 때문에 스케쥴 time을 open time으로 변경한다.
-            if(product_info.end_time != undefined && product_info.end_time < schedule_time){
-                schedule_time = product_info.open_time;
-            }
+            schedule_time = this.__adjectScheduleTime(schedule_time);
         }
 
         let size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
@@ -220,9 +230,6 @@ class ContentsTasks extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside">
-                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> Quick Tasks
-                            </button>
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
                                 <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> New Task
                             </button>

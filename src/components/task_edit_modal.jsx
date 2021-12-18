@@ -2,7 +2,7 @@ class TaskEditModal extends React.Component {
 
     EL_ID_MODAL_SELECT_TYPE = 'edit-task-type-select';
     EL_ID_MODAL_SELECT_PRODUCT = 'edit-task-product-select';
-    EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input"
+    EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input";
 
     constructor(props) {
         super(props);
@@ -169,7 +169,7 @@ class TaskEditModal extends React.Component {
         }
 
         const selected_account_id = this.ref_options_account.current.getSelectedOptionKey();
-        if(selected_account_id == undefined || selected_account_id == ''){
+        if(selected_account_id == undefined){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
@@ -217,6 +217,11 @@ class TaskEditModal extends React.Component {
 
         let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
         let account_id_list = this.state.account_info_list.map((account_info) => account_info.id);
+
+        if(account_email_list.length > 0){
+            account_email_list.unshift('모든 계정');
+            account_id_list.unshift('');
+        }
 
         let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
         let close_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.close_time, true);
