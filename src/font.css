@@ -7,7 +7,7 @@
 @font-face {
     font-family: 'NotoSansKR_Bold';
     src: url('./res/font/NotoSansKR-Bold.otf') format('opentype');
-    font-weight: normal;
+    font-weight: bold !important;
 }
 
 @font-face {
