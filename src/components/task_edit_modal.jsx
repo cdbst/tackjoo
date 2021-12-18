@@ -263,10 +263,10 @@ class TaskEditModal extends React.Component {
                             <hr/>
                             <div className="mb-12 row">
                                 <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_size} label="Size" options={size_list}/>
+                                    <LabelMultipleSelect ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
                                 <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
+                                    <LabelMultipleSelect ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
                                 </div>
                             </div>
                             <hr/>

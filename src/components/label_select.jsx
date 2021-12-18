@@ -65,7 +65,7 @@ class LabelSelect extends React.Component {
             <div className="row">
                 <label className={class_label_col_size + " col-form-label font-weight-bold task-edit-modal-option-label"}>{this.props.label}</label>
                 <div className={class_select_col_size}>
-                    <select className="form-select modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
+                    <select className="form-select form-select-down-arrw modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
                         {option_items}
                     </select>
                 </div>

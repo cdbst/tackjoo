@@ -292,7 +292,7 @@ class ContentsBilling extends React.Component {
                             <div className="m2-12 row">
                                 <div className="col-md-6">
                                     <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
-                                    <select className="form-select select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
+                                    <select className="form-select form-select-down-arrw select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
                                         {this.state.opts_search_result}
                                     </select>
                                 </div>
