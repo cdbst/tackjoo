@@ -15,8 +15,8 @@ function register(){
         let billing_info = data.payload.billing_info;
         let settings_info = data.payload.settings_info;
 
-        const proxy_ip = task_info.proxy_info == undefined ? undefined : task_info.proxy_info.ip
-        const proxy_port = task_info.proxy_info == undefined ? undefined : task_info.proxy_info.port
+        const proxy_ip = task_info.proxy_info;
+        const proxy_port = task_info.proxy_info;
 
         let browser_context = BrowserContextManager.get(task_info.account_id);
         
