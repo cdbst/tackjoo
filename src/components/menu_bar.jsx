@@ -60,7 +60,7 @@ class MenuBar extends React.Component {
                         <a className="nav-link" id={MenuBar.MENU_ID.PROXIES} data-bs-toggle="tab" href="#proxies" role="tab" aria-controls="proxies" aria-selected="false">프록시</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">앱설정</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
                     <ul className="nav justify-content-end" style={{width:'calc(100% - 560px)'}}>
                         <li className="nav-item">
