@@ -10,7 +10,7 @@ class LaodingButton extends React.Component {
         this.__ref_btn = React.createRef();
     }
 
-    setLoginStatus(status){
+    setLoadingStatus(status){
         
         this.__ref_btn.current.disabled = status;
         

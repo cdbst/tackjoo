@@ -57,11 +57,11 @@ class ContentsTheDraw extends React.Component {
 
     onClickLoad(){
 
-        this.__ref_load_btn.current.setLoginStatus(true);
+        this.__ref_load_btn.current.setLoadingStatus(true);
 
         window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
 
-            this.__ref_load_btn.current.setLoginStatus(false);
+            this.__ref_load_btn.current.setLoadingStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             if(thedraw_item_list.length == 0) return;

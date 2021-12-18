@@ -38,7 +38,7 @@ class AccountsTableItem extends React.Component {
     }
 
     setLoginStatus(status){
-        this.ref_login_btn.current.setLoginStatus(status);
+        this.ref_login_btn.current.setLoadingStatus(status);
     }
 
     render(){
