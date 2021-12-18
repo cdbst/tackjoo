@@ -61,7 +61,7 @@ class TaskTableItem extends React.Component {
         
         let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
         if(product_info == undefined){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot found product information', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '상품 정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             this.ref_status_btn.current.disabled = false;
             return;
         }
@@ -85,7 +85,7 @@ class TaskTableItem extends React.Component {
         window.electron.pauseTask(this.props.task_info, (err) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                Index.g_sys_msg_q.enqueue('에러', '작업을 취소하는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
                 this.ref_status_btn.current.disabled = false;
                 if(__callback) __callback();
             }else{
@@ -108,7 +108,7 @@ class TaskTableItem extends React.Component {
     onClickStatusBtn(is_play_btn){
 
         if(this.state.status == common.TASK_STATUS.READY && this.isPossibleToPlay() == false){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot start this task before open time.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            Index.g_sys_msg_q.enqueue('에러', '상품 판매시작 이전에 작업을 시작할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
             return;
         }
 
