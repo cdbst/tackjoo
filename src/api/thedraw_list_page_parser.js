@@ -64,7 +64,4 @@ function parse_thedraw_item_list($, browser_context){
     return thedraw_item_list;
 }
 
-
-
-
 module.exports.parse_thedraw_item_list = parse_thedraw_item_list;
