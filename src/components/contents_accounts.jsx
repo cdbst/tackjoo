@@ -2,8 +2,8 @@
 class ContentsAccounts extends React.Component {
 
     static ACCOUNT_STATUS = {
-        LOGIN : 'login',
-        LOGOUT : 'logout'
+        LOGIN : '로그인',
+        LOGOUT : '로그아웃'
     }
 
     constructor(props) {
@@ -46,12 +46,12 @@ class ContentsAccounts extends React.Component {
 
     __loadAccountInfoFile(){
 
-        Index.g_sys_msg_q.enqueue('Account information loading..', 'Please waiting for loading user information.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        Index.g_sys_msg_q.enqueue('로딩', '계정 정보를 읽는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.getAccountInfo( (err, _account_info_list) => {
 
             if(err) {
-                Index.g_sys_msg_q.enqueue('Warn', 'Cannot load account information from file.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_sys_msg_q.enqueue('경고', '계정정보가 아직 없거나 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
                 for(var i = 0; i < _account_info_list.accounts.length; i++){
                     let account = _account_info_list.accounts[i];
@@ -84,7 +84,7 @@ class ContentsAccounts extends React.Component {
     addAccount(_email, _pwd, _id, modal = true){
 
         if(_email == '' || _pwd == ''){
-            Index.g_sys_msg_q.enqueue('Error', 'please input valid values.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+            Index.g_sys_msg_q.enqueue('에러', '올바른 계정 정보를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -93,7 +93,7 @@ class ContentsAccounts extends React.Component {
         })
 
         if(_dup_account_info.length > 0){
-            Index.g_sys_msg_q.enqueue('Warn', _email + ' is already registered.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 10000);
+            Index.g_sys_msg_q.enqueue('에러', _email + ' 해당 계정이 이미 등록된 상태입니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
         
@@ -102,7 +102,7 @@ class ContentsAccounts extends React.Component {
         window.electron.addAccount(account.email, account.pwd, account.id, (err) =>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Error', 'cannot save new account ' + _email + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                Index.g_sys_msg_q.enqueue('에러', '새로운 계정을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
@@ -111,7 +111,7 @@ class ContentsAccounts extends React.Component {
 
             this.__updateAccountInfo(_account_info);
 
-            if(modal) Index.g_sys_msg_q.enqueue('Add Account', _email + ' has been added.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(modal) Index.g_sys_msg_q.enqueue('안내', _email + ' 새로운 계정을 등록했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
         });
     }
 
@@ -126,19 +126,19 @@ class ContentsAccounts extends React.Component {
         });
 
         if(account_to_remove == undefined){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to delete.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '제거할 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         window.electron.removeAccount(_id, (err)=>{
 
             if(err){
-                Index.g_sys_msg_q.enqueue('WARN', 'Some error was accured while removing account ' + account_to_remove.email  + '\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_sys_msg_q.enqueue('에러', '계정 정보를 제거하는데 알 수 없는 에러가 발생했습니다. ' + account_to_remove.email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             }
 
             this.__updateAccountInfo(_updated_account_info);
 
-            Index.g_sys_msg_q.enqueue('Delete Account', account_to_remove.email  + ' has been removed', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('안내', account_to_remove.email  + ' 계정 정보를 제거하였습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -174,11 +174,9 @@ class ContentsAccounts extends React.Component {
         }
 
         if(account_to_login == undefined){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot found account info to login.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+            Index.g_sys_msg_q.enqueue('에러', '로그인할 계정정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
-
-        if(modal) Index.g_sys_msg_q.enqueue('Try to login', 'Please wait for login is completed. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
         this.table_item_ref_list[account_to_login.id].current.setLoginStatus(true);
 
@@ -187,7 +185,7 @@ class ContentsAccounts extends React.Component {
             this.table_item_ref_list[account_to_login.id].current.setLoginStatus(false);
 
             if(err){
-                Index.g_sys_msg_q.enqueue('Login Fail', 'Please input validate account information (' + account_to_login.email  + ')\n' + err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+                Index.g_sys_msg_q.enqueue('에러', '로그인에 실패했습니다. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
@@ -206,7 +204,7 @@ class ContentsAccounts extends React.Component {
                 account_info : _account_info
             }));
 
-            if(modal) Index.g_sys_msg_q.enqueue('Login Successful', account_to_login.email + ' login successfully', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(modal) Index.g_sys_msg_q.enqueue('안내', account_to_login.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
@@ -247,7 +245,7 @@ class ContentsAccounts extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">{"Accounts (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
+                            <h4 className="contents-title">{"계정관리 (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -257,9 +255,9 @@ class ContentsAccounts extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>E-Mail</th>
-                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>Status</th>
-                                <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>Actions</th>
+                                <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>이메일</th>
+                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>상태</th>
+                                <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -270,10 +268,10 @@ class ContentsAccounts extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
-                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> New Account
+                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
-                                <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> Login All
+                                <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> 전체로그인
                             </button>
                         </div>
                     </div>

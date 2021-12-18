@@ -45,22 +45,22 @@ class MenuBar extends React.Component {
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                     
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">Tasks</a>
+                        <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">작업</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">DRAW</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">THE DRAW</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">Accounts</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">계정관리</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.BILLING} data-bs-toggle="tab" href="#billing" role="tab" aria-controls="billing" aria-selected="false">Billing</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.BILLING} data-bs-toggle="tab" href="#billing" role="tab" aria-controls="billing" aria-selected="false">결제관리</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.PROXIES} data-bs-toggle="tab" href="#proxies" role="tab" aria-controls="proxies" aria-selected="false">Proxies</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.PROXIES} data-bs-toggle="tab" href="#proxies" role="tab" aria-controls="proxies" aria-selected="false">프록시</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
                     <ul className="nav justify-content-end" style={{width:'calc(100% - 560px)'}}>
                         <li className="nav-item">

@@ -88,7 +88,7 @@ class ContentsProxies extends React.Component {
 
         window.electron.loadProxyInfo((err, proxy_info_list)=>{
             if(err){
-                Index.g_sys_msg_q.enqueue('WARN', 'Cannot load proxy information file', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 3000);
+                Index.g_sys_msg_q.enqueue('경고', '프록시 정보가 아직 없거나 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 3000);
                 return;
             }
 
@@ -140,17 +140,17 @@ class ContentsProxies extends React.Component {
 
     __checkProxyInfoValues(ip, port, alias){
         if(ip == undefined || ip == ''){
-            Index.g_sys_msg_q.enqueue('Error', 'IP value is empty', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', 'IP 주소값이 입력되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return false;
         }
 
         if(port == undefined || port == ''){
-            Index.g_sys_msg_q.enqueue('Delete Account', 'Port value is empty', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '포트값이 입력되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return false;
         }
 
         if(alias == undefined || alias == ''){
-            Index.g_sys_msg_q.enqueue('Delete Account', 'Alias value is empty', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '프록시 이름이 입력되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return false;
         }
 
@@ -160,7 +160,7 @@ class ContentsProxies extends React.Component {
     __saveProxyInfo(){
         window.electron.saveProxyInfo(this.__proxy_info_list, (err)=>{
             if(err){
-                Index.g_sys_msg_q.enqueue('WARN', 'Cannot save proxy info', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                Index.g_sys_msg_q.enqueue('에러', '프록시 정보 저장에 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             }
         });
     }
@@ -205,7 +205,7 @@ class ContentsProxies extends React.Component {
 
     onClickAddProxyBulk(){
         //TODO 기능 구현 필요.
-        console.log('onClickAddProxyBulk');
+        //console.log('onClickAddProxyBulk');
     }
 
     render() {
@@ -222,7 +222,7 @@ class ContentsProxies extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">Proxies</h4>
+                            <h4 className="contents-title">프록시</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -232,15 +232,14 @@ class ContentsProxies extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col" style={{width : this.ip_col_width, maxWidth : this.ip_col_width}}>IP</th>
-                                <th scope="col" style={{width : this.port_col_width, maxWidth : this.port_col_width}}>Port</th>
+                                <th scope="col" style={{width : this.ip_col_width, maxWidth : this.ip_col_width}}>IP주소</th>
+                                <th scope="col" style={{width : this.port_col_width, maxWidth : this.port_col_width}}>포트</th>
                                 <th scope="col" style={{width : this.username_col_width, maxWidth : this.username_col_width}}>ID</th>
-                                <th scope="col" style={{width : this.alias_col_width, maxWidth : this.alias_col_width}}>Alias</th>                                
-                                <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>Actions</th>
+                                <th scope="col" style={{width : this.alias_col_width, maxWidth : this.alias_col_width}}>이름</th>                                
+                                <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* "table items" */}
                             {this.state.proxy_table_list}
                         </tbody>
                     </table>
@@ -248,11 +247,11 @@ class ContentsProxies extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickAddProxy.bind(this)}>
-                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> Add Proxy
+                                <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddProxyBulk.bind(this)}>
-                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> Add Bulk
-                            </button>
+                            {/* <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddProxyBulk.bind(this)}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
+                            </button> */}
                         </div>
                     </div>
                 </div>

@@ -198,10 +198,10 @@ class ContentsTheDraw extends React.Component {
                                 ref={this.__ref_load_btn}
                                 h_on_click={this.onClickLoad.bind(this)}
                                 btn_label={"불러오기"}
-                                btn_class={"btn-warning btn-footer-inside"}
+                                btn_class={"btn-primary btn-footer-inside"}
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
                             </button>
                         </div>

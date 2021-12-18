@@ -11,9 +11,9 @@ app_cfg.set_log('info', false);
 function create_window() {
     try{
         const win = new BrowserWindow({
-            width: 1560,
+            width: 1620,
             height: 1020,
-            minWidth : 1560,
+            minWidth : 1620,
             minHeight : 1020,
             webPreferences: {
                 //sandbox: true,

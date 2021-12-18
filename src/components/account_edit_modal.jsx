@@ -56,13 +56,13 @@ class AccountEditModal extends React.Component {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id={this.props.id + '-label'}>Add New Account</h5>
+                            <h5 className="modal-title" id={this.props.id + '-label'}>계정 추가하기</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
                             <div className="mb-3 row">
                                 <form onSubmit={(e)=>{e.preventDefault();}}> 
-                                    <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">Email</label>
+                                    <label htmlFor={this.EL_ID_MODAL_INPUT_EMAIL} className="col-sm-2 col-form-label font-weight-bold">이메일</label>
                                     <div className="col-sm-10">
                                         <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_EMAIL} style={{'--width' : '450px'}}/>
                                     </div>
@@ -70,7 +70,7 @@ class AccountEditModal extends React.Component {
                             </div>
                             <div className="mb-3 row">
                                 <form onSubmit={this.onSubmitAccountInfo.bind(this)}> 
-                                    <label htmlFor={this.EL_ID_MODAL_INPUT_PWD} className="col-sm-2 col-form-label font-weight-bold" >Password</label>
+                                    <label htmlFor={this.EL_ID_MODAL_INPUT_PWD} className="col-sm-2 col-form-label font-weight-bold" >비밀번호</label>
                                     <div className="col-sm-10">
                                         <input type="password" name="password" autoComplete="on" className="form-control" id={this.EL_ID_MODAL_INPUT_PWD} style={{'--width' : '450px'}}/>
                                     </div>
@@ -78,8 +78,8 @@ class AccountEditModal extends React.Component {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitAccountInfo.bind(this)}>OK</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitAccountInfo.bind(this)}>생성</button>
                         </div>
                     </div>
                 </div>

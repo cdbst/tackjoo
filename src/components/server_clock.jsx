@@ -12,7 +12,6 @@ class ServerClock{
 
         this.alam_subscribers = [];
 
-        //TODO: server time을 재대로 얻어오지 못했을 때 어떻게 처리해야하는지 고민 필요.
         this.__getServerDateTime((date)=>{
             this.server_time = new Date(date);
             this.__setPowerOnClock();
@@ -33,7 +32,6 @@ class ServerClock{
     }
 
     __invoke_alam(date) { 
-        //TODO mutex, lock이 필요한지 검토 필요.
 
         for(var i = this.alam_subscribers.length - 1; i >= 0 ; i--){
 

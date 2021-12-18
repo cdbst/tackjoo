@@ -3,7 +3,7 @@
 html * 
 {
     color: white !important;
-    font-family: 'NotoSansKR_Light' !important;
+    font-family: 'NotoSansKR_Regular' !important;
 }
 
 body {
@@ -173,7 +173,7 @@ tbody tr:hover td {
 
 .modal-title{
     color: black !important;
-    font-weight: bold;
+    font-family: 'NotoSansKR_Bold' !important;
 }
 
 .modal-footer{

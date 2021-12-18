@@ -76,7 +76,7 @@ class ProxyEditModal extends React.Component {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id={this.props.id + '-label'}>Edit Proxy Information</h5>
+                            <h5 className="modal-title" id={this.props.id + '-label'}>프록시 정보 편집</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -89,7 +89,7 @@ class ProxyEditModal extends React.Component {
                                 </div>
                                 <div className="col-md-6">
                                     <div className="row">
-                                        <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.PORT} className="col-sm-3 col-form-label font-weight-bold">Port</label>
+                                        <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.PORT} className="col-sm-3 col-form-label font-weight-bold">포트</label>
                                         <input type="text" className="form-control" id={ProxyEditModal.EL_ID_MODAL_INPUT.PORT} style={{'--width' : '170px'}}/>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@ class ProxyEditModal extends React.Component {
                                 </div>
                                 <div className="col-md-6">
                                     <div className="row">
-                                        <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.PWD} className="col-sm-3 col-form-label font-weight-bold">PWD</label>
+                                        <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.PWD} className="col-sm-3 col-form-label font-weight-bold">비번</label>
                                         <input type="password" name="password" className="form-control" id={ProxyEditModal.EL_ID_MODAL_INPUT.PWD} style={{'--width' : '170px'}}/>
                                     </div>
                                 </div>
@@ -114,7 +114,7 @@ class ProxyEditModal extends React.Component {
                                 <div className="col-md-12">
                                     <form onSubmit={this.onSubmitProxyInfo.bind(this)}>
                                         <div className="row">
-                                            <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.ALIAS} className="col-sm-2 col-form-label font-weight-bold">Alias</label>
+                                            <label htmlFor={ProxyEditModal.EL_ID_MODAL_INPUT.ALIAS} className="col-sm-2 col-form-label font-weight-bold">이름</label>
                                             <input type="text" className="form-control" autoComplete="on" id={ProxyEditModal.EL_ID_MODAL_INPUT.ALIAS} style={{'--width' : '390px'}}/>
                                         </div>
                                     </form>
@@ -122,8 +122,8 @@ class ProxyEditModal extends React.Component {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitProxyInfo.bind(this)}>OK</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitProxyInfo.bind(this)}>확인</button>
                         </div>
                     </div>
                 </div>

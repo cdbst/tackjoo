@@ -68,8 +68,8 @@ class PromptModal extends React.Component {
                         {this.state.modal_contents_tag}
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onClickOkBtn.bind(this)}>OK</button>
+                        <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
+                        <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onClickOkBtn.bind(this)}>확인</button>
                     </div>
                     </div>
                 </div>
