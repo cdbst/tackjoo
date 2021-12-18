@@ -80,7 +80,7 @@ function register(){
             const email = data.payload.email;
             const browser_context = BrowserContextManager.get_by_email(email);
             if(browser_context == undefined){
-                event.reply('get-account-id-by-email-reply' + data.id, {err : '계정 정보를 찾는 도중에 알 수 없습니다.', data : browser_context.id});
+                event.reply('get-account-id-by-email-reply' + data.id, {err : '계정 정보를 찾을 수 없습니다.', data : browser_context.id});
             }else{
                 event.reply('get-account-id-by-email-reply' + data.id, {err : undefined, data : browser_context.id});
             }
