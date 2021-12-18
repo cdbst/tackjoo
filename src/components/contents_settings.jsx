@@ -4,6 +4,7 @@ class ContentsSettings extends React.Component {
         HTTP_REQ_RET_INTERVAL : 'http-req-ret-interval-input',
         HTTP_REQ_RET_CNT : 'http-req-ret-cnt-input',
         HTTP_REQ_TIMEOUT : 'http-req-timeout-input',
+        HTTP_MAX_REQ_WITHIN_SAME_IP : 'http-max-req-within-same-ip-input',
         TASK_RET_COUNT : 'task-ret-cnt-input',
         TASK_RET_INTERVAL : 'task-ret-interval-input'
     }
@@ -11,7 +12,8 @@ class ContentsSettings extends React.Component {
     static OPTION_TEXT = {
         HTTP_REQ_RET_INTERVAL : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1.5)',
         HTTP_REQ_RET_CNT : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 회 재시도 할지 설정합니다. (기본 값 : 30)',
-        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 요청을 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력) ',
+        HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 요청을 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력)',
+        HTTP_MAX_REQ_WITHIN_SAME_IP : 'HTTP 요청시 하나의 IP에서 동시에 몇개의 요청까지 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
         TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)'
     }
@@ -92,6 +94,9 @@ class ContentsSettings extends React.Component {
         let http_req_timeout = settings_info.http_req_timeout == undefined ? '' : settings_info.http_req_timeout;
         this.inputValue(ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT, http_req_timeout);
 
+        let http_max_req_within_same_ip = settings_info.http_max_req_within_same_ip == undefined ? '' : settings_info.http_max_req_within_same_ip;
+        this.inputValue(ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP, http_max_req_within_same_ip);
+
         let task_ret_cnt = settings_info.task_ret_cnt == undefined ? '' : settings_info.task_ret_cnt;
         this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_COUNT, task_ret_cnt);
 
@@ -110,6 +115,9 @@ class ContentsSettings extends React.Component {
         let http_req_timeout = this.inputValue(ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT);
         http_req_timeout = http_req_timeout  == '' ? undefined : parseFloat(http_req_timeout);
 
+        let http_max_req_within_same_ip = this.inputValue(ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP);
+        http_max_req_within_same_ip = http_max_req_within_same_ip  == '' ? undefined : parseInt(http_max_req_within_same_ip);
+
         let task_ret_cnt = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_COUNT);
         task_ret_cnt = task_ret_cnt  == '' ? undefined : parseInt(task_ret_cnt);
 
@@ -120,6 +128,7 @@ class ContentsSettings extends React.Component {
             http_req_ret_cnt : http_req_ret_cnt,
             http_req_ret_interval : http_req_ret_interval,
             http_req_timeout : http_req_timeout,
+            http_max_req_within_same_ip : http_max_req_within_same_ip,
             task_ret_cnt : task_ret_cnt,
             task_ret_interval : task_ret_interval
         }
@@ -152,7 +161,8 @@ class ContentsSettings extends React.Component {
                             <SettingsSubTitle sub_title="<HTTP 요청 설정>" /> <br />
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_CNT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_CNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr /> <br />
+                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr />
+                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/> <br />
                             <SettingsSubTitle sub_title="<Tast 설정>" /> <br />
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>

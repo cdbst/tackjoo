@@ -3,6 +3,7 @@ const BrowserContext = require("../api/browser_context.js").BrowserContext;
 const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
 const USER_FILE_PATH = require('../user_file_path.js').USER_FILE_PATH;
 const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
+const IPRequestLock = require('../api/ip_request_lock').IPRequestLock;
 
 const log = require('electron-log');
 const common = require('../common/common');
@@ -103,26 +104,36 @@ function register(){
             return;
         }
 
+        if(borwser_context.is_login){
+            borwser_context.clear_cookies();
+            borwser_context.clear_csrfToken();
+        }
+
         (async () =>{
+            
+            try{
+                await IPRequestLock.accquire(undefined, undefined);
 
-            if(borwser_context.is_login){
-                borwser_context.clear_cookies();
-                borwser_context.clear_csrfToken();
-            }
+                let result = await borwser_context.open_main_page();
+                if(result == false){
+                    log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'fail with openning main page'));
+                    event.reply('login-reply' + data.id, 'fail with openning main page');
+                    return;
+                }
+    
+                result = await borwser_context.login();
+                if(result){
+                    event.reply('login-reply' + data.id, undefined);
+                }else{
+                    log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'login fail'));
+                    event.reply('login-reply' + data.id, 'login fail');
+                }
 
-            let = result = await borwser_context.open_main_page();
-            if(result == false){
-                log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'fail with openning main page'));
-                event.reply('login-reply' + data.id, 'fail with openning main page');
-                return;
-            }
-
-            result = await borwser_context.login();
-            if(result){
-                event.reply('login-reply' + data.id, undefined);
-            }else{
-                log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'login fail'));
-                event.reply('login-reply' + data.id, 'login fail');
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'login-callback', err));
+                event.reply('login-reply' + data.id, err.message);
+            }finally{
+                IPRequestLock.release(undefined, undefined);
             }
 
         })();

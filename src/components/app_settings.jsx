@@ -12,6 +12,7 @@ class AppSettings{
             http_req_ret_cnt : 30,
             http_req_ret_interval : 1.5,
             http_req_timeout : 0,
+            http_max_req_within_same_ip : 3,
             task_ret_cnt : 0,
             task_ret_interval : 1
         }
@@ -43,7 +44,7 @@ class AppSettings{
     }
 
     compareSettingsInfo(settings_info){
-        return JSON.stringify(this.settings_info) == JSON.stringify(settings_info);
+        return window.electron.compareJSON(settings_info, this.settings_info);
     }
 
     saveAppSettings(__callback){
