@@ -70,10 +70,7 @@ class ContentsBilling extends React.Component {
     }
 
     isBillingInfoModified(){
-        let origin_billing_info = JSON.stringify(Index.g_billing_info);
-        let cur_billing_info = JSON.stringify(this.getCurrentBillingInfo());
-
-        return origin_billing_info != cur_billing_info;
+        return !window.electron.compareJSON(Index.g_billing_info, this.getCurrentBillingInfo());
     }
 
     getCurrentBillingInfo(){

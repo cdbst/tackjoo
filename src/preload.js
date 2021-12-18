@@ -1,6 +1,7 @@
 const { contextBridge } = require('electron');
 const { ipcRenderer } = require('electron');
 const { get_ipc_data } = require('./ipc/ipc_util');
+const jsonDiff = require('json-diff');
 
 contextBridge.exposeInMainWorld('electron', {
     sendSensorData : _sendSensorData,
@@ -24,7 +25,8 @@ contextBridge.exposeInMainWorld('electron', {
     loadTheDrawItemList : _loadTheDrawItemList,
     openExternalWebPage : _openExternalWebPage,
     writeTextToClipboard : _writeTextToClipboard,
-    getAccountIDbyEmail : _getAccountIDbyEmail
+    getAccountIDbyEmail : _getAccountIDbyEmail,
+    compareJSON : _compareJSON
 });
 
 let get_sensor_data = undefined;
@@ -327,4 +329,8 @@ function _getAccountIDbyEmail(email, __callback){
     ipcRenderer.once('get-account-id-by-email-reply' + ipc_data.id, (_event, account_id_info) => {
         __callback(account_id_info.err, account_id_info.data);
     });
+}
+
+function _compareJSON(obj1, obj2){
+    return jsonDiff.diff(obj1, obj2) == undefined ? true : false;
 }
