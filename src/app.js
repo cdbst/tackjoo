@@ -12,9 +12,9 @@ function create_window() {
     try{
         const win = new BrowserWindow({
             width: 1560,
-            height: 960,
+            height: 1020,
             minWidth : 1560,
-            minHeight : 960,
+            minHeight : 1020,
             webPreferences: {
                 //sandbox: true,
                 nodeIntegration: true,

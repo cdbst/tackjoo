@@ -181,6 +181,12 @@
         return `[${module_name}] [${function_name}] ${message}`;
     }
 
+    exports.get_random_int = function(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
+    }
+
     exports.NIKE_URL = 'https://www.nike.com';
     exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW', notify :'Notify Me'};
     exports.TASK_STATUS = {

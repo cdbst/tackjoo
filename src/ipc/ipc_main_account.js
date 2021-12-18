@@ -74,6 +74,24 @@ function register(){
 
     });
 
+    ipcMain.on('get-account-id-by-email', (event, data) => {
+
+        try{
+            const email = data.payload.email;
+            const browser_context = BrowserContextManager.get_by_email(email);
+            if(browser_context == undefined){
+                event.reply('get-account-id-by-email-reply' + data.id, {err : '계정 정보를 찾을 수 없습니다.', data : undefined});
+            }else{
+                event.reply('get-account-id-by-email-reply' + data.id, {err : undefined, data : browser_context.id});
+            }
+            
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_account.js', 'get-account-id-by-email-callback', err));
+            event.reply('get-account-id-by-email-reply' + data.id, {err : '계정 정보를 찾는 도중에 알 수 없는 오류가 발생했습니다.', data : undefined});
+        }
+
+    });
+
     ipcMain.on('login', (event, data) => {
         
         let _id = data.payload.id;

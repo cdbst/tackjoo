@@ -205,17 +205,23 @@ tbody tr:hover td {
 
 /* Start To Text Area */
 .form-select{
-    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
     background-color: #32353b !important;
     border: solid #a3a3a3 !important;
     border-width: 1px !important;
     color: white !important;
 }
 
+.form-select-down-arrw{
+    background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
+}
+
+.form-multiple-select > option {
+    border : 0px !important;
+}
+
 .form-select > option {
     color: white !important;
 }
-
 
 /* Start to toast */
 .toast-container{

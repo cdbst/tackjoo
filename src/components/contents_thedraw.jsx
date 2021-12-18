@@ -162,16 +162,16 @@ class ContentsTheDraw extends React.Component {
                             <h4 className="contents-title">THE DRAW</h4>
                         </div>
                         <div className="col-md-2">
-                            <Options ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <Options ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <Options ref={this.__ref_sel_draw_date} label="응모일시" options={this.state.opt_list_draw_date} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_draw_date} label="응모일시" options={this.state.opt_list_draw_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-2">
-                            <Options ref={this.__ref_sel_draw_result} label="당첨여부" options={this.state.opt_list_draw_result} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_draw_result} label="당첨여부" options={this.state.opt_list_draw_result} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                     </div>
                     <div className="table-wrapper">
