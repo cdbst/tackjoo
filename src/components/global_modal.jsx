@@ -15,7 +15,7 @@ class PromptModal extends React.Component {
 
         this.state = {
             modal_title : '',
-            modal_contents_text : ''
+            modal_contents_tag : ''
         };
     }
 
@@ -31,9 +31,9 @@ class PromptModal extends React.Component {
         this.__mount = false;
     }
 
-    onPopModal(_modal_title, _modal_contents_text, h_modal_close){
+    onPopModal(_modal_title, _modal_contents_tag, h_modal_close){
 
-        this.setState({ modal_title : _modal_title, modal_contents_text : _modal_contents_text}, () => {
+        this.setState({ modal_title : _modal_title, modal_contents_tag : _modal_contents_tag}, () => {
             this.__h_modal_close = h_modal_close;
             let el_modal = document.getElementById(PromptModal.id);
             let bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
@@ -65,7 +65,7 @@ class PromptModal extends React.Component {
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        <p>{this.state.modal_contents_text}</p>
+                        {this.state.modal_contents_tag}
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">Cancel</button>
@@ -90,7 +90,7 @@ class PromptModalHandler{
         this.__modal_ref = modal_ref;
     }
 
-    popModal(modal_title, modal_contents_text, h_modal_close){
-        this.__modal_ref.current.onPopModal(modal_title, modal_contents_text, h_modal_close);
+    popModal(modal_title, modal_contents_tag, h_modal_close){
+        this.__modal_ref.current.onPopModal(modal_title, modal_contents_tag, h_modal_close);
     }
 }

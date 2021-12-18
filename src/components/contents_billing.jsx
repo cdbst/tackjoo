@@ -53,7 +53,7 @@ class ContentsBilling extends React.Component {
             
             event.preventDefault();
 
-            Index.g_prompt_modal.popModal('Warning', '이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?', (is_ok)=>{
+            Index.g_prompt_modal.popModal('Warning', <p>이동시 변경 내용이 모두 사라집니다. 이동하시겠습니까?</p>, (is_ok)=>{
 
                 if(is_ok == false) return;
 

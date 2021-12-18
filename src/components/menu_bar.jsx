@@ -7,7 +7,8 @@ class MenuBar extends React.Component {
         TASKS : "tasks-tab",
         ACCOUNTS : "accounts-tab",
         PROXIES : "proxies-tab",
-        SETTINGS : "settings-tab"
+        SETTINGS : "settings-tab",
+        THEDRAW : "thedraw-tab",
     }
 
     constructor(props) {
@@ -45,6 +46,9 @@ class MenuBar extends React.Component {
                     
                     <li className="nav-item" role="presentation">
                         <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">Tasks</a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">DRAW</a>
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">Accounts</a>

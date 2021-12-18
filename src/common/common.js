@@ -41,6 +41,29 @@
         return target;
     }
 
+    exports.get_thedraw_item_obj_scheme = function (){
+        return {
+            product_name : undefined,
+            product_size : undefined,
+            product_price : undefined,
+            product_link : undefined,
+            draw_result : undefined,
+            draw_date : undefined,
+            account_email : undefined,
+            account_pwd : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_thedraw_item_obj = function(thedraw_item, key, value){
+        if(key in this.get_thedraw_item_obj_scheme() == false){
+            throw 'thedraw item object is not includes property : ' + key;
+        }
+
+        thedraw_item[key] = value;
+        return thedraw_item;
+    }
+
     exports.get_task_info_obj_scheme = function (){
         return {
             product_info_id : undefined,
@@ -119,23 +142,37 @@
         return product_info_obj;
     }
 
-    exports.paded_time_str = function(val){
-        return val < 10 ? '0' + val.toString() : val.toString()
+    exports.getValuesFromObjList = function(obj_list, key, value_refiner = undefined){
+        const values = [];
+
+        obj_list.forEach((obj) =>{
+            let value = obj[key];
+            if(value_refiner){
+                value = value_refiner(value);
+            }
+            if(values.includes(value) == false) values.push(value);
+        });
+
+        return values;
     }
 
     exports.get_formatted_date_str = function(date, with_time = false){
 
         if(date == undefined) return '';
 
+        const paded_time_str = (val) =>{
+            return val < 10 ? '0' + val.toString() : val.toString();
+        };
+
         var year = date.getFullYear().toString();
-        var month = this.paded_time_str(date.getMonth() + 1);
-        var day = this.paded_time_str(date.getDate());
+        var month = paded_time_str(date.getMonth() + 1);
+        var day = paded_time_str(date.getDate());
 
         if(with_time == false) return [year, month, day].join('-');
 
-        var hour = this.paded_time_str(date.getHours());
-        var min = this.paded_time_str(date.getMinutes());
-        var seconds = this.paded_time_str(date.getSeconds());
+        var hour = paded_time_str(date.getHours());
+        var min = paded_time_str(date.getMinutes());
+        var seconds = paded_time_str(date.getSeconds());
 
         return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
     }

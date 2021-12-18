@@ -4,7 +4,6 @@
 class AccountsTableItem extends React.Component {
 
     static LOGIN_BTN_SRC = './res/img/door-open-fill.svg';
-    static LOGIN_BTN_LOADING_SRC = './res/img/tail-spin.svg';
 
     constructor(props) {
         
@@ -39,14 +38,7 @@ class AccountsTableItem extends React.Component {
     }
 
     setLoginStatus(status){
-        if(this.__mount == false) return;
-        
-        this.ref_login_btn.current.disabled = status;
-        const new_log_btn_src = status ? AccountsTableItem.LOGIN_BTN_LOADING_SRC : AccountsTableItem.LOGIN_BTN_SRC;
-        
-        this.setState(_ => ({
-            login_btn_src : new_log_btn_src
-        }));
+        this.ref_login_btn.current.setLoadingStatus(status);
     }
 
     render(){
@@ -62,9 +54,12 @@ class AccountsTableItem extends React.Component {
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button ref={this.ref_login_btn} type="button" className="btn btn-warning" onClick={this.onClickLogin.bind(this)}>
-                                <img src={this.state.login_btn_src} style={{width:24, height:24}}/>
-                            </button>
+                            <LaodingButton
+                                ref={this.ref_login_btn}
+                                h_on_click={this.onClickLogin.bind(this)}
+                                btn_class={"btn-warning"}
+                                img_src={"./res/img/door-open-fill.svg"}
+                            />
                         </div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemove.bind(this)}>

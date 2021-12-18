@@ -10,14 +10,12 @@ function register(){
     ipcMain.on('save-settings-info', (event, data) => {
 
         try{
-            let ipc_id = data.id;
             let settings_info = data.payload.settings_info;
             
             UserFileManager.write(USER_FILE_PATH.SETTINGS_INFO, settings_info, (err) =>{
                 if(err) log.error(common.get_log_str('ipc_main_settings.js', 'UserFileManager.write-callback', err));
-                event.reply('save-settings-info-reply' + ipc_id, {err : err});
+                event.reply('save-settings-info-reply' + data.id, {err : err});
             });
-
         }catch(err){
             log.error(common.get_log_str('ipc_main_settings.js', 'save-settings-info-callback', err));
             event.reply('save-settings-info-reply' + data.id, {err : err.message});
@@ -27,17 +25,15 @@ function register(){
     ipcMain.on('load-settings-info', (event, data) => {
 
         try{
-            let ipc_id = data.id;
 
-            UserFileManager.read(USER_FILE_PATH.SETTINGS_INFO, (err, data) =>{
+            UserFileManager.read(USER_FILE_PATH.SETTINGS_INFO, (err, settings_info_data) =>{
                 if(err) log.error(common.get_log_str('ipc_main_settings.js', 'UserFileManager.read-callback', err));
-                event.reply('load-settings-info-reply' + ipc_id, {err : err, data : data});
+                event.reply('load-settings-info-reply' + data.id, {err : err, data : settings_info_data});
             });
         }catch(err){
             log.error(common.get_log_str('ipc_main_settings.js', 'load-settings-info-callback', err));
-            event.reply('load-settings-info-reply' + ipc_id, {err : err.message});
+            event.reply('load-settings-info-reply' + data.id, {err : err.message});
         }
-        
     });
 }
 

@@ -20,7 +20,10 @@ contextBridge.exposeInMainWorld('electron', {
     saveProxyInfo : _saveProxyInfo,
     loadProxyInfo : _loadProxyInfo,
     saveSettingsInfo : _saveSettingsInfo,
-    loadSettingsInfo : _loadSettingsInfo
+    loadSettingsInfo : _loadSettingsInfo,
+    loadTheDrawItemList : _loadTheDrawItemList,
+    openExternalWebPage : _openExternalWebPage,
+    writeTextToClipboard : _writeTextToClipboard
 });
 
 let get_sensor_data = undefined;
@@ -294,4 +297,24 @@ function _loadSettingsInfo(__callback){
     ipcRenderer.once('load-settings-info-reply' + ipc_data.id, (_event, settings_info) => {
         __callback(settings_info.err, settings_info.data);
     });
+}
+
+function _loadTheDrawItemList(__callback){
+
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-thedraw-item-list', ipc_data);
+
+    ipcRenderer.once('load-thedraw-item-list-reply' + ipc_data.id, (_event, thedraw_item_list_info) => {
+        __callback(thedraw_item_list_info.err, thedraw_item_list_info.data);
+    });
+}
+
+function _openExternalWebPage(url){
+    let ipc_data = get_ipc_data({url : url});
+    ipcRenderer.send('open-external-webpage', ipc_data);
+}
+
+function _writeTextToClipboard(text){
+    let ipc_data = get_ipc_data({text : text});
+    ipcRenderer.send('write-text-to-clipboard', ipc_data);
 }

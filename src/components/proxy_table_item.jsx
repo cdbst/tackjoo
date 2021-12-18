@@ -4,7 +4,7 @@ class ProxyTableItem extends React.Component {
         super(props);
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
-        this.conClickEditBtn = this.conClickEditBtn.bind(this);
+        this.onClickEditBtn = this.onClickEditBtn.bind(this);
 
         this.__mount = false;
     }
@@ -21,7 +21,7 @@ class ProxyTableItem extends React.Component {
         this.props.h_remove(this.props.proxy_info._id);
     }
 
-    conClickEditBtn(){
+    onClickEditBtn(){
         this.props.h_modify(this.props.proxy_info._id);
     }
 
@@ -43,7 +43,7 @@ class ProxyTableItem extends React.Component {
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-warning" onClick={this.conClickEditBtn.bind(this)}>
+                            <button type="button" className="btn btn-warning" onClick={this.onClickEditBtn.bind(this)}>
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>

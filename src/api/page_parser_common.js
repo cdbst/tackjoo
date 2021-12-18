@@ -1,5 +1,5 @@
 
-function get_specific_tag_nodes (element, tags, class_names = [], data_attrs = {}) {
+function get_specific_tag_nodes (element, tags = [], class_names = [], data_attrs = {}) {
 
     let specific_childs = [];
     let node_stack = [];
@@ -123,6 +123,10 @@ function get_elem_attr_value(elem, attr_name){
     return elem.attribs[attr_name];
 }
 
+function strip_usless_string(string){
+    return string.replace(/(\t|\n)/gi, '').trim();
+}
+
 module.exports.get_specific_child_text_nodes = get_specific_child_text_nodes;
 module.exports.has_specific_attrs = has_specific_attrs;
 module.exports.has_class = has_class;
@@ -130,3 +134,4 @@ module.exports.get_specific_tag_nodes = get_specific_tag_nodes;
 module.exports.get_data_tag_value = get_data_tag_value;
 module.exports.get_data_tag_elem = get_data_tag_elem;
 module.exports.get_elem_attr_value = get_elem_attr_value;
+module.exports.strip_usless_string = strip_usless_string;
