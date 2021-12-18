@@ -3,6 +3,7 @@ class TaskEditModal extends React.Component {
     EL_ID_MODAL_SELECT_TYPE = 'edit-task-type-select';
     EL_ID_MODAL_SELECT_PRODUCT = 'edit-task-product-select';
     EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input";
+    static ACCOUNT_OPTION_NAME_ALL = '모든 계정'; 
 
     constructor(props) {
         super(props);
@@ -162,22 +163,20 @@ class TaskEditModal extends React.Component {
             return;
         }
 
-        const selected_size = this.ref_options_size.current.getSelectedOptionValue();
-        if(selected_size == undefined || selected_size == ''){
+        const selected_size_list = this.ref_options_size.current.getSelectedOptionValues();
+        if(selected_size_list.length == 0){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (size is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        const selected_account_id = this.ref_options_account.current.getSelectedOptionKey();
-        if(selected_account_id == undefined){
+        let selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
+        if(selected_account_email_list.length == 0){
             Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        const selected_account_email = this.ref_options_account.current.getSelectedOptionValue();
-        if(selected_account_email == undefined || selected_account_email == ''){
-            Index.g_sys_msg_q.enqueue('Error', "Cannot create task (account is not set condition.)", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
+        if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
+            selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
         }
 
         let selected_schedule = undefined;
@@ -197,7 +196,7 @@ class TaskEditModal extends React.Component {
             selected_proxy_info = this.state.proxy_info_list.find((proxy_info) => { return proxy_info._id == selected_proxy_id });
         }
         
-        this.props.h_create_task(this.state.selected_product, selected_size, selected_account_id, selected_account_email, selected_schedule, selected_proxy_info);
+        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info);
         
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
@@ -216,11 +215,8 @@ class TaskEditModal extends React.Component {
         let size_list = ProductManager.getProductSizeList(this.state.selected_product);
 
         let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
-        let account_id_list = this.state.account_info_list.map((account_info) => account_info.id);
-
         if(account_email_list.length > 0){
-            account_email_list.unshift('모든 계정');
-            account_id_list.unshift('');
+            account_email_list.unshift(TaskEditModal.ACCOUNT_OPTION_NAME_ALL);
         }
 
         let open_time_str = this.state.selected_product == undefined ? '' : common.get_formatted_date_str(this.state.selected_product.open_time, true);
@@ -262,11 +258,11 @@ class TaskEditModal extends React.Component {
                             </div>
                             <hr/>
                             <div className="mb-12 row">
-                                <div className="col-md-6">
+                                <div className="col-md-4">
                                     <LabelMultipleSelect ref={this.ref_options_size} label="Size" options={size_list}/>
                                 </div>
-                                <div className="col-md-6">
-                                    <LabelMultipleSelect ref={this.ref_options_account} label="Account" options={account_email_list} option_keys={account_id_list}/>
+                                <div className="col-md-8">
+                                    <LabelMultipleSelect ref={this.ref_options_account} label="Account" options={account_email_list}/>
                                 </div>
                             </div>
                             <hr/>

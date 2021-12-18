@@ -23,7 +23,8 @@ contextBridge.exposeInMainWorld('electron', {
     loadSettingsInfo : _loadSettingsInfo,
     loadTheDrawItemList : _loadTheDrawItemList,
     openExternalWebPage : _openExternalWebPage,
-    writeTextToClipboard : _writeTextToClipboard
+    writeTextToClipboard : _writeTextToClipboard,
+    getAccountIDbyEmail : _getAccountIDbyEmail
 });
 
 let get_sensor_data = undefined;
@@ -317,4 +318,13 @@ function _openExternalWebPage(url){
 function _writeTextToClipboard(text){
     let ipc_data = get_ipc_data({text : text});
     ipcRenderer.send('write-text-to-clipboard', ipc_data);
+}
+
+function _getAccountIDbyEmail(email, __callback){
+    let ipc_data = get_ipc_data({email : email});
+    ipcRenderer.send('get-account-id-by-email', ipc_data);
+
+    ipcRenderer.once('get-account-id-by-email-reply' + ipc_data.id, (_event, account_id_info) => {
+        __callback(account_id_info.err, account_id_info.data);
+    });
 }

@@ -15,6 +15,7 @@ class ContentsTasks extends React.Component {
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
+        this.__createNewTask = this.__createNewTask.bind(this);
 
         this.task_list = [];
         this.table_item_refs = [];
@@ -83,7 +84,7 @@ class ContentsTasks extends React.Component {
         bs_obj_modal.show();
     }
 
-    __adjectScheduleTime(schedule_time){
+    __adjectScheduleTime(product_info, schedule_time){
         //스케쥴 time이 open time보다 이전 시간이면 open time으로 스케쥴 타임을 조정시킨다.
         if(product_info.open_time != undefined && product_info.open_time > schedule_time){
             schedule_time = product_info.open_time;
@@ -97,35 +98,46 @@ class ContentsTasks extends React.Component {
         return schedule_time;
     }
 
-    onCreateNewTask(product_info, friendly_size_name, account_id, account_email, schedule_time, proxy_info){
+    onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info){
 
-        if(account_id == ''){ // 모든 계정으로 task 생성.
-
+        for(var i = 0; i < account_email_list.length; i++){
+            let friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
+            this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info);
         }
-    
-        if(schedule_time != undefined){
-            schedule_time = this.__adjectScheduleTime(schedule_time);
-        }
+    }
 
-        let size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+    __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info){
 
-        let task_info_obj = common.get_task_info_obj_scheme();
-        common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
-        common.update_task_info_obj(task_info_obj, 'size_name', size_name);
-        common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
-        common.update_task_info_obj(task_info_obj, 'account_email', account_email);
-        common.update_task_info_obj(task_info_obj, 'account_id', account_id);
-        common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
-        common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
-        common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
+        window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', 'Task를 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+                return;
+            }
 
-        if(this.__checkTaskDuplicated(task_info_obj)){
-            Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
-            return;
-        }
-        this.task_list.push(task_info_obj);
+            if(schedule_time != undefined){
+                schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
+            }
 
-        this.__updateTaskTalbeItems();
+            let task_info_obj = common.get_task_info_obj_scheme();
+            const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+
+            common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
+            common.update_task_info_obj(task_info_obj, 'size_name', size_name);
+            common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
+            common.update_task_info_obj(task_info_obj, 'account_email', account_email);
+            common.update_task_info_obj(task_info_obj, 'account_id', account_id);
+            common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+            common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
+            common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
+
+            if(this.__checkTaskDuplicated(task_info_obj)){
+                Index.g_sys_msg_q.enqueue('Error', 'Cannot create duplicated task', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+                return;
+            }
+
+            this.task_list.push(task_info_obj);
+            this.__updateTaskTalbeItems();
+        });
     }
 
     __checkTaskDuplicated(task_info_to_check){
