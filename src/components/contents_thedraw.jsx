@@ -25,6 +25,7 @@ class ContentsTheDraw extends React.Component {
         this.__ref_sel_account_name = React.createRef();
         this.__ref_sel_draw_date = React.createRef();
         this.__ref_sel_draw_result = React.createRef();
+        this.__ref_load_btn = React.createRef();
 
         this.__mount = false;
         this.__setupColumnsWidth();
@@ -56,7 +57,11 @@ class ContentsTheDraw extends React.Component {
 
     onClickLoad(){
 
+        this.__ref_load_btn.current.setLoginStatus(true);
+
         window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
+
+            this.__ref_load_btn.current.setLoginStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             if(thedraw_item_list.length == 0) return;
@@ -189,9 +194,13 @@ class ContentsTheDraw extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoad.bind(this)}>
-                                <img src="./res/img/cloud-arrow-down-fill.svg" style={{width:24, height:24}}/> 결과확인
-                            </button>
+                            <LaodingButton
+                                ref={this.__ref_load_btn}
+                                h_on_click={this.onClickLoad.bind(this)}
+                                btn_label={"불러오기"}
+                                btn_class={"btn-warning btn-footer-inside"}
+                                img_src={"./res/img/cloud-arrow-down-fill.svg"}
+                            />
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
                             </button>
