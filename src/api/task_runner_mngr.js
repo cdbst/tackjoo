@@ -6,6 +6,7 @@ class TaskRunnerManager{
 
         this.__task_runner_dict = {};
         this.__browser_context_mutex_dict = {};
+        this.__stop_pending_dict = {}; // dict of task ids;
     }
 
     async acquire_browser_context_mutex(browser_context_id){
@@ -27,7 +28,14 @@ class TaskRunnerManager{
     }
 
     async add(task_runner){
-        this.__task_runner_dict[task_runner.task_info._id] = task_runner;
+
+        const task_id = task_runner.task_info._id;
+        if(this.is_task_stopped(task_id)){
+            this.unset_stop_pending(task_id);
+            throw new TaskCanceledError(task_runner, 'Task is canceled.'); 
+        }
+
+        this.__task_runner_dict[task_id] = task_runner;
         await this.acquire_browser_context_mutex(task_runner.browser_context.id);
     }
 
@@ -58,8 +66,17 @@ class TaskRunnerManager{
         return task_runner_list.filter((task_runner) => {return task_runner.running});
     }
 
+    is_task_stopped(task_id){
+        return (task_id in this.__stop_pending_dict);
+    }
+
+    set_stop_pending(task_id){
+        this.__stop_pending_dict[task_id] = true;
+    }
+
+    unset_stop_pending(task_id){
+        if(task_id in this.__stop_pending_dict) delete this.__stop_pending_dict[task_id];
+    }
 }
 
-let taskRunnerManager = new TaskRunnerManager();
-
-module.exports.taskRunnerManager = taskRunnerManager;
+module.exports.taskRunnerManager = new TaskRunnerManager();
