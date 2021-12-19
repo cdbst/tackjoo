@@ -59,12 +59,15 @@ class ContentsTheDraw extends React.Component {
 
         this.__ref_load_btn.current.setLoadingStatus(true);
 
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 THE DRAW 당첨 결과를 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
         window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
 
-            if(err) Index.g_sys_msg_q.enqueue('Error', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             if(thedraw_item_list.length == 0) return;
+            Index.g_sys_msg_q.enqueue('안내', 'THE DRAW 당첨결과를 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.thedraw_item_list = thedraw_item_list;
             this.setFilters(this.thedraw_item_list);
