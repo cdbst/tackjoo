@@ -65,7 +65,7 @@ function _sendSensorData(_sensor_data){
     ipcRenderer.send('send_sensor_data', data);
 }
 
-function _addAccount(_email, _pwd, _id, __callback){
+function _addAccount(_email, _pwd, _id, _save_to_file, __callback){
 
     if(_email == '' || _email == undefined){
         __callback('add account fail : email information is invalid');
@@ -82,7 +82,7 @@ function _addAccount(_email, _pwd, _id, __callback){
         return;
     }
 
-    let ipc_payload = {email : _email, pwd : _pwd, id : _id}
+    let ipc_payload = {email : _email, pwd : _pwd, id : _id, save_to_file : _save_to_file}
     let ipc_data = get_ipc_data(ipc_payload);
 
     ipcRenderer.send('add-account', ipc_data);

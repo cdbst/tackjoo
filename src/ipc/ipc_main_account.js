@@ -24,16 +24,22 @@ function register(){
 
     ipcMain.on('add-account', (event, data) => {
 
-        let account_info = data.payload;
-        let borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        const account_info = data.payload;
+        const borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        const save_to_file = data.payload.save_to_file;
 
         try{
             BrowserContextManager.add(borwser_context);
-
-            const file_data = BrowserContextManager.get_file_data();
-            UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
-                event.reply('add-account-reply' + data.id, err);
-            });
+            
+            if(save_to_file){
+                const file_data = BrowserContextManager.get_file_data();
+                UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
+                    event.reply('add-account-reply' + data.id, err);
+                });
+            }else{
+                event.reply('add-account-reply' + data.id, undefined);
+            }
+            
         }catch(err){
             log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err));
             event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
