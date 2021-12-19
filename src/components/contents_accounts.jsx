@@ -81,7 +81,7 @@ class ContentsAccounts extends React.Component {
         };
     }
 
-    addAccount(_email, _pwd, _id, modal = true){
+    addAccount(_email, _pwd, _id, save_to_file = true, modal = true){
 
         if(_email == '' || _pwd == ''){
             Index.g_sys_msg_q.enqueue('에러', '올바른 계정 정보를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -99,7 +99,7 @@ class ContentsAccounts extends React.Component {
         
         let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT, _id);
 
-        window.electron.addAccount(account.email, account.pwd, account.id, (err) =>{
+        window.electron.addAccount(account.email, account.pwd, account.id, save_to_file, (err) =>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('에러', '새로운 계정을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);

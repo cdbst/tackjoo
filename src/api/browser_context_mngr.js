@@ -54,19 +54,16 @@ class BrowserContextManager{
     }
 
     get_file_data(){
-        
-        let ids = Object.keys(this._browser_contexts_dict);
 
-        let accounts_info = [];
+        const accounts_info = [];
 
-        ids.forEach((id) =>{
-            let browser_context = this._browser_contexts_dict[id];
+        for(const [id, browser_context] of Object.entries(this._browser_contexts_dict)){
             accounts_info.push({
                 email : browser_context.email,
                 pwd : browser_context.pwd,
                 id : id
             });
-        });
+        }
 
         return {
             'accounts' : accounts_info
