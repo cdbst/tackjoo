@@ -62,7 +62,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 560px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 500px)'}}>
                         <li className="nav-item">
                             <a className="nav-link">{this.state.server_time}</a>
                         </li>
