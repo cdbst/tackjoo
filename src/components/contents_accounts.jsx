@@ -55,7 +55,7 @@ class ContentsAccounts extends React.Component {
             }else{
                 for(var i = 0; i < _account_info_list.accounts.length; i++){
                     let account = _account_info_list.accounts[i];
-                    this.addAccount(account.email, account.pwd, account.id, false); // modal disable.
+                    this.addAccount(account.email, account.pwd, account.id, false, false); // modal disable.
                 }
             }
         });
