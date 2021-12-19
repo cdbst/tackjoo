@@ -55,7 +55,11 @@ function register(){
         
         let task_info = data.payload.task_info;
         let task_runner = TaskRunnerManager.get(task_info._id);
-        if(task_runner != undefined) task_runner.stop();
+        if(task_runner != undefined){
+            task_runner.stop();
+        }else{
+            TaskRunnerManager.set_stop_pending(task_info._id);
+        }
 
         event.reply('pause-task-reply' + task_info._id, {err : undefined});
     });
