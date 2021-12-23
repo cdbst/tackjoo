@@ -7,9 +7,11 @@ const IpcMainProxy = require('./ipc_main_proxy');
 const IpcMainSettings = require('./ipc_main_settings');
 const IpcMainTheDraw = require('./ipc_main_thedraw');
 const IpcMainCommon = require('./ipc_main_common');
+const IpcMainAppAuth = require('./ipc_main_app_auth');
 
 function register(win){
     // IPC Responses
+    IpcMainAppAuth.register();
     IpcMainAccount.register();
     IpcMainProduct.register();
     IpcMainSensor.register(win);

@@ -3,6 +3,7 @@ class ContentsSignIn extends React.Component {
     constructor(props) {
         super(props);
 
+        this.onClickLoginBtn = this.onClickLoginBtn.bind(this);
         this.__mount = false;
     }
 
@@ -13,6 +14,14 @@ class ContentsSignIn extends React.Component {
     componentWillUnmount(){
         this.__mount = false;
     }
+
+    onClickLoginBtn(){
+        window.electron.loginApp('test', 'a', true, (err, result)=>{
+            console.log(err);
+            console.log(result);
+        });
+    }
+
 
     render() {
         return (
@@ -34,7 +43,7 @@ class ContentsSignIn extends React.Component {
                             <input type="checkbox"/> 
                         </label>
                     </div>
-                    <button className="w-100 btn btn-lg btn-primary" type="submit">로그인</button>
+                    <button className="w-100 btn btn-lg btn-primary" type="submit" onClick={this.onClickLoginBtn.bind(this)}>로그인</button>
                     <p className="mt-5 mb-3 text-muted">&copy; cdbst 2021-2022</p>
                 </div>
             </div>
