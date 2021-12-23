@@ -29,7 +29,7 @@ class Index extends React.Component {
             <div>
                 <PromptModal ref={this.prompt_modal_ref}/>
                 <Toast sys_msg_q={this.state.sys_msg_q}/>
-                <SignInPage/>
+                <ContentsSignIn/>
                 {/* <MenuBar/>
                 <MainContents /> */}
             </div>
