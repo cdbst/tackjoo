@@ -1,5 +1,9 @@
 
 /* Start To Global */
+html
+{
+    height: 100% !important;
+}
 html * 
 {
     color: white !important;
@@ -38,7 +42,7 @@ input::-webkit-inner-spin-button {
 /* Start To Contents Title */
 .contents-title {
     color : #83f195 !important;
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .contents-sub-title {
