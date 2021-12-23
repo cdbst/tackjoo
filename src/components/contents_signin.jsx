@@ -16,6 +16,9 @@ class ContentsSignIn extends React.Component {
     }
 
     onClickLoginBtn(){
+        // 입력된 유저 정보를 읽고, 그 유효성을 파악해야함
+        // 로그인 버튼을 disable 하고, 응답 완료후 enable 처리필요.
+
         window.electron.loginApp('test', 'a', true, (err, result)=>{
             console.log(err);
             console.log(result);
