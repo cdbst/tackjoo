@@ -4,6 +4,7 @@ const path = require('path');
 const package_files = [
     'font.css',
     'index.css',
+    'signin.css',
     'package.json',
     'package-lock.json'
 ];
