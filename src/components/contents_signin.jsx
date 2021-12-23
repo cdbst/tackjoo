@@ -2,26 +2,36 @@ class ContentsSignIn extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.__mount = false;
+    }
+
+    componentDidMount(){
+        this.__mount = true;
+    }
+
+    componentWillUnmount(){
+        this.__mount = false;
     }
 
     render() {
         return (
             <div className="text-center form-signin d-flex flex-column min-vh-100 justify-content-center align-items-center">
                 <div className="col-md-12">
-                    {/* <img className="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> */}
                     <h1 className="h3 mb-3 contents-title">SNKRS BOT KR</h1>
                     <br/>
                     <div className="form-floating">
-                        <input type="email" className="form-control" id="floatingInput" style={{"--width" : "100%"}} placeholder="name@example.com"/>
-                        <label className="sigin-in-user-info-label" htmlFor="floatingInput">이메일 주소</label>
+                        <input type="email" className="form-control" id="signin-input-emial" style={{"--width" : "100%"}} placeholder="name@example.com"/>
+                        <label className="sigin-in-user-info-label" htmlFor="signin-input-emial">이메일 주소</label>
                     </div>
                     <div className="form-floating">
-                        <input type="password" className="form-control" id="floatingPassword" style={{"--width" : "100%"}} placeholder="Password"/>
-                        <label className="sigin-in-user-info-label" htmlFor="floatingPassword">비밀번호</label>
+                        <input type="password" className="form-control" id="signin-input-password" style={{"--width" : "100%"}} placeholder="비밀번호"/>
+                        <label className="sigin-in-user-info-label" htmlFor="signin-input-password">비밀번호</label>
                     </div>
+                    <br/>
                     <div className="checkbox mb-3">
                         <label>로그인정보 저장하기 
-                            <input type="checkbox" value="remember-me"/> 
+                            <input type="checkbox"/> 
                         </label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit">로그인</button>
