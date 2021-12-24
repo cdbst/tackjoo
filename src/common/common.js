@@ -18,6 +18,16 @@
         });
     }
 
+    exports.is_valid_email = function(email) {
+        return String(email).toLowerCase().match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+    }
+
+    exports.is_valid_password = function(password){
+        return String(password).match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);
+    }
+
     exports.async_sleep = function(time_out) {
         return new Promise((resolve, reject) =>{
             try{
