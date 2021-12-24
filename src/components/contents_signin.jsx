@@ -15,6 +15,7 @@ class ContentsSignIn extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
+        //TODO : 로그인 정보 파일을 읽을 수 있다면 input을 초기화 시킨다.
     }
 
     componentWillUnmount(){
@@ -51,7 +52,7 @@ class ContentsSignIn extends React.Component {
         const el_btn_signin = document.getElementById(this.SIGNIN_BTN_ID);
         el_btn_signin.disabled = true;
         
-        window.electron.loginApp(email, password, true, (err, result)=>{
+        window.electron.loginApp(email, password, remember, (err, result)=>{
 
             el_btn_signin.disabled = false;
 
@@ -68,6 +69,10 @@ class ContentsSignIn extends React.Component {
             this.onSubmitUserInfo(e);
         }
     }
+
+    //TODO: 정보 저장 체크박스 관련 처리
+    // 체크된 상태로 로그인에 성공하면 파일로 저장
+    // 체크 해제시 로그인 정보 파일 삭제
 
     render() {
         return (
