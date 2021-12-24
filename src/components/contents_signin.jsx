@@ -10,16 +10,28 @@ class ContentsSignIn extends React.Component {
 
         this.onSubmitUserInfo = this.onSubmitUserInfo.bind(this);
         this.onKeyDownInputPwd = this.onKeyDownInputPwd.bind(this);
+        this.loadLoginInfo = this.loadLoginInfo.bind(this);
         this.__mount = false;
     }
 
     componentDidMount(){
         this.__mount = true;
         //TODO : 로그인 정보 파일을 읽을 수 있다면 input을 초기화 시킨다.
+        this.loadLoginInfo();
     }
 
     componentWillUnmount(){
         this.__mount = false;
+    }
+
+    loadLoginInfo(){
+        window.electron.loadLoginInfo((err, login_info) =>{
+            if(err) return;
+            if(login_info.remember === undefined || login_info.remember === false) return;
+            document.getElementById(this.INPUT_EMAIL_ID).value = login_info.email;
+            document.getElementById(this.INPUT_PWD_ID).value = login_info.password;
+            document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked = login_info.remember;
+        });
     }
 
     onSubmitUserInfo(e){

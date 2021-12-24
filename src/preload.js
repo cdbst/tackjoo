@@ -27,7 +27,8 @@ contextBridge.exposeInMainWorld('electron', {
     writeTextToClipboard : _writeTextToClipboard,
     getAccountIDbyEmail : _getAccountIDbyEmail,
     compareJSON : _compareJSON,
-    loginApp : _loginApp
+    loginApp : _loginApp,
+    loadLoginInfo : _loadLoginInfo
 });
 
 let get_sensor_data = undefined;
@@ -337,8 +338,8 @@ function _compareJSON(obj1, obj2){
 }
 
 function _loginApp(email, password, remember, __callback){
-    if(email == undefined || password == undefined || remember == undefined ||
-        email == '' || password == '' || remember == ''){
+    if(email === undefined || password === undefined || remember === undefined ||
+        email === '' || password === '' || remember === ''){
             __callback('입력한 계정 정보가 올바르지 않습니다.', undefined);
             return;
     }
@@ -349,5 +350,14 @@ function _loginApp(email, password, remember, __callback){
 
     ipcRenderer.once('login-app-reply' + ipc_data.id, (_event, result) => {
         __callback(result.err, result.data);
+    });
+}
+
+function _loadLoginInfo(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-login-info', ipc_data);
+
+    ipcRenderer.once('load-login-info-reply' + ipc_data.id, (_event, login_info_data) => {
+        __callback(login_info_data.err, login_info_data.data);
     });
 }
