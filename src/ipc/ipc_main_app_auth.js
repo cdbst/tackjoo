@@ -12,10 +12,12 @@ function register(){
 
         (async()=>{
             try{
-                const auth_info = data.payload;
-                AuthEngine.signin(auth_info.email, auth_info.password);
-                
-                event.reply('login-app-reply' + data.id, {err : undefined, data : true});
+                const error = await AuthEngine.signin(data.payload.email, data.payload.password);
+                if(error){
+                    event.reply('login-app-reply' + data.id, {err : error});
+                }else{
+                    event.reply('login-app-reply' + data.id, {err : undefined, data : true});
+                }
             }catch(err){
                 log.error(common.get_log_str('ipc_main_billing.js', 'login-app-callback', err));
                 event.reply('login-app-reply' + data.id, {err : err.message});

@@ -21,10 +21,14 @@ class AuthEngine{
 
         try{
             const res = await axios.post(AUTH_SERVER_URL + '/api/user_login', payload);
-            return true;
+            if(res.data.result == false){
+                return res.data.message;
+            }else{
+                return undefined;
+            }
         }catch(err){
-            log.error(common.get_log_str('auth_engine.js', 'AuthEngine.signin', error));
-            return false;
+            log.error(common.get_log_str('auth_engine.js', 'AuthEngine.signin', err));
+            return '로그인 실패 : 알 수 없는 오류 발생';
         }
         
     }
