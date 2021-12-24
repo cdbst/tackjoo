@@ -3,11 +3,13 @@ class ContentsSignIn extends React.Component {
     INPUT_EMAIL_ID = 'input-signin-emial';
     INPUT_PWD_ID = 'input-signin-password';
     SIGNIN_BTN_ID = 'btn-signin';
+    INPUT_REMEMBER_INFO_ID = 'input-remember-info';
 
     constructor(props) {
         super(props);
 
         this.onSubmitUserInfo = this.onSubmitUserInfo.bind(this);
+        this.onKeyDownInputPwd = this.onKeyDownInputPwd.bind(this);
         this.__mount = false;
     }
 
@@ -20,9 +22,8 @@ class ContentsSignIn extends React.Component {
     }
 
     onSubmitUserInfo(e){
-        // 입력된 유저 정보를 읽고, 그 유효성을 파악해야함
-        // 로그인 버튼을 disable 하고, 응답 완료후 enable 처리필요.
-        // 로그인시 남은 사용기간이 언제까지인지 표시 필요.
+
+        // TODO : 로그인시 남은 사용기간이 언제까지인지 표시 필요.
         e.preventDefault();
 
         const email = document.getElementById(this.INPUT_EMAIL_ID).value;
@@ -44,6 +45,9 @@ class ContentsSignIn extends React.Component {
             return;
         }
 
+        const remember = document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked;
+        console.log(`remember : ${remember}`);
+
         const el_btn_signin = document.getElementById(this.SIGNIN_BTN_ID);
         el_btn_signin.disabled = true;
         
@@ -59,6 +63,12 @@ class ContentsSignIn extends React.Component {
         });
     }
 
+    onKeyDownInputPwd(e){
+        if(e.keyCode == 13){
+            this.onSubmitUserInfo(e);
+        }
+    }
+
     render() {
         return (
             <div className="text-center form-signin d-flex flex-column min-vh-100 justify-content-center align-items-center">
@@ -66,17 +76,17 @@ class ContentsSignIn extends React.Component {
                     <h1 className="h3 mb-3 contents-title">SNKRS BOT KR</h1>
                     <br/>
                     <div className="form-floating">
-                        <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" onKeyDown={(e)=>{e.key}}/>
+                        <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" />
                         <label className="sigin-in-user-info-label" htmlFor={this.INPUT_EMAIL_ID}>이메일 주소</label>
                     </div>
                     <div className="form-floating">
-                        <input type="password" className="form-control" id={this.INPUT_PWD_ID} style={{"--width" : "100%"}} placeholder="비밀번호"/>
+                        <input type="password" className="form-control" id={this.INPUT_PWD_ID} style={{"--width" : "100%"}} placeholder="비밀번호" onKeyDown={this.onKeyDownInputPwd.bind(this)}/>
                         <label className="sigin-in-user-info-label" htmlFor={this.INPUT_PWD_ID}>비밀번호</label>
                     </div>
                     <br/>
                     <div className="form-switch mb-3">
-                        <input id="test-input-cbox" type="checkbox" className="form-check-input" style={{marginRight: '5px'}}/>
-                        <label htmlFor="test-input-cbox" className="form-check-label">로그인정보 저장하기</label>
+                        <input id={this.INPUT_REMEMBER_INFO_ID} type="checkbox" className="form-check-input" style={{marginRight: '5px'}}/>
+                        <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
                     <p className="mt-5 mb-3 text-muted">&copy; cdbst 2021-2022</p>
