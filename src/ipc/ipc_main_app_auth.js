@@ -42,7 +42,15 @@ function register(){
         }
     });
 
-    //TODO : login info remove file interface.
+    ipcMain.on('delete-login-info', (event, data) => {
+        try{
+            const result = UserFileManager.delete(USER_FILE_PATH.APP_AUTH_INFO);
+            event.reply('delete-login-info-reply' + data.id, {err : result ? undefined : 'delete fail'});
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_billing.js', 'delete-login-info-callback', err));
+            event.reply('delete-login-info-reply' + data.id, {err : err.message});
+        }
+    });
 }
 
 

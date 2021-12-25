@@ -28,7 +28,8 @@ contextBridge.exposeInMainWorld('electron', {
     getAccountIDbyEmail : _getAccountIDbyEmail,
     compareJSON : _compareJSON,
     loginApp : _loginApp,
-    loadLoginInfo : _loadLoginInfo
+    loadLoginInfo : _loadLoginInfo,
+    deleteLoginInfo : _deleteLoginInfo
 });
 
 let get_sensor_data = undefined;
@@ -359,5 +360,14 @@ function _loadLoginInfo(__callback){
 
     ipcRenderer.once('load-login-info-reply' + ipc_data.id, (_event, login_info_data) => {
         __callback(login_info_data.err, login_info_data.data);
+    });
+}
+
+function _deleteLoginInfo(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('delete-login-info', ipc_data);
+
+    ipcRenderer.once('delete-login-info-reply' + ipc_data.id, (_event, result_info) => {
+        __callback(result_info.err);
     });
 }

@@ -11,12 +11,12 @@ class ContentsSignIn extends React.Component {
         this.onSubmitUserInfo = this.onSubmitUserInfo.bind(this);
         this.onKeyDownInputPwd = this.onKeyDownInputPwd.bind(this);
         this.loadLoginInfo = this.loadLoginInfo.bind(this);
+        this.onChangeInputRemember = this.onChangeInputRemember.bind(this);
         this.__mount = false;
     }
 
     componentDidMount(){
         this.__mount = true;
-        //TODO : 로그인 정보 파일을 읽을 수 있다면 input을 초기화 시킨다.
         this.loadLoginInfo();
     }
 
@@ -59,7 +59,6 @@ class ContentsSignIn extends React.Component {
         }
 
         const remember = document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked;
-        console.log(`remember : ${remember}`);
 
         const el_btn_signin = document.getElementById(this.SIGNIN_BTN_ID);
         el_btn_signin.disabled = true;
@@ -85,6 +84,10 @@ class ContentsSignIn extends React.Component {
     //TODO: 정보 저장 체크박스 관련 처리
     // 체크된 상태로 로그인에 성공하면 파일로 저장
     // 체크 해제시 로그인 정보 파일 삭제
+    onChangeInputRemember(e){
+        if(document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked) return;
+        window.electron.deleteLoginInfo(()=>{});
+    }
 
     render() {
         return (
@@ -102,7 +105,7 @@ class ContentsSignIn extends React.Component {
                     </div>
                     <br/>
                     <div className="form-switch mb-3">
-                        <input id={this.INPUT_REMEMBER_INFO_ID} type="checkbox" className="form-check-input" style={{marginRight: '5px'}}/>
+                        <input id={this.INPUT_REMEMBER_INFO_ID} type="checkbox" className="form-check-input" style={{marginRight: '5px'}} onChange={this.onChangeInputRemember.bind(this)}/>
                         <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
