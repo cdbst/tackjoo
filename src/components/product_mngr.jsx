@@ -10,8 +10,6 @@ class ProductManager{
 
         this.__product_info_list = [];
         this.__product_info_req_gate = new RequestGate();
-
-        this.loadProductInfoList();
     }
 
     /**

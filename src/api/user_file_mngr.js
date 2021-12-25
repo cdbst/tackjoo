@@ -1,97 +1,104 @@
 const fs = require('fs');
 const path = require('path');
 const Mutex = require('async-mutex').Mutex;
+const si = require('systeminformation');
+const jwt = require('jsonwebtoken');
 
 class UserFileManager{
 
     constructor(){
-        this.read = this.read.bind(this);
-        this.write = this.write.bind(this);
-        this.__write = this.__write.bind(this);
-        this.remove = this.remove.bind(this);
-        this.exists = this.exists.bind(this);
-        this.mkdir = this.mkdir.bind(this);
-        this.__encode_base64 = this.__encode_base64.bind(this);
-        this.__decode_base64 = this.__decode_base64.bind(this);
 
         this.file_mutex = new Mutex();
+        this.user_file_secret = '0e81956a-4f44-48c3-aacc-afa3292dd46e';
+
+        (async() =>{
+            const release = await this.file_mutex.acquire();
+            si.baseboard((data) =>{
+                try{
+                    if(data.serial == undefined) return;
+                    this.user_file_secret = data.serial;
+                }finally{
+                    release();
+                }
+            });
+        })();
     }
 
-    async read(_path, __callback){
+    __read(path){
+        return new Promise((resolve, reject) =>{
+            fs.readFile(path, {encoding: 'utf8'}, (err, data) =>{
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(data);
+                }
+            })
+        });
+    }
 
-        const release = await this.file_mutex.acquire();
+    async read(path){
 
-        fs.readFile(_path, 'utf8', (err, data) => {
+        let release = undefined;
 
-            release();
+        try{
+            release = await this.file_mutex.acquire();
+            const raw_file_data = await this.__read(path);
+            const decrypted_file_data = this.__decrypt_json(raw_file_data);
+            return decrypted_file_data;
+        }catch(err){
+            throw err;
+        }finally{
+            if(release !== undefined) release();
+        }
+        
+    }
 
-            if(err){
-                __callback(err, undefined);
-                return;
+    __mkdir(dir_path){
+        return new Promise((resolve, reject) =>{
+            fs.mkdir(dir_path, {recursive : true}, (err, path)=>{
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(path);
+                }
+            })
+        });
+    }
+
+    __write(path, data){
+        return new Promise((resolve, reject) =>{
+            fs.writeFile(path, data, (err)=>{
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    async write(_path, data){
+
+        let release = undefined;
+
+        try{
+            release = await this.file_mutex.acquire();
+            const parent_dir = path.dirname(_path);            
+
+            if(fs.existsSync(parent_dir) == false){
+                await this.__mkdir(parent_dir);
             }
 
-            try{
-                let decoded_data = this.__decode_base64(data);
-                let data_obj = JSON.parse(decoded_data);
-                __callback(undefined, data_obj);
-                
-            }catch(err){
-                __callback(err, undefined);
-            }
-        });
-    }
+            const encrypted_data = this.__encrypt_json(data);
+            await this.__write(_path, encrypted_data);
 
-    remove(_path, __callback){
-
-        fs.unlink(_path, (err) => {
-            __callback(err);
-        });
-    }
-
-    exists(_path, __callback){
-
-        fs.access(_path, fs.F_OK, (err) => {
-            __callback(err);
-        });
-    }
-
-    mkdir(_dir_path, __callback){
-        fs.mkdir (_dir_path, { recursive: true }, (err)=>{
-            __callback(err);
-        });
-    }
-
-    write(_path, _data, __callback = undefined){
-
-        let parent_dir = path.dirname(_path);
-        this.exists(parent_dir, async (err)=>{
-
-            if(err){ // if not exists
-                this.mkdir(parent_dir, async (err)=>{
-                    if(err){
-                        __callback(err);
-                        return;
-                    }
-                    await this.__write(_path, _data, __callback)
-                });
-            }else{ // if exists
-                await this.__write(_path, _data, __callback)
-            }
-        });
-
-    }
-
-    async __write(_path, _data, __callback){
-
-        const data = JSON.stringify(_data);
-        const encoded_data = this.__encode_base64(data);
-
-        const release = await this.file_mutex.acquire();
-
-        fs.writeFile(_path, encoded_data, (err) =>{ 
-            release();
-            __callback(err);
-        });
+            return true;
+        }catch(err){
+            throw err;
+        }finally{
+            if(release !== undefined) release();
+        }
+        
     }
 
     delete(_path){
@@ -107,11 +114,18 @@ class UserFileManager{
 
     __encode_base64(_data){
         return Buffer.from(_data, "utf8").toString('base64');
-        
     }
     
     __decode_base64(_data){
         return Buffer.from(_data, 'base64').toString('utf8');
+    }
+
+    __encrypt_json(_json_data){
+        return jwt.sign(_json_data, this.user_file_secret, {noTimestamp : true});
+    }
+
+    __decrypt_json(_encrypt_data){
+        return jwt.verify(_encrypt_data, this.user_file_secret);
     }
 }
 

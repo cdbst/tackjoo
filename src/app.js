@@ -16,6 +16,7 @@ function create_window() {
             minWidth : 1620,
             minHeight : 1020,
             webPreferences: {
+                devTools: false,
                 //sandbox: true,
                 nodeIntegration: true,
                 preload: path.join(__dirname, "preload.js"),

@@ -28,23 +28,23 @@ function register(){
         const borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
         const save_to_file = data.payload.save_to_file;
 
-        try{
-            BrowserContextManager.add(borwser_context);
-            
-            if(save_to_file){
-                const file_data = BrowserContextManager.get_file_data();
-                UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
-                    event.reply('add-account-reply' + data.id, err);
-                });
-            }else{
+        (async() =>{
+            try{
+
+                BrowserContextManager.add(borwser_context);
+
+                if(save_to_file){
+                    const file_data = BrowserContextManager.get_file_data();
+                    await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
+                } 
+
                 event.reply('add-account-reply' + data.id, undefined);
+
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err));
+                event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
             }
-            
-        }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'add-account-callback', err));
-            event.reply('add-account-reply' + data.id, 'invalid exception has been occurred while registering account information');
-        }
-        
+        })();
     });
 
     ipcMain.on('remove-account', (event, data) => {
@@ -57,28 +57,28 @@ function register(){
             return;
         }
 
-        try{
-            const file_data = BrowserContextManager.get_file_data();
-            UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data, (err) =>{
-                event.reply('remove-account-reply' + data.id, err);
-            });
-        }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'remove-account-callback', err));
-            event.reply('remove-account-reply' + data.id, 'invalid exception has been occurred while removing account information');
-        }
+        (async() =>{
+            try{
+                const file_data = BrowserContextManager.get_file_data();
+                await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
+                event.reply('remove-account-reply' + data.id, undefined);
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'remove-account-callback', err));
+                event.reply('remove-account-reply' + data.id, 'invalid exception has been occurred while removing account information');
+            }
+        })();
     });
 
     ipcMain.on('get-account-info', (event, data) => {
-
-        try{
-            UserFileManager.read(USER_FILE_PATH.USER_INFO, (_err, _data) =>{
-                event.reply('get-account-info-reply' + data.id, {err : _err, data : _data});
-            });
-        }catch(err){
-            log.error(common.get_log_str('ipc_main_account.js', 'get-account-info-callback', err));
-            event.reply('get-account-info-reply' + data.id, {err : 'invalid exception has been occurred while getting account information', data : undefined});
-        }
-
+        (async()=>{
+            try{
+                const account_info = await UserFileManager.read(USER_FILE_PATH.USER_INFO);
+                event.reply('get-account-info-reply' + data.id, {err : undefined, data : account_info});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'get-account-info-callback', err));
+                event.reply('get-account-info-reply' + data.id, {err : '계정 정보 파일을 읽을 수 없습니다.', data : undefined});
+            }
+        })();
     });
 
     ipcMain.on('get-account-id-by-email', (event, data) => {

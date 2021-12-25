@@ -22,33 +22,29 @@ function register(){
     });
 
     ipcMain.on('save-billing-info', (event, data) => {
+        (async()=>{
+            try{
+                const billing_info = data.payload.billing_info;
 
-        try{
-            let billing_info = data.payload.billing_info;
-        
-            UserFileManager.write(USER_FILE_PATH.BILLING_INFO, billing_info, (err) =>{
-                if(err) log.error(common.get_log_str('ipc_main_billing.js', 'UserFileManager.write-callback', err));
-                event.reply('save-billing-info-reply' + data.id, {err : err});
-            });
-        }catch(err){
-            log.error(common.get_log_str('ipc_main_billing.js', 'save-billing-info-callback', err));
-            event.reply('save-billing-info-reply' + data.id, {err : err.message});
-        }
-        
+                await UserFileManager.write(USER_FILE_PATH.BILLING_INFO, billing_info);
+                event.reply('save-billing-info-reply' + data.id, {err : undefined});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_billing.js', 'save-billing-info-callback', err));
+                event.reply('save-billing-info-reply' + data.id, {err : err.message});
+            }
+        })();
     });
 
     ipcMain.on('load-billing-info', (event, data) => {
-
-        try{
-            UserFileManager.read(USER_FILE_PATH.BILLING_INFO, (err, billing_info_data) =>{
-                if(err) log.error(common.get_log_str('ipc_main_billing.js', 'UserFileManager.read-callback', err));
-                event.reply('load-billing-info-reply' + data.id, {err : err, data : billing_info_data});
-            });
-        }catch(err){
-            log.error(common.get_log_str('ipc_main_billing.js', 'load-billing-info-callback', err));
-            event.reply('load-billing-info-reply' + data.id, {err : err.message});
-        }
-
+        (async()=>{
+            try{
+                const billing_info_data = await UserFileManager.read(USER_FILE_PATH.BILLING_INFO);
+                event.reply('load-billing-info-reply' + data.id, {err : undefined, data : billing_info_data});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_billing.js', 'load-billing-info-callback', err));
+                event.reply('load-billing-info-reply' + data.id, {err : err.message});
+            }
+        })();
     });
 }
 

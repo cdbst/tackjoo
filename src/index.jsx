@@ -28,6 +28,7 @@ class Index extends React.Component {
     }
 
     onSignedIn(){
+        Index.g_product_mngr.loadProductInfoList();
         this.setState(_ => ({
             signed_in : true
         }));
