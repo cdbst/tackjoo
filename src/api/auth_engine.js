@@ -8,7 +8,6 @@ const AUTH_SERVER_URL = 'http://localhost';
 class AuthEngine{
     constructor(){
         this.session_token = undefined;
-        this.expired_date = undefined;
     }
 
     async signin(email, password){
@@ -24,13 +23,13 @@ class AuthEngine{
             if(res.data.result == false){
                 return res.data.message;
             }else{
+                this.session_token = res.data.session_token;
                 return undefined;
             }
         }catch(err){
             log.error(common.get_log_str('auth_engine.js', 'AuthEngine.signin', err));
             return '로그인 실패 : 알 수 없는 오류 발생';
         }
-        
     }
 
     signout(){
