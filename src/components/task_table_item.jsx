@@ -47,6 +47,7 @@ class TaskTableItem extends React.Component {
     }
 
     componentWillUnmount(){
+        this.onPauseTask();
         this.__mount = false;
     }
 

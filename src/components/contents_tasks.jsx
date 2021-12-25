@@ -10,19 +10,18 @@ class ContentsTasks extends React.Component {
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
-        this.__genTasksTableItems = this.__genTasksTableItems.bind(this);
-        this.__updateTaskTalbeItems = this.__updateTaskTalbeItems.bind(this);
+        this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
         this.__createNewTask = this.__createNewTask.bind(this);
+        this.__push_task_table_item = this.__push_task_table_item.bind(this);
 
-        this.task_list = [];
-        this.table_item_refs = [];
         this.task_edit_modal_id = 'edit-task-modal';
 
+        this.__table_item_ref_dict = {};
         this.state = {
-            task_table_items : []
+            task_table_item_list : []
         };
 
         this.__setupColumnsWidth();
@@ -52,30 +51,21 @@ class ContentsTasks extends React.Component {
     onClickBtnRemoveAll(){
         Index.g_prompt_modal.popModal('경고', <p>모든 작업을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
-
-            let paused_remain = this.table_item_refs.length;
-
-            this.table_item_refs.forEach((table_item_ref) =>{
-                table_item_ref.current.onPauseTask(()=>{
-                    if(--paused_remain == 0){
-                        this.task_list = [];
-                        this.__updateTaskTalbeItems();
-                    }
-                });
-            });
+            this.__table_item_ref_dict = {};
+            this.setState({ task_table_item_list: []});
         });
     }
 
     onClickBtnRunAll(){
-        this.table_item_refs.forEach((table_item_ref) =>{
+        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
             table_item_ref.current.onPlayTask();
-        });
+        }
     }
 
     onClickBtnStopAll(){
-        this.table_item_refs.forEach((table_item_ref) =>{
+        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
             table_item_ref.current.onPauseTask();
-        });
+        }
     }
 
     onClickBtnNewTask(){
@@ -114,9 +104,7 @@ class ContentsTasks extends React.Component {
                 return;
             }
 
-            if(schedule_time != undefined){
-                schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
-            }
+            if(schedule_time != undefined) schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
 
             let task_info_obj = common.get_task_info_obj_scheme();
             const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
@@ -135,16 +123,29 @@ class ContentsTasks extends React.Component {
                 return;
             }
 
-            this.task_list.push(task_info_obj);
-            this.__updateTaskTalbeItems();
+            this.__push_task_table_item(task_info_obj);
         });
+    }
+
+    __push_task_table_item(task_info){
+        const task_table_item_ref = React.createRef();
+        const task_table_item = this.__getTaskTableElement(task_info, task_table_item_ref);
+
+        this.state.task_table_item_list.push(task_table_item);
+        this.__table_item_ref_dict[task_info._id] = task_table_item_ref;
+
+        this.setState({
+            task_table_item_list: this.state.task_table_item_list
+        });        
     }
 
     __checkTaskDuplicated(task_info_to_check){
 
         let task_info_to_check_product_info = Index.g_product_mngr.getProductInfo(task_info_to_check.product_info_id);
+        
+        let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
 
-        let duplicated = this.task_list.filter((task_info) =>{
+            const task_info = task_table_item.props.task_info;
             if(task_info.account_id != task_info_to_check.account_id) return false;
 
             let task_info_product_info = Index.g_product_mngr.getProductInfo(task_info.product_info_id);
@@ -156,54 +157,35 @@ class ContentsTasks extends React.Component {
     }
 
     onRemoveTask(task_id){
-        for(var i = 0; i < this.task_list.length; i++){
-            if(this.task_list[i]._id == task_id){
-                this.task_list.splice(i, 1);
-                break;
-            }
-        }
+        const task_table_item_list = this.state.task_table_item_list.filter((task_table_item) => {
+            return task_table_item.key != task_id;
+        });
 
-        this.__updateTaskTalbeItems();
+        delete this.__table_item_ref_dict[task_id];
+        this.setState({
+            task_table_item_list: task_table_item_list
+        });
     }
 
-    __updateTaskTalbeItems(){
-        let el_task_table_items = this.__genTasksTableItems(this.task_list);
-        
-        this.setState(_ => ({
-            task_table_items : el_task_table_items
-        }));
-    }
-
-    __genTasksTableItems(task_list){
-
-        let task_table_items = [];
-        this.table_item_refs = [];
-
-        for(var i = 0; i < task_list.length; i++){
-            let task_info = task_list[i];
-            let task_ref = React.createRef();
-            this.table_item_refs.push(task_ref);
-            task_table_items.push(
-                <TaskTableItem 
-                    key={task_info._id} 
-                    id={task_info._id}
-                    h_remove={this.onRemoveTask.bind(this)}
-                    task_info={task_info}
-                    ref={task_ref}
-                    type_col_width={this.type_col_width}
-                    product_col_width={this.product_col_width}
-                    size_col_width={this.size_col_width}
-                    account_col_width={this.account_col_width}
-                    proxy_col_width={this.proxy_col_width}
-                    open_time_col_width={this.open_time_col_width}
-                    scheduled_time_col_width={this.scheduled_time_col_width}
-                    status_col_width={this.status_col_width}
-                    action_col_width={this.action_col_width}
-                />
-            );
-        }
-
-        return task_table_items;
+    __getTaskTableElement(task_info, task_ref){
+        return (
+            <TaskTableItem
+                key={task_info._id} 
+                id={task_info._id}
+                h_remove={this.onRemoveTask.bind(this)}
+                task_info={task_info}
+                ref={task_ref}
+                type_col_width={this.type_col_width}
+                product_col_width={this.product_col_width}
+                size_col_width={this.size_col_width}
+                account_col_width={this.account_col_width}
+                proxy_col_width={this.proxy_col_width}
+                open_time_col_width={this.open_time_col_width}
+                scheduled_time_col_width={this.scheduled_time_col_width}
+                status_col_width={this.status_col_width}
+                action_col_width={this.action_col_width}
+            />
+        );
     }
 
     render() {
@@ -214,7 +196,7 @@ class ContentsTasks extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">{"작업 (" + this.task_list.length +")"}</h4>
+                            <h4 className="contents-title">{"작업 (" + this.state.task_table_item_list.length +")"}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -236,7 +218,7 @@ class ContentsTasks extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.task_table_items}
+                            {this.state.task_table_item_list}
                         </tbody>
                     </table>
                     </div>
@@ -258,7 +240,6 @@ class ContentsTasks extends React.Component {
                     </div>
                 </div>
             </div>
-
         );
     }
 }
