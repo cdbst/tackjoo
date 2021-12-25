@@ -143,9 +143,7 @@ class ContentsBilling extends React.Component {
             }
 
             this.setBillingInfoToUI(billing_info);
-
             Index.g_billing_info = billing_info;
-
             Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }

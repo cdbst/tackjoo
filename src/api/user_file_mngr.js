@@ -11,15 +11,17 @@ class UserFileManager{
         this.file_mutex = new Mutex();
         this.user_file_secret = '0e81956a-4f44-48c3-aacc-afa3292dd46e';
 
-        const release = this.file_mutex.acquire();
-        si.baseboard((data) =>{
-            try{
-                if(data.serial == undefined) return;
-                this.user_file_secret = data.serial;
-            }finally{
-                release();
-            }
-        });
+        (async() =>{
+            const release = await this.file_mutex.acquire();
+            si.baseboard((data) =>{
+                try{
+                    if(data.serial == undefined) return;
+                    this.user_file_secret = data.serial;
+                }finally{
+                    release();
+                }
+            });
+        })();
     }
 
     __read(path){
@@ -44,7 +46,7 @@ class UserFileManager{
             const decrypted_file_data = this.__decrypt_json(raw_file_data);
             return decrypted_file_data;
         }catch(err){
-            return undefined;
+            throw err;
         }finally{
             if(release !== undefined) release();
         }
@@ -75,23 +77,24 @@ class UserFileManager{
         });
     }
 
-    async write(path, data){
+    async write(_path, data){
 
         let release = undefined;
 
         try{
             release = await this.file_mutex.acquire();
+            const parent_dir = path.dirname(_path);            
 
-            if(fs.existsSync(path) == false){
-                await this.__mkdir(path.dirname(path));
+            if(fs.existsSync(parent_dir) == false){
+                await this.__mkdir(parent_dir);
             }
 
             const encrypted_data = this.__encrypt_json(data);
-            await this.__write(path, encrypted_data);
+            await this.__write(_path, encrypted_data);
 
             return true;
         }catch(err){
-            return false;
+            throw err;
         }finally{
             if(release !== undefined) release();
         }
@@ -118,7 +121,7 @@ class UserFileManager{
     }
 
     __encrypt_json(_json_data){
-        return jwt.sign(_json_data, this.user_file_secret);
+        return jwt.sign(_json_data, this.user_file_secret, {noTimestamp : true});
     }
 
     __decrypt_json(_encrypt_data){

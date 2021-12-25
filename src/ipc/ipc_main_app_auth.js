@@ -20,7 +20,7 @@ function register(){
 
                 if(data.payload.remember){
                     try{
-                        UserFileManager.write(USER_FILE_PATH.APP_AUTH_INFO, data.payload);
+                        await UserFileManager.write(USER_FILE_PATH.APP_AUTH_INFO, data.payload);
                     }catch(err){
                         log.error(common.get_log_str('ipc_main_billing.js', 'UserFileManager.write', err));
                     }

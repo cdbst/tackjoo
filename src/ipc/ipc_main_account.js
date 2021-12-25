@@ -35,7 +35,7 @@ function register(){
 
                 if(save_to_file){
                     const file_data = BrowserContextManager.get_file_data();
-                    await UserFileManager.write((USER_FILE_PATH.USER_INFO, file_data));
+                    await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
                 } 
 
                 event.reply('add-account-reply' + data.id, undefined);
