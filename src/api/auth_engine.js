@@ -3,8 +3,8 @@ const common = require('../common/common.js');
 const log = require('electron-log');
 const { dialog, app } = require('electron');
 
-// const AUTH_SERVER_URL = 'http://18.179.4.170:8080';
-const AUTH_SERVER_URL = 'http://localhost';
+const AUTH_SERVER_URL = 'http://18.179.4.170';
+//const AUTH_SERVER_URL = 'http://localhost';
 
 class AuthEngine{
     constructor(){
