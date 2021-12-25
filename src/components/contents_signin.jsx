@@ -81,9 +81,6 @@ class ContentsSignIn extends React.Component {
         }
     }
 
-    //TODO: 정보 저장 체크박스 관련 처리
-    // 체크된 상태로 로그인에 성공하면 파일로 저장
-    // 체크 해제시 로그인 정보 파일 삭제
     onChangeInputRemember(e){
         if(document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked) return;
         window.electron.deleteLoginInfo(()=>{});
