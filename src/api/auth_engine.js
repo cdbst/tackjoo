@@ -47,7 +47,7 @@ class AuthEngine{
     start_session_checker(){
         setInterval(async ()=>{
             try{
-                const res = await axios.post(AUTH_SERVER_URL + '/api/ssck', {session_token : this.session_token});
+                const res = await axios.post(AUTH_SERVER_URL + '/api/ssck', {session_token : this.session_token}, {timeout : this.session_check_interval});
                 if(res.data.result == false){
                     this.auth_denied(res.data.message);
                 }
