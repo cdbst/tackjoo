@@ -46,7 +46,7 @@ class ContentsAccounts extends React.Component {
 
     __loadAccountInfoFile(){
 
-        Index.g_sys_msg_q.enqueue('로딩', '계정 정보를 읽는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        //Index.g_sys_msg_q.enqueue('로딩', '계정 정보를 읽는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.getAccountInfo( (err, _account_info_list) => {
 

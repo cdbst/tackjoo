@@ -28,7 +28,7 @@ function create_window() {
     
         IpcM.register(win);
     
-        win.webContents.openDevTools();
+        //win.webContents.openDevTools();
         win.setMenuBarVisibility(false);
         win.loadFile(path.join(__dirname, "index.html"));
     }catch(e){

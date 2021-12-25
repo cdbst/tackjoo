@@ -72,6 +72,7 @@ class ContentsSignIn extends React.Component {
             }else{
                 const formatted_expired_date_str = common.get_formatted_date_str(expired_date, true);
                 Index.g_sys_msg_q.enqueue('로그인 성공', `앱 사용 만료 시간 : ${formatted_expired_date_str}`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
+                this.props.h_signed_in();
             }
         });
     }
