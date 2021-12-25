@@ -16,12 +16,21 @@ class Index extends React.Component {
     constructor(props) {
         super(props);
 
+        this.onSignedIn = this.onSignedIn.bind(this);
+        
         this.prompt_modal_ref = React.createRef();
         Index.g_prompt_modal.setModalRef(this.prompt_modal_ref);
 
         this.state = {
-            sys_msg_q : Index.g_sys_msg_q
+            sys_msg_q : Index.g_sys_msg_q,
+            signed_in : false
         };
+    }
+
+    onSignedIn(){
+        this.setState(_ => ({
+            signed_in : true
+        }));
     }
 
     render() {
@@ -29,9 +38,14 @@ class Index extends React.Component {
             <div>
                 <PromptModal ref={this.prompt_modal_ref}/>
                 <Toast sys_msg_q={this.state.sys_msg_q}/>
-                {/* <ContentsSignIn/> */}
-                <MenuBar/>
-                <MainContents />
+                {this.state.signed_in ? (
+                    <div>
+                        <MenuBar/>
+                        <MainContents />
+                    </div>
+                ) : (
+                    <ContentsSignIn h_signed_in={this.onSignedIn.bind(this)}/>
+                )}
             </div>
         );
     }

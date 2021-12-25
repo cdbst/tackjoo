@@ -94,6 +94,17 @@ class UserFileManager{
         });
     }
 
+    delete(_path){
+        if(fs.existsSync(_path) == false) return false;
+
+        try{
+            fs.rmSync(_path);
+            return true;
+        }catch(err){
+            return false;
+        }
+    }
+
     __encode_base64(_data){
         return Buffer.from(_data, "utf8").toString('base64');
         

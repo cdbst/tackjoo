@@ -8,7 +8,8 @@ const USER_FILE_PATH = {
     USER_INFO :  path.join(APP_DATA_PATH, 'userdata', 'user_info.dat'),
     BILLING_INFO : path.join(APP_DATA_PATH, 'userdata', 'billing_info.dat'),
     PROXY_INFO : path.join(APP_DATA_PATH, 'userdata', 'proxy_info.dat'),
-    SETTINGS_INFO : path.join(APP_DATA_PATH, 'userdata', 'settings.dat')
+    SETTINGS_INFO : path.join(APP_DATA_PATH, 'userdata', 'settings.dat'),
+    APP_AUTH_INFO : path.join(APP_DATA_PATH, 'userdata', 'aai.dat')
 };
 
 module.exports.USER_FILE_PATH = USER_FILE_PATH;
