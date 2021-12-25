@@ -21,7 +21,7 @@ class MenuBar extends React.Component {
         }
 
         this.__mount = false;
-        Index.g_server_clock.subscribeAlam(undefined, this.serverTimeAlamListener);
+        Index.g_server_clock.subscribeAlam(undefined, this.serverTimeAlamListener, common.uuidv4());
     }
 
     componentDidMount(){

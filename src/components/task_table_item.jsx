@@ -41,12 +41,15 @@ class TaskTableItem extends React.Component {
     componentDidMount(){
         this.__mount = true;
 
-        if(this.props.task_info.schedule_time != undefined){
-            Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime);
+        if(this.props.task_info.schedule_time !== undefined){
+            Index.g_server_clock.subscribeAlam(this.props.task_info.schedule_time, this.onAlamScheduledTime, this.props.task_info._id);
         }
     }
 
     componentWillUnmount(){
+        if(this.props.task_info.schedule_time !== undefined){
+            Index.g_server_clock.unsubscribeAlam(this.props.task_info._id);
+        }
         this.onPauseTask();
         this.__mount = false;
     }
