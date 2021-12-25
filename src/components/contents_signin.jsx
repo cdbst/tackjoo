@@ -35,8 +35,7 @@ class ContentsSignIn extends React.Component {
     }
 
     onSubmitUserInfo(e){
-
-        // TODO : 로그인시 남은 사용기간이 언제까지인지 표시 필요.
+        
         e.preventDefault();
 
         const email = document.getElementById(this.INPUT_EMAIL_ID).value;
