@@ -23,6 +23,8 @@ function create_window() {
             },
             offscreen : true
         });
+
+        app.main_browser_window = win;
     
         IpcM.register(win);
     

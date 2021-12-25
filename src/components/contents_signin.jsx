@@ -63,14 +63,15 @@ class ContentsSignIn extends React.Component {
         const el_btn_signin = document.getElementById(this.SIGNIN_BTN_ID);
         el_btn_signin.disabled = true;
         
-        window.electron.loginApp(email, password, remember, (err, result)=>{
+        window.electron.loginApp(email, password, remember, (err, expired_date)=>{
 
             el_btn_signin.disabled = false;
 
             if(err){
-                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('에러', err, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
             }else{
-                Index.g_sys_msg_q.enqueue('알림', '로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                const formatted_expired_date_str = common.get_formatted_date_str(expired_date, true);
+                Index.g_sys_msg_q.enqueue('로그인 성공', `앱 사용 만료 시간 : ${formatted_expired_date_str}`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 10000);
             }
         });
     }

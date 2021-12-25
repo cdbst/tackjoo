@@ -12,16 +12,16 @@ function register(){
 
         (async()=>{
             try{
-                const error = await AuthEngine.signin(data.payload.email, data.payload.password);
-                if(error){
-                    event.reply('login-app-reply' + data.id, {err : error});
+                const [result, result_data] = await AuthEngine.signin(data.payload.email, data.payload.password);
+                if(result == false){
+                    event.reply('login-app-reply' + data.id, {err : result_data});
                 }else{
                     if(data.payload.remember){
                         UserFileManager.write(USER_FILE_PATH.APP_AUTH_INFO, data.payload, (err) =>{
                             if(err) log.error(common.get_log_str('ipc_main_billing.js', 'UserFileManager.write-callback', err));
                         });
                     }
-                    event.reply('login-app-reply' + data.id, {err : undefined, data : true});
+                    event.reply('login-app-reply' + data.id, {err : undefined, data : result_data});
                 }
             }catch(err){
                 log.error(common.get_log_str('ipc_main_billing.js', 'login-app-callback', err));
