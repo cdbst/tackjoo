@@ -11,13 +11,13 @@ class UserFileManager{
         this.file_mutex = new Mutex();
         this.user_file_secret = '0e81956a-4f44-48c3-aacc-afa3292dd46e';
 
-        const resolve = this.file_mutex.acquire();
+        const release = this.file_mutex.acquire();
         si.baseboard((data) =>{
             try{
                 if(data.serial == undefined) return;
                 this.user_file_secret = data.serial;
             }finally{
-                resolve();
+                release();
             }
         });
     }
