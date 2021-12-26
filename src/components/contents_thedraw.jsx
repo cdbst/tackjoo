@@ -89,12 +89,17 @@ class ContentsTheDraw extends React.Component {
         let draw_result_list = common.getValuesFromObjList(thedraw_item_list, 'draw_result');
         draw_result_list.unshift('');
 
-        this.setState(_ => ({
+        this.setState({
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
             opt_list_draw_date : draw_date_list,
             opt_list_draw_result : draw_result_list,
-        }));
+        }, () => {
+            this.__ref_sel_product_name.current.setValue('');
+            this.__ref_sel_account_name.current.setValue('');
+            this.__ref_sel_draw_date.current.setValue('');
+            this.__ref_sel_draw_result.current.setValue('');
+        });
     }
 
     setContents(thedraw_item_list){
