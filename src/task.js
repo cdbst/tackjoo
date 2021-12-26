@@ -38,7 +38,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('exit', (code) => {
-    //global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
+    global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
     log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
 });
 
@@ -55,14 +55,16 @@ async function main(browser_context, task_info, product_info, billing_info){
         throw new TaskInfoError(task_info, "TaskInfo is not valid to tasking");
     }
 
-    // STEP1.5 : Check validation of Task Information.
-    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
-    const login_result = await TaskUtils.login(browser_context);
-    if(login_result == undefined){
-        throw new LoginError(browser_context, "Cannot open product page info");
+    if(browser_context.is_login == false || browser_context.proxy_info != undefined){
+        // STEP1.5 : Check validation of Task Information.
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
+        const login_result = await TaskUtils.login(browser_context);
+        if(login_result == undefined){
+            throw new LoginError(browser_context, "Cannot open product page info");
+        }
     }
     
-    // STEP2 : Check validation of Task Information.
+    // STEP2 : Open Product Page
     global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
     product_info = await TaskUtils.open_product_page(browser_context, product_info);
     if(product_info == undefined){
