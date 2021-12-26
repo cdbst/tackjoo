@@ -50,7 +50,7 @@ class BrowserContextManager{
     get_all_logged_in_browser_contexts(){
         let borwser_context_list = this.get_all_browser_contexts();
 
-        return borwser_context_list.filter((borwser_context) => {return borwser_context.is_login});
+        return borwser_context_list.filter((borwser_context) => {return borwser_context.login_date !== undefined});
     }
 
     get_file_data(){

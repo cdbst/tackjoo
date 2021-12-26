@@ -80,7 +80,7 @@ class BrowserContext {
         this.id = _id;
 
         this.in_progress_login = false;
-        this.is_login = false;
+        this.login_date = undefined;
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -104,6 +104,7 @@ class BrowserContext {
         Object.assign(this, json);
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
+        this.login_date = json.login_date !== undefined ? new Date(json.login_date) : undefined;
     }
 
     update_settings(settings_info){
@@ -371,10 +372,10 @@ class BrowserContext {
             return false;
         }
 
-        result = await this.__open_login_modal();
-        if(result == false){
-            log.warn(common.get_log_str('browser_context.js', 'login', 'Cannot open login modal'));
-        }
+        // result = await this.__open_login_modal();
+        // if(result == false){
+        //     log.warn(common.get_log_str('browser_context.js', 'login', 'Cannot open login modal'));
+        // }
 
         let payload_obj = {
             'locale': 'ko_KR',
@@ -422,7 +423,7 @@ class BrowserContext {
                 this.__set_cookie(this.__cookie_storage, res);
                 
                 this.in_progress_login = false;
-                this.is_login = true;
+                this.login_date = new Date();
                 return true;
 
             }catch(e){
