@@ -117,7 +117,7 @@ async function main(browser_context, task_info, product_info, billing_info){
 
         // STEP8 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
-        await common.async_sleep(3000);
+        await common.async_sleep(500);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
