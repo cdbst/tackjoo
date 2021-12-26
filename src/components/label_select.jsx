@@ -5,11 +5,13 @@ class LabelSelect extends React.Component {
         this.onChangeOption = this.onChangeOption.bind(this);
         this.getOptionItems = this.getOptionItems.bind(this);
         this.setDisable = this.setDisable.bind(this);
+        this.setValue = this.setValue.bind(this);
 
         this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
         this.getSelectedOptionKey = this.getSelectedOptionKey.bind(this);
 
         this.ref_options = React.createRef();
+        this.__select_el_id = common.uuidv4();
     }
 
     getOptionItems(items, keys = undefined){
@@ -28,6 +30,11 @@ class LabelSelect extends React.Component {
             {item}
             </option>
         );
+    }
+
+    setValue(value){
+        const el_select = document.getElementById(this.__select_el_id);
+        el_select.value = value;
     }
 
     onChangeOption(e){
@@ -65,7 +72,7 @@ class LabelSelect extends React.Component {
             <div className="row">
                 <label className={class_label_col_size + " col-form-label font-weight-bold task-edit-modal-option-label"}>{this.props.label}</label>
                 <div className={class_select_col_size}>
-                    <select className="form-select form-select-down-arrw modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
+                    <select id={this.__select_el_id} className="form-select form-select-down-arrw modal-select" ref={this.ref_options} aria-label="Default select example" onChange={this.onChangeOption.bind(this)}>
                         {option_items}
                     </select>
                 </div>
