@@ -5,6 +5,10 @@ const path = require("path");
 const IpcM = require('./ipc/ipc_main');
 const common = require('./common/common');
 const app_cfg = require('./app_config');
+const autoUpdater  = require('electron-updater');
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
 
 app_cfg.set_log('info', false);
 

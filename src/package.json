@@ -34,6 +34,7 @@
     "cheerio": "^1.0.0-rc.10",
     "cookie": "^0.4.1",
     "electron-log": "^4.4.1",
+    "electron-updater": "^4.6.1",
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
     "systeminformation": "^5.9.17"
