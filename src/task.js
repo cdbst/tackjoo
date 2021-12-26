@@ -63,7 +63,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
     const cur_date = new Date();
     const is_login_session_expired = (browser_context.login_date !== undefined) && 
-        (settings_info.nike_login_session_timeout != 0) &&
+        (settings_info.nike_login_session_timeout !== 0) &&
         (cur_date > common.add_minutes(browser_context.login_date, settings_info.nike_login_session_timeout));
 
     if(browser_context.proxy_info !== undefined || //프록시가 셋팅 되어 있으면 무조건 로그인을 다시한다.
