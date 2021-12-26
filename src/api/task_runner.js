@@ -197,7 +197,7 @@ class TaskRunner{
 
     stop(){
         this.canceled = true;
-        if(this.worker != undefined) this.worker.terminate();
+        if(this.worker != undefined) this.worker.postMessage({ type: 'exit', code: 1 });
         this.close_pay_window();
         this.running = false;
     }

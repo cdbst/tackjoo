@@ -38,15 +38,21 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('exit', (code) => {
-    //global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
+    global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
     log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
 });
 
+parentPort.on('message', (data)=>{
+    if(data.type == 'exit'){
+        process.exit(data.code);
+    }
+})
+
 global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
-main(browser_context, task_info, product_info, billing_info);
+main(browser_context, task_info, product_info, billing_info, settings_info);
 
-async function main(browser_context, task_info, product_info, billing_info){
+async function main(browser_context, task_info, product_info, billing_info, settings_info){
 
     log.info(common.get_log_str('task.js', 'main', 'task start'));
 
@@ -55,14 +61,24 @@ async function main(browser_context, task_info, product_info, billing_info){
         throw new TaskInfoError(task_info, "TaskInfo is not valid to tasking");
     }
 
-    // STEP1.5 : Check validation of Task Information.
-    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
-    const login_result = await TaskUtils.login(browser_context);
-    if(login_result == undefined){
-        throw new LoginError(browser_context, "Cannot open product page info");
+    const cur_date = new Date();
+    const is_login_session_expired = (browser_context.login_date !== undefined) && 
+        (settings_info.nike_login_session_timeout !== 0) &&
+        (cur_date > common.add_minutes(browser_context.login_date, settings_info.nike_login_session_timeout));
+
+    if(browser_context.proxy_info !== undefined || //프록시가 셋팅 되어 있으면 무조건 로그인을 다시한다.
+        browser_context.login_date === undefined ||  //로그인을 아직 하지 않은 상태라면 로그인을 시도한다.
+        is_login_session_expired) // 로그인이 되어 있지만, 로그인 세션이 만료됐다면 다시 로그인을 시도한다.
+        {
+        // STEP1.5 : Check validation of Task Information.
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
+        const login_result = await TaskUtils.login(browser_context);
+        if(login_result == undefined){
+            throw new LoginError(browser_context, "Cannot open product page info");
+        }
     }
     
-    // STEP2 : Check validation of Task Information.
+    // STEP2 : Open Product Page
     global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
     product_info = await TaskUtils.open_product_page(browser_context, product_info);
     if(product_info == undefined){
@@ -115,7 +131,7 @@ async function main(browser_context, task_info, product_info, billing_info){
 
         // STEP8 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
-        await common.async_sleep(3000);
+        await common.async_sleep(1000);
         let checkout_result = await TaskUtils.checkout_request(browser_context);
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");

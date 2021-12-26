@@ -6,7 +6,8 @@ class ContentsSettings extends React.Component {
         HTTP_REQ_TIMEOUT : 'http-req-timeout-input',
         HTTP_MAX_REQ_WITHIN_SAME_IP : 'http-max-req-within-same-ip-input',
         TASK_RET_COUNT : 'task-ret-cnt-input',
-        TASK_RET_INTERVAL : 'task-ret-interval-input'
+        TASK_RET_INTERVAL : 'task-ret-interval-input',
+        NIKE_LOGIN_SESSION_TIMEOUT : 'login-session-timeout-input'
     }
 
     static OPTION_TEXT = {
@@ -15,7 +16,8 @@ class ContentsSettings extends React.Component {
         HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 응답을 최대 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력)',
         HTTP_MAX_REQ_WITHIN_SAME_IP : 'HTTP 요청시 하나의 IP에서 동시에 몇개의 요청까지 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
-        TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)'
+        TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)',
+        NIKE_LOGIN_SESSION_TIMEOUT : '나이키 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)'
     }
 
     constructor(props) {
@@ -102,6 +104,9 @@ class ContentsSettings extends React.Component {
 
         let task_ret_interval = settings_info.task_ret_interval == undefined ? '' : settings_info.task_ret_interval;
         this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_INTERVAL, task_ret_interval);
+
+        let nike_login_session_timeout = settings_info.nike_login_session_timeout == undefined ? '' : settings_info.nike_login_session_timeout;
+        this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT, nike_login_session_timeout);
     }
 
     getCurrentSettingsInfo(){
@@ -124,13 +129,17 @@ class ContentsSettings extends React.Component {
         let task_ret_interval = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_INTERVAL);
         task_ret_interval = task_ret_interval  == '' ? undefined : parseFloat(task_ret_interval);
 
+        let nike_login_session_timeout = this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT);
+        nike_login_session_timeout = nike_login_session_timeout  == '' ? undefined : parseInt(nike_login_session_timeout);
+
         return {
             http_req_ret_cnt : http_req_ret_cnt,
             http_req_ret_interval : http_req_ret_interval,
             http_req_timeout : http_req_timeout,
             http_max_req_within_same_ip : http_max_req_within_same_ip,
             task_ret_cnt : task_ret_cnt,
-            task_ret_interval : task_ret_interval
+            task_ret_interval : task_ret_interval,
+            nike_login_session_timeout : nike_login_session_timeout
         }
     }
 
@@ -163,9 +172,10 @@ class ContentsSettings extends React.Component {
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr/>
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr />
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/> <br />
-                            <SettingsSubTitle sub_title="<Tast 설정>" /> <br />
+                            <SettingsSubTitle sub_title="<Task 설정>" /> <br />
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                             <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
+                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
                         </div>
                         <div className="col-md-4">
                         </div>

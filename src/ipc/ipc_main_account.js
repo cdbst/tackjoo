@@ -110,7 +110,7 @@ function register(){
             return;
         }
 
-        if(borwser_context.is_login){
+        if(borwser_context.login_date !== undefined){
             borwser_context.clear_cookies();
             borwser_context.clear_csrfToken();
         }

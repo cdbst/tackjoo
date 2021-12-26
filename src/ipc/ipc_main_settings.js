@@ -40,6 +40,7 @@ function register(){
 function settings_synchronizer(settings_info){
     if(settings_info == undefined) return;
     
+    // 중요) 이 곳에서 설정되는 default 값은 AppSettings.jsx의 생성자에서 설정되는 기본 설정 값과 일치해야한다.
     const http_max_req_within_same_ip = settings_info['http_max_req_within_same_ip'] ?? 3;
     IPRequestLock.set_max_num_http_req(http_max_req_within_same_ip);
 }

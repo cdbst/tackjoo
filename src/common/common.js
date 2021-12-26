@@ -187,6 +187,10 @@
         return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
     }
 
+    exports.add_minutes = function(date, minutes){
+        return new Date(date.getTime() + minutes*60000);
+    }
+
     exports.get_log_str = function(module_name, function_name, message){
         return `[${module_name}] [${function_name}] ${message}`;
     }
