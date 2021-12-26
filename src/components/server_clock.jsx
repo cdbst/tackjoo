@@ -95,7 +95,7 @@ class ServerClock{
         for(var i = this.alam_subscribers.length - 1; i >= 0 ; i--){
 
             try{
-                let subscriber = this.alam_subscribers[i];
+                const subscriber = this.alam_subscribers[i];
 
                 if(subscriber.id == subscriber_id){
                     this.alam_subscribers.splice(i, 1);
