@@ -10,6 +10,7 @@
     "build": "node ./build/build.js",
     "prestart": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "start": "set BUILD_ENV=develop&&electron ./app.js",
+    "prepublish": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "publish": "set BUILD_ENV=publish&& node ./build/build.js"
   },
   "repository": {
