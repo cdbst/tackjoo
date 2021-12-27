@@ -73,7 +73,7 @@ function create_update_window() {
         offscreen : true,
         resizable: false
     });
-    update_win.webContents.openDevTools();
+    //update_win.webContents.openDevTools();
     update_win.on('closed', () => {
         update_win = null;
     });
@@ -102,7 +102,7 @@ autoUpdater.on('download-progress', (progress_obj) => {
 })
 autoUpdater.on('update-downloaded', (info) => {
     send_message_to_update_win('다운로드 완료. 다시 시작하는 중..');
-    autoUpdater.quitAndInstall(false, true);
+    autoUpdater.quitAndInstall(true, true);
 });
 
 app.whenReady().then(() => {
