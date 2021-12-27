@@ -2,7 +2,6 @@ const path = require('path');
 const builder = require('electron-builder');
 const Platform = builder.Platform;
 const package_json = require('../package.json');
-const fs = require('fs');
 
 const app_icon_path = path.join(path.join('.', 'build', 'icon.ico')); //base path : /src/dist/
 
