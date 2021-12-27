@@ -51,7 +51,6 @@ function create_window() {
 let update_win = undefined;
 
 function sendStatusToWindow(text) {
-    log.info(text);
     update_win.webContents.send('message', text);
 }
 function create_update_window() {
@@ -78,14 +77,16 @@ function create_update_window() {
     update_win.loadURL(`file://${__dirname}/update.html#v${app.getVersion()}`);
     return update_win;
 }
+
 autoUpdater.on('checking-for-update', () => {
     sendStatusToWindow('Checking for update...');
 })
 autoUpdater.on('update-available', (info) => {
-    sendStatusToWindow('Update available.');
+    sendStatusToWindow('Update available. ' + info);
 })
 autoUpdater.on('update-not-available', (info) => {
-    //sendStatusToWindow('Update not available.');
+    sendStatusToWindow('Update not available. ' + info );
+    update_win.close();
     create_window();
 })
 autoUpdater.on('error', (err) => {
@@ -99,33 +100,20 @@ autoUpdater.on('download-progress', (progressObj) => {
 })
 autoUpdater.on('update-downloaded', (info) => {
     sendStatusToWindow('Update downloaded');
+    autoUpdater.quitAndInstall(false, true);
 });
 
-
-//
-// CHOOSE one of the following options for Auto updates
-//
-
-//-------------------------------------------------------------------
-// Auto updates - Option 1 - Simplest version
-//
-// This will immediately download an update, then install when the
-// app quits.
-//-------------------------------------------------------------------
-
-
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
     log.info(common.get_log_str('app.js', 'whenReady', '=======App start'));
 
     create_update_window();
-    const test = await autoUpdater.checkForUpdatesAndNotify();
-    //create_window();
+    autoUpdater.checkForUpdatesAndNotify();
+    
 
     //for mac platform
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             create_update_window();
-            //create_window();
         }
     });
 });
