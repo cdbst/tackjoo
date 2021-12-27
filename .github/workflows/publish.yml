@@ -45,5 +45,6 @@ jobs:
         npm run publish
       env : 
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        BUILD_VER: ${{ github.event.inputs.BuildVersion }}
 
 
