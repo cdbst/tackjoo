@@ -3,6 +3,10 @@
  * Base structure
  */
 
+body {
+  overflow: hidden !important;
+}
+
 .contents-title {
   color : #83f195 !important;
   font-weight: bold !important;
@@ -22,6 +26,8 @@
   max-height: 500px;
   width : 340px;
   height : 500px;
+  margin-top : 60px;
+  overflow-y: hidden;
 }
 
 .rotate {
