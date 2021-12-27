@@ -5,6 +5,9 @@ const package_files = [
     'font.css',
     'index.css',
     'signin.css',
+    'update.css',
+    'update.js',
+    'update.html',
     'package.json',
     'package-lock.json'
 ];

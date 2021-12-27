@@ -1,6 +1,6 @@
 {
   "name": "snkrsbotkr",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Nike SNKRS BOT for korean",
   "appid": "com.cdbst.snkrsbotkr",
   "copyright": "Copyright on cdbst all right reserved.",
@@ -9,7 +9,8 @@
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "build": "node ./build/build.js",
     "prestart": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
-    "start": "electron ./app.js"
+    "start": "set BUILD_ENV=develop&&electron ./app.js",
+    "publish": "set BUILD_ENV=publish&& node ./build/build.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "cheerio": "^1.0.0-rc.10",
     "cookie": "^0.4.1",
     "electron-log": "^4.4.1",
+    "electron-updater": "^4.6.1",
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
     "systeminformation": "^5.9.17"
