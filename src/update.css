@@ -1,0 +1,30 @@
+
+/*
+ * Base structure
+ */
+
+.contents-title {
+  color : #83f195 !important;
+  font-weight: bold !important;
+}
+
+#update-progress-bar {
+  background-color : #83f195 !important;
+}
+
+#update_message {
+  font-weight: bold !important;
+}
+
+.rotate {
+  animation: rotation 8s infinite linear;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
