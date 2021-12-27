@@ -50,6 +50,7 @@
     "electron-packager": "^15.4.0",
     "electron-winstaller": "^5.0.0",
     "esbuild": "^0.12.28",
+    "glob-parent": "^6.0.2",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
