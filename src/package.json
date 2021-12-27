@@ -9,7 +9,7 @@
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "build": "node ./build/build.js",
     "prestart": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
-    "start": "electron ./app.js",
+    "start": "set BUILD_ENV=develop&&electron ./app.js",
     "publish": "set BUILD_ENV=publish&& node ./build/build.js"
   },
   "repository": {

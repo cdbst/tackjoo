@@ -108,13 +108,22 @@ autoUpdater.on('update-downloaded', (info) => {
 app.whenReady().then(() => {
     log.info(common.get_log_str('app.js', 'whenReady', '=======App start'));
 
-    create_update_window();
-    autoUpdater.checkForUpdatesAndNotify();
-    
+    if(process.env.BUILD_ENV === 'develop'){
+        create_window();
+    }else{
+        create_update_window();
+        autoUpdater.checkForUpdatesAndNotify();
+    }
+
     //for mac platform
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
-            create_update_window();
+            if(process.env.BUILD_ENV === 'develop'){
+                create_window();
+            }else{
+                create_update_window();
+                autoUpdater.checkForUpdatesAndNotify();
+            }
         }
     });
 });
