@@ -34,6 +34,7 @@ const cleanup_dirs = [
 
 function prebuild(){
     cleanup();
+    update_package_json_version()
     copy_package_files();
 }
 
@@ -113,6 +114,18 @@ function copyFolderRecursiveSync( source, target ) {
             }
         } );
     }
+}
+
+function update_package_json_version(){
+
+    if(process.env.BUILD_VER === undefined) return;
+
+    const package_json_path = path.resolve(path.join(__dirname, '..', 'package.json'));
+
+    const package_json_data = fs.readFileSync(package_json_path, { encoding: 'utf-8'});
+    const package_json_obj = JSON.parse(package_json_data);
+    package_json_obj.version = process.env.BUILD_VER;
+    fs.writeFileSync(package_json_path, JSON.stringify(package_json_obj, null, 2));
 }
 
 module.exports.prebuild = prebuild;

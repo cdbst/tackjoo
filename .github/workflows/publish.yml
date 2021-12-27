@@ -1,25 +1,22 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: deploy
+name: publish
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+    inputs:
+      BuildVersion:
+        description: 'Build version'
+        required: true
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -28,6 +25,26 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+        cache-dependency-path: src/package-lock.json
+
+    - name: setup git config
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+    - name: making git tag
+      run: |
+        # Stage the file, commit and push
+        git tag -a v${{ github.event.inputs.BuildVersion }} -m "New release for v${{ github.event.inputs.BuildVersion }}"
+        git push --tags
+
+    - name : build and publish application
+      run : |
+        cd ./src
+        npm ci
+        npm run publish
+      env : 
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        BUILD_VER: ${{ github.event.inputs.BuildVersion }}
+
+

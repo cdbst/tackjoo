@@ -5,7 +5,7 @@ const path = require("path");
 const IpcM = require('./ipc/ipc_main');
 const common = require('./common/common');
 const app_cfg = require('./app_config');
-const {autoUpdater} = require("electron-updater");
+const { autoUpdater } = require("electron-updater");
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
@@ -92,6 +92,7 @@ autoUpdater.on('update-not-available', (info) => {
     create_window();
 })
 autoUpdater.on('error', (err) => {
+    log.error(common.get_log_str('app.js', 'autoUpdater-on-error', err));
     send_message_to_update_win('업데이트에 실패 했습니다. 수동 다운로드 : https://github.com/cdbst/sbkr_release/releases');
 })
 autoUpdater.on('download-progress', (progress_obj) => {
