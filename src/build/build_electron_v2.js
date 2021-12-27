@@ -40,10 +40,6 @@ async function build(){
             }
         }
 
-        if(process.env.BUILD_VER !== undefined){
-            update_package_json_version(process.env.BUILD_VER);
-        }
-
         const result = await builder.build(build_cfg);
         return result;
         
@@ -51,16 +47,6 @@ async function build(){
         console.log(`Build fail: ${e.message}`);
         return undefined;
     }
-}
-
-function update_package_json_version(version){
-
-    const package_json_path = path.resolve(path.join(__dirname, '..', 'package.json'));
-
-    const package_json_data = fs.readFileSync(package_json_path, { encoding: 'utf-8'});
-    const package_json_obj = JSON.parse(package_json_data);
-    package_json_obj.version = version;
-    fs.writeFileSync(package_json_path, JSON.stringify(package_json_obj, null, 2));
 }
 
 module.exports.build = build;
