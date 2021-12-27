@@ -29,7 +29,7 @@ jobs:
     - name : build and publish application
       run : |
         cd ./src
-        npm install
+        npm ci
         npm run publish
       env : 
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
