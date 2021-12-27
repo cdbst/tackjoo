@@ -5,9 +5,10 @@ name: publish
 
 on:
   workflow_dispatch:
-    BuildVersion:
-      description: 'Build version'
-      required: true
+    inputs:
+      BuildVersion:
+        description: 'Build version'
+        required: true
 
 jobs:
   build:
