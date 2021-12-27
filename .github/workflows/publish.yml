@@ -27,6 +27,17 @@ jobs:
         cache: 'npm'
         cache-dependency-path: src/package-lock.json
 
+    - name: setup git config
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+    - name: making git tag
+      run: |
+        # Stage the file, commit and push
+        git tag -a v${{ github.event.inputs.BuildVersion }} -m "New release for v${{ github.event.inputs.BuildVersion }}"
+        git push --tags
+
     - name : build and publish application
       run : |
         cd ./src
