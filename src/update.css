@@ -14,6 +14,14 @@
 
 #update_message {
   font-weight: bold !important;
+  word-wrap: break-word !important;
+}
+
+.contents-main {
+  max-width: 340px;
+  max-height: 500px;
+  width : 340px;
+  height : 500px;
 }
 
 .rotate {
