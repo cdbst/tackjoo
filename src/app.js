@@ -103,7 +103,7 @@ autoUpdater.on('download-progress', (progress_obj) => {
 })
 autoUpdater.on('update-downloaded', (info) => {
     send_message_to_update_win('다운로드 완료. 다시 시작하는 중..');
-    autoUpdater.quitAndInstall(true, true);
+    autoUpdater.quitAndInstall(false, true);
 });
 
 app.whenReady().then(() => {
