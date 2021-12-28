@@ -29,7 +29,8 @@ contextBridge.exposeInMainWorld('electron', {
     compareJSON : _compareJSON,
     loginApp : _loginApp,
     loadLoginInfo : _loadLoginInfo,
-    deleteLoginInfo : _deleteLoginInfo
+    deleteLoginInfo : _deleteLoginInfo,
+    getAppVersion : _getAppVersion
 });
 
 let get_sensor_data = undefined;
@@ -371,3 +372,9 @@ function _deleteLoginInfo(__callback){
         __callback(result_info.err);
     });
 }
+
+function _getAppVersion(){
+    const package_json = require('./package.json');
+    return package_json.version;
+}
+

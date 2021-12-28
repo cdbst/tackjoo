@@ -12,7 +12,7 @@ async function build(){
 
         const build_cfg = {
             targets: Platform.WINDOWS.createTarget(),
-            projectDir : path.resolve(path.join('.', 'dist')),            
+            projectDir : path.resolve(path.join('.', 'dist')),
             config: {
                 asar : true,
                 appId : package_json.appid,
