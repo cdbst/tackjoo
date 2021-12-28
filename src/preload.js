@@ -30,7 +30,9 @@ contextBridge.exposeInMainWorld('electron', {
     loginApp : _loginApp,
     loadLoginInfo : _loadLoginInfo,
     deleteLoginInfo : _deleteLoginInfo,
-    getAppVersion : _getAppVersion
+    getAppVersion : _getAppVersion,
+    openDirectory : _openDirectory,
+    getAppPath : _getAppPath
 });
 
 let get_sensor_data = undefined;
@@ -378,3 +380,16 @@ function _getAppVersion(){
     return package_json.version;
 }
 
+function _openDirectory(path){
+    let ipc_data = get_ipc_data({path : path});
+    ipcRenderer.send('open-log-directory', ipc_data);
+}
+
+function _getAppPath(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('get-app-path', ipc_data);
+
+    ipcRenderer.once('get-app-path-reply' + ipc_data.id, (_event, app_path) => {
+        __callback(app_path);
+    });
+}
