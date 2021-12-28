@@ -29,6 +29,7 @@ class ContentsSettings extends React.Component {
         this.loadAppSettings = this.loadAppSettings.bind(this);
         this.getCurrentSettingsInfo = this.getCurrentSettingsInfo.bind(this);
         this.setCurrentSettingsInfo = this.setCurrentSettingsInfo.bind(this);
+        this.onClickOpenLogDirectory = this.onClickOpenLogDirectory.bind(this);
 
         this.__mount = false;
     }
@@ -154,6 +155,12 @@ class ContentsSettings extends React.Component {
         });
     }
 
+    onClickOpenLogDirectory(){
+        window.electron.getAppPath((app_path) =>{
+            window.electron.openDirectory(app_path + '/logs');
+        });
+    }
+
     render(){
         return(
             <div className="tab-pane fade" id="settings" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.SETTINGS}>
@@ -184,6 +191,9 @@ class ContentsSettings extends React.Component {
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center" onClick={this.onClickSaveBtn.bind(this)}>
                             <button type="button" className="btn btn-primary btn-footer-inside">
                                 <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> 저장하기
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickOpenLogDirectory.bind(this)}>
+                                <img src="./res/img/file-earmark-text-fill.svg" style={{width:24, height:24}}/> 로그폴더
                             </button>
                         </div>
                     </div>
