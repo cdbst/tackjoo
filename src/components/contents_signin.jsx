@@ -78,6 +78,10 @@ class ContentsSignIn extends React.Component {
         });
     }
 
+    onClickFindPassword(){
+        window.electron.openExternalWebPage('http://18.179.4.170/password');
+    }
+
     onKeyDownInputPwd(e){
         if(e.keyCode == 13){
             this.onSubmitUserInfo(e);
@@ -109,6 +113,9 @@ class ContentsSignIn extends React.Component {
                         <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
+                    <div className="mt-3" onClick={this.onClickFindPassword.bind(this)}>
+                        <a href="#" className="text-info">비밀번호 찾기</a>
+                    </div>
                     <div className="mt-5 text-muted">Discord Cdbst#2766</div>
                     <div className="text-muted">{`version v${this.app_version}`}</div>
                     <div className="text-muted">&copy; cdbst 2021-2022</div>
