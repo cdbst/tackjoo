@@ -125,7 +125,7 @@ class TaskRunner{
                 //     }
                 // }
             }catch(e){
-                log.warn(common.get_log_str('task_runner.js', 'res_pkt_hooker-callback', e));
+                log.verbose(common.get_log_str('task_runner.js', 'res_pkt_hooker-callback', e));
             }
         };
 

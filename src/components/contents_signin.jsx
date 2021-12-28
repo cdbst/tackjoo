@@ -12,6 +12,8 @@ class ContentsSignIn extends React.Component {
         this.onKeyDownInputPwd = this.onKeyDownInputPwd.bind(this);
         this.loadLoginInfo = this.loadLoginInfo.bind(this);
         this.onChangeInputRemember = this.onChangeInputRemember.bind(this);
+
+        this.app_version = window.electron.getAppVersion();
         this.__mount = false;
     }
 
@@ -107,7 +109,9 @@ class ContentsSignIn extends React.Component {
                         <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
-                    <p className="mt-5 mb-3 text-muted">&copy; cdbst 2021-2022</p>
+                    <div className="mt-5 text-muted">Discord Cdbst#2766</div>
+                    <div className="text-muted">{`version v${this.app_version}`}</div>
+                    <div className="text-muted">&copy; cdbst 2021-2022</div>
                 </div>
             </div>
         );
