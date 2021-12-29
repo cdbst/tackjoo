@@ -153,13 +153,10 @@ class TaskRunner{
 
             this.resolve = resolve;
             this.reject = reject;
+
             const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
-            let task_js_contents = FileCache.get(task_js_path);
-            if(task_js_contents == undefined){
-                task_js_contents = FileCache.cache(task_js_path);
-            }
-            
-            this.worker = new Worker(task_js_contents, {
+
+            let worker_thread_opts = {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
                     task_info : this.task_info,
@@ -167,10 +164,22 @@ class TaskRunner{
                     billing_info : this.billing_info,
                     settings_info : this.settings_info,
                     log_path : log.transports.file.resolvePath()
-                },
-                eval : true
-            });
-    
+                }
+            }
+
+            if(process.env.BUILD_ENV === 'develop'){
+                this.worker = new Worker(task_js_path, worker_thread_opts);
+            }else{
+
+                let task_js_contents = FileCache.get(task_js_path);
+                if(task_js_contents == undefined){
+                    task_js_contents = FileCache.cache(task_js_path);
+                }
+
+                worker_thread_opts.eval = true;
+                this.worker = new Worker(task_js_contents, worker_thread_opts);
+            }
+            
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{
