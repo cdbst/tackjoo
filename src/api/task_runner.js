@@ -166,27 +166,25 @@ class TaskRunner{
 
         const pkt_hooker = (params, url, data)=>{
             console.log(url);
-            if(data == undefined) return;
-            try{
-                let res_obj = JSON.parse(data);
-            }catch(e){
-                log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
+
+            if(url.includes('nike-service.iamport.kr/payco_payments/result?code=0')){
+                pay_done = true;
             }
+
+            // if(data == undefined) return;
+            // try{
+            //     let res_obj = JSON.parse(data);
+            // }catch(e){
+            //     log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
+            // }
         };
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
         this.pay_window.open();
 
         this.pay_window.attach_window_close_event_hooker(()=>{
-            if(pay_done == false)this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
-        });
-
-        //결제 완료시 창을 닫기위한 용도로 추가함.
-        this.pay_window.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
-            if(url.includes('https://nike-service.iamport.kr/kakaopay_payments/success')){
-                pay_done = true;
-                this.end_task();
-            }
+            if(pay_done == false)this.end_task(new Error('Payco connection is closed. canceled by user'));
+            else this.end_task();
         });
     }
 
