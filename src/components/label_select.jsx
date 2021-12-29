@@ -22,7 +22,7 @@ class LabelSelect extends React.Component {
 
         return items.map((item) => 
             <option
-                className="modal-select-option"
+                className="select-option"
                 key={keys[idx]}
                 value={item}
                 data-key={keys[idx++]}

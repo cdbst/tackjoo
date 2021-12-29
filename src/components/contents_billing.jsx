@@ -23,6 +23,10 @@ class ContentsBilling extends React.Component {
         this.ref_addr2 = React.createRef();
         this.ref_postcode = React.createRef();
 
+        this.el_sel_pay_method = 'select-pay-method';
+        this.el_input_pay_id = 'input-pay-id';
+        this.el_input_pay_pwd = 'input-pay-pwd';
+
         this.__mount = false;
 
         this.state = {
@@ -271,14 +275,24 @@ class ContentsBilling extends React.Component {
                             <br />
                             <div className="m2-12 row">
                                 <div className="col-md-6">
-                                    <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">결제 방식</label>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-kakaopay" defaultChecked/>
-                                        <label className="form-check-label" htmlFor="opt-checkout-method-kakaopay">카카오페이</label>
+                                    <label className="form-label contents-bill-input-label">결제 수단</label>
+                                    <select id={this.el_sel_pay_method} className="form-select form-select-down-arrw modal-select" aria-label="Default select example" >
+                                        <option className="select-option" value="kakaopay">카카오페이</option>
+                                        <option className="select-option" value="payco">페이코</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <div className="m2-12 row">
+                                <div className="col-md-6">
+                                    <label className="form-label contents-bill-input-label">결제 계정</label>
+                                    <div className="form-floating">
+                                        <input type="text" className="form-control" id={this.el_input_pay_id} style={{"--width" : "100%"}} placeholder="아이디 또는 이메일" />
+                                        <label className="common-input-label" htmlFor={this.el_input_pay_id}>아이디 또는 이메일</label>
                                     </div>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-naverpay" disabled/>
-                                        <label className="form-check-label" htmlFor="opt-checkout-method-naverpay">네이버페이</label>
+                                    <div className="form-floating">
+                                        <input type="password" className="form-control" id={this.el_input_pay_pwd} style={{"--width" : "100%"}} placeholder="비밀번호" />
+                                        <label className="common-input-label" htmlFor={this.el_input_pay_pwd}>비밀번호</label>
                                     </div>
                                 </div>
                             </div>

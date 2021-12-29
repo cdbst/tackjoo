@@ -101,11 +101,11 @@ class ContentsSignIn extends React.Component {
                     <br/>
                     <div className="form-floating">
                         <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" />
-                        <label className="sigin-in-user-info-label" htmlFor={this.INPUT_EMAIL_ID}>이메일 주소</label>
+                        <label className="common-input-label" htmlFor={this.INPUT_EMAIL_ID}>이메일 주소</label>
                     </div>
                     <div className="form-floating">
                         <input type="password" className="form-control" id={this.INPUT_PWD_ID} style={{"--width" : "100%"}} placeholder="비밀번호" onKeyDown={this.onKeyDownInputPwd.bind(this)}/>
-                        <label className="sigin-in-user-info-label" htmlFor={this.INPUT_PWD_ID}>비밀번호</label>
+                        <label className="common-input-label" htmlFor={this.INPUT_PWD_ID}>비밀번호</label>
                     </div>
                     <br/>
                     <div className="form-switch mb-3">

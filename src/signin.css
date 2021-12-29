@@ -33,10 +33,6 @@
   border-top-right-radius: 0;
 }
 
-.sigin-in-user-info-label{
-  color : #83f195 !important;
-}
-
 .form-check-input:checked {
   background-color: #83f195 !important;
 }
