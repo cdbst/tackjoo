@@ -926,7 +926,7 @@ class BrowserContext {
         return false;
     }
 
-    async checkout_request(){
+    async checkout_request(billing_info){
 
         let headers = {
             'accept':' */*',
@@ -947,7 +947,7 @@ class BrowserContext {
         };
 
         let params = {
-            pay_method: 'point',
+            pay_method: billing_info.pay_method === 'kakaopay' ? 'point' : billing_info.pay_method,
             gToken: '',
             _: new Date().getTime()
         }
@@ -1026,13 +1026,19 @@ class BrowserContext {
                 }
 
                 const $ = cheerio.load(res.data);
+                let pay_prepare_payload = undefined
 
-                let kakaopay_prepare_payload = checkout_page_parser.parse_kakaopay_prepare_payload_from_checkout_page($);
-                if(kakaopay_prepare_payload == undefined){
+                if(billing_info.pay_method === 'kakaopay'){
+                    pay_prepare_payload = checkout_page_parser.parse_kakaopay_prepare_payload_from_checkout_page($);
+                }else if(billing_info.pay_method === 'payco'){
+                    pay_prepare_payload = checkout_page_parser.parse_payco_prepare_payload_from_checkout_page($);
+                }
+                
+                if(pay_prepare_payload == undefined){
                     throw new Error('checkout_singleship : cannot parse payment payload from checkout page.');
                 }
                 
-                return kakaopay_prepare_payload;
+                return pay_prepare_payload;
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'checkout_singleship', e));
@@ -1043,7 +1049,7 @@ class BrowserContext {
         return undefined;
     }
 
-    async prepare_kakaopay(prepare_pay_payload){
+    async prepare_pay(prepare_pay_payload, billing_info){
 
         let payload = new URLSearchParams(prepare_pay_payload).toString();
 
@@ -1057,7 +1063,6 @@ class BrowserContext {
             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'origin': BrowserContext.IAMPORT_URL,
             'pragma': 'no-cache',
-            'referer': 'https://nike-service.iamport.kr/payments/ready/imp35948874/kakaopay/CA00004A62',
             'sec-ch-ua': BrowserContext.SEC_CA_UA,
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': 'Windows',
@@ -1068,24 +1073,40 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
+        let req_url = undefined;
+
+        if(billing_info.pay_method === 'kakaopay'){
+            headers.referer = 'https://nike-service.iamport.kr/payments/ready/imp35948874/kakaopay/CA00004A62';
+            req_url = BrowserContext.IAMPORT_URL + '/kakaopay_payments/prepare.json';
+        }else if(billing_info.pay_method === 'payco'){
+            headers.referer = 'https://nike-service.iamport.kr/payments/ready/imp35948874/payco/IM_4AKE96';
+            req_url = BrowserContext.IAMPORT_URL + '/payco_payments/prepare.json';
+        }
+
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.IAMPORT_URL + '/kakaopay_payments/prepare.json', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, req_url, headers, payload);
 
                 if('data' in res.data == false){
-                    throw new Error('prepare_kakaopay : invalid response data : `data` is not in response payload');
+                    throw new Error('prepare_pay : invalid response data : `data` is not in response payload');
                 }
 
                 if(res.data.code != 0){
-                    throw new Error('prepare_kakaopay : prepare pay fail - result code is ' + res.data.code + '  msg :' + res.data.msg);
+                    throw new Error('prepare_pay : prepare pay fail - result code is ' + res.data.code + '  msg :' + res.data.msg);
                 }
 
                 this.__set_cookie(this.__iamport_cookie_storage, res);
 
-                return res.data.data.kakaoData;
+                if(billing_info.pay_method === 'kakaopay'){
+                    return res.data.data.kakaoData.next_redirect_pc_url;
+                }else if(billing_info.pay_method === 'payco'){
+                    return res.data.data.payco_reserve.orderSheetUrl;
+                }else{
+                    return undefined;
+                }
 
             }catch(e){
-                log.error(common.get_log_str('browser_context.js', 'prepare_kakaopay', e));
+                log.error(common.get_log_str('browser_context.js', 'prepare_pay', e));
                 this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

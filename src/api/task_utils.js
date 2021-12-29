@@ -121,14 +121,14 @@ module.exports.checkout_singleship = async(browser_context, billing_info) =>{
     return kakaopay_prepare_payload;
 };
 
-module.exports.checkout_request = async(browser_context) =>{
-    const checkout_result = await browser_context.checkout_request();
+module.exports.checkout_request = async(browser_context, billing_info) =>{
+    const checkout_result = await browser_context.checkout_request(billing_info);
     return checkout_result;
 }
 
-module.exports.prepare_kakaopay = async(browser_context, prepare_pay_payload) =>{
-    const kakao_data = await browser_context.prepare_kakaopay(prepare_pay_payload);
-    return kakao_data;
+module.exports.prepare_pay = async(browser_context, prepare_pay_payload, billing_info) =>{
+    const pay_url = await browser_context.prepare_pay(prepare_pay_payload, billing_info);
+    return pay_url;
 }
 
 module.exports.open_checkout_page = async(browser_context, product_info) =>{

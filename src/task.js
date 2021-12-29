@@ -132,21 +132,21 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         // STEP8 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
         await common.async_sleep(1000);
-        let checkout_result = await TaskUtils.checkout_request(browser_context);
+        let checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
         }
 
         // STEP9 : prepare kakaopay
-        const kakao_data = await TaskUtils.prepare_kakaopay(browser_context, kakaopay_prepare_payload);
-        if(kakao_data == undefined){
+        const pay_url = await TaskUtils.prepare_pay(browser_context, kakaopay_prepare_payload, billing_info);
+        if(pay_url == undefined){
             throw new PrepareKakaoPayError(kakaopay_prepare_payload, "Fail with prepare kakaopay")
         }
 
         // STEP10 : open kakaopay checkout window
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
         try{
-            await global.MainThreadApiCaller.call('open_kakaopay_window', [kakao_data.next_redirect_pc_url]);
+            await global.MainThreadApiCaller.call('open_kakaopay_window', [pay_url]);
         }catch(e){
             let _err = new OpenKakaoPayWindowError(kakao_data, "Open kakaopay window fail");
             _err.stack = e.stack;
