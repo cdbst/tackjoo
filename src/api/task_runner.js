@@ -19,6 +19,7 @@ class TaskRunner{
         this.gen_sensor_data = this.gen_sensor_data.bind(this);
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
+        this.open_payco_window = this.open_payco_window.bind(this);
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
@@ -103,12 +104,12 @@ class TaskRunner{
 
         let pay_done = false;
 
-        const res_pkt_hooker = (params, response)=>{
+        const pkt_hooker = (params, url, data)=>{
 
-            if(response == undefined) return;
+            if(data == undefined) return;
 
             try{
-                let res_obj = JSON.parse(response);
+                let res_obj = JSON.parse(data);
 
                 if('expired' in res_obj && res_obj.expired == true){
                     this.end_task(new Error('Kakaopay connection is expired'));
@@ -125,11 +126,55 @@ class TaskRunner{
                 //     }
                 // }
             }catch(e){
-                log.verbose(common.get_log_str('task_runner.js', 'res_pkt_hooker-callback', e));
+                log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
             }
         };
 
-        this.pay_window = new ExternalPage(url, window_opts, res_pkt_hooker, true);
+        this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, true);
+        this.pay_window.open();
+
+        this.pay_window.attach_window_close_event_hooker(()=>{
+            if(pay_done == false)this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
+        });
+
+        //결제 완료시 창을 닫기위한 용도로 추가함.
+        this.pay_window.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
+            if(url.includes('https://nike-service.iamport.kr/payco_payments/success')){
+                pay_done = true;
+                this.end_task();
+            }
+        });
+    }
+
+    open_payco_window(url){
+
+        let window_opts = {
+            width: 720,
+            height: 650,
+            resizable : false,
+            minimizable : false,
+            //titleBarStyle : 'hidden',
+            webPreferences: {
+                webSecurity : false,
+                nodeIntegration : false,
+                nativeWindowOpen : true
+            },
+            title : this.product_info.name + ' : ' + this.product_info.price
+        }
+
+        let pay_done = false;
+
+        const pkt_hooker = (params, url, data)=>{
+            console.log(url);
+            if(data == undefined) return;
+            try{
+                let res_obj = JSON.parse(data);
+            }catch(e){
+                log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
+            }
+        };
+
+        this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
         this.pay_window.open();
 
         this.pay_window.attach_window_close_event_hooker(()=>{

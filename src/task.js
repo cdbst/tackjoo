@@ -124,8 +124,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
 
         // STEP7 : chekcout singleship (registering buyer address info)
-        const kakaopay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
-        if(kakaopay_prepare_payload == undefined){
+        const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
+        if(pay_prepare_payload == undefined){
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
 
@@ -138,15 +138,21 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
 
         // STEP9 : prepare kakaopay
-        const pay_url = await TaskUtils.prepare_pay(browser_context, kakaopay_prepare_payload, billing_info);
+        const pay_url = await TaskUtils.prepare_pay(browser_context, pay_prepare_payload, billing_info);
         if(pay_url == undefined){
-            throw new PrepareKakaoPayError(kakaopay_prepare_payload, "Fail with prepare kakaopay")
+            throw new PrepareKakaoPayError(pay_prepare_payload, "Fail with prepare kakaopay")
         }
 
         // STEP10 : open kakaopay checkout window
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
         try{
-            await global.MainThreadApiCaller.call('open_kakaopay_window', [pay_url]);
+            let open_pay_window_api = undefined;
+            if(billing_info.pay_method === 'payco'){
+                open_pay_window_api = 'open_payco_window';
+            }else if(billing_info.pay_method === 'kakaopay'){
+                open_pay_window_api = 'open_kakaopay_window';
+            }
+            await global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
         }catch(e){
             let _err = new OpenKakaoPayWindowError(kakao_data, "Open kakaopay window fail");
             _err.stack = e.stack;

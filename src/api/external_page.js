@@ -4,7 +4,7 @@ const log = require('electron-log');
 
 class ExternalPage{
     
-    constructor(url, browser_window_opts, res_pkt_subscriber, disable_exit = false){
+    constructor(url, browser_window_opts, pkt_subscriber, disable_exit = false){
 
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
@@ -14,7 +14,7 @@ class ExternalPage{
 
         this.url = url;
         this.browser_window_opts = browser_window_opts;
-        this.res_pkt_subscriber = res_pkt_subscriber;
+        this.pkt_subscriber = pkt_subscriber;
         this.disable_exit = disable_exit;
         this.window = undefined;
         this.is_closed = true;
@@ -38,7 +38,7 @@ class ExternalPage{
 
         this.window.setMenuBarVisibility(false);
         this.window.loadURL(this.url);
-        //this.window.webContents.openDevTools(); // TO TEST
+        this.window.webContents.openDevTools(); // TO TEST
 
         this.window.on('close', (e) => {
             if(this.disable_exit == false || this.is_closed){
@@ -50,7 +50,7 @@ class ExternalPage{
             e.preventDefault();
         });
         
-        if(this.res_pkt_subscriber != undefined){
+        if(this.pkt_subscriber != undefined){
             this.attach_res_pkt_hooker();
         }
 
@@ -96,13 +96,14 @@ class ExternalPage{
 
             //var req_data = params.request.postData;
             var res_data = await get_res_data(params.requestId);
-            this.res_pkt_subscriber(params, res_data);
+            this.pkt_subscriber(params, params.request.url, res_data);
             await this.window.webContents.debugger.sendCommand("Fetch.continueRequest", {requestId: params.requestId}).catch((e)=>{});
         });
 
         this.window.webContents.debugger.sendCommand('Fetch.enable', { 
             patterns: [
-                { requestStage: "Response" }
+                { requestStage: "Response" },
+                { requestStage: "Request" }
             ]
         });
         
