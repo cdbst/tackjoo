@@ -46,7 +46,10 @@ class ContentsBilling extends React.Component {
             phone_num: '',
             buyer_addr1: '',
             buyer_addr2: '',
-            postal_code: ''
+            postal_code: '',
+            pay_method: 'kakaopay',
+            pay_id: '',
+            pay_pwd: ''
         }
     }
 
@@ -78,12 +81,20 @@ class ContentsBilling extends React.Component {
     }
 
     getCurrentBillingInfo(){
+
+        const cur_pay_method = document.getElementById(this.el_sel_pay_method).value;
+        const cur_pay_id = document.getElementById(this.el_input_pay_id).value;
+        const cur_pay_pwd = document.getElementById(this.el_input_pay_pwd).value;
+
         return billing_info = {
             buyer_name : this.ref_buyer_name.current.value,
             phone_num : this.ref_phone_num.current.value,
             buyer_addr1 : this.ref_addr1.current.value,
             buyer_addr2 : this.ref_addr2.current.value,
-            postal_code : this.ref_postcode.current.value == undefined ? '' : this.ref_postcode.current.value
+            postal_code : this.ref_postcode.current.value === undefined ? '' : this.ref_postcode.current.value,
+            pay_method : cur_pay_method === undefined ? '' : cur_pay_method,
+            pay_id : cur_pay_id === undefined ? '' : cur_pay_id,
+            pay_pwd : cur_pay_pwd === undefined ? '' : cur_pay_pwd,
         };
     }
 
@@ -96,6 +107,9 @@ class ContentsBilling extends React.Component {
         this.ref_addr1.current.value = billing_info.buyer_addr1;
         this.ref_addr2.current.value = billing_info.buyer_addr2;
         this.update_postcode(billing_info.postal_code);
+        document.getElementById(this.el_sel_pay_method).value = billing_info.pay_method;
+        document.getElementById(this.el_input_pay_id).value = billing_info.pay_id;
+        document.getElementById(this.el_input_pay_pwd).value = billing_info.pay_pwd;
     }
 
     onClickSaveBtn(){
@@ -146,8 +160,8 @@ class ContentsBilling extends React.Component {
                 return;
             }
 
-            this.setBillingInfoToUI(billing_info);
-            Index.g_billing_info = billing_info;
+            Index.g_billing_info = common.merge_object(this.getDefaultBillingInfo(), billing_info);
+            this.setBillingInfoToUI(Index.g_billing_info);
             Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }

@@ -41,7 +41,6 @@
     }
 
     exports.merge_object = function (target, source) {
-        //console.log(source);
 
         Object.entries(source).forEach(([key, value]) =>{
             if(value == undefined) return;

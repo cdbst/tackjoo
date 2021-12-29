@@ -40,7 +40,7 @@ class AppSettings{
             }
 
             this.updateSettings(settings_info);
-            __callback(undefined, settings_info);
+            __callback(undefined, this.settings_info);
         });
     }
 
