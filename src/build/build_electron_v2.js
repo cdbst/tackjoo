@@ -14,7 +14,7 @@ async function build(){
             targets: Platform.WINDOWS.createTarget(),
             projectDir : path.resolve(path.join('.', 'dist')),
             config: {
-                asar : true,
+                asar : false,
                 appId : package_json.appid,
                 copyright : package_json.copyright,
                 win: {

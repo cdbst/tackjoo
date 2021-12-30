@@ -13,7 +13,6 @@ const package_files = [
 ];
 
 const package_dirs = [
-    'akam',
     'common',
     'lib',
     'node_modules',
