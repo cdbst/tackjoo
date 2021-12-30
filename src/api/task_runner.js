@@ -7,6 +7,7 @@ const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
 const common = require('../common/common');
 const log = require('electron-log');
+const tesseract = require("node-tesseract-ocr");
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -150,13 +151,14 @@ class TaskRunner{
         let window_opts = {
             width: 720,
             height: 650,
-            resizable : false,
+            resizable : true,
             minimizable : false,
-            //titleBarStyle : 'hidden',
             webPreferences: {
                 webSecurity : false,
-                nodeIntegration : false,
-                nativeWindowOpen : true
+                nodeIntegration: true,
+                //contextIsolation: false,
+                //enableRemoteModule: true,
+                preload: path.join(__dirname, "payco_preload.js"),
             },
             title : this.product_info.name + ' : ' + this.product_info.price
         }
@@ -170,12 +172,35 @@ class TaskRunner{
                 pay_done = true;
             }
 
-            // if(data == undefined) return;
-            // try{
-            //     let res_obj = JSON.parse(data);
-            // }catch(e){
-            //     log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
-            // }
+            if(url.includes('https://id.payco.com/login/keys.nhn')){
+                this.pay_window.call_renderer_api('doLogin', [this.billing_info.pay_id, this.billing_info.pay_pwd]);
+            }
+
+            if(url.includes('https://bill.payco.com/static/html/blank.html')){
+                setTimeout(()=>{
+                    this.pay_window.call_renderer_api('clickCheckoutBtn');
+                }, 1000);
+            }
+
+            if(url.includes('https://bill.payco.com/password/keyboard.png')){
+
+                const config = {
+                    lang: "eng",
+                    oem: 3,
+                    psm: 3,
+                }
+
+                tesseract
+                    .recognize(url, config)
+                    .then((text) => {
+                        console.log("Result:", text)
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+                
+                console.log('test');
+            }
         };
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
@@ -208,7 +233,7 @@ class TaskRunner{
                     log_path : log.transports.file.resolvePath()
                 }
             });
-                
+
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{

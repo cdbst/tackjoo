@@ -11,6 +11,7 @@ class ExternalPage{
         this.__set_win_state = this.__set_win_state.bind(this);
         this.attach_res_pkt_hooker = this.attach_res_pkt_hooker.bind(this);
         this.attach_web_contents_event_hooker = this.attach_web_contents_event_hooker.bind(this);
+        this.call_renderer_api = this.call_renderer_api.bind(this);
 
         this.url = url;
         this.browser_window_opts = browser_window_opts;
@@ -103,11 +104,15 @@ class ExternalPage{
         this.window.webContents.debugger.sendCommand('Fetch.enable', { 
             patterns: [
                 { requestStage: "Response" },
-                { requestStage: "Request" }
+                // { requestStage: "Request" }
             ]
         });
         
         return true;
+    }
+
+    call_renderer_api(api, args){
+        this.window.webContents.send('message', {api: api, args: args});
     }
 
     close(){
