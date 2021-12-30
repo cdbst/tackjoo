@@ -5,7 +5,6 @@ const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const ExternalPage = require("./external_page.js").ExternalPage;
 const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
-const FileCache = require('./file_cache').FileCache;
 const common = require('../common/common');
 const log = require('electron-log');
 
@@ -97,7 +96,7 @@ class TaskRunner{
             webPreferences: {
                 webSecurity : false,
                 nodeIntegration : false,
-                nativeWindowOpen : true
+                //nativeWindowOpen : true
             },
             title : this.product_info.name + ' : ' + this.product_info.price
         }
@@ -199,7 +198,7 @@ class TaskRunner{
 
             const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
 
-            let worker_thread_opts = {
+            this.worker = new Worker(task_js_path, {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
                     task_info : this.task_info,
@@ -208,25 +207,13 @@ class TaskRunner{
                     settings_info : this.settings_info,
                     log_path : log.transports.file.resolvePath()
                 }
-            }
-
-            if(process.env.BUILD_ENV === 'develop'){
-                this.worker = new Worker(task_js_path, worker_thread_opts);
-            }else{
-
-                let task_js_contents = FileCache.get(task_js_path);
-                if(task_js_contents == undefined){
-                    task_js_contents = FileCache.cache(task_js_path);
-                }
-
-                worker_thread_opts.eval = true;
-                this.worker = new Worker(task_js_contents, worker_thread_opts);
-            }
-            
+            });
+                
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{
                 log.warn(common.get_log_str('task_runner.js', 'error-callback', err.message));
+                log.warn(common.get_log_str('task_runner.js', 'error-callback', err.stack));
                 this.end_task(err);
             });
 

@@ -6,7 +6,7 @@ var babel = require('gulp-babel');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 
-const includes = ['./index.js', './components'];
+const includes = ['./index.js', './components', './akam'];
 
 function bundle(){
     const scripts = get_script_file();
