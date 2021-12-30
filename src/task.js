@@ -6,9 +6,9 @@ const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError,
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
     PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./api/task_errors.js');
 
-const log = require('electron-log');
-const app_cfg = require('./app_config');
-app_cfg.set_log('info', false, workerData.log_path);
+// const log = require('electron-log');
+// const app_cfg = require('./app_config');
+// app_cfg.set_log('info', false, workerData.log_path);
 
 const browser_context = new BrowserContext(JSON.parse(workerData.browser_context)); //workerData.browser_context is serialized josn string.
 const task_info = workerData.task_info;
@@ -24,7 +24,7 @@ const task_ret_interval = settings_info.task_ret_interval * 1000;
 
 process.on('unhandledRejection', (err) => {
 
-    log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
+    //log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
 
     if(remain_ret_cnt > 0){
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
@@ -39,7 +39,7 @@ process.on('unhandledRejection', (err) => {
 
 process.on('exit', (code) => {
     global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
-    log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
+    //log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
 });
 
 parentPort.on('message', (data)=>{
@@ -54,7 +54,7 @@ main(browser_context, task_info, product_info, billing_info, settings_info);
 
 async function main(browser_context, task_info, product_info, billing_info, settings_info){
 
-    log.info(common.get_log_str('task.js', 'main', 'task start'));
+    //log.info(common.get_log_str('task.js', 'main', 'task start'));
 
     // STEP1 : Check validation of Task Information.
     if(TaskUtils.is_valid_billing_info_to_tasking(billing_info) == false){
