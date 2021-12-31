@@ -38,8 +38,8 @@
     "electron-updater": "^4.6.1",
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
-    "node-tesseract-ocr": "^2.2.1",
-    "systeminformation": "^5.9.17"
+    "systeminformation": "^5.9.17",
+    "tesseract.js": "^2.1.5"
   },
   "devDependencies": {
     "asar": "^3.1.0",

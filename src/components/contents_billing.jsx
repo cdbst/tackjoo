@@ -26,6 +26,7 @@ class ContentsBilling extends React.Component {
         this.el_sel_pay_method = 'select-pay-method';
         this.el_input_pay_id = 'input-pay-id';
         this.el_input_pay_pwd = 'input-pay-pwd';
+        this.el_input_checkout_pwd = 'input-checkout-pwd';
 
         this.__mount = false;
 
@@ -49,7 +50,8 @@ class ContentsBilling extends React.Component {
             postal_code: '',
             pay_method: 'kakaopay',
             pay_id: '',
-            pay_pwd: ''
+            pay_pwd: '',
+            checkout_pwd: ''
         }
     }
 
@@ -85,6 +87,7 @@ class ContentsBilling extends React.Component {
         const cur_pay_method = document.getElementById(this.el_sel_pay_method).value;
         const cur_pay_id = document.getElementById(this.el_input_pay_id).value;
         const cur_pay_pwd = document.getElementById(this.el_input_pay_pwd).value;
+        const cur_checkout_pwd = document.getElementById(this.el_input_checkout_pwd).value;
 
         return billing_info = {
             buyer_name : this.ref_buyer_name.current.value,
@@ -95,6 +98,7 @@ class ContentsBilling extends React.Component {
             pay_method : cur_pay_method === undefined ? '' : cur_pay_method,
             pay_id : cur_pay_id === undefined ? '' : cur_pay_id,
             pay_pwd : cur_pay_pwd === undefined ? '' : cur_pay_pwd,
+            checkout_pwd : cur_checkout_pwd === undefined ? '' : cur_checkout_pwd,
         };
     }
 
@@ -110,6 +114,7 @@ class ContentsBilling extends React.Component {
         document.getElementById(this.el_sel_pay_method).value = billing_info.pay_method;
         document.getElementById(this.el_input_pay_id).value = billing_info.pay_id;
         document.getElementById(this.el_input_pay_pwd).value = billing_info.pay_pwd;
+        document.getElementById(this.el_input_checkout_pwd).value = billing_info.checkout_pwd;
     }
 
     onClickSaveBtn(){
@@ -131,10 +136,18 @@ class ContentsBilling extends React.Component {
             return;
         }
 
+        
+        if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
+            Index.g_sys_msg_q.enqueue('에러', '받으실 분 세부 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
         if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
             Index.g_sys_msg_q.enqueue('에러', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
+
+        //TODO: 결제 방법이 payco일경우, 결제 정보를 설정하지 않았을 경우, 오류를 출력해야함.
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
 
@@ -307,6 +320,10 @@ class ContentsBilling extends React.Component {
                                     <div className="form-floating">
                                         <input type="password" className="form-control" id={this.el_input_pay_pwd} style={{"--width" : "100%"}} placeholder="비밀번호" />
                                         <label className="common-input-label" htmlFor={this.el_input_pay_pwd}>비밀번호</label>
+                                    </div>
+                                    <div className="form-floating">
+                                        <input type="password" className="form-control" id={this.el_input_checkout_pwd} style={{"--width" : "100%"}} placeholder="결제 비밀번호" />
+                                        <label className="common-input-label" htmlFor={this.el_input_checkout_pwd}>결제 비밀번호</label>
                                     </div>
                                 </div>
                             </div>

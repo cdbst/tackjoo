@@ -84,10 +84,11 @@ class ExternalPage{
         var get_res_data = async (request_id) => {
             try{
                 const res = await this.window.webContents.debugger.sendCommand("Fetch.getResponseBody", {requestId: request_id});
-                return res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
+                const res_body = res.base64Encoded ? Buffer.from(res.body, 'base64').toString() : res.body;
+                return [res, res_body];
             }catch(e){
                 log.verbose(common.get_log_str('external_page.js', 'attach_res_pkt_hooker-get_res_data', e));
-                return undefined;
+                return [undefined, undefined];
             }
         }
 
@@ -96,8 +97,8 @@ class ExternalPage{
             if(method !== 'Fetch.requestPaused') return;
 
             //var req_data = params.request.postData;
-            var res_data = await get_res_data(params.requestId);
-            this.pkt_subscriber(params, params.request.url, res_data);
+            const [res, res_data] = await get_res_data(params.requestId);
+            this.pkt_subscriber(params, params.request.url, res_data, res);
             await this.window.webContents.debugger.sendCommand("Fetch.continueRequest", {requestId: params.requestId}).catch((e)=>{});
         });
 

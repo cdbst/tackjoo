@@ -7,7 +7,7 @@ const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
 const common = require('../common/common');
 const log = require('electron-log');
-const tesseract = require("node-tesseract-ocr");
+const Tesseract  = require('tesseract.js');
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -154,7 +154,7 @@ class TaskRunner{
             resizable : true,
             minimizable : false,
             webPreferences: {
-                webSecurity : false,
+                //webSecurity : false,
                 nodeIntegration: true,
                 //contextIsolation: false,
                 //enableRemoteModule: true,
@@ -165,7 +165,8 @@ class TaskRunner{
 
         let pay_done = false;
 
-        const pkt_hooker = (params, url, data)=>{
+        const pkt_hooker = (params, url, data, res)=>{
+            
             console.log(url);
 
             if(url.includes('nike-service.iamport.kr/payco_payments/result?code=0')){
@@ -184,23 +185,14 @@ class TaskRunner{
 
             if(url.includes('https://bill.payco.com/password/keyboard.png')){
 
-                const config = {
-                    lang: "eng",
-                    oem: 3,
-                    psm: 3,
-                }
+                let imageBuffer = Buffer.from(res.body, "base64");
 
-                tesseract
-                    .recognize(url, config)
-                    .then((text) => {
-                        console.log("Result:", text)
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
-                
-                console.log('test');
+                Tesseract.recognize(imageBuffer, 'eng')
+                .then(({ data: { text } }) => {
+                    this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.checkout_pwd]);
+                });
             }
+            
         };
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
