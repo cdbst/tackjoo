@@ -23,7 +23,8 @@ const cleanup_files = [
     'index.min.js',
     'app.js',
     'task.js',
-    'preload.js'
+    'preload.js',
+    'payco_preload.js'
 ]
 
 const cleanup_dirs = [

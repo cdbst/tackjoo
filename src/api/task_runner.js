@@ -158,7 +158,7 @@ class TaskRunner{
                 nodeIntegration: true,
                 //contextIsolation: false,
                 //enableRemoteModule: true,
-                preload: path.join(__dirname, "payco_preload.js"),
+                preload: path.resolve(path.join(app.getAppPath(), 'payco_preload.js'))
             },
             title : this.product_info.name + ' : ' + this.product_info.price
         }
