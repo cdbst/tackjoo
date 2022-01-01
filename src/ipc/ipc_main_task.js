@@ -33,10 +33,12 @@ function register(){
         };
 
         event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.WAITING_FOR_OTHER_TASK, done : false});
-        let task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, settings_info, message_cb);
-
+        
         (async () => {
             try{
+                const task_runner = new TaskRunner(browser_context, task_info, product_info, billing_info, settings_info, message_cb);
+                if(billing_info.pay_method === 'payco') await task_runner.init_tesseract_worker();
+
                 await IPRequestLock.accquire(proxy_ip, proxy_port);
                 await TaskRunnerManager.add(task_runner);
                 await task_runner.start();

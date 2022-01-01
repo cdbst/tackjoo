@@ -23,6 +23,7 @@ class TaskRunner{
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
+        this.init_tesseract_worker = this.init_tesseract_worker.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -38,6 +39,23 @@ class TaskRunner{
         this.resolve = undefined;
         this.reject = undefined;
         this.pay_window = undefined;
+
+        this.tesseract_worker = undefined;
+    }
+
+    async init_tesseract_worker(){
+        
+        this.tesseract_worker = Tesseract.createWorker({
+            langPath: path.join(app.getAppPath(), 'traineddata', 'langs')
+        });
+
+        await this.tesseract_worker.load();
+        await this.tesseract_worker.loadLanguage('eng');
+        await this.tesseract_worker.initialize('eng');
+        await this.tesseract_worker.setParameters({
+            tessedit_char_whitelist: '0123456789',
+            preserve_interword_spaces: '0',
+        });
     }
 
     on_recv_api_call(data){
@@ -154,7 +172,7 @@ class TaskRunner{
             resizable : true,
             minimizable : false,
             webPreferences: {
-                //webSecurity : false,
+                webSecurity : false,
                 nodeIntegration: true,
                 //contextIsolation: false,
                 //enableRemoteModule: true,
@@ -165,9 +183,7 @@ class TaskRunner{
 
         let pay_done = false;
 
-        const pkt_hooker = (params, url, data, res)=>{
-            
-            console.log(url);
+        const pkt_hooker = async (params, url, data, res)=>{
 
             if(url.includes('nike-service.iamport.kr/payco_payments/result?code=0')){
                 pay_done = true;
@@ -176,23 +192,21 @@ class TaskRunner{
             if(url.includes('https://id.payco.com/login/keys.nhn')){
                 this.pay_window.call_renderer_api('doLogin', [this.billing_info.pay_id, this.billing_info.pay_pwd]);
             }
+            
+            if(url.includes('https://bill.payco.com/static/js/service/orderSheet/payment/checkout/')){
+                this.pay_window.call_renderer_api('clickCheckoutBtn');
+            }
 
-            if(url.includes('https://bill.payco.com/static/html/blank.html')){
-                setTimeout(()=>{
-                    this.pay_window.call_renderer_api('clickCheckoutBtn');
-                }, 1000);
+            if(url.includes('/deviceEnvironment/deviceEnvironmentBirthdayCertification.js')){
+                this.pay_window.call_renderer_api('doConfirmBirthdayIfno', [this.billing_info.birthday]);
             }
 
             if(url.includes('https://bill.payco.com/password/keyboard.png')){
 
-                let imageBuffer = Buffer.from(res.body, "base64");
-
-                Tesseract.recognize(imageBuffer, 'eng')
-                .then(({ data: { text } }) => {
-                    this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.checkout_pwd]);
-                });
+                const imageBuffer = Buffer.from(res.body, "base64");
+                const { data: { text } } = await this.tesseract_worker.recognize(imageBuffer);
+                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.checkout_pwd]);
             }
-            
         };
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
@@ -260,6 +274,7 @@ class TaskRunner{
 
     async end_task(error){
         this.close_pay_window();
+        if(this.tesseract_worker !== undefined) await this.tesseract_worker.terminate();
         if(error){
             this.reject(error);
         }else{
