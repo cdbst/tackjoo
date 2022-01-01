@@ -7,7 +7,7 @@ const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
 const common = require('../common/common');
 const log = require('electron-log');
-const Tesseract  = require('tesseract.js');
+const OCREngine = require('./ocr_engine').OCREngine;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -23,7 +23,6 @@ class TaskRunner{
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
-        this.init_tesseract_worker = this.init_tesseract_worker.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -39,23 +38,6 @@ class TaskRunner{
         this.resolve = undefined;
         this.reject = undefined;
         this.pay_window = undefined;
-
-        this.tesseract_worker = undefined;
-    }
-
-    async init_tesseract_worker(){
-        
-        this.tesseract_worker = Tesseract.createWorker({
-            langPath: path.join(app.getAppPath(), 'traineddata', 'langs')
-        });
-
-        await this.tesseract_worker.load();
-        await this.tesseract_worker.loadLanguage('eng');
-        await this.tesseract_worker.initialize('eng');
-        await this.tesseract_worker.setParameters({
-            tessedit_char_whitelist: '0123456789',
-            preserve_interword_spaces: '0',
-        });
     }
 
     on_recv_api_call(data){
@@ -203,8 +185,8 @@ class TaskRunner{
 
             if(url.includes('https://bill.payco.com/password/keyboard.png')){
 
-                const imageBuffer = Buffer.from(res.body, "base64");
-                const { data: { text } } = await this.tesseract_worker.recognize(imageBuffer);
+                const image_buffer = Buffer.from(res.body, "base64");
+                const text = await OCREngine.get_text(image_buffer);
                 this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.checkout_pwd]);
             }
         };
@@ -274,7 +256,6 @@ class TaskRunner{
 
     async end_task(error){
         this.close_pay_window();
-        if(this.tesseract_worker !== undefined) await this.tesseract_worker.terminate();
         if(error){
             this.reject(error);
         }else{
