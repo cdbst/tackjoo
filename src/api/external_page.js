@@ -39,7 +39,7 @@ class ExternalPage{
 
         this.window.setMenuBarVisibility(false);
         this.window.loadURL(this.url);
-        this.window.webContents.openDevTools(); // TO TEST
+        //this.window.webContents.openDevTools(); // TO TEST
 
         this.window.on('close', (e) => {
             if(this.disable_exit == false || this.is_closed){

@@ -2,21 +2,25 @@ const Tesseract  = require('tesseract.js');
 
 class OCREngine{
     constructor(){
-        this.worker = Tesseract.createWorker();
+        
+        this.__scheduler = Tesseract.createScheduler();
 
         (async()=>{
-            await this.worker.load();
-            await this.worker.loadLanguage('eng');
-            await this.worker.initialize('eng');
-            await this.worker.setParameters({
+            const worker = Tesseract.createWorker();
+            await worker.load();
+            await worker.loadLanguage('eng');
+            await worker.initialize('eng');
+            await worker.setParameters({
                 tessedit_char_whitelist: '0123456789',
                 preserve_interword_spaces: '0',
             });
+
+            this.__scheduler.addWorker(worker);
         })();
     }
 
     async get_text(image){
-        const { data: { text } } = await this.worker.recognize(image);
+        const { data: { text } } = await this.__scheduler.addJob('recognize', image);
         return text;
     }
 }
