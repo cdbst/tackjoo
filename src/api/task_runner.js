@@ -174,7 +174,7 @@ class TaskRunner{
             }
 
             if(url.includes('https://id.payco.com/login/keys.nhn')){
-                this.pay_window.call_renderer_api('doLogin', [this.billing_info.pay_id, this.billing_info.pay_pwd]);
+                this.pay_window.call_renderer_api('doLogin', [this.billing_info.payco_info.pay_id, this.billing_info.payco_info.pay_pwd]);
             }
             
             if(url.includes('https://bill.payco.com/static/js/service/orderSheet/payment/checkout/')){
@@ -182,14 +182,14 @@ class TaskRunner{
             }
 
             if(url.includes('/deviceEnvironment/deviceEnvironmentBirthdayCertification.js')){
-                this.pay_window.call_renderer_api('doConfirmBirthdayIfno', [this.billing_info.birthday]);
+                this.pay_window.call_renderer_api('doConfirmBirthdayIfno', [this.billing_info.payco_info.birthday]);
             }
 
             if(url.includes('https://bill.payco.com/password/keyboard.png')){
 
                 const image_buffer = Buffer.from(res.body, "base64");
                 const text = await OCREngine.get_text(image_buffer);
-                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.checkout_pwd]);
+                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.payco_info.checkout_pwd]);
             }
         };
 
