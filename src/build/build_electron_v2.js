@@ -6,6 +6,7 @@ const package_json = require('../package.json');
 const app_icon_path = path.join(path.join('.', 'build', 'icon.ico')); //base path : /src/dist/
 
 const RELEASE_REPO_NAME = 'sbkr_release';
+const TEST_RELEASE_REPO_NAME = 'sbkr_test_release';
 
 async function build(){
     try {
@@ -33,6 +34,16 @@ async function build(){
             build_cfg.config.publish = {
                 provider : 'github',
                 repo : RELEASE_REPO_NAME,
+                owner : package_json.author,
+                vPrefixedTagName : true,
+                protocol : 'https'
+            }
+        }else if(process.env.BUILD_ENV === 'test_publish'){
+
+            build_cfg.publish = "always";
+            build_cfg.config.publish = {
+                provider : 'github',
+                repo : TEST_RELEASE_REPO_NAME,
                 owner : package_json.author,
                 vPrefixedTagName : true,
                 protocol : 'https'
