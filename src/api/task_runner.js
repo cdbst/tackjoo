@@ -92,11 +92,12 @@ class TaskRunner{
             width: 420,
             height: 700,
             resizable : false,
-            minimizable : false,
+            minimizable : true,
             //titleBarStyle : 'hidden',
             webPreferences: {
                 webSecurity : false,
                 nodeIntegration : false,
+                backgroundThrottling: false
                 //nativeWindowOpen : true
             },
             title : this.product_info.name + ' : ' + this.product_info.price
@@ -152,13 +153,14 @@ class TaskRunner{
             width: 720,
             height: 650,
             resizable : true,
-            minimizable : false,
+            minimizable : true,
             webPreferences: {
                 webSecurity : false,
                 nodeIntegration: true,
                 //contextIsolation: false,
                 //enableRemoteModule: true,
-                preload: path.resolve(path.join(app.getAppPath(), 'payco_preload.js'))
+                preload: path.resolve(path.join(app.getAppPath(), 'payco_preload.js')),
+                backgroundThrottling: false
             },
             title : this.product_info.name + ' : ' + this.product_info.price
         }
