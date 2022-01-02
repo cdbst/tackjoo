@@ -174,7 +174,7 @@ class TaskRunner{
             }
 
             if(url.includes('https://id.payco.com/login/keys.nhn')){
-                this.pay_window.call_renderer_api('doLogin', [this.billing_info.payco_info.pay_id, this.billing_info.payco_info.pay_pwd]);
+                this.pay_window.call_renderer_api('doLogin', [this.billing_info.payco_info.pay_email, this.billing_info.payco_info.pay_pwd]);
             }
             
             if(url.includes('https://bill.payco.com/static/js/service/orderSheet/payment/checkout/')){

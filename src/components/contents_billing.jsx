@@ -27,10 +27,10 @@ class ContentsBilling extends React.Component {
         this.el_sel_pay_method = 'select-pay-method';
 
         this.el_div_payco_info = 'div-payco-info';
-        this.el_input_payco_id = 'input-pay-id';
-        this.el_input_payco_pwd = 'input-pay-pwd';
-        this.el_input_payco_checkout_pwd = 'input-checkout-pwd';
-        this.el_input_payco_birthday = 'input-checkout-birthday';
+        this.el_input_payco_email = 'input-payco-email';
+        this.el_input_payco_pwd = 'input-payco-pwd';
+        this.el_input_payco_checkout_pwd = 'input-payco-checkout-pwd';
+        this.el_input_payco_birthday = 'input-payco-birthday';
 
         this.__mount = false;
 
@@ -54,7 +54,7 @@ class ContentsBilling extends React.Component {
             postal_code: '',
             pay_method: 'kakaopay',
             payco_info : {
-                pay_id: '',
+                pay_email: '',
                 pay_pwd: '',
                 checkout_pwd: '',
                 birthday: ''
@@ -92,7 +92,7 @@ class ContentsBilling extends React.Component {
     getCurrentBillingInfo(){
 
         const cur_pay_method = document.getElementById(this.el_sel_pay_method).value;
-        const cur_pay_id = document.getElementById(this.el_input_payco_id).value;
+        const cur_pay_email = document.getElementById(this.el_input_payco_email).value;
         const cur_pay_pwd = document.getElementById(this.el_input_payco_pwd).value;
         const cur_checkout_pwd = document.getElementById(this.el_input_payco_checkout_pwd).value;
         const cur_birthday = document.getElementById(this.el_input_payco_birthday).value;
@@ -105,7 +105,7 @@ class ContentsBilling extends React.Component {
             postal_code : this.ref_postcode.current.value === undefined ? '' : this.ref_postcode.current.value,
             pay_method : cur_pay_method === undefined ? '' : cur_pay_method,
             payco_info : {
-                pay_id : cur_pay_id === undefined ? '' : cur_pay_id,
+                pay_email : cur_pay_email === undefined ? '' : cur_pay_email,
                 pay_pwd : cur_pay_pwd === undefined ? '' : cur_pay_pwd,
                 checkout_pwd : cur_checkout_pwd === undefined ? '' : cur_checkout_pwd,
                 birthday : cur_birthday === undefined ? '' : cur_birthday,
@@ -123,7 +123,7 @@ class ContentsBilling extends React.Component {
         this.ref_addr2.current.value = billing_info.buyer_addr2;
         this.update_postcode(billing_info.postal_code);
         document.getElementById(this.el_sel_pay_method).value = billing_info.pay_method;
-        document.getElementById(this.el_input_payco_id).value = billing_info.payco_info.pay_id;
+        document.getElementById(this.el_input_payco_email).value = billing_info.payco_info.pay_email;
         document.getElementById(this.el_input_payco_pwd).value = billing_info.payco_info.pay_pwd;
         document.getElementById(this.el_input_payco_checkout_pwd).value = billing_info.payco_info.checkout_pwd;
         document.getElementById(this.el_input_payco_birthday).value = billing_info.payco_info.birthday;
@@ -162,12 +162,32 @@ class ContentsBilling extends React.Component {
             return;
         }
 
-        //TODO: 결제 방법이 payco일경우, 결제 정보를 설정하지 않았을 경우, 오류를 출력해야함.
-        // pay_method
-        // pay_id 
-        // pay_pwd
-        // checkout_pwd
-        // birthday
+        if(billing_info.pay_method === 'payco'){
+            if(billing_info.payco_info === undefined){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 정보가 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.pay_email == undefined || common.is_valid_email(billing_info.payco_info.pay_email) == null){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 계정(이메일)을 입력하지 않았거나 올바른 형태가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd === ''){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 계정 비밀번호를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd === '' || billing_info.payco_info.checkout_pwd.length !== 6){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 암호 6자리를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday === '' || common.is_valid_yyyymmdd(billing_info.payco_info.birthday) == false){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 로그인시 요구하는 생년월일 정보를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+        }
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
 
@@ -342,8 +362,8 @@ class ContentsBilling extends React.Component {
                                 <div className="col-md-6">
                                     <label className="form-label contents-bill-input-label">페이코 결제 정보</label>
                                     <div className="form-floating">
-                                        <input type="text" className="form-control" id={this.el_input_payco_id} style={{"--width" : "100%"}} placeholder="아이디 또는 이메일" />
-                                        <label className="common-input-label" htmlFor={this.el_input_payco_id}>아이디 또는 이메일</label>
+                                        <input type="text" className="form-control" id={this.el_input_payco_email} style={{"--width" : "100%"}} placeholder="이메일" />
+                                        <label className="common-input-label" htmlFor={this.el_input_payco_email}>이메일</label>
                                     </div>
                                     <div className="form-floating">
                                         <input type="password" className="form-control" id={this.el_input_payco_pwd} style={{"--width" : "100%"}} placeholder="비밀번호" />
