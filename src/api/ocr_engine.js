@@ -1,4 +1,6 @@
 const Tesseract  = require('tesseract.js');
+const common = require('../common/common');
+const log = require('electron-log');
 
 class OCREngine{
     constructor(){
@@ -6,7 +8,11 @@ class OCREngine{
         this.__scheduler = Tesseract.createScheduler();
 
         (async()=>{
-            const worker = Tesseract.createWorker();
+            const worker = Tesseract.createWorker({
+                logger: (m) => {
+                    log.warn(common.get_log_str('ocr_engine.js', 'tesseract-logger', m.status))
+                }
+            });
             await worker.load();
             await worker.loadLanguage('eng');
             await worker.initialize('eng');
