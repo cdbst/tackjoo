@@ -112,8 +112,9 @@ app.whenReady().then(() => {
     if(process.env.BUILD_ENV === 'develop'){
         create_window();
     }else{
-        create_update_window();
-        autoUpdater.checkForUpdatesAndNotify();
+        create_window();
+        // create_update_window();
+        // autoUpdater.checkForUpdatesAndNotify();
     }
 
     //for mac platform

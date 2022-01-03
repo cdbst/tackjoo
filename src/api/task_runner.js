@@ -155,6 +155,7 @@ class TaskRunner{
             resizable : true,
             minimizable : true,
             webPreferences: {
+                //sandbox : false,
                 webSecurity : false,
                 nodeIntegration: true,
                 //contextIsolation: false,
