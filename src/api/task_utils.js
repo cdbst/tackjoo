@@ -11,12 +11,13 @@ module.exports.is_valid_billing_info_to_tasking = (billing_info) =>{
     if(billing_info.phone_num == undefined || billing_info.phone_num == '') return false;
     if(billing_info.postal_code == undefined || billing_info.postal_code == '') return false;
     if(billing_info.pay_method == undefined || billing_info.pay_method == '') return false;
-    if(billing_info.payco_info == undefined) return false;
-    if(billing_info.payco_info.pay_email == undefined || billing_info.payco_info.pay_email == '') return false;
-    if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd == '') return false;
-    if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd == '') return false;
-    if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday == '') return false;
-
+    if(billing_info.pay_method != undefined && billing_info.pay_method === 'payco'){
+        if(billing_info.payco_info == undefined) return false;
+        if(billing_info.payco_info.pay_email == undefined || billing_info.payco_info.pay_email == '') return false;
+        if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd == '') return false;
+        if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd == '') return false;
+        if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday == '') return false;
+    }
     return true;
 }
 
