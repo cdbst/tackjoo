@@ -31,7 +31,6 @@ function create_window() {
         });
 
         app.main_browser_window = win;
-    
         IpcM.register(win);
     
         //win.webContents.openDevTools();

@@ -132,61 +132,68 @@ class ContentsBilling extends React.Component {
         el_payco_info_div.style.visibility = billing_info.pay_method !== 'payco' ? 'hidden' : 'visible';
     }
 
+    static isValidBillingInfo(billing_info){
+
+        try{
+            if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
+                return '받으시는 분 이름이 지정되지 않았습니다.';
+            }
+    
+            if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
+                return '받으시는 분 전화번호가 지정되지 않았습니다.';
+            }
+    
+            if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
+                return '받으시는 분 주소가 지정되지 않았습니다.';
+            }
+    
+            
+            if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
+                return '받으시는 분 세부 주소가 지정되지 않았습니다.';
+            }
+    
+            if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
+                return '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.';
+            }
+    
+            if(billing_info.pay_method === 'payco'){
+
+                if(billing_info.payco_info === undefined){
+                    return '페이코 결제 정보가 없습니다.';
+                }
+    
+                if(billing_info.payco_info.pay_email == undefined || common.is_valid_email(billing_info.payco_info.pay_email) == null){
+                    return '페이코 계정(이메일)을 입력하지 않았거나 올바른 형태가 아닙니다.';
+                }
+    
+                if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd === ''){
+                    return '페이코 계정 비밀번호를 입력하지 않았습니다.';
+                }
+    
+                if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd === '' || billing_info.payco_info.checkout_pwd.length !== 6){
+                    return '페이코 결제 암호 6자리를 올바르게 입력하지 않았습니다.';
+                }
+    
+                if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday === '' || common.is_valid_yyyymmdd(billing_info.payco_info.birthday) == false){
+                    return '페이코 로그인시 요구하는 생년월일 정보를 올바르게 입력하지 않았습니다.';
+                }
+            }
+
+            return undefined;
+
+        }catch(err){
+            return err.message;
+        }
+    }
+
     onClickSaveBtn(){
 
-        let billing_info = this.getCurrentBillingInfo();
+        const billing_info = this.getCurrentBillingInfo();
+        const err_message = ContentsBilling.isValidBillingInfo(billing_info);
 
-        if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+        if(err_message !== undefined){
+            Index.g_sys_msg_q.enqueue('에러', err_message, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
-        }
-
-        if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        
-        if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 세부 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
-            Index.g_sys_msg_q.enqueue('에러', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        if(billing_info.pay_method === 'payco'){
-            if(billing_info.payco_info === undefined){
-                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 정보가 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            if(billing_info.payco_info.pay_email == undefined || common.is_valid_email(billing_info.payco_info.pay_email) == null){
-                Index.g_sys_msg_q.enqueue('에러', '페이코 계정(이메일)을 입력하지 않았거나 올바른 형태가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd === ''){
-                Index.g_sys_msg_q.enqueue('에러', '페이코 계정 비밀번호를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd === '' || billing_info.payco_info.checkout_pwd.length !== 6){
-                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 암호 6자리를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday === '' || common.is_valid_yyyymmdd(billing_info.payco_info.birthday) == false){
-                Index.g_sys_msg_q.enqueue('에러', '페이코 로그인시 요구하는 생년월일 정보를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
         }
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
@@ -210,12 +217,12 @@ class ContentsBilling extends React.Component {
             if(err){
                 Index.g_sys_msg_q.enqueue('경고', '결제 정보가 아직 없거나 읽을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
                 Index.g_billing_info = this.getDefaultBillingInfo();
-                return;
+            }else{
+                Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                Index.g_billing_info = Object.assign(this.getDefaultBillingInfo(), billing_info);
             }
             
-            Index.g_billing_info = Object.assign(this.getDefaultBillingInfo(), billing_info);
             this.setBillingInfoToUI(Index.g_billing_info);
-            Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 

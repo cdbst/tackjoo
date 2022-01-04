@@ -90,6 +90,12 @@ class ContentsTasks extends React.Component {
 
     onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info){
 
+        const err_message = ContentsBilling.isValidBillingInfo(Index.g_billing_info);
+        if(err_message !== undefined){
+            Index.g_sys_msg_q.enqueue('에러', `작업을 생성하려면 [결제관리] 탭에서 결제 정보를 저장해야 합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 10000);
+            return;
+        }
+
         for(var i = 0; i < account_email_list.length; i++){
             let friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
             this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info);
