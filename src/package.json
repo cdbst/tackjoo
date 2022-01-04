@@ -11,7 +11,9 @@
     "prestart": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
     "start": "set BUILD_ENV=develop&&electron ./app.js",
     "prepublish": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
-    "publish": "set BUILD_ENV=publish&& node ./build/build.js"
+    "publish": "set BUILD_ENV=publish&& node ./build/build.js",
+    "pretestpublish": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
+    "testpublish": "set BUILD_ENV=test_publish&& node ./build/build.js"
   },
   "repository": {
     "type": "git",
@@ -38,7 +40,8 @@
     "electron-updater": "^4.6.1",
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
-    "systeminformation": "^5.9.17"
+    "systeminformation": "^5.9.17",
+    "tesseract.js": "^2.1.5"
   },
   "devDependencies": {
     "asar": "^3.1.0",

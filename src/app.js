@@ -27,7 +27,7 @@ function create_window() {
                 preload: path.join(__dirname, "preload.js"),
                 backgroundThrottling: false
             },
-            offscreen : true
+            //offscreen : true
         });
 
         app.main_browser_window = win;

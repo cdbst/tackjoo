@@ -25,6 +25,10 @@ body {
     font-weight: bold;
 }
 
+.common-input-label{
+    color : #83f195 !important;
+}
+
 /* Disable input type number arrow buttons */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -184,7 +188,7 @@ tbody tr:hover td {
     background-color: #202225 !important;
 }
 
-.modal-select, .modal-select-option{
+.modal-select, .select-option{
     background: #32353b !important;
     color: white !important;
     border: solid #dee2e6 !important;

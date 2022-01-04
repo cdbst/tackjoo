@@ -24,6 +24,11 @@
         );
     }
 
+    exports.is_valid_yyyymmdd = function(date_str) {
+        var regex = RegExp(/^\d{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$/);
+        return regex.test(date_str);
+    }
+
     exports.is_valid_password = function(password){
         return String(password).match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);
     }
@@ -41,7 +46,6 @@
     }
 
     exports.merge_object = function (target, source) {
-        //console.log(source);
 
         Object.entries(source).forEach(([key, value]) =>{
             if(value == undefined) return;

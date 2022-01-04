@@ -16,12 +16,21 @@ class ContentsBilling extends React.Component {
         this.setBillingInfoToUI = this.setBillingInfoToUI.bind(this);
         this.registerOnHideTabEvent = this.registerOnHideTabEvent.bind(this);
         this.getDefaultBillingInfo = this.getDefaultBillingInfo.bind(this);
+        this.onChangePayMethod = this.onChangePayMethod.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
         this.ref_addr1 = React.createRef();
         this.ref_addr2 = React.createRef();
         this.ref_postcode = React.createRef();
+
+        this.el_sel_pay_method = 'select-pay-method';
+
+        this.el_div_payco_info = 'div-payco-info';
+        this.el_input_payco_email = 'input-payco-email';
+        this.el_input_payco_pwd = 'input-payco-pwd';
+        this.el_input_payco_checkout_pwd = 'input-payco-checkout-pwd';
+        this.el_input_payco_birthday = 'input-payco-birthday';
 
         this.__mount = false;
 
@@ -42,7 +51,14 @@ class ContentsBilling extends React.Component {
             phone_num: '',
             buyer_addr1: '',
             buyer_addr2: '',
-            postal_code: ''
+            postal_code: '',
+            pay_method: 'kakaopay',
+            payco_info : {
+                pay_email: '',
+                pay_pwd: '',
+                checkout_pwd: '',
+                birthday: ''
+            }
         }
     }
 
@@ -74,12 +90,26 @@ class ContentsBilling extends React.Component {
     }
 
     getCurrentBillingInfo(){
+
+        const cur_pay_method = document.getElementById(this.el_sel_pay_method).value;
+        const cur_pay_email = document.getElementById(this.el_input_payco_email).value;
+        const cur_pay_pwd = document.getElementById(this.el_input_payco_pwd).value;
+        const cur_checkout_pwd = document.getElementById(this.el_input_payco_checkout_pwd).value;
+        const cur_birthday = document.getElementById(this.el_input_payco_birthday).value;
+
         return billing_info = {
             buyer_name : this.ref_buyer_name.current.value,
             phone_num : this.ref_phone_num.current.value,
             buyer_addr1 : this.ref_addr1.current.value,
             buyer_addr2 : this.ref_addr2.current.value,
-            postal_code : this.ref_postcode.current.value == undefined ? '' : this.ref_postcode.current.value
+            postal_code : this.ref_postcode.current.value === undefined ? '' : this.ref_postcode.current.value,
+            pay_method : cur_pay_method === undefined ? '' : cur_pay_method,
+            payco_info : {
+                pay_email : cur_pay_email === undefined ? '' : cur_pay_email,
+                pay_pwd : cur_pay_pwd === undefined ? '' : cur_pay_pwd,
+                checkout_pwd : cur_checkout_pwd === undefined ? '' : cur_checkout_pwd,
+                birthday : cur_birthday === undefined ? '' : cur_birthday,
+            }
         };
     }
 
@@ -92,6 +122,14 @@ class ContentsBilling extends React.Component {
         this.ref_addr1.current.value = billing_info.buyer_addr1;
         this.ref_addr2.current.value = billing_info.buyer_addr2;
         this.update_postcode(billing_info.postal_code);
+        document.getElementById(this.el_sel_pay_method).value = billing_info.pay_method;
+        document.getElementById(this.el_input_payco_email).value = billing_info.payco_info.pay_email;
+        document.getElementById(this.el_input_payco_pwd).value = billing_info.payco_info.pay_pwd;
+        document.getElementById(this.el_input_payco_checkout_pwd).value = billing_info.payco_info.checkout_pwd;
+        document.getElementById(this.el_input_payco_birthday).value = billing_info.payco_info.birthday;
+
+        const el_payco_info_div = document.getElementById(this.el_div_payco_info);
+        el_payco_info_div.style.visibility = billing_info.pay_method !== 'payco' ? 'hidden' : 'visible';
     }
 
     onClickSaveBtn(){
@@ -99,23 +137,56 @@ class ContentsBilling extends React.Component {
         let billing_info = this.getCurrentBillingInfo();
 
         if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으실 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 이름이 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으실 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 전화번호가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
-            Index.g_sys_msg_q.enqueue('에러', '받으실 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        
+        if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
+            Index.g_sys_msg_q.enqueue('에러', '받으시는 분 세부 주소가 지정되지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
         if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
             Index.g_sys_msg_q.enqueue('에러', '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
+        }
+
+        if(billing_info.pay_method === 'payco'){
+            if(billing_info.payco_info === undefined){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 정보가 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.pay_email == undefined || common.is_valid_email(billing_info.payco_info.pay_email) == null){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 계정(이메일)을 입력하지 않았거나 올바른 형태가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.pay_pwd == undefined || billing_info.payco_info.pay_pwd === ''){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 계정 비밀번호를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.checkout_pwd == undefined || billing_info.payco_info.checkout_pwd === '' || billing_info.payco_info.checkout_pwd.length !== 6){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 결제 암호 6자리를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(billing_info.payco_info.birthday == undefined || billing_info.payco_info.birthday === '' || common.is_valid_yyyymmdd(billing_info.payco_info.birthday) == false){
+                Index.g_sys_msg_q.enqueue('에러', '페이코 로그인시 요구하는 생년월일 정보를 올바르게 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
         }
 
         window.electron.saveBillingInfo(billing_info, (err) =>{
@@ -141,11 +212,19 @@ class ContentsBilling extends React.Component {
                 Index.g_billing_info = this.getDefaultBillingInfo();
                 return;
             }
-
-            this.setBillingInfoToUI(billing_info);
-            Index.g_billing_info = billing_info;
+            
+            Index.g_billing_info = Object.assign(this.getDefaultBillingInfo(), billing_info);
+            this.setBillingInfoToUI(Index.g_billing_info);
             Index.g_sys_msg_q.enqueue('안내', '결제 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
+    }
+
+    onChangePayMethod(e){
+        const selected_idx = e.target.selectedIndex;
+        const selected_opt = e.target[selected_idx];
+
+        const el_payco_info_div = document.getElementById(this.el_div_payco_info);
+        el_payco_info_div.style.visibility = selected_opt.value !== 'payco' ? 'hidden' : 'visible';
     }
 
     onChangeAddr1Value(e){
@@ -271,15 +350,34 @@ class ContentsBilling extends React.Component {
                             <br />
                             <div className="m2-12 row">
                                 <div className="col-md-6">
-                                    <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">결제 방식</label>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-kakaopay" defaultChecked/>
-                                        <label className="form-check-label" htmlFor="opt-checkout-method-kakaopay">카카오페이</label>
+                                    <label className="form-label contents-bill-input-label">결제 수단</label>
+                                    <select id={this.el_sel_pay_method} className="form-select form-select-down-arrw modal-select" aria-label="Default select example" onChange={this.onChangePayMethod.bind(this)}>
+                                        <option className="select-option" value="kakaopay">카카오페이</option>
+                                        <option className="select-option" value="payco">페이코</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <div className="m2-12 row" id={this.el_div_payco_info}>
+                                <div className="col-md-6">
+                                    <label className="form-label contents-bill-input-label">페이코 결제 정보</label>
+                                    <div className="form-floating">
+                                        <input type="text" className="form-control" id={this.el_input_payco_email} style={{"--width" : "100%"}} placeholder="이메일" />
+                                        <label className="common-input-label" htmlFor={this.el_input_payco_email}>이메일</label>
                                     </div>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="radio" name="flexRadioDefault" id="opt-checkout-method-naverpay" disabled/>
-                                        <label className="form-check-label" htmlFor="opt-checkout-method-naverpay">네이버페이</label>
+                                    <div className="form-floating">
+                                        <input type="password" className="form-control" id={this.el_input_payco_pwd} style={{"--width" : "100%"}} placeholder="비밀번호" />
+                                        <label className="common-input-label" htmlFor={this.el_input_payco_pwd}>비밀번호</label>
                                     </div>
+                                    <div className="form-floating">
+                                        <input type="password" className="form-control" id={this.el_input_payco_checkout_pwd} style={{"--width" : "100%"}} placeholder="결제 비밀번호(6자리숫자)" />
+                                        <label className="common-input-label" htmlFor={this.el_input_payco_checkout_pwd}>결제 비밀번호(6자리숫자)</label>
+                                    </div>
+                                    <div className="form-floating">
+                                        <input type="text" className="form-control" id={this.el_input_payco_birthday} style={{"--width" : "100%"}} placeholder="생년월일 예시)19950130" />
+                                        <label className="common-input-label" htmlFor={this.el_input_payco_birthday}>생년월일 예시)19950130</label>
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

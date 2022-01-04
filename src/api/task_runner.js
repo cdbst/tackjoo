@@ -7,6 +7,7 @@ const { TaskCanceledError } = require("./task_errors.js");
 const { app } = require('electron');
 const common = require('../common/common');
 const log = require('electron-log');
+const OCREngine = require('./ocr_engine').OCREngine;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -18,6 +19,7 @@ class TaskRunner{
         this.gen_sensor_data = this.gen_sensor_data.bind(this);
         this.on_recv_api_call = this.on_recv_api_call.bind(this);
         this.open_kakaopay_window = this.open_kakaopay_window.bind(this);
+        this.open_payco_window = this.open_payco_window.bind(this);
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
@@ -90,11 +92,12 @@ class TaskRunner{
             width: 420,
             height: 700,
             resizable : false,
-            minimizable : false,
+            minimizable : true,
             //titleBarStyle : 'hidden',
             webPreferences: {
                 webSecurity : false,
                 nodeIntegration : false,
+                backgroundThrottling: false
                 //nativeWindowOpen : true
             },
             title : this.product_info.name + ' : ' + this.product_info.price
@@ -102,12 +105,12 @@ class TaskRunner{
 
         let pay_done = false;
 
-        const res_pkt_hooker = (params, response)=>{
+        const pkt_hooker = (params, url, data)=>{
 
-            if(response == undefined) return;
+            if(data == undefined) return;
 
             try{
-                let res_obj = JSON.parse(response);
+                let res_obj = JSON.parse(data);
 
                 if('expired' in res_obj && res_obj.expired == true){
                     this.end_task(new Error('Kakaopay connection is expired'));
@@ -124,11 +127,11 @@ class TaskRunner{
                 //     }
                 // }
             }catch(e){
-                log.verbose(common.get_log_str('task_runner.js', 'res_pkt_hooker-callback', e));
+                log.verbose(common.get_log_str('task_runner.js', 'pkt_hooker-callback', e));
             }
         };
 
-        this.pay_window = new ExternalPage(url, window_opts, res_pkt_hooker, true);
+        this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, true);
         this.pay_window.open();
 
         this.pay_window.attach_window_close_event_hooker(()=>{
@@ -144,6 +147,62 @@ class TaskRunner{
         });
     }
 
+    open_payco_window(url){
+
+        let window_opts = {
+            width: 720,
+            height: 650,
+            resizable : true,
+            minimizable : true,
+            webPreferences: {
+                //sandbox : false,
+                webSecurity : false,
+                nodeIntegration: true,
+                //contextIsolation: false,
+                //enableRemoteModule: true,
+                preload: path.resolve(path.join(app.getAppPath(), 'payco_preload.js')),
+                backgroundThrottling: false
+            },
+            title : this.product_info.name + ' : ' + this.product_info.price
+        }
+
+        let pay_done = false;
+
+        const pkt_hooker = async (params, url, data, res)=>{
+
+            if(url.includes('nike-service.iamport.kr/payco_payments/result?code=0')){
+                pay_done = true;
+            }
+
+            if(url.includes('https://id.payco.com/login/keys.nhn')){
+                this.pay_window.call_renderer_api('doLogin', [this.billing_info.payco_info.pay_email, this.billing_info.payco_info.pay_pwd]);
+            }
+            
+            if(url.includes('https://bill.payco.com/static/js/service/orderSheet/payment/checkout/')){
+                this.pay_window.call_renderer_api('clickCheckoutBtn');
+            }
+
+            if(url.includes('/deviceEnvironment/deviceEnvironmentBirthdayCertification.js')){
+                this.pay_window.call_renderer_api('doConfirmBirthdayIfno', [this.billing_info.payco_info.birthday]);
+            }
+
+            if(url.includes('https://bill.payco.com/password/keyboard.png')){
+
+                const image_buffer = Buffer.from(res.body, "base64");
+                const text = await OCREngine.get_text(image_buffer);
+                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.payco_info.checkout_pwd]);
+            }
+        };
+
+        this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
+        this.pay_window.open();
+
+        this.pay_window.attach_window_close_event_hooker(()=>{
+            if(pay_done == false)this.end_task(new Error('Payco connection is closed. canceled by user'));
+            else this.end_task();
+        });
+    }
+
     start(){
         if(this.canceled) throw new TaskCanceledError(this, 'Task is canceled.');
         this.running = true;
@@ -152,8 +211,9 @@ class TaskRunner{
 
             this.resolve = resolve;
             this.reject = reject;
+
             const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
-            
+
             this.worker = new Worker(task_js_path, {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
@@ -164,7 +224,7 @@ class TaskRunner{
                     log_path : log.transports.file.resolvePath()
                 }
             });
-    
+
             this.worker.on('message', this.on_message);
 
             this.worker.on('error', (err)=>{
