@@ -35,6 +35,10 @@ class AuthEngine{
         }
     }
 
+    is_authorized(){
+        return this.session_token !== undefined;
+    }
+
     auth_denied(message){
         dialog.showMessageBoxSync(app.main_browser_window, {
             message : message,
