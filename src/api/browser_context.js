@@ -1026,7 +1026,7 @@ class BrowserContext {
                 }
 
                 const $ = cheerio.load(res.data);
-                let pay_prepare_payload = undefined
+                let pay_prepare_payload = undefined;
 
                 if(billing_info.pay_method === 'kakaopay'){
                     pay_prepare_payload = checkout_page_parser.parse_kakaopay_prepare_payload_from_checkout_page($);

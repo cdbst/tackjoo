@@ -4,7 +4,7 @@ const parser_common = require('./page_parser_common');
 
 function parse_kakaopay_prepare_payload_from_checkout_page($){
 
-    let amount = parser_common.get_data_tag_value($, 'strong', 'data-retail-price');
+    let amount = parser_common.get_data_tag_value($, 'strong', 'data-amount');
     if(amount == undefined) return undefined;
 
     let name = parser_common.get_data_tag_value($, 'a', 'data-eng-name'); // product name
@@ -53,7 +53,7 @@ function parse_kakaopay_prepare_payload_from_checkout_page($){
 
 function parse_payco_prepare_payload_from_checkout_page($){
 
-    let amount = parser_common.get_data_tag_value($, 'strong', 'data-retail-price');
+    let amount = parser_common.get_data_tag_value($, 'strong', 'data-amount');
     if(amount == undefined) return undefined;
 
     let name = parser_common.get_data_tag_value($, 'a', 'data-eng-name'); // product name
