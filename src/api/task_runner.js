@@ -8,6 +8,7 @@ const { app } = require('electron');
 const common = require('../common/common');
 const log = require('electron-log');
 const OCREngine = require('./ocr_engine').OCREngine;
+const AuthEngine = require('../api/auth_engine.js').AuthEngine;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -205,6 +206,7 @@ class TaskRunner{
 
     start(){
         if(this.canceled) throw new TaskCanceledError(this, 'Task is canceled.');
+        if(AuthEngine.is_authorized() === false) throw new TaskCanceledError(this, 'Unauthorized user.');
         this.running = true;
 
         return new Promise((resolve, reject)=>{
