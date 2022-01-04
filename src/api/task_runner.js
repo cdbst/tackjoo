@@ -140,7 +140,7 @@ class TaskRunner{
 
         //결제 완료시 창을 닫기위한 용도로 추가함.
         this.pay_window.attach_web_contents_event_hooker('did-navigate', (evt, url)=>{
-            if(url.includes('https://nike-service.iamport.kr/payco_payments/success')){
+            if(url.includes('https://nike-service.iamport.kr/kakaopay_payments/success')){
                 pay_done = true;
                 this.end_task();
             }
