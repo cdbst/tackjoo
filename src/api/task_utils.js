@@ -74,9 +74,7 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
         return undefined;
     }
 
-    const size_info_len = product_info.size_info_list.length;
-
-    if(size_info_len == 0){
+    if(product_info.size_info_list.length == 0){
         return undefined;
     }
 
