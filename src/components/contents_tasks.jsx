@@ -7,6 +7,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
         this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
+        this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
@@ -18,6 +19,8 @@ class ContentsTasks extends React.Component {
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
+
+        this.__ref_product_list_reload_btn = React.createRef();
 
         this.__table_item_ref_dict = {};
         this.state = {
@@ -46,6 +49,15 @@ class ContentsTasks extends React.Component {
             this.action_col_width;
 
         this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
+    }
+
+    onClickBtnProductListReload(){
+
+        this.__ref_product_list_reload_btn.current.setLoadingStatus(true);
+
+        Index.g_product_mngr.loadProductInfoList(()=>{
+            this.__ref_product_list_reload_btn.current.setLoadingStatus(false);
+        });
     }
 
     onClickBtnRemoveAll(){
@@ -242,6 +254,13 @@ class ContentsTasks extends React.Component {
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
+                            <LaodingButton
+                                ref={this.__ref_product_list_reload_btn}
+                                h_on_click={this.onClickBtnProductListReload.bind(this)}
+                                btn_label={"상품리스트 갱신"}
+                                btn_class={"btn-primary btn-footer-inside"}
+                                img_src={"./res/img/cloud-arrow-down-fill.svg"}
+                            />
                         </div>
                     </div>
                 </div>

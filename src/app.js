@@ -17,9 +17,9 @@ function create_window() {
     try{
         const win = new BrowserWindow({
             width: 1620,
-            height: 1020,
+            height: 1080,
             minWidth : 1620,
-            minHeight : 1020,
+            minHeight : 1080,
             webPreferences: {
                 devTools: false,
                 //sandbox: true,
