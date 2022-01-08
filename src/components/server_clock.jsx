@@ -13,7 +13,7 @@ class ServerClock{
         this.alam_subscribers = [];
 
         this.__getServerDateTime((date)=>{
-            this.server_time = new Date(date);
+            this.server_time = date;
             this.__setPowerOnClock();
         });
     }
@@ -58,17 +58,25 @@ class ServerClock{
 
     __getServerDateTime(__callback){
 
+        let before_req_timestamp = undefined;
+
         var xhr = new XMLHttpRequest();
         xhr.open("GET", common.NIKE_URL + '/kr/ko_kr/', true);
         xhr.onload = (e) =>{
+
             if(xhr.readyState === 4){
-                __callback(xhr.getResponseHeader("Date"));
+                const after_req_timestamp = new Date();
+                let server_date = new Date(xhr.getResponseHeader("Date"));
+                server_date.setMilliseconds(server_date.getMilliseconds() + ((after_req_timestamp - before_req_timestamp) / 2));
+                __callback(server_date);
             }
         };
         xhr.onerror = function (e) {
             console.error(xhr.statusText);
             Index.g_sys_msg_q.enqueue('에러', '나이키 서버시간 정보를 가져오는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 8000);
         };
+
+        before_req_timestamp = new Date();
         xhr.send(null); 
     }
 
