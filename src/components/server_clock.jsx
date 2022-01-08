@@ -20,9 +20,9 @@ class ServerClock{
 
     __setPowerOnClock() {
         setInterval(()=>{
-            this.server_time.setMilliseconds(this.server_time.getMilliseconds() + 40);
+            this.server_time.setMilliseconds(this.server_time.getMilliseconds() + 20);
             this.__invoke_alam(this.server_time);
-        },40);
+        },20);
     }
     
     __invoke_alam(date) { 
@@ -67,7 +67,7 @@ class ServerClock{
             if(xhr.readyState === 4){
                 const after_req_timestamp = new Date();
                 let server_date = new Date(xhr.getResponseHeader("Date"));
-                server_date.setMilliseconds(server_date.getMilliseconds() + ((after_req_timestamp - before_req_timestamp) / 2));
+                server_date.setMilliseconds(server_date.getMilliseconds() + (after_req_timestamp - before_req_timestamp));
                 __callback(server_date);
             }
         };
