@@ -5,12 +5,14 @@ class ServerClock{
 
         this.__getServerDateTime = this.__getServerDateTime.bind(this);
         this.__setPowerOnClock = this.__setPowerOnClock.bind(this);
+        this.__update_server_clock = this.__update_server_clock.bind(this);
         this.__invoke_alam = this.__invoke_alam.bind(this);
         this.subscribeAlam = this.subscribeAlam.bind(this);
         this.unsubscribeAlam = this.unsubscribeAlam.bind(this);
         this.getServerTime = this.getServerTime.bind(this);
-
+        
         this.alam_subscribers = [];
+        this.__server_timer_update_interval = 100; // millesec
 
         this.__getServerDateTime((date)=>{
             this.server_time = date;
@@ -18,11 +20,22 @@ class ServerClock{
         });
     }
 
+    __update_server_clock(){
+        return new Promise((resolve, reject) =>{
+            try{
+                this.server_time.setMilliseconds(this.server_time.getMilliseconds() + this.__server_timer_update_interval);
+                resolve(this.server_time);
+            }catch(err){
+                reject(err);
+            }
+        });
+    }
+
     __setPowerOnClock() {
         setInterval(()=>{
-            this.server_time.setMilliseconds(this.server_time.getMilliseconds() + 20);
+            this.__update_server_clock();
             this.__invoke_alam(this.server_time);
-        },20);
+        }, this.__server_timer_update_interval);
     }
     
     __invoke_alam(date) { 
