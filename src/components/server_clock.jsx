@@ -16,38 +16,44 @@ class ServerClock{
             this.server_time = new Date(date);
             this.__setPowerOnClock();
         });
-        this.clock_handler = undefined;
     }
 
     __setPowerOnClock() {
-        setTimeout(()=>{
-            this.server_time.setSeconds(this.server_time.getSeconds() + 1);
+        setInterval(()=>{
+            this.server_time.setMilliseconds(this.server_time.getMilliseconds() + 40);
             this.__invoke_alam(this.server_time);
-            this.__setPowerOnClock();
-        }, 1000);
+        },40);
     }
     
     __invoke_alam(date) { 
 
-        for(var i = this.alam_subscribers.length - 1; i >= 0 ; i--){
-
+        return new Promise((resolve, reject) =>{
             try{
-                const subscriber = this.alam_subscribers[i];
+                for(var i = this.alam_subscribers.length - 1; i >= 0 ; i--){
 
-                if(subscriber.date == undefined){
-                    subscriber.invoke(date);
-                    continue;
+                    try{
+                        const subscriber = this.alam_subscribers[i];
+        
+                        if(subscriber.date == undefined){
+                            subscriber.invoke(date);
+                            continue;
+                        }
+            
+                        if(date < subscriber.date) continue;
+            
+                        subscriber.invoke(date);
+                        this.alam_subscribers.splice(i, 1);
+                    }catch(err){
+                        continue;
+                    }
                 }
-    
-                if(date < subscriber.date) continue;
-    
-                subscriber.invoke(date);
-                this.alam_subscribers.splice(i, 1);
+
+                resolve();
+
             }catch(err){
-                console.err(err);
-                continue;
+                reject(err);
             }
-        }
+        });
     }
 
     __getServerDateTime(__callback){
