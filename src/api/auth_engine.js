@@ -10,6 +10,7 @@ class AuthEngine{
     constructor(){
         this.session_token = undefined;
         this.session_check_interval = 20000;
+        this.timeout_accumulater = 0;
     }
 
     async signin(email, pwd){
@@ -52,12 +53,19 @@ class AuthEngine{
         setInterval(async ()=>{
             try{
                 const res = await axios.post(AUTH_SERVER_URL + '/api/ssck', {session_token : this.session_token}, {timeout : this.session_check_interval});
-                if(res.data.result == false){
-                    this.auth_denied(res.data.message);
-                }
+                if(res.data.result == false) this.auth_denied(res.data.message);
+                this.timeout_accumulater = 0;
+                
             }catch(err){
+
                 log.error(common.get_log_str('auth_engine.js', 'AuthEngine.start_session_checker', err));
-                this.auth_denied('사용자 인증에 실패했습니다.');
+                if(this.timeout_accumulater > 2) this.auth_denied('사용자 인증에 실패했습니다.');
+
+                if(err.message.includes('timeout')){
+                    this.timeout_accumulater++;
+                }else{
+                    this.auth_denied('사용자 인증에 실패했습니다.');
+                }
             }
             
         }, this.session_check_interval);
