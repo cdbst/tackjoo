@@ -188,8 +188,8 @@ class ContentsSettings extends React.Component {
                         </div>
                     </div>
                     <div className="row footer">
-                        <div className="d-flex flex-row-reverse bd-highlight align-items-center" onClick={this.onClickSaveBtn.bind(this)}>
-                            <button type="button" className="btn btn-primary btn-footer-inside">
+                        <div className="d-flex flex-row-reverse bd-highlight align-items-center">
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickSaveBtn.bind(this)}>
                                 <img src="./res/img/save2-fill.svg" style={{width:24, height:24}}/> 저장하기
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickOpenLogDirectory.bind(this)}>
