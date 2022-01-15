@@ -5,7 +5,7 @@ const product_page_parser = require('./api/product_page_parser.js');
 const BrowserContext = require('./api/browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError, GetSkuInventoryError} = require('./api/task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenPayWindowError, LoginError, GetSkuInventoryError} = require('./api/task_errors.js');
 
 const log = require('electron-log');
 const app_cfg = require('./app_config');
@@ -168,7 +168,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             }
             global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
         }catch(e){
-            let _err = new OpenKakaoPayWindowError(kakao_data, "Open pay window fail");
+            let _err = new OpenPayWindowError(kakao_data, "Open pay window fail");
             _err.stack = e.stack;
             _err.message = e.message;
             throw _err;
@@ -178,18 +178,13 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
         // STEP10 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
-       
-        TaskUtils.checkout_request(browser_context, billing_info).then((checkout_result)=>{
+        const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
+        if(checkout_result == undefined){
+            throw new CheckOutRequestError("Fail with checkout request");
+        }
 
-            common.print_time_duration(log, 'checkout_request', time_stamp);
+        common.print_time_duration(log, 'checkout_request', time_stamp);
 
-            if(checkout_result == undefined){
-                throw new CheckOutRequestError("Fail with checkout request");
-            }else{
-                process.exit(0);
-            }
-        }).catch((error)=>{
-            throw new CheckOutRequestError(error.message);
-        });
+        process.exit(0);
     }
 }

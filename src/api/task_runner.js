@@ -39,6 +39,7 @@ class TaskRunner{
         this.resolve = undefined;
         this.reject = undefined;
         this.pay_window = undefined;
+
     }
 
     on_recv_api_call(data){
