@@ -205,6 +205,12 @@
         return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
     }
 
+    exports.print_time_duration = function(log, message, before_time){
+        const cur_time = Date.now();
+        log.info(this.get_log_str('task.js', 'PERPORMANCE', message + ': ' + (cur_time - before_time)));
+        return cur_time;
+    }
+
     exports.NIKE_URL = 'https://www.nike.com';
     exports.SELL_TYPE = {normal : 'Buy', ftfs :'Coming Soon', draw : 'THE DRAW', notify :'Notify Me'};
     exports.TASK_STATUS = {
