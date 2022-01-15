@@ -9,6 +9,7 @@ const common = require('../common/common');
 const log = require('electron-log');
 const OCREngine = require('./ocr_engine').OCREngine;
 const AuthEngine = require('../api/auth_engine.js').AuthEngine;
+const EventWait = require('./event_wait').EventWait;
 
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
@@ -40,6 +41,7 @@ class TaskRunner{
         this.reject = undefined;
         this.pay_window = undefined;
 
+        this.checkout_wait = new EventWait();
     }
 
     on_recv_api_call(data){
@@ -135,6 +137,7 @@ class TaskRunner{
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, true);
         this.pay_window.open();
+        this.pay_window.setModalView(path.resolve(path.join(app.getAppPath(), 'checkout_wait.html')));
 
         this.pay_window.attach_window_close_event_hooker(()=>{
             if(pay_done == false)this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
@@ -154,7 +157,7 @@ class TaskRunner{
         let window_opts = {
             width: 720,
             height: 650,
-            resizable : true,
+            resizable : false,
             minimizable : true,
             webPreferences: {
                 //sandbox : false,
@@ -192,12 +195,14 @@ class TaskRunner{
 
                 const image_buffer = Buffer.from(res.body, "base64");
                 const text = await OCREngine.get_text(image_buffer);
+                await this.checkout_wait.wait();
                 this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.payco_info.checkout_pwd]);
             }
         };
 
         this.pay_window = new ExternalPage(url, window_opts, pkt_hooker, false);
         this.pay_window.open();
+        this.pay_window.setModalView(path.resolve(path.join(app.getAppPath(), 'checkout_wait.html')));
 
         this.pay_window.attach_window_close_event_hooker(()=>{
             if(pay_done == false)this.end_task(new Error('Payco connection is closed. canceled by user'));
@@ -217,6 +222,7 @@ class TaskRunner{
 
             const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
 
+            this.checkout_wait.set();
             this.worker = new Worker(task_js_path, {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
@@ -241,7 +247,12 @@ class TaskRunner{
                     log.warn(common.get_log_str('task_runner.js', 'exit-callback', `Worker stopped with exit code ${code}`));
                     this.end_task(new Error(`Worker stopped with exit code ${code}`));
                 }else{
-                    if(this.pay_window == undefined) this.end_task();
+                    if(this.pay_window == undefined){
+                        this.end_task();
+                    }else{
+                        this.checkout_wait.release();
+                        this.pay_window.unsetModalView();
+                    }
                 }
             });
         });

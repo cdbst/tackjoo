@@ -166,7 +166,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             }else if(billing_info.pay_method === 'kakaopay'){
                 open_pay_window_api = 'open_kakaopay_window';
             }
-            global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
+            await global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
         }catch(e){
             let _err = new OpenPayWindowError(kakao_data, "Open pay window fail");
             _err.stack = e.stack;
@@ -178,6 +178,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
         // STEP10 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
+        await common.async_sleep(1500);
         const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
