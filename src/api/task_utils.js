@@ -1,5 +1,5 @@
 const common = require("../common/common.js");
-const TaskCommon = require('./task_common.js');
+const TaskCommon = require('./task_common.js')
 
 module.exports.is_valid_billing_info_to_tasking = (billing_info) =>{
     if(billing_info == undefined) return false;
@@ -137,6 +137,15 @@ module.exports.open_product_page = async (browser_context, product_info) => {
         return undefined;
     }
     return common.merge_object(product_info, new_product_info);
+}
+
+module.exports.get_product_sku_inventory = async (browser_context, product_info) => {
+
+    const sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info.product_id);
+    if(sku_inventory_info == undefined){
+        return undefined;
+    }
+    return sku_inventory_info;
 }
 
 module.exports.apply_draw = async(browser_context, product_info, size_info) =>{

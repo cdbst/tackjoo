@@ -211,7 +211,7 @@ class BrowserContext {
     async __http_request(method, url, headers, params, send_sensor_data = true){
 
         if(send_sensor_data){
-            await this.__send_fake_sensor_data();
+            this.__send_fake_sensor_data();
         }
 
         if(headers == undefined) headers = {};

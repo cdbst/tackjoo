@@ -12,6 +12,20 @@ class TaskInfoError extends Error {
     }
 }
 
+class GetSkuInventoryError extends Error {
+    constructor(product_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, GetSkuInventoryError);
+        }
+
+        this.name = 'GetSkuInventoryError';
+        this.product_info = product_info;
+    }
+}
+
 class TaskCanceledError extends Error {
     constructor(task_runner, ...params) {
       
@@ -200,3 +214,4 @@ module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
 module.exports.OpenKakaoPayWindowError = OpenKakaoPayWindowError;
 module.exports.TaskCanceledError = TaskCanceledError;
 module.exports.LoginError = LoginError;
+module.exports.GetSkuInventoryError = GetSkuInventoryError;
