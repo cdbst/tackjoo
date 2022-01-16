@@ -25,6 +25,8 @@ class ProductManager{
                 return;
             };
 
+            this.__product_info_list = [];
+
             product_info_list.forEach((_product_info) =>{
 
                 let product_info = common.get_product_info_obj_scheme();
