@@ -8,6 +8,8 @@ const package_files = [
     'update.css',
     'update.js',
     'update.html',
+    'checkout_wait.css',
+    'checkout_wait.html',
     'package.json',
     'package-lock.json'
 ];

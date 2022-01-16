@@ -1,0 +1,44 @@
+
+/*
+ * Base structure
+ */
+
+body {
+  overflow: hidden !important;
+}
+
+.contents-title {
+  color : #83f195 !important;
+  font-weight: bold !important;
+}
+
+#update-progress-bar {
+  background-color : #83f195 !important;
+}
+
+#update_message {
+  font-weight: bold !important;
+  word-wrap: break-word !important;
+}
+
+.contents-main {
+  max-width: 340px;
+  max-height: 500px;
+  width : 340px;
+  height : 500px;
+  margin-top : 60px;
+  overflow-y: hidden;
+}
+
+.rotate {
+  animation: rotation 8s infinite linear;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

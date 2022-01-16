@@ -225,7 +225,7 @@ class BrowserContext {
             method: method,
             url: url,
             timeout: this.__req_timout,
-            headers : headers,
+            headers : headers
         };
 
         let proxy_cfg = this.__get_proxy_cfg();

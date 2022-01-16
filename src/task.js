@@ -1,10 +1,11 @@
 const {parentPort, workerData} = require('worker_threads');
 const common = require("./common/common.js");
 const TaskUtils = require('./api/task_utils.js');
+const product_page_parser = require('./api/product_page_parser.js');
 const BrowserContext = require('./api/browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenKakaoPayWindowError, LoginError} = require('./api/task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenPayWindowError, LoginError, GetSkuInventoryError} = require('./api/task_errors.js');
 
 const log = require('electron-log');
 const app_cfg = require('./app_config');
@@ -68,8 +69,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
     if(browser_context.proxy_info !== undefined || //프록시가 셋팅 되어 있으면 무조건 로그인을 다시한다.
         browser_context.login_date === undefined ||  //로그인을 아직 하지 않은 상태라면 로그인을 시도한다.
-        is_login_session_expired) // 로그인이 되어 있지만, 로그인 세션이 만료됐다면 다시 로그인을 시도한다.
-        {
+        is_login_session_expired){ // 로그인이 되어 있지만, 로그인 세션이 만료됐다면 다시 로그인을 시도한다.
+        
         // STEP1.5 : Check validation of Task Information.
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_LOGIN]);
         const login_result = await TaskUtils.login(browser_context);
@@ -78,12 +79,14 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
     }
     
-    // STEP2 : Open Product Page
-    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
-    product_info = await TaskUtils.open_product_page(browser_context, product_info);
-    if(product_info == undefined){
-        throw new OpenProductPageError("Cannot open product page info");
+    // STEP2 : Get Sku inventory information
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
+    const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info);
+    if(sku_inventory_info == undefined){
+        throw new GetSkuInventoryError("Cannot gathering product inventory info");
     }
+    
+    product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
     
     // STEP3 : Check validation : Product Info is possible to tasking.
     if(TaskUtils.is_valid_product_info_to_tasking(product_info) == false){
@@ -91,7 +94,6 @@ async function main(browser_context, task_info, product_info, billing_info, sett
     }
 
     // STEP4 : Judge product size to checkout.
-    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
     const size_info = TaskUtils.judge_appropreate_size_info(product_info, task_info);
     if(size_info == undefined){
         throw new SizeInfoError(product_info, task_info, "Cannot found to proudct size information");
@@ -129,21 +131,13 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
 
-        // STEP8 : Click checkout button (결제 버튼 클릭)
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
-        await common.async_sleep(1000);
-        let checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
-        if(checkout_result == undefined){
-            throw new CheckOutRequestError("Fail with checkout request");
-        }
-
-        // STEP9 : prepare kakaopay
+        // STEP8 : prepare kakaopay
         const pay_url = await TaskUtils.prepare_pay(browser_context, pay_prepare_payload, billing_info);
         if(pay_url == undefined){
             throw new PrepareKakaoPayError(pay_prepare_payload, "Fail with prepare kakaopay")
         }
 
-        // STEP10 : open kakaopay checkout window
+        // STEP9 : open kakaopay checkout window
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
         try{
             let open_pay_window_api = undefined;
@@ -154,10 +148,18 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             }
             await global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
         }catch(e){
-            let _err = new OpenKakaoPayWindowError(kakao_data, "Open kakaopay window fail");
+            let _err = new OpenPayWindowError(kakao_data, "Open pay window fail");
             _err.stack = e.stack;
             _err.message = e.message;
             throw _err;
+        }
+
+        // STEP10 : Click checkout button (결제 버튼 클릭)
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
+        await common.async_sleep(2000);
+        const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
+        if(checkout_result == undefined){
+            throw new CheckOutRequestError("Fail with checkout request");
         }
 
         process.exit(0);

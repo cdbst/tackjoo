@@ -49,6 +49,7 @@ let get_product_list_info_from_feed_page = ($) => {
         let sell_type_text = undefined;
         let product_url = undefined;
         let product_img_url = undefined;
+        let product_id = undefined;
         
         for(var i = 0; i < maybe_meaningful_nodes.length; i++){
             let maybe_meaningful_node = maybe_meaningful_nodes[i];
@@ -65,6 +66,8 @@ let get_product_list_info_from_feed_page = ($) => {
                 sell_type_text = maybe_meaningful_node.childNodes[0].data;
             }else if(maybe_meaningful_node.name == 'button' && parser_common.has_specific_attrs(maybe_meaningful_node, {'data-qa' : ['theme-feed'] })){
                 sell_type_text = maybe_meaningful_node.childNodes[0].data;
+            }else if(maybe_meaningful_node.name == 'div' && parser_common.has_attr(maybe_meaningful_node, 'data-id')){
+                product_id = maybe_meaningful_node.attribs['data-id'];
             }
         }
         
@@ -79,6 +82,7 @@ let get_product_list_info_from_feed_page = ($) => {
         common.update_product_info_obj(product_info, 'sell_type', sell_type);
         common.update_product_info_obj(product_info, 'url', product_url);
         common.update_product_info_obj(product_info, 'img_url', product_img_url);
+        common.update_product_info_obj(product_info, 'product_id', product_id);
 
         product_list.push(product_info);
     });

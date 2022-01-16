@@ -12,6 +12,20 @@ class TaskInfoError extends Error {
     }
 }
 
+class GetSkuInventoryError extends Error {
+    constructor(product_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, GetSkuInventoryError);
+        }
+
+        this.name = 'GetSkuInventoryError';
+        this.product_info = product_info;
+    }
+}
+
 class TaskCanceledError extends Error {
     constructor(task_runner, ...params) {
       
@@ -173,17 +187,17 @@ class PrepareKakaoPayError extends Error {
     }
 }
 
-class OpenKakaoPayWindowError extends Error {
+class OpenPayWindowError extends Error {
 
     constructor(kakao_data, ...params) {
       
         super(...params);
   
         if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, OpenKakaoPayWindowError);
+            Error.captureStackTrace(this, OpenPayWindowError);
         }
         this.kakao_data = kakao_data;
-        this.name = 'OpenKakaoPayWindowError';
+        this.name = 'OpenPayWindowError';
     }
 }
 
@@ -197,6 +211,7 @@ module.exports.CheckOutSingleShipError = CheckOutSingleShipError;
 module.exports.CheckOutRequestError = CheckOutRequestError;
 module.exports.PrepareKakaoPayError = PrepareKakaoPayError;
 module.exports.OpenCheckOutPageError = OpenCheckOutPageError;
-module.exports.OpenKakaoPayWindowError = OpenKakaoPayWindowError;
+module.exports.OpenPayWindowError = OpenPayWindowError;
 module.exports.TaskCanceledError = TaskCanceledError;
 module.exports.LoginError = LoginError;
+module.exports.GetSkuInventoryError = GetSkuInventoryError;

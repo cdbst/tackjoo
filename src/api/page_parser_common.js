@@ -40,6 +40,10 @@ function has_class(el, class_names){
     return intersection.length != 0;
 }
 
+function has_attr(el, attr_name){
+    return el.attribs[attr_name] !== undefined;
+}
+
 function has_specific_attrs(el, attr){
     let attr_names = Object.keys(attr);
 
@@ -130,6 +134,7 @@ function strip_usless_string(string){
 module.exports.get_specific_child_text_nodes = get_specific_child_text_nodes;
 module.exports.has_specific_attrs = has_specific_attrs;
 module.exports.has_class = has_class;
+module.exports.has_attr = has_attr;
 module.exports.get_specific_tag_nodes = get_specific_tag_nodes;
 module.exports.get_data_tag_value = get_data_tag_value;
 module.exports.get_data_tag_elem = get_data_tag_elem;

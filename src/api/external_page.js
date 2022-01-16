@@ -1,4 +1,4 @@
-const { BrowserWindow } = require("electron");
+const { BrowserWindow, BrowserView } = require("electron");
 const common = require("../common/common.js");
 const log = require('electron-log');
 
@@ -12,6 +12,8 @@ class ExternalPage{
         this.attach_res_pkt_hooker = this.attach_res_pkt_hooker.bind(this);
         this.attach_web_contents_event_hooker = this.attach_web_contents_event_hooker.bind(this);
         this.call_renderer_api = this.call_renderer_api.bind(this);
+        this.setModalView = this.setModalView.bind(this);
+        this.unsetModalView = this.unsetModalView.bind(this);
 
         this.url = url;
         this.browser_window_opts = browser_window_opts;
@@ -22,6 +24,7 @@ class ExternalPage{
         this.is_opened = false;
 
         this.window_close_event_subscriber = undefined;
+        this.modal_view = undefined;
     }
 
     __set_win_state(is_open){
@@ -123,6 +126,20 @@ class ExternalPage{
 
         this.window.close();
         return true;
+    }
+
+    setModalView(html_path){
+        this.modal_view = new BrowserView();
+        this.window.setBrowserView(this.modal_view);
+
+        const width = this.browser_window_opts.width;
+        const height = this.browser_window_opts.height;
+        this.modal_view.setBounds({ x: 0, y: 0, width: width, height: height });
+        this.modal_view.webContents.loadFile(html_path)
+    }
+
+    unsetModalView(){
+        this.window.removeBrowserView(this.modal_view);
     }
 }
 
