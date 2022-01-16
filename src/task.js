@@ -57,14 +57,10 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
     log.info(common.get_log_str('task.js', 'main', 'task start'));
 
-    let time_stamp = new Date();
-
     // STEP1 : Check validation of Task Information.
     if(TaskUtils.is_valid_billing_info_to_tasking(billing_info) == false){
         throw new TaskInfoError(task_info, "TaskInfo is not valid to tasking");
     }
-
-    time_stamp = common.print_time_duration(log, 'is_valid_billing_info_to_tasking', time_stamp);
 
     const cur_date = new Date();
     const is_login_session_expired = (browser_context.login_date !== undefined) && 
@@ -82,8 +78,6 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             throw new LoginError(browser_context, "Cannot open product page info");
         }
     }
-
-    time_stamp = common.print_time_duration(log, 'login', time_stamp);
     
     // STEP2 : Get Sku inventory information
     global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
@@ -93,23 +87,17 @@ async function main(browser_context, task_info, product_info, billing_info, sett
     }
     
     product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
-
-    time_stamp = common.print_time_duration(log, 'get_product_sku_inventory', time_stamp);
     
     // STEP3 : Check validation : Product Info is possible to tasking.
     if(TaskUtils.is_valid_product_info_to_tasking(product_info) == false){
         throw new ProductInfoError(product_info, "Product Information is not possible to tasking");
     }
 
-    time_stamp = common.print_time_duration(log, 'is_valid_product_info_to_tasking', time_stamp);
-
     // STEP4 : Judge product size to checkout.
     const size_info = TaskUtils.judge_appropreate_size_info(product_info, task_info);
     if(size_info == undefined){
         throw new SizeInfoError(product_info, task_info, "Cannot found to proudct size information");
     }
-
-    time_stamp = common.print_time_duration(log, 'judge_appropreate_size_info', time_stamp);
     
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
@@ -131,15 +119,11 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             throw new AddToCartError(product_info, size_info, "Fail with add to cart");
         }
 
-        time_stamp = common.print_time_duration(log, 'add_to_cart', time_stamp);
-
         // STEP6 : open checkout page
         const open_checkout_page_result = await TaskUtils.open_checkout_page(browser_context, product_info);
         if(open_checkout_page_result == false){
             throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
         }
-
-        time_stamp = common.print_time_duration(log, 'open_checkout_page', time_stamp);
 
         // STEP7 : chekcout singleship (registering buyer address info)
         const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
@@ -147,15 +131,11 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
 
-        time_stamp = common.print_time_duration(log, 'checkout_singleship', time_stamp);
-
         // STEP8 : prepare kakaopay
         const pay_url = await TaskUtils.prepare_pay(browser_context, pay_prepare_payload, billing_info);
         if(pay_url == undefined){
             throw new PrepareKakaoPayError(pay_prepare_payload, "Fail with prepare kakaopay")
         }
-
-        time_stamp = common.print_time_duration(log, 'prepare_pay', time_stamp);
 
         // STEP9 : open kakaopay checkout window
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
@@ -174,8 +154,6 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             throw _err;
         }
 
-        time_stamp = common.print_time_duration(log, 'open_pay_window_api', time_stamp);
-
         // STEP10 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
         await common.async_sleep(2000);
@@ -183,8 +161,6 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
         }
-
-        common.print_time_duration(log, 'checkout_request', time_stamp);
 
         process.exit(0);
     }
