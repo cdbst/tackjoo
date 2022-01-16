@@ -46,7 +46,7 @@ function register(){
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
             }finally{
                 TaskRunnerManager.remove(task_runner.task_info._id);
-                IPRequestLock.release(proxy_ip, proxy_port)
+                IPRequestLock.release(proxy_ip, proxy_port);
             }
         })();
     });
