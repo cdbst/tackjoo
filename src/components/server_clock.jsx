@@ -80,7 +80,7 @@ class ServerClock{
             if(xhr.readyState === 4){
                 const after_req_timestamp = new Date();
                 let server_date = new Date(xhr.getResponseHeader("Date"));
-                server_date.setMilliseconds(server_date.getMilliseconds() + (after_req_timestamp - before_req_timestamp));
+                server_date.setMilliseconds(server_date.getMilliseconds() + Math.floor((after_req_timestamp - before_req_timestamp) / 2));
                 __callback(server_date);
             }
         };
