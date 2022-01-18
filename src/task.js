@@ -79,15 +79,23 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
     }
     
-    // STEP2 : Get Sku inventory information
-    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
-    const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info);
-    if(sku_inventory_info == undefined){
-        throw new GetSkuInventoryError("Cannot gathering product inventory info");
+    if(product_info.sell_type === common.SELL_TYPE.draw){
+        // STEP2 : Open Product Page
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
+        product_info = await TaskUtils.open_product_page(browser_context, product_info);
+        if(product_info == undefined){
+            throw new OpenProductPageError("Cannot open product page info");
+        }
+    }else{
+        // STEP2 : Get Sku inventory information
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
+        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info);
+        if(sku_inventory_info == undefined){
+            throw new GetSkuInventoryError("Cannot gathering product inventory info");
+        }
+        product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
     }
-    
-    product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
-    
+
     // STEP3 : Check validation : Product Info is possible to tasking.
     if(TaskUtils.is_valid_product_info_to_tasking(product_info) == false){
         throw new ProductInfoError(product_info, "Product Information is not possible to tasking");
