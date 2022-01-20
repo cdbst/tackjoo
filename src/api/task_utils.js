@@ -23,24 +23,20 @@ module.exports.is_valid_billing_info_to_tasking = (billing_info) =>{
 
 module.exports.is_valid_product_info_to_tasking = (product_info) =>{
 
-    if(product_info == undefined) return false;
-    if(product_info.soldout == undefined || product_info.soldout == true) return false;
-    if(product_info.sell_type != common.SELL_TYPE.draw && product_info.item_attr == undefined) return false;
+    if(product_info == undefined) return 'product info is not valid.';
+    if(product_info.soldout == undefined || product_info.soldout == true) return 'product has been probably soldout.';
+    if(product_info.sell_type != common.SELL_TYPE.draw && product_info.item_attr == undefined) return 'product size info is not valid - item_attr info is missing.';
+    if(product_info.size_info_list.length == 0) return 'product has been probably soldout. size info list is empty.';
+    if(product_info.sell_type == common.SELL_TYPE.draw) return undefined;
 
-    if(product_info.size_info_list.length == 0) return false;
-
-    if(product_info.sell_type == common.SELL_TYPE.draw) return true;
-
-    let has_quantity = false;
     for(var i = 0; i < product_info.size_info_list.length; i++){
         let size_info = product_info.size_info_list[i];
         if(size_info.quantity == 1){
-            has_quantity = true;
-            break;
+            return undefined;
         }
     }
 
-    return has_quantity;
+    return 'product has been probably soldout. all of size info quantity is zero';
 }
 
 function judge_appropreate_non_shoe_size_info(product_info, task_info){
