@@ -31,7 +31,7 @@ process.on('unhandledRejection', (err) => {
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         remain_ret_cnt--;
         common.async_sleep(task_ret_interval).then(()=>{
-            main(browser_context, task_info, product_info, billing_info);
+            main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
         throw err;
@@ -97,8 +97,9 @@ async function main(browser_context, task_info, product_info, billing_info, sett
     }
 
     // STEP3 : Check validation : Product Info is possible to tasking.
-    if(TaskUtils.is_valid_product_info_to_tasking(product_info) == false){
-        throw new ProductInfoError(product_info, "Product Information is not possible to tasking");
+    const err = TaskUtils.is_valid_product_info_to_tasking(product_info);
+    if(err !== undefined){
+        throw new ProductInfoError(product_info, "Product Information is not possible to tasking\n" + err);
     }
 
     // STEP4 : Judge product size to checkout.
