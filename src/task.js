@@ -31,6 +31,7 @@ process.on('unhandledRejection', (err) => {
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         remain_ret_cnt--;
         common.async_sleep(task_ret_interval).then(()=>{
+            browser_context.open_main_page();
             main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
