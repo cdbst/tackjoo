@@ -180,9 +180,13 @@ function parse_draw_product_page($, _product_info){
 
 function parse_closed_product_page($, _product_info){
     let open_time = parse_ftfs_time_from_product_page($);
-
     if(open_time == undefined) return false;
     common.update_product_info_obj(_product_info, 'open_time', open_time);
+
+    const item_attr = parse_item_attr_from_closed_product_page($);
+    if(item_attr === undefined) return false;
+    common.update_product_info_obj(_product_info, 'item_attr', item_attr);
+
     return true;
 }
 
@@ -207,6 +211,14 @@ function parse_item_attr_from_product_page($){
         item_attr = input_hidden_option.attribs.name;
     });
 
+    return item_attr;
+}
+
+function parse_item_attr_from_closed_product_page($){
+    let item_attr_name = parser_common.get_data_tag_value($, 'div', 'data-bu');
+    if(item_attr_name === undefined) return undefined;
+
+    const item_attr = `itemAttributes[${item_attr_name}_SIZE]`;
     return item_attr;
 }
 
