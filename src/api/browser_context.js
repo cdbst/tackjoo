@@ -878,8 +878,18 @@ class BrowserContext {
                 }
     
                 this.__set_cookie(this.__cookie_storage, res);
+
+                if(('error' in res.data) && (typeof res.data.error) === 'string' && res.data.error.includes('재고가 없습니다')){
+                    log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data.error));
+                    return undefined; // 상품 재고가 없는 상황에서 retry 하는 것은 의미가 없다.
+                }
+
+                if('error' in res.data){
+                    log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data.error));
+                }
     
                 if(('quantityAdded' in res.data) == false || ('cartItemCount' in res.data) == false){
+                    log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data));
                     throw new Error('add_to_cart : recv invalid payload.');
                 }
     
