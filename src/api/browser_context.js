@@ -759,6 +759,7 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'get_product_sku_inventory', e));
+                this.open_main_page(); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
