@@ -1,7 +1,7 @@
 {
-  "name": "snkrsbotkr",
+  "name": "tackjoo",
   "version": "0.7.0",
-  "description": "Nike SNKRS BOT for korean",
+  "description": "TACKJOO Business app",
   "appid": "com.cdbst.snkrsbotkr",
   "copyright": "Copyright on cdbst all right reserved.",
   "main": "app.js",
