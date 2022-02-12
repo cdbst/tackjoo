@@ -97,7 +97,7 @@ class ContentsSignIn extends React.Component {
         return (
             <div className="text-center form-signin d-flex flex-column min-vh-100 justify-content-center align-items-center">
                 <div className="col-md-12">
-                    <h1 className="h3 mb-3 contents-title">SNKRS BOT KR</h1>
+                    <h1 className="h3 mb-3 contents-title">TACKJOO</h1>
                     <br/>
                     <div className="form-floating">
                         <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" />
