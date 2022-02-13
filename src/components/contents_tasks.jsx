@@ -136,7 +136,7 @@ class ContentsTasks extends React.Component {
             let task_info_obj = common.get_task_info_obj_scheme();
             const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
 
-            common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
+            common.update_task_info_obj(task_info_obj, 'product_info', product_info);
             common.update_task_info_obj(task_info_obj, 'size_name', size_name);
             common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
             common.update_task_info_obj(task_info_obj, 'account_email', account_email);
@@ -167,16 +167,13 @@ class ContentsTasks extends React.Component {
     }
 
     __checkTaskDuplicated(task_info_to_check){
-
-        let task_info_to_check_product_info = Index.g_product_mngr.getProductInfo(task_info_to_check.product_info_id);
         
         let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
 
             const task_info = task_table_item.props.task_info;
             if(task_info.account_id != task_info_to_check.account_id) return false;
 
-            let task_info_product_info = Index.g_product_mngr.getProductInfo(task_info.product_info_id);
-            if(task_info_to_check_product_info.sell_type == common.SELL_TYPE.draw && task_info_product_info._id == task_info_to_check_product_info._id) return true;
+            if(task_info_to_check.product_info.sell_type == common.SELL_TYPE.draw && task_info.product_info._id == task_info_to_check_product_info._id) return true;
             else return false;
         });
 

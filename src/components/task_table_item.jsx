@@ -63,7 +63,7 @@ class TaskTableItem extends React.Component {
         if(this.isPossibleToPlay() == false) return;
         this.ref_status_btn.current.disabled = true;
         
-        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+        let product_info = this.props.task_info.product_info;
         if(product_info == undefined){
             Index.g_sys_msg_q.enqueue('에러', '상품 정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             this.ref_status_btn.current.disabled = false;
@@ -170,7 +170,7 @@ class TaskTableItem extends React.Component {
         switch(this.state.status){
             case common.TASK_STATUS.READY : 
                 const cur_server_time = Index.g_server_clock.getServerTime();
-                const product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+                const product_info = this.props.task_info.product_info;
                 return product_info.open_time <= cur_server_time;
             case common.TASK_STATUS.PAUSE : 
                 return true;
@@ -207,7 +207,7 @@ class TaskTableItem extends React.Component {
 
     render(){
         
-        let product_info = Index.g_product_mngr.getProductInfo(this.props.task_info.product_info_id);
+        let product_info = this.props.task_info.product_info;
         let product_name = ProductManager.getProductDescName(product_info);
         let open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
         let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
