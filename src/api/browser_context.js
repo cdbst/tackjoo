@@ -1042,7 +1042,7 @@ class BrowserContext {
             'content-type': 'application/x-www-form-urlencoded',
             'origin': BrowserContext.NIKE_URL,
             'pragma': 'no-cache',
-			'referer' : BrowserContext.NIKE_URL + (product_info.category === 'snkrs' ? '/kr/launch/checkout' : '/kr/ko_kr/checkout'),
+            'referer' : BrowserContext.NIKE_URL + (product_info.category === 'snkrs' ? '/kr/launch/checkout' : '/kr/ko_kr/checkout'),
             'sec-ch-ua': BrowserContext.SEC_CA_UA,
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': 'Windows',
