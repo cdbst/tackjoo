@@ -10,6 +10,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
+        this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
         this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
@@ -19,6 +20,7 @@ class ContentsTasks extends React.Component {
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
+        this.load_link_product_modal_id = 'load-link-product-modal';
 
         this.__ref_product_list_reload_btn = React.createRef();
 
@@ -80,8 +82,11 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    onClickBtnNewTask(){
+    onClickBtnNewTask(product_link_url){
+
         let el_modal = document.getElementById(this.task_edit_modal_id);
+        el_modal.product_link_url = product_link_url;
+
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
     }
@@ -112,6 +117,10 @@ class ContentsTasks extends React.Component {
             let friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
             this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info);
         }
+    }
+
+    onLoadLinkProduct(product_link_url){
+        this.onClickBtnNewTask(product_link_url);
     }
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info){
@@ -211,6 +220,7 @@ class ContentsTasks extends React.Component {
             <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.TASKS}>
                 <div className="container-fluid">
                     <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
+                    <LoadLinkProductModal id={this.load_link_product_modal_id} h_load_product={this.onLoadLinkProduct.bind(this)}/>
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -242,8 +252,11 @@ class ContentsTasks extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
                                 <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
+                                <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
                                 <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작

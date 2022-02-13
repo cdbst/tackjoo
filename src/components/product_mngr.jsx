@@ -101,7 +101,7 @@ class ProductManager{
 
         let size_list = undefined;
 
-        if(product_info != undefined && product_info.size_info_list.length > 0){
+        if(product_info != undefined && product_info.size_info_list != undefined &&product_info.size_info_list.length > 0){
             if(product_info.sell_type == common.SELL_TYPE.draw){
                 size_list = product_info['size_info_list'].map((size_info) => size_info.friendly_name);
             }else{

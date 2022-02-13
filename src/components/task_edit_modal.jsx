@@ -15,6 +15,7 @@ class TaskEditModal extends React.Component {
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
         this.setLoadingStatus = this.setLoadingStatus.bind(this);
+        this.setCustomURLProduct = this.setCustomURLProduct.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
@@ -75,12 +76,46 @@ class TaskEditModal extends React.Component {
 
                 if(err) proxy_info_list = [];
 
-                this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
-                    this.onChangeType(
-                        this.ref_options_type.current.getSelectedOptionValue(),
-                        this.ref_options_product.current.getSelectedOptionKey()
-                    );
-                });
+                let el_modal = document.getElementById(this.props.id);
+
+                if(el_modal.product_link_url === undefined){
+
+                    this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
+                        this.onChangeType(
+                            this.ref_options_type.current.getSelectedOptionValue(),
+                            this.ref_options_product.current.getSelectedOptionKey()
+                        );
+                    });
+
+                }else{                    
+                    this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
+                }
+            });
+        });
+    }
+
+    setCustomURLProduct(product_link_url, account_info_list, proxy_info_list){
+
+        this.setLoadingStatus(true);
+
+        window.electron.getProductInfo(product_link_url, (error, product_info) =>{
+
+            this.setLoadingStatus(false);
+            
+            if(product_info == undefined){
+                Index.g_sys_msg_q.enqueue('에러', '제품 정보를 읽는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            common.update_product_info_obj(product_info, '_id', common.uuidv4());
+            common.update_product_info_obj(product_info, 'url', product_link_url);
+
+            this.product_info_list = [product_info];
+
+            this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
+                this.setState(_ => ({
+                    selected_product : product_info
+                }));
             });
         });
     }

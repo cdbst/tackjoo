@@ -101,6 +101,18 @@ function get_product_info_from_product_page ($) {
         }else{
             common.update_product_info_obj(_product_info, 'soldout', false);
         }
+
+        const img_url = parse_product_img_src_from_product_page($);
+        if(img_url == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'img_url', img_url);
+
+        const product_name = parse_product_name_form_product_page($);
+        if(product_name == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'name', product_name);
+
+        const product_alt_name = parse_product_alt_name_form_product_page($);
+        if(product_alt_name == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'alt_name', product_alt_name);
         
         let price = parse_price_from_product_page($);
         if(price == undefined) return undefined;
@@ -145,6 +157,19 @@ function get_product_info_from_product_page ($) {
     }
 }
 
+function parse_product_img_src_from_product_page($){
+    try{
+        const img_product_src = $('img[data-ui-gallery-fullscreen-image=primary]');
+        if(img_product_src.length == undefined) return undefined;
+
+        return img_product_src[0].attribs.src;
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_img_src_from_product_page', err));
+        return undefined;
+    }
+}
+
 function parse_price_from_product_page($){
     try{
         let el_price_info_div = $('div.headline-5.pb6-sm.fs14-sm.fs16-md');
@@ -158,6 +183,41 @@ function parse_price_from_product_page($){
         
     }catch(e){
         log.error(common.get_log_str('product_page_parser.js', 'parse_price_from_product_page', e));
+        return undefined;
+    }
+}
+
+function parse_product_name_form_product_page($){
+    try{
+
+        let el_product_alt_name_h1 = $('h1.headline-5.pb3-sm');
+        if(el_product_alt_name_h1.length == undefined) return undefined;
+
+        let product_name_text = parser_common.get_specific_child_text_nodes(el_product_alt_name_h1[0]);
+
+        if(product_name_text.length == 0) return undefined;
+
+        return product_name_text[0].data.trim();
+        
+    }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_name_form_product_page', e));
+        return undefined;
+    }
+}
+
+function parse_product_alt_name_form_product_page($){
+    try{
+        let el_product_name_h5 = $('h5.headline-1.pb3-sm');
+        if(el_product_name_h5.length == undefined) return undefined;
+
+        let product_alt_name_text = parser_common.get_specific_child_text_nodes(el_product_name_h5[0]);
+
+        if(product_alt_name_text.length == 0) return undefined;
+
+        return product_alt_name_text[0].data.trim();
+        
+    }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_alt_name_form_product_page', e));
         return undefined;
     }
 }
