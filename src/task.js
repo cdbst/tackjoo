@@ -136,7 +136,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
 
         // STEP7 : chekcout singleship (registering buyer address info)
-        const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info);
+        const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info, product_info);
         if(pay_prepare_payload == undefined){
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
         }
@@ -167,7 +167,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         // STEP10 : Click checkout button (결제 버튼 클릭)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
         await common.async_sleep(2000);
-        const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info);
+        const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info, product_info);
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
         }

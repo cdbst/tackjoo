@@ -31,7 +31,7 @@ module.exports.is_valid_product_info_to_tasking = (product_info) =>{
 
     for(var i = 0; i < product_info.size_info_list.length; i++){
         let size_info = product_info.size_info_list[i];
-        if(size_info.quantity == 1){
+        if(size_info.quantity > 0){
             return undefined;
         }
     }
@@ -137,7 +137,7 @@ module.exports.open_product_page = async (browser_context, product_info) => {
 
 module.exports.get_product_sku_inventory = async (browser_context, product_info) => {
 
-    const sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info.product_id);
+    const sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info);
     if(sku_inventory_info == undefined){
         return undefined;
     }
@@ -156,13 +156,13 @@ module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
     return res_data;
 }
 
-module.exports.checkout_singleship = async(browser_context, billing_info) =>{
-    const kakaopay_prepare_payload = await browser_context.checkout_singleship(billing_info);
+module.exports.checkout_singleship = async(browser_context, billing_info, product_info) =>{
+    const kakaopay_prepare_payload = await browser_context.checkout_singleship(billing_info, product_info);
     return kakaopay_prepare_payload;
 };
 
-module.exports.checkout_request = async(browser_context, billing_info) =>{
-    const checkout_result = await browser_context.checkout_request(billing_info);
+module.exports.checkout_request = async(browser_context, billing_info, product_info) =>{
+    const checkout_result = await browser_context.checkout_request(billing_info, product_info);
     return checkout_result;
 }
 
