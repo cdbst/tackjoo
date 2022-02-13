@@ -90,10 +90,12 @@ let get_product_list_info_from_feed_page = ($) => {
     return product_list;
 }
 
-function get_product_info_from_product_page ($) {
+function get_snkrs_product_info_from_product_page ($) {
 
     try{
         let _product_info = common.get_product_info_obj_scheme();
+
+        common.update_product_info_obj(_product_info, 'category', 'snkrs');
 
         if($('.product-soldout').length > 0){
             common.update_product_info_obj(_product_info, 'soldout', true);
@@ -101,6 +103,18 @@ function get_product_info_from_product_page ($) {
         }else{
             common.update_product_info_obj(_product_info, 'soldout', false);
         }
+
+        const img_url = parse_product_img_src_from_product_page($);
+        if(img_url == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'img_url', img_url);
+
+        const product_name = parse_product_name_from_product_page($);
+        if(product_name == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'name', product_name);
+
+        const product_alt_name = parse_product_alt_name_from_product_page($);
+        if(product_alt_name == undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'alt_name', product_alt_name);
         
         let price = parse_price_from_product_page($);
         if(price == undefined) return undefined;
@@ -140,7 +154,71 @@ function get_product_info_from_product_page ($) {
         return _product_info;
 
     }catch(e){
-        log.error(common.get_log_str('product_page_parser.js', 'get_product_info_from_product_page', e));
+        log.error(common.get_log_str('product_page_parser.js', 'get_snkrs_product_info_from_product_page', e));
+        return undefined;
+    }
+}
+
+function get_new_released_product_info_from_product_page ($) {
+    try{
+
+        const _product_info = common.get_product_info_obj_scheme();
+        common.update_product_info_obj(_product_info, 'category', 'new_released');
+
+        const product_name = parse_product_name_from_new_released_product_page($);
+        if(product_name === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'name', product_name);
+
+        const model_id = parse_model_id_from_new_released_product_page($);
+        if(model_id === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'model_id', model_id);
+
+        const product_price = parse_product_price_from_new_released_product_page($);
+        if(product_price === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'price', product_price);
+
+        const product_id = parse_product_id_from_new_released_product_page($);
+        if(product_id === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'product_id', product_id);
+
+        const product_options = parse_product_options_from_new_released_product_page($);
+        if(product_options === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'product_options', product_options);
+
+        common.update_product_info_obj(_product_info, 'sell_type', common.SELL_TYPE.normal);
+        common.update_product_info_obj(_product_info, 'item_attr', `itemAttributes[${product_options[0].attributeName}]`);
+        
+        const product_img_url = parse_product_img_url_from_new_released_product_page($);
+        if(product_img_url === undefined) return undefined;
+        common.update_product_info_obj(_product_info, 'img_url', product_img_url);
+
+        return _product_info;
+
+    }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'get_new_released_product_info_from_product_page', e));
+        return undefined;  
+    }
+}
+
+function get_product_info_from_product_page ($) {
+
+    const el_product_option_radio = $('.product-option_radio'); // 해당 element가 존재하면 new released 상품 페이지이다.
+    if(el_product_option_radio.length === 0){
+        return get_snkrs_product_info_from_product_page($);
+    }else{
+        return get_new_released_product_info_from_product_page($);
+    }
+}
+
+function parse_product_img_src_from_product_page($){
+    try{
+        const img_product_src = $('img[data-ui-gallery-fullscreen-image=primary]');
+        if(img_product_src.length == undefined) return undefined;
+
+        return img_product_src[0].attribs.src;
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_img_src_from_product_page', err));
         return undefined;
     }
 }
@@ -158,6 +236,41 @@ function parse_price_from_product_page($){
         
     }catch(e){
         log.error(common.get_log_str('product_page_parser.js', 'parse_price_from_product_page', e));
+        return undefined;
+    }
+}
+
+function parse_product_name_from_product_page($){
+    try{
+
+        let el_product_alt_name_h1 = $('h1.headline-5.pb3-sm');
+        if(el_product_alt_name_h1.length == undefined) return undefined;
+
+        let product_name_text = parser_common.get_specific_child_text_nodes(el_product_alt_name_h1[0]);
+
+        if(product_name_text.length == 0) return undefined;
+
+        return product_name_text[0].data.trim();
+        
+    }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_name_from_product_page', e));
+        return undefined;
+    }
+}
+
+function parse_product_alt_name_from_product_page($){
+    try{
+        let el_product_name_h5 = $('h5.headline-1.pb3-sm');
+        if(el_product_name_h5.length == undefined) return undefined;
+
+        let product_alt_name_text = parser_common.get_specific_child_text_nodes(el_product_name_h5[0]);
+
+        if(product_alt_name_text.length == 0) return undefined;
+
+        return product_alt_name_text[0].data.trim();
+        
+    }catch(e){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_alt_name_from_product_page', e));
         return undefined;
     }
 }
@@ -521,6 +634,92 @@ function update_product_info_as_sku_inventory_info(product_info, sku_inventory_i
     });
 
     common.update_product_info_obj(product_info, 'size_info_list', _size_info_list);
+}
+
+
+function parse_product_name_from_new_released_product_page($){
+    try{
+        const el_title_wrap = $('.title-wrap');
+        if(el_title_wrap.length === 0) return undefined;
+        const el_span_title = parser_common.get_specific_tag_nodes(el_title_wrap[0], ['span']);
+        if(el_span_title.length === 0) return undefined;
+
+        return el_span_title[0].attribs['data-name'];
+
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_name_from_new_released_product_page', err));
+        return undefined;
+    }
+}
+
+function parse_model_id_from_new_released_product_page($){
+    try{
+
+        const el_span_data_model = $('span[data-model]');
+        if(el_span_data_model.length === 0) return undefined;
+        return el_span_data_model[0].attribs['data-model'];
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_model_id_from_new_released_product_page', err));
+        return undefined;
+    }
+}
+
+function parse_product_price_from_new_released_product_page($){
+    try{
+
+        const el_strong_data_price = $('strong[data-price]');
+        if(el_strong_data_price.length === 0) return undefined;
+
+        const price_text_info = parser_common.get_specific_child_text_nodes(el_strong_data_price[0]);
+        if(price_text_info.length == 0) return undefined;
+
+        return price_text_info[0].data.trim();
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_price_from_new_released_product_page', err));
+        return undefined;
+    }
+}
+
+function parse_product_id_from_new_released_product_page($){
+    try{
+        const el_div_data_product_id = $('div[data-product-id]');
+        if(el_div_data_product_id.length === 0) return undefined;
+
+        return el_div_data_product_id[0].attribs['data-product-id'];
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_id_from_new_released_product_page', err));
+        return undefined;
+    }
+}
+
+function parse_product_options_from_new_released_product_page($){
+    try{
+        const el_div_data_product_options = $('div[data-product-options]');
+        if(el_div_data_product_options.length === 0) return undefined;
+
+        return JSON.parse(el_div_data_product_options[0].attribs['data-product-options']);
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_options_from_new_released_product_page', err));
+        return undefined;
+    }
+}
+
+function parse_product_img_url_from_new_released_product_page($){
+    try{
+        const el_img_data_product_img = $('img[data-product-image]');
+        if(el_img_data_product_img.length === 0) return undefined;
+
+        return el_img_data_product_img[0].attribs['src'];
+
+    }catch(err){
+        log.error(common.get_log_str('product_page_parser.js', 'parse_product_img_url_from_new_released_product_page', err));
+        return undefined;
+    }
 }
 
 

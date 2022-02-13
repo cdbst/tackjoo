@@ -1,4 +1,5 @@
 const Mutex = require('async-mutex').Mutex;
+const { TaskCanceledError } = require("./task_errors.js");
 
 class TaskRunnerManager{
 

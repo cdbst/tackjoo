@@ -10,6 +10,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
+        this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
         this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
@@ -19,6 +20,7 @@ class ContentsTasks extends React.Component {
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
+        this.load_link_product_modal_id = 'load-link-product-modal';
 
         this.__ref_product_list_reload_btn = React.createRef();
 
@@ -80,8 +82,11 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    onClickBtnNewTask(){
+    onClickBtnNewTask(product_link_url){
+
         let el_modal = document.getElementById(this.task_edit_modal_id);
+        el_modal.product_link_url = product_link_url;
+
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
     }
@@ -114,6 +119,10 @@ class ContentsTasks extends React.Component {
         }
     }
 
+    onLoadLinkProduct(product_link_url){
+        this.onClickBtnNewTask(product_link_url);
+    }
+
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info){
 
         window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
@@ -127,7 +136,7 @@ class ContentsTasks extends React.Component {
             let task_info_obj = common.get_task_info_obj_scheme();
             const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
 
-            common.update_task_info_obj(task_info_obj, 'product_info_id', product_info._id);
+            common.update_task_info_obj(task_info_obj, 'product_info', product_info);
             common.update_task_info_obj(task_info_obj, 'size_name', size_name);
             common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
             common.update_task_info_obj(task_info_obj, 'account_email', account_email);
@@ -158,16 +167,13 @@ class ContentsTasks extends React.Component {
     }
 
     __checkTaskDuplicated(task_info_to_check){
-
-        let task_info_to_check_product_info = Index.g_product_mngr.getProductInfo(task_info_to_check.product_info_id);
         
         let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
 
             const task_info = task_table_item.props.task_info;
             if(task_info.account_id != task_info_to_check.account_id) return false;
 
-            let task_info_product_info = Index.g_product_mngr.getProductInfo(task_info.product_info_id);
-            if(task_info_to_check_product_info.sell_type == common.SELL_TYPE.draw && task_info_product_info._id == task_info_to_check_product_info._id) return true;
+            if(task_info_to_check.product_info.sell_type == common.SELL_TYPE.draw && task_info.product_info._id == task_info_to_check_product_info._id) return true;
             else return false;
         });
 
@@ -211,6 +217,7 @@ class ContentsTasks extends React.Component {
             <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.TASKS}>
                 <div className="container-fluid">
                     <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
+                    <LoadLinkProductModal id={this.load_link_product_modal_id} h_load_product={this.onLoadLinkProduct.bind(this)}/>
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -242,8 +249,11 @@ class ContentsTasks extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickBtnNewTask.bind(this)}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
                                 <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
+                                <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
                                 <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작

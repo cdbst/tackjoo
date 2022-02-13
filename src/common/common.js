@@ -80,7 +80,7 @@
 
     exports.get_task_info_obj_scheme = function (){
         return {
-            product_info_id : undefined,
+            product_info : undefined,
             size_name : undefined,
             friendly_size_name : undefined,
             account_email : undefined,

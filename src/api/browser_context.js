@@ -701,14 +701,14 @@ class BrowserContext {
         if(product_info == undefined) return undefined;
         if(product_info.sell_type != common.SELL_TYPE.normal) return product_info;
 
-        let sku_inventory_info = await this.get_product_sku_inventory(product_url, product_info.product_id);
+        let sku_inventory_info = await this.get_product_sku_inventory(product_url, product_info);
         if(sku_inventory_info == undefined) return undefined;
 
         product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
         return product_info;
     }
 
-    async get_product_sku_inventory(product_url, product_id){
+    async get_product_sku_inventory(product_url, product_info){
 
         let headers = {
             'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -728,14 +728,21 @@ class BrowserContext {
         };
 
         let params = {
-            productId : product_id,
+            productId : product_info.product_id,
             _ : new Date().getTime()
         };
+
+        let req_url = undefined;
+        if(product_info.category === 'snkrs'){
+            req_url = BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory';
+        }else{
+            req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/productSkuInventory';
+        }
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
 
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory', headers, params);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers, params);
 
                 if(res.status != 200){
                     throw new Error('get_product_sku_inventory : response ' + res.status);
@@ -869,9 +876,16 @@ class BrowserContext {
             "x-requested-with": "XMLHttpRequest"
         };
 
+        let req_url = undefined;
+        if(product_info.category === 'snkrs'){
+            req_url = BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true';
+        }else{
+            req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/cart/add?directOrder=true';
+        }
+
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/cart/add?directOrder=true', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, req_url, headers, payload);
 
                 if(res.status != 200){
                     throw new Error('add_to_cart : invalid response status code.' + res.status);
@@ -911,9 +925,16 @@ class BrowserContext {
         headers['refer'] = product_info.url;
         headers['upgrade-insecure-requests'] = 1;
 
+        let req_url = undefined;
+        if(product_info.category === 'snkrs'){
+            req_url = BrowserContext.NIKE_URL + '/kr/launch/checkout';
+        }else{
+            req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/checkout';
+        }
+
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout', headers);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers);
 
                 if(res.status != 200){
                     throw new Error('open_checkout_page : response ' + res.status);
@@ -937,7 +958,7 @@ class BrowserContext {
         return false;
     }
 
-    async checkout_request(billing_info){
+    async checkout_request(billing_info, product_info){
 
         let headers = {
             'accept':' */*',
@@ -946,7 +967,7 @@ class BrowserContext {
             'cache-control': 'no-cache',
             'cookie': this.__cookie_storage.get_serialized_cookie_data(),
             'pragma': 'no-cache',
-            'referer': BrowserContext.NIKE_URL + '/kr/launch/checkout',
+            'referer': BrowserContext.NIKE_URL + (product_info.category === 'snkrs' ? '/kr/launch/checkout' : '/kr/ko_kr/checkout'),
             'sec-ch-ua': BrowserContext.SEC_CA_UA,
             'sec-ch-ua-mobile':' ?0',
             'sec-ch-ua-platform': "Windows",
@@ -957,6 +978,13 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
+        let req_url = undefined;
+        if(product_info.category === 'snkrs'){
+            req_url = BrowserContext.NIKE_URL + '/kr/launch/checkout/request';
+        }else{
+            req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/checkout/request';
+        }
+
         let params = {
             pay_method: billing_info.pay_method === 'kakaopay' ? 'point' : billing_info.pay_method,
             gToken: '',
@@ -965,7 +993,7 @@ class BrowserContext {
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/checkout/request', headers, params);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers, params);
 
                 if(res.status != 200){
                     throw new Error('checkout_request : invalid response status : ' + res.status);
@@ -986,7 +1014,7 @@ class BrowserContext {
         return undefined;
     }
 
-    async checkout_singleship(billing_info){
+    async checkout_singleship(billing_info, product_info){
 
         let payload_obj = {
             'address.isoCountryAlpha2': 'US',
@@ -1014,7 +1042,7 @@ class BrowserContext {
             'content-type': 'application/x-www-form-urlencoded',
             'origin': BrowserContext.NIKE_URL,
             'pragma': 'no-cache',
-            'referer': BrowserContext.NIKE_URL + '/kr/launch/checkout',
+            'referer' : BrowserContext.NIKE_URL + (product_info.category === 'snkrs' ? '/kr/launch/checkout' : '/kr/ko_kr/checkout'),
             'sec-ch-ua': BrowserContext.SEC_CA_UA,
             'sec-ch-ua-mobile': '?0',
             'sec-ch-ua-platform': 'Windows',
@@ -1023,13 +1051,21 @@ class BrowserContext {
             'sec-fetch-site': 'same-origin',
             'sec-fetch-user': '?1',
             'upgrade-insecure-requests': 1,
-            'user-agent': BrowserContext.USER_AGENT
+            'user-agent': BrowserContext.USER_AGENT,
+            
+        }
+
+        let req_url = undefined;
+        if(product_info.category === 'snkrs'){
+            req_url = BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship';
+        }else{
+            req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/checkout/singleship';
         }
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
 
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/checkout/singleship', headers, payload);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, req_url, headers, payload);
 
                 if(res.status != 200){
                     __callback('checkout_singleship : response invalid status : ' + res.status, undefined);
