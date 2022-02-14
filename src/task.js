@@ -87,6 +87,13 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(product_info == undefined){
             throw new OpenProductPageError("Cannot open product page info");
         }
+    }else if(product_info.sell_type === common.SELL_TYPE.custom){
+        // STEP2 : Open Product Page
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.WAITING_FOR_RELEASE]);
+        product_info = await TaskUtils.open_product_page(browser_context, product_info, -1);
+        if(product_info == undefined){
+            throw new OpenProductPageError("Cannot open product page info - custom product");
+        }
     }else{
         // STEP2 : Get Sku inventory information
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);

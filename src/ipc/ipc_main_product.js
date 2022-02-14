@@ -28,7 +28,7 @@ function register(){
         
         (async () => {
 
-            const product_info = await browser_context.open_product_page(product_url);
+            const product_info = await browser_context.open_product_page(product_url, 2);
             if(product_info == undefined){
                 log.error(common.get_log_str('ipc_main_product.js', 'get-product-info-callback', 'Cannot open product page'));
                 event.reply('get-product-info-reply' + data.id, {err : 'Cannot open product page', data : undefined});

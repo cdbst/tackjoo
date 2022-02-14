@@ -184,6 +184,17 @@ class ProductManager{
         }
 
         return size_name == undefined ? friendly_name : size_name;
+    }
 
+    static getCustomProductInfo(product_url){
+        const product_info = common.get_product_info_obj_scheme();
+        common.update_product_info_obj(product_info, 'name', '');
+        common.update_product_info_obj(product_info, 'alt_name', '');
+        common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.custom);
+        common.update_product_info_obj(product_info, 'url', product_url);
+        common.update_product_info_obj(product_info, 'img_url', './res/img/new-product.png');
+        common.update_product_info_obj(product_info, 'price', '');
+        common.update_product_info_obj(product_info, '_id', common.uuidv4());
+        return product_info;
     }
 }

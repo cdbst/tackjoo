@@ -170,8 +170,12 @@ class TaskTableItem extends React.Component {
         switch(this.state.status){
             case common.TASK_STATUS.READY : 
                 const cur_server_time = Index.g_server_clock.getServerTime();
-                const product_info = this.props.task_info.product_info;
-                return product_info.open_time <= cur_server_time;
+                const task_info = this.props.task_info;
+                if(task_info.product_info.sell_type === common.SELL_TYPE.custom){
+                    return task_info.schedule_time <= cur_server_time;
+                }else{
+                    return task_info.product_info.open_time <= cur_server_time;
+                }
             case common.TASK_STATUS.PAUSE : 
                 return true;
             case common.TASK_STATUS.PLAY : 
@@ -195,6 +199,8 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.GET_PRODUCT_INFO :
                 return false;
             case common.TASK_STATUS.WAITING_FOR_OTHER_TASK:
+                return false;
+            case common.TASK_STATUS.WAITING_FOR_RELEASE:
                 return false;
         }
     }
