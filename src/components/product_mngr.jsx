@@ -192,7 +192,7 @@ class ProductManager{
         common.update_product_info_obj(product_info, 'alt_name', '');
         common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.custom);
         common.update_product_info_obj(product_info, 'url', product_url);
-        common.update_product_info_obj(product_info, 'img_url', './res/img/exclamation-diamond.svg');
+        common.update_product_info_obj(product_info, 'img_url', './res/img/new-product.png');
         common.update_product_info_obj(product_info, 'price', '');
         common.update_product_info_obj(product_info, '_id', common.uuidv4());
         return product_info;
