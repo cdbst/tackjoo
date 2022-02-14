@@ -659,14 +659,16 @@ class BrowserContext {
         return undefined;
     }
 
-    async open_product_page(product_url){
+    async open_product_page(product_url, retry_cnt = undefined){
 
         let product_info = undefined;
 
         this.__cookie_storage.add_cookie_data('oldCartId=none');
         let headers = this.__get_open_page_header();
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
 
             try{
 

@@ -98,13 +98,18 @@ class TaskEditModal extends React.Component {
 
         this.setLoadingStatus(true);
 
+        Index.g_sys_msg_q.enqueue('알림', '제품 정보 읽어오는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+
         window.electron.getProductInfo(product_link_url, (error, product_info) =>{
 
             this.setLoadingStatus(false);
             
             if(product_info == undefined){
-                Index.g_sys_msg_q.enqueue('에러', '제품 정보를 읽는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('경고', '제품 정보를 읽는데 실패했습니다. 아직 미출시 상태의 상품 링크이거나 올바른 링크가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 4000);
                 return;
+                //TODO 아직 미출시 상품의 경우 처리.
+            }else{
+                Index.g_sys_msg_q.enqueue('알림', '제품 정보를 성공적으로 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
             }
 
             common.update_product_info_obj(product_info, '_id', common.uuidv4());
