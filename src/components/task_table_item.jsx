@@ -196,6 +196,8 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.WAITING_FOR_OTHER_TASK:
                 return false;
+            case common.TASK_STATUS.WAITING_FOR_RELEASE:
+                return false;
         }
     }
 

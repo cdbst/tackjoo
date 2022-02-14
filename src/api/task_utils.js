@@ -126,9 +126,9 @@ module.exports.login = async (browser_context) => {
     return result;
 }
 
-module.exports.open_product_page = async (browser_context, product_info) => {
+module.exports.open_product_page = async (browser_context, product_info, retry_cnt) => {
 
-    const new_product_info = await browser_context.open_product_page(product_info.url);
+    const new_product_info = await browser_context.open_product_page(product_info.url, retry_cnt);
     if(new_product_info == undefined){
         return undefined;
     }

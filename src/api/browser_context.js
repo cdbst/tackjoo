@@ -666,9 +666,13 @@ class BrowserContext {
         this.__cookie_storage.add_cookie_data('oldCartId=none');
         let headers = this.__get_open_page_header();
 
-        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+        let __retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+        __retry_cnt = Math.abs(__retry_cnt);
 
-        for(var i = 0; i < retry_cnt; i++){
+        for(var i = 0; i < __retry_cnt; ++i){
+
+            //파라메터로 전달받은 retry_cnt가 음수값인 경우, 무한 반복한다.
+            if(retry_cnt < 0) i--;
 
             try{
 
