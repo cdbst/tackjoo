@@ -3,6 +3,7 @@ class TaskEditModal extends React.Component {
     EL_ID_MODAL_SELECT_TYPE = 'edit-task-type-select';
     EL_ID_MODAL_SELECT_PRODUCT = 'edit-task-product-select';
     EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input";
+    EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME = 'edit-task-custom-product-name-input';
     static ACCOUNT_OPTION_NAME_ALL = '모든 계정'; 
 
     constructor(props) {
@@ -30,6 +31,7 @@ class TaskEditModal extends React.Component {
         this.ref_options_size = React.createRef();
         this.ref_options_type = React.createRef();
         this.ref_options_product = React.createRef();
+        this.ref_options_custom_product = React.createRef();
         this.ref_options_account = React.createRef();
         this.ref_options_proxy = React.createRef();
         
@@ -106,14 +108,14 @@ class TaskEditModal extends React.Component {
             
             if(product_info == undefined){
                 Index.g_sys_msg_q.enqueue('경고', '제품 정보를 읽는데 실패했습니다. 아직 미출시 상태의 상품 링크이거나 올바른 링크가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 4000);
-                return;
-                //TODO 아직 미출시 상품의 경우 처리.
+
+                product_info = ProductManager.getCustomProductInfo(product_link_url);
             }else{
                 Index.g_sys_msg_q.enqueue('알림', '제품 정보를 성공적으로 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
-            }
 
-            common.update_product_info_obj(product_info, '_id', common.uuidv4());
-            common.update_product_info_obj(product_info, 'url', product_link_url);
+                common.update_product_info_obj(product_info, '_id', common.uuidv4());
+                common.update_product_info_obj(product_info, 'url', product_link_url);
+            }
 
             this.product_info_list = [product_info];
 
@@ -203,6 +205,16 @@ class TaskEditModal extends React.Component {
             return;
         }
 
+        if(this.state.selected_product.sell_type === common.SELL_TYPE.custom){
+            const custom_product_name = document.getElementById(this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME);
+            if(custom_product_name.value === '' || custom_product_name.value === undefined){
+                Index.g_sys_msg_q.enqueue('에러', "상품 이름을 입력하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }else{
+                common.update_product_info_obj(this.state.selected_product, 'name', custom_product_name.value);
+            }
+        }
+
         const selected_size_list = this.ref_options_size.current.getSelectedOptionValues();
         if(selected_size_list.length == 0){
             Index.g_sys_msg_q.enqueue('에러', "사이즈가 선택되지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -264,19 +276,26 @@ class TaskEditModal extends React.Component {
 
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
 
-        if(open_time_str != '') this.schedule_time_input_instance.setDate(open_time_str, false);
+        if(open_time_str != ''){
+            this.schedule_time_input_instance.setDate(open_time_str, false);
+        }else if(product_sell_type === common.SELL_TYPE.custom ){
+            this.schedule_time_input_instance.setDate(common.get_formatted_date_str(new Date(), true), false);
+        }
 
         let porxy_alias_list = this.state.proxy_info_list.map((proxy_info => proxy_info.alias));
         porxy_alias_list.unshift('');
         let porxy__id_list = this.state.proxy_info_list.map((proxy_info => proxy_info._id));
         porxy__id_list.unshift('');
 
+        let modal_title_text = '';
+        if(this.state.selected_product) modal_title_text = this.state.selected_product.sell_type === common.SELL_TYPE.custom ? '커스텀 작업 생성하기' : product_desc_name;
+        
         return (
             <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id={this.props.id + '-label'}>{product_desc_name}</h5>
+                            <h5 className="modal-title" id={this.props.id + '-label'}>{modal_title_text}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -289,11 +308,17 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
                                     <LabelSelect ref={this.ref_options_type} label="유형" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
                                     <LabelSelect ref={this.ref_options_product} label="상품" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
+                                </div>
+                                <div className="col-md-12" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'none' : 'block'}}>
+                                    <div className="form-floating">
+                                        <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME} style={{"--width" : "100%"}} placeholder="조던 1 하이 XXX" />
+                                        <label className="common-input-label" htmlFor={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME}>상품 이름 입력란</label>
+                                    </div>
                                 </div>
                             </div>
                             <hr/>
