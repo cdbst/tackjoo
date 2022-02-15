@@ -40,7 +40,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 process.on('exit', (code) => {
-    global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
+    //global.MainThreadApiCaller.call('sync_browser_context', [JSON.stringify(browser_context)]);
     log.info(common.get_log_str('task.js', 'main', 'task thread exit with : ' + code));
 });
 
@@ -68,7 +68,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         (settings_info.nike_login_session_timeout !== 0) &&
         (cur_date > common.add_minutes(browser_context.login_date, settings_info.nike_login_session_timeout));
 
-    if(browser_context.proxy_info !== undefined || //프록시가 셋팅 되어 있으면 무조건 로그인을 다시한다.
+    if( //browser_context.proxy_info !== undefined || //프록시가 셋팅 되어 있으면 무조건 로그인을 다시한다.
         browser_context.login_date === undefined ||  //로그인을 아직 하지 않은 상태라면 로그인을 시도한다.
         is_login_session_expired){ // 로그인이 되어 있지만, 로그인 세션이 만료됐다면 다시 로그인을 시도한다.
         
