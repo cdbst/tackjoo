@@ -100,12 +100,14 @@ class ProductManager{
     static getProductSizeList(product_info){
 
         let size_list = undefined;
+        let soldout_size_list = [];
 
-        if(product_info != undefined && product_info.size_info_list != undefined &&product_info.size_info_list.length > 0){
+        if(product_info != undefined && product_info.size_info_list != undefined && product_info.size_info_list.length > 0){
             if(product_info.sell_type == common.SELL_TYPE.draw){
                 size_list = product_info['size_info_list'].map((size_info) => size_info.friendly_name);
             }else{
                 size_list = product_info['size_info_list'].filter((size_info) => {return size_info.quantity > 0}).map((size_info) => size_info.friendly_name);
+                soldout_size_list = product_info['size_info_list'].filter((size_info) => {return size_info.quantity === 0}).map((size_info) => size_info.friendly_name);
             }
             
         }else if(product_info != undefined){
@@ -114,7 +116,7 @@ class ProductManager{
             size_list = [];
         }
 
-        return size_list
+        return [size_list, soldout_size_list]
     }
 
     static getDefaultSizeNameList(){

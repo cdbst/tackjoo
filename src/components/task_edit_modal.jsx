@@ -264,7 +264,20 @@ class TaskEditModal extends React.Component {
         let product_img_url = this.state.selected_product == undefined ? './res/img/exclamation-diamond.svg' : this.state.selected_product.img_url;
         let product_desc_name = this.state.selected_product == undefined ? '' : ProductManager.getProductDescName(this.state.selected_product);
 
-        let size_list = ProductManager.getProductSizeList(this.state.selected_product);
+        const size_list_info = ProductManager.getProductSizeList(this.state.selected_product);
+        const size_list_data = [
+            {
+                label : '사이즈',
+                class : 'col-form-label font-weight-bold task-edit-modal-option-label',
+                options : size_list_info[0]
+            },
+            {
+                label : '품절',
+                class : 'col-form-label font-weight-bold task-edit-modal-option-label-danger',
+                options : size_list_info[1]
+            }
+        ];
+
 
         let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
         if(account_email_list.length > 0){
@@ -324,7 +337,10 @@ class TaskEditModal extends React.Component {
                             <hr/>
                             <div className="row">
                                 <div className="col-md-5">
-                                    <LabelMultipleSelect ref={this.ref_options_size} label="사이즈" options={size_list}/>
+                                    <LabelMultipleSelectDual 
+                                        ref={this.ref_options_size}
+                                        data={size_list_data}
+                                    />
                                 </div>
                                 <div className="col-md-7">
                                     <LabelMultipleSelect ref={this.ref_options_account} label="계정" options={account_email_list}/>

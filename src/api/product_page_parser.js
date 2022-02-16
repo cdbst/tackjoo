@@ -16,6 +16,10 @@ function get_sell_type(sell_type_string){
         sell_type = common.SELL_TYPE.draw;
     }else if(text.includes(common.SELL_TYPE.notify.toLowerCase())){
         sell_type = common.SELL_TYPE.notify;
+    }else if(text.includes(common.SELL_TYPE.notify.toLowerCase())){
+        sell_type = common.SELL_TYPE.notify;
+    }else if(text.includes('품절')){
+        sell_type = common.SELL_TYPE.normal;
     }
 
     return sell_type;
@@ -99,7 +103,7 @@ function get_snkrs_product_info_from_product_page ($) {
 
         if($('.product-soldout').length > 0){
             common.update_product_info_obj(_product_info, 'soldout', true);
-            return _product_info;
+            //return _product_info;
         }else{
             common.update_product_info_obj(_product_info, 'soldout', false);
         }
