@@ -105,7 +105,7 @@ class ContentsTasks extends React.Component {
         return schedule_time;
     }
 
-    onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info){
+    onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info, watchdog){
 
         const err_message = ContentsBilling.isValidBillingInfo(Index.g_billing_info);
         if(err_message !== undefined){
@@ -115,7 +115,7 @@ class ContentsTasks extends React.Component {
 
         for(var i = 0; i < account_email_list.length; i++){
             let friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
-            this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info);
+            this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info, watchdog);
         }
     }
 
@@ -123,7 +123,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnNewTask(product_link_url);
     }
 
-    __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info){
+    __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
 
         window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
             if(err){
@@ -143,6 +143,7 @@ class ContentsTasks extends React.Component {
             common.update_task_info_obj(task_info_obj, 'account_id', account_id);
             common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
             common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
+            common.update_task_info_obj(task_info_obj, 'watchdog', watchdog);
             common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
 
             if(this.__checkTaskDuplicated(task_info_obj)){

@@ -273,7 +273,7 @@ class TaskRunner{
 
     async end_task(error){
         this.close_pay_window();
-        await this.browser_context.open_main_page();
+        await this.browser_context.open_main_page(1);
         if(error){
             this.reject(error);
         }else{
