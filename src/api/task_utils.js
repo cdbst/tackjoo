@@ -135,7 +135,7 @@ module.exports.open_product_page = async (browser_context, product_info, retry_c
     return common.merge_object(product_info, new_product_info);
 }
 
-module.exports.get_product_sku_inventory = async (browser_context, product_info, watchdog) => {
+module.exports.get_product_sku_inventory = async (browser_context, product_info, watchdog, settings_info) => {
 
     let sku_inventory_info = undefined;
 
@@ -143,7 +143,7 @@ module.exports.get_product_sku_inventory = async (browser_context, product_info,
         do{
             sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info);
             //browser_context.open_main_page();
-            await common.async_sleep(3000);
+            await common.async_sleep(settings_info.restock_watchdog_interval * 1000);
             if(sku_inventory_info == undefined) continue;
         }while(sku_inventory_info.usable === false)
     }else{

@@ -15,7 +15,8 @@ class AppSettings{
             http_max_req_within_same_ip : 3,
             task_ret_cnt : 0,
             task_ret_interval : 1,
-            nike_login_session_timeout : 60 // 분 단위
+            nike_login_session_timeout : 60, // 분 단위
+            restock_watchdog_interval: 3
         }
     }
 

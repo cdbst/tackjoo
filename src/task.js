@@ -101,7 +101,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }else{
             global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
         }
-        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog);
+        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog, settings_info);
         if(sku_inventory_info == undefined){
             throw new GetSkuInventoryError("Cannot gathering product inventory info");
         }
