@@ -21,6 +21,10 @@ class LabelMultipleSelectDual extends React.Component {
         }));
     }
 
+    getToggleValue(){
+        return this.state.toggle;
+    }
+
     getOptionItems(items){
         
         const keys = [...Object.keys(items)];

@@ -96,8 +96,12 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
     }else{
         // STEP2 : Get Sku inventory information
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
-        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info);
+        if(task_info.watchdog){
+            global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.WAITING_FOR_RELEASE]);
+        }else{
+            global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
+        }
+        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog);
         if(sku_inventory_info == undefined){
             throw new GetSkuInventoryError("Cannot gathering product inventory info");
         }

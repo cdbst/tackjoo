@@ -221,6 +221,11 @@ class TaskEditModal extends React.Component {
             return;
         }
 
+        const watchdog = this.ref_options_size.current.getToggleValue();
+        if(watchdog){
+            Index.g_sys_msg_q.enqueue('경고', "품절된 사이즈를 등록했습니다. 구매 가능한 사이즈가 확인되면 지정한 사이즈와 가장 유사한 사이즈를 자동 구매합니다.", ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
+        }
+
         let selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
         if(selected_account_email_list.length == 0){
             Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -248,7 +253,7 @@ class TaskEditModal extends React.Component {
             selected_proxy_info = this.state.proxy_info_list.find((proxy_info) => { return proxy_info._id == selected_proxy_id });
         }
         
-        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info);
+        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info, watchdog);
         
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);

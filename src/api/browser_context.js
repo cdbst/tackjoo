@@ -281,7 +281,7 @@ class BrowserContext {
         else return false;
     }
 
-    async open_page(url, __callback){
+    async open_page(url){
 
         let headers = this.__get_open_page_header();
 
@@ -598,11 +598,13 @@ class BrowserContext {
         this.csrfToken = undefined;
     }
 
-    async open_main_page(){
+    async open_main_page(retry_cnt){
 
         let headers = this.__get_open_page_header();
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry_cnt = retry_cnt !== undefined ? retry_cnt : this.__req_retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr', headers);
 
