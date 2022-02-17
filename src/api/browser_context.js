@@ -901,9 +901,10 @@ class BrowserContext {
     
                 this.__set_cookie(this.__cookie_storage, res);
 
-                if(('error' in res.data) && (typeof res.data.error) === 'string' && res.data.error.includes('재고가 없습니다')){
+                if(('error' in res.data) && (typeof res.data.error) === 'string' && 
+                    (res.data.error.includes('재고가 없습니다') || res.data.error.includes('유효하지 않습니다'))){
                     log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data.error));
-                    return undefined; // 상품 재고가 없는 상황에서 retry 하는 것은 의미가 없다.
+                    return size_info; // 상품 재고가 없는 상황에서 retry 하는 것은 의미가 없다. 이와 같은 경우 구매를 시도한 size_info object를 반환한다.
                 }
 
                 if('error' in res.data){
