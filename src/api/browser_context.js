@@ -12,7 +12,7 @@ class BrowserContext {
 
     static NIKE_DOMAIN_NAME = 'www.nike.com';
     static NIKE_URL = common.NIKE_URL;
-    static USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.232 Whale/2.10.124.26 Safari/537.36';
+    static USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.70 Whale/3.13.131.27 Safari/537.36';
     static SEC_CA_UA = "\"Chromium\";v=\"90\", \" Not A;Brand\";v=\"99\", \"Whale\";v=\"2\""
 
     static IAMPORT_URL = 'https://nike-service.iamport.kr';
@@ -281,11 +281,13 @@ class BrowserContext {
         else return false;
     }
 
-    async open_page(url){
+    async open_page(url, retry){
 
         let headers = this.__get_open_page_header();
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry = retry === undefined ? this.__req_retry_cnt : retry;
+
+        for(var i = 0; i < retry; i++){
 
             try{
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, url, headers);
@@ -293,6 +295,9 @@ class BrowserContext {
                 if(res.status != 200){
                     throw new Error('open_page : response ' + res.status);
                 }
+
+                const $ = cheerio.load(res.data);
+                this.__post_process_open_page(res.headers, $);
     
                 return res;
 
@@ -774,7 +779,7 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'get_product_sku_inventory', e));
-                this.open_main_page(); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
+                this.open_page(product_url, 1); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
