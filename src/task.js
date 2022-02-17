@@ -96,11 +96,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         }
     }else{
         // STEP2 : Get Sku inventory information
-        if(task_info.watchdog){
-            global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.WAITING_FOR_RELEASE]);
-        }else{
-            global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
-        }
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
+
         const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog, settings_info);
         if(sku_inventory_info == undefined){
             throw new GetSkuInventoryError("Cannot gathering product inventory info");
@@ -116,7 +113,7 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
     // STEP4 : Judge product size to checkout.
     const size_info = TaskUtils.judge_appropreate_size_info(product_info, task_info);
-    if(size_info == undefined){
+    if(size_info === undefined){
         throw new SizeInfoError(product_info, task_info, "Cannot found to proudct size information");
     }
     

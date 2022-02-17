@@ -39,29 +39,33 @@ module.exports.is_valid_product_info_to_tasking = (product_info) =>{
     return 'product has been probably soldout. all of size info quantity is zero';
 }
 
-function judge_appropreate_non_shoe_size_info(product_info, task_info){
-
-    let size_info_list_has_quantity = [];
+module.exports.judge_appropreate_non_shoe_size_info = (product_info, task_info) => {
 
     if(product_info.sell_type == common.SELL_TYPE.draw){
-
         let target_size_info = product_info.size_info_list.find((size_info) => { return size_info.name === task_info.size_name});
         if(target_size_info != undefined) return target_size_info;
-
-        size_info_list_has_quantity = product_info.size_info_list;
-
-    }else{
-        size_info_list_has_quantity = product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
     }
 
-    if(size_info_list_has_quantity.length == 0){ // 재고가 하나도 없는 상태임.
-        return undefined;
-    }
+    const size_info_list_has_quantity = this.get_size_info_list_has_quantity(product_info);
+    if(size_info_list_has_quantity.length == 0) return undefined;
 
     const target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.name === task_info.size_name} );
     if(target_size_info !== undefined) return target_size_info;
 
     return size_info_list_has_quantity[Math.floor((size_info_list_has_quantity.length - 1) / 2)];
+}
+
+module.exports.get_size_info_list_has_quantity = (product_info) => {
+
+    let size_info_list_has_quantity = [];
+
+    if(product_info.sell_type == common.SELL_TYPE.draw){
+        size_info_list_has_quantity = product_info.size_info_list;
+    }else{
+        size_info_list_has_quantity = product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
+    }
+
+    return size_info_list_has_quantity;
 }
 
 module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
@@ -72,10 +76,16 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
 
     if(product_info.size_info_list.length == 0){
         return undefined;
+    }else if(product_info.size_info_list.length === 1){ // free size일 경우 처리.
+        const maybe_free_size_info = product_info.size_info_list[0];
+        if(maybe_free_size_info.name === 'FREE' || maybe_free_size_info.friendly_name === 'FREE'){
+            if(maybe_free_size_info.quantity > 0) return maybe_free_size_info;
+            else return undefined;
+        }
     }
 
     if(task_info.size_name.replace(/\D/g, '') === ''){ // 신발이 아님.
-        return judge_appropreate_non_shoe_size_info(product_info, task_info);
+        return this.judge_appropreate_non_shoe_size_info(product_info, task_info);
     }
 
     const compare_size = (a, b) => {
@@ -85,22 +95,13 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
         return _a - _b;
     };
 
-    let size_info_list_has_quantity = [];
-
     if(product_info.sell_type == common.SELL_TYPE.draw){
-
         let target_size_info = product_info.size_info_list.find((size_info) => { return compare_size(size_info.name, task_info.size_name) == 0} );
         if(target_size_info != undefined) return target_size_info;
-
-        size_info_list_has_quantity = product_info.size_info_list;
-
-    }else{
-        size_info_list_has_quantity = product_info.size_info_list.filter((size_info) => { return size_info.quantity > 0} );
     }
 
-    if(size_info_list_has_quantity.length == 0){ // 재고가 하나도 없는 상태임.
-        return undefined;
-    }
+    const size_info_list_has_quantity = this.get_size_info_list_has_quantity(product_info);
+    if(size_info_list_has_quantity.length == 0) return undefined;
     
     let target_size_info = size_info_list_has_quantity.find((size_info) => { return compare_size(size_info.name, task_info.size_name) == 0 });
     if(target_size_info != undefined) return target_size_info;
@@ -163,8 +164,18 @@ module.exports.apply_draw = async(browser_context, product_info, size_info) =>{
 
 module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
 
-    const res_data = await browser_context.add_to_cart(product_info, size_info);
-    return res_data;
+    let size_info_has_quantity = this.get_size_info_list_has_quantity(product_info);
+
+    while(true){
+
+        const res_data = await browser_context.add_to_cart(product_info, size_info);
+        if(res_data === undefined) return undefined;
+        if('sku_id' in res_data === false) return res_data;
+
+        size_info_has_quantity = size_info_has_quantity.filter(si => si.sku_id !== res_data.sku_id);
+        const rand_idx = common.get_random_int(0, size_info_has_quantity.length - 1);
+        size_info = size_info_has_quantity[rand_idx];
+    }
 }
 
 module.exports.checkout_singleship = async(browser_context, billing_info, product_info) =>{
