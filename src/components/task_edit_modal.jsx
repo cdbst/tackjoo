@@ -215,10 +215,13 @@ class TaskEditModal extends React.Component {
             }
         }
 
-        const selected_size_list = this.ref_options_size.current.getSelectedOptionValues();
+        let selected_size_list = this.ref_options_size.current.getSelectedOptionValues();
         if(selected_size_list.length == 0){
             Index.g_sys_msg_q.enqueue('에러', "사이즈가 선택되지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
+        }else if(selected_size_list.length === 1 && selected_size_list[0].includes('무작위')){
+            selected_size_list = this.ref_options_size.current.getAllOptionValues();
+            selected_size_list = selected_size_list.filter(selected_size => ( !selected_size.includes('무작위') ));
         }
 
         const watchdog = this.ref_options_size.current.getToggleValue();
@@ -270,6 +273,9 @@ class TaskEditModal extends React.Component {
         let product_desc_name = this.state.selected_product == undefined ? '' : ProductManager.getProductDescName(this.state.selected_product);
 
         const size_list_info = ProductManager.getProductSizeList(this.state.selected_product);
+        size_list_info.forEach((size_list) => {
+            if(size_list.length > 0) size_list.unshift('🎲무작위');
+        });
         const size_list_data = [
             {
                 label : '사이즈',
