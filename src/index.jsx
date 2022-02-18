@@ -60,6 +60,15 @@ class CommonUtils {
             </ul>
         )
     }
+    static fetchReleaseNote(__callback){
+        fetch('https://api.github.com/repos/cdbst/sbkr_release/releases')
+        .then((res)=>{
+            return res.json();
+        })
+        .then((res_json)=>{
+            __callback(res_json);
+        })
+    }
 }
 
 const domContainer = document.querySelector('#index-container');

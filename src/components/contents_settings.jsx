@@ -32,6 +32,7 @@ class ContentsSettings extends React.Component {
         this.getCurrentSettingsInfo = this.getCurrentSettingsInfo.bind(this);
         this.setCurrentSettingsInfo = this.setCurrentSettingsInfo.bind(this);
         this.onClickOpenLogDirectory = this.onClickOpenLogDirectory.bind(this);
+        this.onClickOpenPatchNote = this.onClickOpenPatchNote.bind(this);
 
         this.__mount = false;
     }
@@ -170,6 +171,23 @@ class ContentsSettings extends React.Component {
         });
     }
 
+    onClickOpenPatchNote(){
+        CommonUtils.fetchReleaseNote((release_note_json)=>{
+            let release_note_markdown = '';
+
+            release_note_json.forEach((release_note_obj)=>{
+                const published_date_str = common.get_formatted_date_str(new Date(release_note_obj.published_at));
+                release_note_markdown += `# ${release_note_obj.name} (${published_date_str})\r\n\r\n`;
+                release_note_markdown += release_note_obj.body + '\r\n';
+            });
+
+            const converter = new showdown.Converter();
+            const release_note_html = converter.makeHtml(release_note_markdown);
+            console.log(release_note_html);
+            Index.g_prompt_modal.popModal('에러 정보', release_note_html, ()=>{});
+        });
+    }
+
     render(){
         return(
             <div className="tab-pane fade" id="settings" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.SETTINGS}>
@@ -204,6 +222,9 @@ class ContentsSettings extends React.Component {
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickOpenLogDirectory.bind(this)}>
                                 <img src="./res/img/file-earmark-text-fill.svg" style={{width:24, height:24}}/> 로그폴더
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickOpenPatchNote.bind(this)}>
+                                <img src="./res/img/journal-text.svg" style={{width:24, height:24}}/> 패치노트
                             </button>
                         </div>
                     </div>
