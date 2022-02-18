@@ -4,7 +4,7 @@ class TaskEditModal extends React.Component {
     EL_ID_MODAL_SELECT_PRODUCT = 'edit-task-product-select';
     EL_ID_MODAL_INPUT_SCHDULE_TIME = "schedule-time-input";
     EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME = 'edit-task-custom-product-name-input';
-    static ACCOUNT_OPTION_NAME_ALL = '모든 계정'; 
+    static ACCOUNT_OPTION_NAME_ALL = '⚡모든 계정';
 
     constructor(props) {
         super(props);
@@ -253,12 +253,15 @@ class TaskEditModal extends React.Component {
         }
 
         const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
-        let selected_proxy_info = undefined;
-        if(selected_proxy_id != ''){
-            selected_proxy_info = this.state.proxy_info_list.find((proxy_info) => { return proxy_info._id == selected_proxy_id });
+        let selected_proxy_info_list = [];
+
+        if(selected_proxy_id === '분할할당'){
+            selected_proxy_info_list = this.state.proxy_info_list; // 분할 할당을 선택하면 모든 프록시를 지정한다.( 모든 프록시를 각각의 계정에 분할해서 할당하기 위함이다.)
+        }else if(selected_proxy_id != ''){
+            selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id );
         }
         
-        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info, watchdog);
+        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
         
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
@@ -309,9 +312,17 @@ class TaskEditModal extends React.Component {
         }
 
         let porxy_alias_list = this.state.proxy_info_list.map((proxy_info => proxy_info.alias));
-        porxy_alias_list.unshift('');
         let porxy__id_list = this.state.proxy_info_list.map((proxy_info => proxy_info._id));
-        porxy__id_list.unshift('');
+
+        if(porxy__id_list.length > 0){ // 프로그램에 등록된 프록시가 최소 1개 이상 있을경우, '분할 할당' 옵션을 추가한다.
+            porxy_alias_list.unshift('⚡분할 할당'); // 프록시를 선택하지 않는 옵션을 추가한다.
+            porxy__id_list.unshift('분할할당'); // 프록시를 선택하지 않는 옵션을 추가한다.
+        }
+
+        porxy_alias_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
+        porxy__id_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
+
+
 
         let modal_title_text = '';
         if(this.state.selected_product) modal_title_text = this.state.selected_product.sell_type === common.SELL_TYPE.custom ? '커스텀 작업 생성하기' : product_desc_name;
