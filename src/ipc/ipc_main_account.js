@@ -47,6 +47,31 @@ function register(){
         })();
     });
 
+    ipcMain.on('add-account-list', (event, data) => {
+
+        const account_info_list = data.payload;
+        event.reply('add-account-list-reply' + data.id, undefined);
+
+        for(var i = 0; i < account_info_list.length; i++){
+            const account_info = account_info_list[i];
+            const borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+            BrowserContextManager.add(borwser_context);
+        }
+
+        (async() =>{
+            try{
+                const file_data = BrowserContextManager.get_file_data();
+                await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
+
+                event.reply('add-account-list-reply' + data.id, undefined);
+
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'add-account-list-callback', err));
+                event.reply('add-account-list-reply' + data.id, 'invalid exception has been occurred while registering account information');
+            }
+        })();
+    });
+
     ipcMain.on('remove-account', (event, data) => {
 
         let _id = data.payload.id;

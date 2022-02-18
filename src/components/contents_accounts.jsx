@@ -10,17 +10,20 @@ class ContentsAccounts extends React.Component {
         super(props);
 
         this.addAccount = this.addAccount.bind(this);
+        this.addBulkAccount = this.addBulkAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
         this.getTableItems = this.getTableItems.bind(this);
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
+        this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
 
         this.account_edit_modal_el_id = "edit-account-modal";
+        this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
 
         let account_info = [];
         let table_items = this.getTableItems(account_info);
@@ -81,10 +84,86 @@ class ContentsAccounts extends React.Component {
         };
     }
 
+    //_account_info_list 는 멀티라인 텍스트이다.
+    addBulkAccount(_account_info_list){
+
+        const account_info_list = _account_info_list.split('\n');
+        const error_messages = [];
+        const account_info_obj_list = [];
+
+        for(var i = 0; i < account_info_list.length; i++){
+            const account_info = account_info_list[i];
+
+            if(account_info.trim() === '') continue; // 공백라인은 생략한다.
+
+            const email_pwd_info_array = account_info.split(':');
+            if(email_pwd_info_array.length < 2){
+                error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${account_info})`);
+                continue;
+            }
+
+            const email = email_pwd_info_array.shift().trim();
+            const pwd = email_pwd_info_array.join(':');
+
+            //유효성 검사 : email이 올바른 포멧인지 확인 필요.
+            if(common.is_valid_email(email) == null){
+                error_messages.push(`[${i + 1}]번째 줄의 이메일 값이 올바르지 않습니다. (${account_info})`);
+                continue;
+            }
+            if(pwd === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 비밀번호 값이 빈상태 입니다. (${account_info})`);
+                continue;
+            }
+
+            // 중복 점검 - 현재 새로 계정 들 중에서도 중복인지 확인.
+            let duplicated_account_info = account_info_obj_list.find((account_info_obj) => account_info_obj.email === email);
+            if(duplicated_account_info !== undefined){
+                error_messages.push(`[${i + 1}]번째 줄의 계정 정보는 이미 앞에서 입력됐습니다. (${account_info})`);
+                continue;
+            }
+
+            // 중복 점검 - 기존 리스트.
+            duplicated_account_info = this.state.account_info.find((account_info_obj) => account_info_obj.email === email);
+            if(duplicated_account_info !== undefined){
+                error_messages.push(`[${i + 1}]번째 줄의 계정 정보는 이미 등록된 계정입니다. (${account_info})`);
+                continue;
+            }
+
+            const account_info_obj = this.genAccountObj(email, pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+            account_info_obj_list.push(account_info_obj);            
+        }
+        
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showAccountBulkEditModal()});
+            return;
+        }
+        
+        if(account_info_obj_list.length === 0) return;
+
+        window.electron.addAccountList(account_info_obj_list, (err)=>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '새로운 계정들을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
+            _account_info = [..._account_info, ...account_info_obj_list];
+            this.__updateAccountInfo(_account_info);
+            
+            Index.g_sys_msg_q.enqueue('안내', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
+    }
+
     addAccount(_email, _pwd, _id, save_to_file = true, modal = true){
 
         if(_email == '' || _pwd == ''){
             Index.g_sys_msg_q.enqueue('에러', '올바른 계정 정보를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        if(common.is_valid_email(_email) == null){
+            Index.g_sys_msg_q.enqueue('에러', '유효한 이메일 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -152,6 +231,12 @@ class ContentsAccounts extends React.Component {
         el_pwd_inpt.value = _pwd
 
         let el_modal = document.getElementById(this.account_edit_modal_el_id);
+        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
+    showAccountBulkEditModal(){
+        const el_modal = document.getElementById(this.account_bulk_edit_modal_el_id);
         var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
         bs_obj_modal.show();
     }
@@ -242,6 +327,12 @@ class ContentsAccounts extends React.Component {
             <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ACCOUNTS}>
                 <div className="container-fluid">
                     <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
+                    <TextareaEditModal 
+                        id={this.account_bulk_edit_modal_el_id} 
+                        h_submit={this.addBulkAccount.bind(this)}
+                        title="계정 여러개 추가하기"
+                        desc="한 줄당 계정 하나 👉 testaccount@gmail.com:testpassword"
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -269,6 +360,9 @@ class ContentsAccounts extends React.Component {
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
                                 <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_bulk_edit_modal_el_id}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
                                 <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> 전체로그인

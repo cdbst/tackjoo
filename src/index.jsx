@@ -52,5 +52,15 @@ class Index extends React.Component {
     }
 }
 
+class CommonUtils {
+    static getTextListTag(text_list){
+        return (
+            <ul>
+                {text_list.map((text, idx) => (<li key={idx}>{text}</li>))}
+            </ul>
+        )
+    }
+}
+
 const domContainer = document.querySelector('#index-container');
 ReactDOM.render(e(Index), domContainer);

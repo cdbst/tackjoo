@@ -6,6 +6,7 @@ const jsonDiff = require('json-diff');
 contextBridge.exposeInMainWorld('electron', {
     sendSensorData : _sendSensorData,
     addAccount : _addAccount,
+    addAccountList : _addAccountList,
     removeAccount : _removeAccount,
     login : _login,
     getAccountInfo : _getAccountInfo,
@@ -94,6 +95,21 @@ function _addAccount(_email, _pwd, _id, _save_to_file, __callback){
     ipcRenderer.send('add-account', ipc_data);
 
     ipcRenderer.once('add-account-reply' + ipc_data.id, (event, err) => {
+        __callback(err);
+    });
+}
+
+function _addAccountList(account_info_list, __callback){
+    if(account_info_list.length === 0){
+        __callback('add account list fail : account info list is empty.');
+        return;
+    }
+
+    let ipc_data = get_ipc_data(account_info_list);
+
+    ipcRenderer.send('add-account-list', ipc_data);
+
+    ipcRenderer.once('add-account-list-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 }
