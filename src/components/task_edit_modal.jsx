@@ -51,13 +51,14 @@ class TaskEditModal extends React.Component {
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
 
-        let el_schedule_time_input = document.getElementById(this.EL_ID_MODAL_INPUT_SCHDULE_TIME);
-        this.schedule_time_input_instance = flatpickr(el_schedule_time_input, {
+        this.schedule_time_input_instance = flatpickr('#'+this.EL_ID_MODAL_INPUT_SCHDULE_TIME, {
             enableTime: true,
             time_24hr: true,
             enableSeconds: true,
-            minuteIncrement : 2,
-            dateFormat: "Y-m-d H:i:S"
+            minuteIncrement : 1,
+            dateFormat: "Y-m-d H:i:S",
+            locale: "ko",
+            static : true
         });
     }
 
@@ -316,7 +317,7 @@ class TaskEditModal extends React.Component {
         if(this.state.selected_product) modal_title_text = this.state.selected_product.sell_type === common.SELL_TYPE.custom ? '커스텀 작업 생성하기' : product_desc_name;
         
         return (
-            <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
+            <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -347,18 +348,6 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <hr/>
-                            <div className="row">
-                                <div className="col-md-5">
-                                    <LabelMultipleSelectDual 
-                                        ref={this.ref_options_size}
-                                        data={size_list_data}
-                                    />
-                                </div>
-                                <div className="col-md-7">
-                                    <LabelMultipleSelect ref={this.ref_options_account} label="계정" options={account_email_list}/>
-                                </div>
-                            </div>
-                            <hr/>
                             <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
                                 <div className="row" >
                                     <div className="col-md-2">
@@ -385,6 +374,18 @@ class TaskEditModal extends React.Component {
                                 </div>
                                 <hr/>
                             </div>
+                            <div className="row">
+                                <div className="col-md-5">
+                                    <LabelMultipleSelectDual 
+                                        ref={this.ref_options_size}
+                                        data={size_list_data}
+                                    />
+                                </div>
+                                <div className="col-md-7">
+                                    <LabelMultipleSelect ref={this.ref_options_account} label="계정" options={account_email_list}/>
+                                </div>
+                            </div>
+                            <hr/>
                             <div className="row">
                                 <label className="col-md-2 col-form-label font-weight-bold task-edit-modal-option-label">가격</label>
                                 <label className="col-sm-4 col-form-label font-weight-bold task-edit-modal-option-label">
