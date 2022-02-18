@@ -94,7 +94,7 @@ class ContentsAccounts extends React.Component {
         for(var i = 0; i < account_info_list.length; i++){
             const account_info = account_info_list[i];
 
-            if(account_info === '') continue; // 공백라인은 생략한다.
+            if(account_info.trim() === '') continue; // 공백라인은 생략한다.
 
             const email_pwd_info_array = account_info.split(':');
             if(email_pwd_info_array.length < 2){
