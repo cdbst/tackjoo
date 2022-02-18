@@ -30,8 +30,7 @@ class TextareaEditModal extends React.Component {
     }
 
     onModalshown(e){
-        let el_textarea = document.getElementById(this.EL_ID_MODAL_TEXTAREA);
-        el_textarea.focus();
+        this.editor.focus();
     }
 
     onModalClosed(e){
