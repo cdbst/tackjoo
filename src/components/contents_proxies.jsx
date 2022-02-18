@@ -16,6 +16,7 @@ class ContentsProxies extends React.Component {
 
         this.onClickRemoveProxyInfo = this.onClickRemoveProxyInfo.bind(this);
         this.onClickModifyProxyInfo = this.onClickModifyProxyInfo.bind(this);
+        this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
 
         this.__getProxyInfoObj = this.__getProxyInfoObj.bind(this);
         this.__removeProxyInfo = this.__removeProxyInfo.bind(this);
@@ -136,8 +137,16 @@ class ContentsProxies extends React.Component {
     onClickRemoveProxyInfo(_id){
         this.__removeProxyInfo(_id);
         this.__updateTableItems();
-
         this.__saveProxyInfo();
+    }
+
+    onClickBtnRemoveAll(){
+        Index.g_prompt_modal.popModal('경고', <p>모든 프록시 정보를 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+            this.__proxy_info_list = [];
+            this.__updateTableItems(); 
+            this.__saveProxyInfo();
+        });
     }
 
     __checkProxyInfoValues(ip, port, alias){
@@ -283,7 +292,7 @@ class ContentsProxies extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">프록시</h4>
+                            <h4 className="contents-title">{`프록시(${this.state.proxy_table_list.length})`}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -312,6 +321,9 @@ class ContentsProxies extends React.Component {
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.__openProxyBulkEditModal.bind(this)}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
+                            </button>
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
                         </div>
                     </div>
