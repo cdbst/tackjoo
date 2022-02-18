@@ -221,8 +221,9 @@ class TaskEditModal extends React.Component {
             return;
         }else if(selected_size_list.length === 1 && selected_size_list[0].includes('무작위')){
             selected_size_list = this.ref_options_size.current.getAllOptionValues();
-            selected_size_list = selected_size_list.filter(selected_size => ( !selected_size.includes('무작위') ));
         }
+
+        selected_size_list = selected_size_list.filter(selected_size => ( !selected_size.includes('무작위') )); // 무작위 사이즈는 리스트에서 제거한다.
 
         const watchdog = this.ref_options_size.current.getToggleValue();
         if(watchdog){
