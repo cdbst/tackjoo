@@ -9,6 +9,8 @@ class TextareaEditModal extends React.Component {
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
+
+        this.editor = undefined;
     }
 
     componentDidMount(){
@@ -18,6 +20,13 @@ class TextareaEditModal extends React.Component {
 
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
+
+        const textarea = document.getElementById(this.EL_ID_MODAL_TEXTAREA);
+
+        this.editor = CodeMirror.fromTextArea(textarea, {
+            lineNumbers: true
+        });
+        this.editor.setOption('theme', 'midnight');
     }
 
     onModalshown(e){
@@ -34,11 +43,9 @@ class TextareaEditModal extends React.Component {
     onSubmit(e){
 
         e.preventDefault();
-        
-        let el_textarea = document.getElementById(this.EL_ID_MODAL_TEXTAREA);
 
         //Idd Item Needed;
-        this.props.h_submit(el_textarea.value);
+        this.props.h_submit(this.editor.getValue());
 
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
@@ -60,7 +67,7 @@ class TextareaEditModal extends React.Component {
                                 <label htmlFor={this.EL_ID_MODAL_TEXTAREA} className="col-sm-12 col-form-label font-weight-bold">{this.props.desc}</label>
                             </div>
                             <div >
-                                <textarea className="form-control modal-textarea" id={this.EL_ID_MODAL_TEXTAREA} style={{'--width' : '450px'}}/>
+                                <textarea className="modal-textarea" id={this.EL_ID_MODAL_TEXTAREA}/>
                             </div>
                         </div>
                         <div className="modal-footer">
