@@ -2,6 +2,7 @@
 class ContentsProxies extends React.Component {
 
     proxy_edit_modal_id = 'proxy-edit-modal';
+    proxy_bulk_edit_modal_id = 'proxy-bulk-edit-modal';
 
     constructor(props) {
         super(props);
@@ -9,8 +10,9 @@ class ContentsProxies extends React.Component {
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__getTableItems = this.__getTableItems.bind(this);
         this.onClickAddProxy = this.onClickAddProxy.bind(this);
-        this.onClickAddProxyBulk = this.onClickAddProxyBulk.bind(this);
+        this.onClickAddBulkProxy = this.onClickAddBulkProxy.bind(this);
         this.onCreateProxyInfo = this.onCreateProxyInfo.bind(this);
+        this.onCreateProxyInfoList = this.onCreateProxyInfoList.bind(this);
         this.onModifyProxyInfo = this.onModifyProxyInfo.bind(this);
 
         this.onClickRemoveProxyInfo = this.onClickRemoveProxyInfo.bind(this);
@@ -22,6 +24,7 @@ class ContentsProxies extends React.Component {
         this.__getProxyInfo = this.__getProxyInfo.bind(this);
 
         this.__openProxyEditModal = this.__openProxyEditModal.bind(this);
+        this.__openProxyBulkEditModal = this.__openProxyBulkEditModal.bind(this);
         this.__checkProxyInfoValues = this.__checkProxyInfoValues.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
 
@@ -181,6 +184,10 @@ class ContentsProxies extends React.Component {
         this.__saveProxyInfo();
     }
 
+    onCreateProxyInfoList(proxy_info_list){
+        console.log(proxy_info_list);
+    }
+
     __openProxyEditModal(proxy_info){
         let el_modal = document.getElementById(this.proxy_edit_modal_id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
@@ -199,13 +206,18 @@ class ContentsProxies extends React.Component {
         bs_obj_modal.show();
     }
 
+    __openProxyBulkEditModal(){
+        let el_modal = document.getElementById(this.proxy_bulk_edit_modal_id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
     onClickAddProxy(){
         this.__openProxyEditModal();
     }
 
-    onClickAddProxyBulk(){
-        //TODO 기능 구현 필요.
-        //console.log('onClickAddProxyBulk');
+    onClickAddBulkProxy(){
+        this.__openProxyBulkEditModal();
     }
 
     render() {
@@ -218,6 +230,12 @@ class ContentsProxies extends React.Component {
                         id={this.proxy_edit_modal_id} 
                         h_create_proxy={this.onCreateProxyInfo.bind(this)}
                         h_modify_proxy={this.onModifyProxyInfo.bind(this)}
+                    />
+                    <TextareaEditModal 
+                        id={this.proxy_bulk_edit_modal_id} 
+                        h_submit={this.onCreateProxyInfoList.bind(this)}
+                        title="프록시 여러개 추가하기"
+                        desc="한 줄당 프록시 하나 👉 999.777.888.123:8080 또는 999.777.888.123:8080:아이디:비번"
                     />
                     <br/>
                     <div className="row">
@@ -249,9 +267,9 @@ class ContentsProxies extends React.Component {
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickAddProxy.bind(this)}>
                                 <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
-                            {/* <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddProxyBulk.bind(this)}>
-                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
-                            </button> */}
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddBulkProxy.bind(this)}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
+                            </button>
                         </div>
                     </div>
                 </div>

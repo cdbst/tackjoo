@@ -1,7 +1,5 @@
 class TextareaEditModal extends React.Component {
 
-    EL_ID_MODAL_TEXTAREA = 'modal-textarea';
-
     constructor(props) {
         super(props);
 
@@ -9,6 +7,8 @@ class TextareaEditModal extends React.Component {
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
+
+        this.EL_ID_MODAL_TEXTAREA = 'modal-textarea-' + this.props.id;
 
         this.editor = undefined;
     }
