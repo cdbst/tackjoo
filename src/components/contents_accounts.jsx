@@ -85,13 +85,76 @@ class ContentsAccounts extends React.Component {
 
     //_account_info_list 는 멀티라인 텍스트이다.
     addBulkAccount(_account_info_list){
-        console.log(_account_info_list);
+
+        const account_info_list = _account_info_list.split('\n');
+        const error_messages = [];
+        const account_info_obj_list = [];
+
+        for(var i = 0; i < account_info_list.length; i++){
+            const account_info = account_info_list[i];
+
+            if(account_info === '') continue; // 공백라인은 생략한다.
+
+            const email_pwd_tuple = account_info.split(':');
+            if(email_pwd_tuple.length !== 2){
+                error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${account_info})`);
+                continue;
+            }
+
+            const email = email_pwd_tuple[0].trim();
+            const pwd = email_pwd_tuple[1];
+
+            //유효성 검사 : email이 올바른 포멧인지 확인 필요.
+            if(common.is_valid_email(email) == null){
+                error_messages.push(`[${i + 1}]번째 줄인 이메일 값이 올바르지 않습니다. (${account_info})`);
+                continue;
+            }
+
+            // 중복 점검 - 현재 새로 계정 들 중에서도 중복인지 확인.
+            let duplicated_account_info = account_info_obj_list.find((account_info_obj) => account_info_obj.email === email);
+            if(duplicated_account_info !== undefined){
+                error_messages.push(`[${i + 1}]번째 입력된 계정 정보는 이미 앞에서 입력됐습니다. (${account_info})`);
+                continue;
+            }
+
+            // 중복 점검 - 기존 리스트.
+            duplicated_account_info = this.state.account_info.find((account_info_obj) => account_info_obj.email === email);
+            if(duplicated_account_info !== undefined){
+                error_messages.push(`[${i + 1}]번째 입력된 계정 정보는 이미 등록된 계정입니다. (${account_info})`);
+                continue;
+            }
+
+            const account_info_obj = this.genAccountObj(email, pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+            account_info_obj_list.push(account_info_obj);            
+        }
+        
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{});
+            return;
+        }
+        
+        if(account_info_obj_list.length === 0) return;
+
+        window.electron.addAccountList(account_info_obj_list, (err)=>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '새로운 계정들을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            Index.g_sys_msg_q.enqueue('안내', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     addAccount(_email, _pwd, _id, save_to_file = true, modal = true){
 
         if(_email == '' || _pwd == ''){
             Index.g_sys_msg_q.enqueue('에러', '올바른 계정 정보를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        if(common.is_valid_email(_email) == null){
+            Index.g_sys_msg_q.enqueue('에러', '유효한 이메일 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 

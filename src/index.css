@@ -315,8 +315,7 @@ tbody tr:hover td {
 /* start to TextareaModal */
 .modal-textarea{
     overflow-y: scroll !important;
-    height: 460px;
-    width: 450px;
+    overflow-x: hidden !important;
     resize: none; /* Remove this if you want the user to resize the textarea */
 }
 
