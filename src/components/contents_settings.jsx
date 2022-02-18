@@ -177,14 +177,13 @@ class ContentsSettings extends React.Component {
 
             release_note_json.forEach((release_note_obj)=>{
                 const published_date_str = common.get_formatted_date_str(new Date(release_note_obj.published_at));
-                release_note_markdown += `# ${release_note_obj.name} (${published_date_str})\r\n\r\n`;
-                release_note_markdown += release_note_obj.body + '\r\n';
+                release_note_markdown += `## ${release_note_obj.name} (${published_date_str})\r\n`;
+                release_note_markdown += release_note_obj.body.replace(/###/g, '####') + '\r\n';
             });
 
             const converter = new showdown.Converter();
             const release_note_html = converter.makeHtml(release_note_markdown);
-            console.log(release_note_html);
-            Index.g_prompt_modal.popModal('에러 정보', release_note_html, ()=>{});
+            Index.g_prompt_modal.popModal('패치 노트', (<div className="Container" dangerouslySetInnerHTML={{__html: release_note_html}}></div>), ()=>{});
         });
     }
 

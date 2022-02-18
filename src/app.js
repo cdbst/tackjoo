@@ -65,6 +65,7 @@ function create_update_window() {
         minHeight : 500,
         titleBarStyle: "hidden",
         webPreferences: {
+            devTools: false,
             nodeIntegration: true,
             contextIsolation: false,
             enableRemoteModule: true,
