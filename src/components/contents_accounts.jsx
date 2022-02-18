@@ -151,7 +151,7 @@ class ContentsAccounts extends React.Component {
             _account_info = [..._account_info, ...account_info_obj_list];
             this.__updateAccountInfo(_account_info);
             
-            Index.g_sys_msg_q.enqueue('안내', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('알림', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 

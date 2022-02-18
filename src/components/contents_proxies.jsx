@@ -2,26 +2,29 @@
 class ContentsProxies extends React.Component {
 
     proxy_edit_modal_id = 'proxy-edit-modal';
+    proxy_bulk_edit_modal_id = 'proxy-bulk-edit-modal';
 
     constructor(props) {
         super(props);
 
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__getTableItems = this.__getTableItems.bind(this);
-        this.onClickAddProxy = this.onClickAddProxy.bind(this);
-        this.onClickAddProxyBulk = this.onClickAddProxyBulk.bind(this);
+
         this.onCreateProxyInfo = this.onCreateProxyInfo.bind(this);
+        this.onCreateProxyInfoList = this.onCreateProxyInfoList.bind(this);
         this.onModifyProxyInfo = this.onModifyProxyInfo.bind(this);
 
         this.onClickRemoveProxyInfo = this.onClickRemoveProxyInfo.bind(this);
         this.onClickModifyProxyInfo = this.onClickModifyProxyInfo.bind(this);
+        this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
 
-        this.__addProxyInfo = this.__addProxyInfo.bind(this);
+        this.__getProxyInfoObj = this.__getProxyInfoObj.bind(this);
         this.__removeProxyInfo = this.__removeProxyInfo.bind(this);
         this.__modifyProxyInfo = this.__modifyProxyInfo.bind(this);
         this.__getProxyInfo = this.__getProxyInfo.bind(this);
 
         this.__openProxyEditModal = this.__openProxyEditModal.bind(this);
+        this.__openProxyBulkEditModal = this.__openProxyBulkEditModal.bind(this);
         this.__checkProxyInfoValues = this.__checkProxyInfoValues.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
 
@@ -47,15 +50,15 @@ class ContentsProxies extends React.Component {
         this.username_col_width = 'calc( 100% - ' + (this.actions_col_width + this.port_col_width + this.ip_col_width + this.alias_col_width) + 'px)';
     }
 
-    __addProxyInfo(ip, port, id, pwd, alias){
-        this.__proxy_info_list.push({
+    __getProxyInfoObj(ip, port, id, pwd, alias){
+        return {
             ip : ip,
             port : port,
             id : id,
             pwd : pwd,
             alias : alias,
             _id : common.uuidv4()
-        });
+        }
     }
 
     __modifyProxyInfo(_id, ip, port, id, pwd, alias){
@@ -134,8 +137,16 @@ class ContentsProxies extends React.Component {
     onClickRemoveProxyInfo(_id){
         this.__removeProxyInfo(_id);
         this.__updateTableItems();
-
         this.__saveProxyInfo();
+    }
+
+    onClickBtnRemoveAll(){
+        Index.g_prompt_modal.popModal('경고', <p>모든 프록시 정보를 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+            this.__proxy_info_list = [];
+            this.__updateTableItems(); 
+            this.__saveProxyInfo();
+        });
     }
 
     __checkProxyInfoValues(ip, port, alias){
@@ -175,10 +186,66 @@ class ContentsProxies extends React.Component {
 
     onCreateProxyInfo(ip, port, id, pwd, alias){
         if(this.__checkProxyInfoValues(ip, port, alias) == false) return;
-        this.__addProxyInfo(ip, port, id, pwd, alias);
-        this.__updateTableItems();
-
+        const proxy_info_obj = this.__getProxyInfoObj(ip, port, id, pwd, alias);
+        this.__proxy_info_list.push(proxy_info_obj);
+        this.__updateTableItems(); 
         this.__saveProxyInfo();
+    }
+
+    onCreateProxyInfoList(proxy_info_list){
+        proxy_info_list = proxy_info_list.split('\n');
+        const error_messages = [];
+        const proxy_info_obj_list = [];
+
+        for(var i = 0; i < proxy_info_list.length; i++){
+            const proxy_info_line = proxy_info_list[i];
+            if(proxy_info_line.trim() === '') continue; // 공백라인은 생략한다.
+
+            const porxy_info_array = proxy_info_line.split(':');
+            
+            if(porxy_info_array.length < 2){
+                error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            const ip = porxy_info_array.shift().trim();
+            if(common.is_valid_ip_addr(ip) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 IP주소가 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            const port = porxy_info_array.shift().trim();
+            if(common.is_valid_port_number(port) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 포트번호가 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            let id = porxy_info_array.shift() ;
+            id = id === undefined ? '' : id.trim();
+
+            let pwd = undefined;
+            if(porxy_info_array.length === 0){
+                pwd = '';
+            }else{
+                pwd = porxy_info_array.join(':');
+            }
+
+            const alias = faker.name.findName();
+            proxy_info_obj_list.push(this.__getProxyInfoObj(ip, port, id, pwd, alias));
+        }
+
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.__openProxyBulkEditModal()});
+            return;
+        }
+        
+        if(proxy_info_obj_list.length === 0) return;
+
+        this.__proxy_info_list = [...this.__proxy_info_list, ...proxy_info_obj_list];
+        this.__updateTableItems(); 
+        this.__saveProxyInfo();
+
+        Index.g_sys_msg_q.enqueue('알림', `총 ${proxy_info_obj_list.length} 개의 프록시를 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
     }
 
     __openProxyEditModal(proxy_info){
@@ -199,13 +266,10 @@ class ContentsProxies extends React.Component {
         bs_obj_modal.show();
     }
 
-    onClickAddProxy(){
-        this.__openProxyEditModal();
-    }
-
-    onClickAddProxyBulk(){
-        //TODO 기능 구현 필요.
-        //console.log('onClickAddProxyBulk');
+    __openProxyBulkEditModal(){
+        let el_modal = document.getElementById(this.proxy_bulk_edit_modal_id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     render() {
@@ -219,10 +283,16 @@ class ContentsProxies extends React.Component {
                         h_create_proxy={this.onCreateProxyInfo.bind(this)}
                         h_modify_proxy={this.onModifyProxyInfo.bind(this)}
                     />
+                    <TextareaEditModal 
+                        id={this.proxy_bulk_edit_modal_id} 
+                        h_submit={this.onCreateProxyInfoList.bind(this)}
+                        title="프록시 여러개 추가하기"
+                        desc="한 줄당 프록시 하나 👉 123.123.123.123:8080 또는 123.123.123.123:8080:아이디:비번"
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">프록시</h4>
+                            <h4 className="contents-title">{`프록시(${this.state.proxy_table_list.length})`}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
@@ -246,12 +316,15 @@ class ContentsProxies extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickAddProxy.bind(this)}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.__openProxyEditModal.bind(this)}>
                                 <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
-                            {/* <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddProxyBulk.bind(this)}>
-                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
-                            </button> */}
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.__openProxyBulkEditModal.bind(this)}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
+                            </button>
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
+                            </button>
                         </div>
                     </div>
                 </div>
