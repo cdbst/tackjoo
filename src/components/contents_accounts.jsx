@@ -17,6 +17,7 @@ class ContentsAccounts extends React.Component {
         this.loginAccount = this.loginAccount.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
+        this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
@@ -95,32 +96,36 @@ class ContentsAccounts extends React.Component {
 
             if(account_info === '') continue; // 공백라인은 생략한다.
 
-            const email_pwd_tuple = account_info.split(':');
-            if(email_pwd_tuple.length !== 2){
+            const email_pwd_info_array = account_info.split(':');
+            if(email_pwd_info_array.length < 2){
                 error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${account_info})`);
                 continue;
             }
 
-            const email = email_pwd_tuple[0].trim();
-            const pwd = email_pwd_tuple[1];
+            const email = email_pwd_info_array.shift().trim();
+            const pwd = email_pwd_info_array.join(':');
 
             //유효성 검사 : email이 올바른 포멧인지 확인 필요.
             if(common.is_valid_email(email) == null){
-                error_messages.push(`[${i + 1}]번째 줄인 이메일 값이 올바르지 않습니다. (${account_info})`);
+                error_messages.push(`[${i + 1}]번째 줄의 이메일 값이 올바르지 않습니다. (${account_info})`);
+                continue;
+            }
+            if(pwd === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 비밀번호 값이 빈상태 입니다. (${account_info})`);
                 continue;
             }
 
             // 중복 점검 - 현재 새로 계정 들 중에서도 중복인지 확인.
             let duplicated_account_info = account_info_obj_list.find((account_info_obj) => account_info_obj.email === email);
             if(duplicated_account_info !== undefined){
-                error_messages.push(`[${i + 1}]번째 입력된 계정 정보는 이미 앞에서 입력됐습니다. (${account_info})`);
+                error_messages.push(`[${i + 1}]번째 줄의 계정 정보는 이미 앞에서 입력됐습니다. (${account_info})`);
                 continue;
             }
 
             // 중복 점검 - 기존 리스트.
             duplicated_account_info = this.state.account_info.find((account_info_obj) => account_info_obj.email === email);
             if(duplicated_account_info !== undefined){
-                error_messages.push(`[${i + 1}]번째 입력된 계정 정보는 이미 등록된 계정입니다. (${account_info})`);
+                error_messages.push(`[${i + 1}]번째 줄의 계정 정보는 이미 등록된 계정입니다. (${account_info})`);
                 continue;
             }
 
@@ -129,7 +134,7 @@ class ContentsAccounts extends React.Component {
         }
         
         if(error_messages.length > 0){
-            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{});
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showAccountBulkEditModal()});
             return;
         }
         
@@ -142,6 +147,10 @@ class ContentsAccounts extends React.Component {
                 return;
             }
 
+            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
+            _account_info = [..._account_info, ...account_info_obj_list];
+            this.__updateAccountInfo(_account_info);
+            
             Index.g_sys_msg_q.enqueue('안내', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
@@ -222,6 +231,12 @@ class ContentsAccounts extends React.Component {
         el_pwd_inpt.value = _pwd
 
         let el_modal = document.getElementById(this.account_edit_modal_el_id);
+        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
+    showAccountBulkEditModal(){
+        const el_modal = document.getElementById(this.account_bulk_edit_modal_el_id);
         var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
         bs_obj_modal.show();
     }
