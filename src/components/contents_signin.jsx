@@ -116,7 +116,7 @@ class ContentsSignIn extends React.Component {
                     <div className="mt-3" onClick={this.onClickFindPassword.bind(this)}>
                         <a href="#" className="text-info">비밀번호 찾기</a>
                     </div>
-                    <div className="mt-5 text-muted">Discord Cdbst#2766</div>
+                    <div className="mt-5 text-muted">Discord 문의👉 Takc#8171</div>
                     <div className="text-muted">{`version v${this.app_version}`}</div>
                     <div className="text-muted">&copy; cdbst 2021-2022</div>
                 </div>
