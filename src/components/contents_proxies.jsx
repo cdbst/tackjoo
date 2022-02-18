@@ -287,7 +287,7 @@ class ContentsProxies extends React.Component {
                         id={this.proxy_bulk_edit_modal_id} 
                         h_submit={this.onCreateProxyInfoList.bind(this)}
                         title="프록시 여러개 추가하기"
-                        desc="한 줄당 프록시 하나 👉 999.777.888.123:8080 또는 999.777.888.123:8080:아이디:비번"
+                        desc="한 줄당 프록시 하나 👉 123.123.123.123:8080 또는 123.123.123.123:8080:아이디:비번"
                     />
                     <br/>
                     <div className="row">
