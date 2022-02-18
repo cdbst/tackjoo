@@ -9,8 +9,7 @@ class ContentsProxies extends React.Component {
 
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__getTableItems = this.__getTableItems.bind(this);
-        this.onClickAddProxy = this.onClickAddProxy.bind(this);
-        this.onClickAddBulkProxy = this.onClickAddBulkProxy.bind(this);
+
         this.onCreateProxyInfo = this.onCreateProxyInfo.bind(this);
         this.onCreateProxyInfoList = this.onCreateProxyInfoList.bind(this);
         this.onModifyProxyInfo = this.onModifyProxyInfo.bind(this);
@@ -18,7 +17,7 @@ class ContentsProxies extends React.Component {
         this.onClickRemoveProxyInfo = this.onClickRemoveProxyInfo.bind(this);
         this.onClickModifyProxyInfo = this.onClickModifyProxyInfo.bind(this);
 
-        this.__addProxyInfo = this.__addProxyInfo.bind(this);
+        this.__getProxyInfoObj = this.__getProxyInfoObj.bind(this);
         this.__removeProxyInfo = this.__removeProxyInfo.bind(this);
         this.__modifyProxyInfo = this.__modifyProxyInfo.bind(this);
         this.__getProxyInfo = this.__getProxyInfo.bind(this);
@@ -50,15 +49,15 @@ class ContentsProxies extends React.Component {
         this.username_col_width = 'calc( 100% - ' + (this.actions_col_width + this.port_col_width + this.ip_col_width + this.alias_col_width) + 'px)';
     }
 
-    __addProxyInfo(ip, port, id, pwd, alias){
-        this.__proxy_info_list.push({
+    __getProxyInfoObj(ip, port, id, pwd, alias){
+        return {
             ip : ip,
             port : port,
             id : id,
             pwd : pwd,
             alias : alias,
             _id : common.uuidv4()
-        });
+        }
     }
 
     __modifyProxyInfo(_id, ip, port, id, pwd, alias){
@@ -178,14 +177,66 @@ class ContentsProxies extends React.Component {
 
     onCreateProxyInfo(ip, port, id, pwd, alias){
         if(this.__checkProxyInfoValues(ip, port, alias) == false) return;
-        this.__addProxyInfo(ip, port, id, pwd, alias);
-        this.__updateTableItems();
-
+        const proxy_info_obj = this.__getProxyInfoObj(ip, port, id, pwd, alias);
+        this.__proxy_info_list.push(proxy_info_obj);
+        this.__updateTableItems(); 
         this.__saveProxyInfo();
     }
 
     onCreateProxyInfoList(proxy_info_list){
-        console.log(proxy_info_list);
+        proxy_info_list = proxy_info_list.split('\n');
+        const error_messages = [];
+        const proxy_info_obj_list = [];
+
+        for(var i = 0; i < proxy_info_list.length; i++){
+            const proxy_info_line = proxy_info_list[i];
+            if(proxy_info_line.trim() === '') continue; // 공백라인은 생략한다.
+
+            const porxy_info_array = proxy_info_line.split(':');
+            
+            if(porxy_info_array.length < 2){
+                error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            const ip = porxy_info_array.shift().trim();
+            if(common.is_valid_ip_addr(ip) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 IP주소가 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            const port = porxy_info_array.shift().trim();
+            if(common.is_valid_port_number(port) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 포트번호가 올바르지 않습니다. (${proxy_info_line})`);
+                continue;
+            }
+
+            let id = porxy_info_array.shift() ;
+            id = id === undefined ? '' : id.trim();
+
+            let pwd = undefined;
+            if(porxy_info_array.length === 0){
+                pwd = '';
+            }else{
+                pwd = porxy_info_array.join(':');
+            }
+
+            const alias = faker.name.findName();
+            proxy_info_obj_list.push(this.__getProxyInfoObj(ip, port, id, pwd, alias));
+        }
+
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.__openProxyBulkEditModal()});
+            return;
+        }
+        
+        if(proxy_info_obj_list.length === 0) return;
+
+        this.__proxy_info_list = [...this.__proxy_info_list, ...proxy_info_obj_list];
+        this.__updateTableItems(); 
+        this.__saveProxyInfo();
+
+        Index.g_sys_msg_q.enqueue('알림', `총 ${proxy_info_obj_list.length} 개의 프록시를 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
     }
 
     __openProxyEditModal(proxy_info){
@@ -210,14 +261,6 @@ class ContentsProxies extends React.Component {
         let el_modal = document.getElementById(this.proxy_bulk_edit_modal_id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
-    }
-
-    onClickAddProxy(){
-        this.__openProxyEditModal();
-    }
-
-    onClickAddBulkProxy(){
-        this.__openProxyBulkEditModal();
     }
 
     render() {
@@ -264,10 +307,10 @@ class ContentsProxies extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickAddProxy.bind(this)}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.__openProxyEditModal.bind(this)}>
                                 <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
                             </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickAddBulkProxy.bind(this)}>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.__openProxyBulkEditModal.bind(this)}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
                             </button>
                         </div>
