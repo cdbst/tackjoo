@@ -10,6 +10,7 @@ class ContentsAccounts extends React.Component {
         super(props);
 
         this.addAccount = this.addAccount.bind(this);
+        this.addBulkAccount = this.addBulkAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
         this.getTableItems = this.getTableItems.bind(this);
         this.genAccountObj = this.genAccountObj.bind(this);
@@ -21,6 +22,7 @@ class ContentsAccounts extends React.Component {
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
 
         this.account_edit_modal_el_id = "edit-account-modal";
+        this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
 
         let account_info = [];
         let table_items = this.getTableItems(account_info);
@@ -79,6 +81,11 @@ class ContentsAccounts extends React.Component {
             status : _status,
             id : _id == undefined ? common.uuidv4() : _id
         };
+    }
+
+    //_account_info_list 는 멀티라인 텍스트이다.
+    addBulkAccount(_account_info_list){
+        console.log(_account_info_list);
     }
 
     addAccount(_email, _pwd, _id, save_to_file = true, modal = true){
@@ -242,6 +249,12 @@ class ContentsAccounts extends React.Component {
             <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ACCOUNTS}>
                 <div className="container-fluid">
                     <AccountEditModal id={this.account_edit_modal_el_id} h_add_new_account={this.addAccount.bind(this)}/>
+                    <TextareaEditModal 
+                        id={this.account_bulk_edit_modal_el_id} 
+                        h_submit={this.addBulkAccount.bind(this)}
+                        title="계정 여러개 추가하기"
+                        desc="한 줄당 계정 하나 👉 testaccount@gmail.com:testpassword"
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -269,6 +282,9 @@ class ContentsAccounts extends React.Component {
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_edit_modal_el_id}>
                                 <img src="./res/img/file-plus-fill.svg" style={{width:24, height:24}}/> 추가하기
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_bulk_edit_modal_el_id}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
                             </button>
                             <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
                                 <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> 전체로그인

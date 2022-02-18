@@ -311,3 +311,13 @@ tbody tr:hover td {
     background: inherit !important;
 }
 /* End to Contents Bill */
+
+/* start to TextareaModal */
+.modal-textarea{
+    overflow-y: scroll !important;
+    height: 460px;
+    resize: none; /* Remove this if you want the user to resize the textarea */
+}
+
+
+/*End to TextareaModal */
