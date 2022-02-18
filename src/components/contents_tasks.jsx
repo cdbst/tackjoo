@@ -105,7 +105,7 @@ class ContentsTasks extends React.Component {
         return schedule_time;
     }
 
-    onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info, watchdog){
+    onCreateNewTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info_list, watchdog){
 
         const err_message = ContentsBilling.isValidBillingInfo(Index.g_billing_info);
         if(err_message !== undefined){
@@ -114,8 +114,14 @@ class ContentsTasks extends React.Component {
         }
 
         for(var i = 0; i < account_email_list.length; i++){
-            let friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
-            this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, proxy_info, watchdog);
+            const friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
+
+            let cur_proxy_info = undefined;
+            if(proxy_info_list.length !== 0){
+                cur_proxy_info = proxy_info_list[i % proxy_info_list.length];
+            }
+
+            this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, cur_proxy_info, watchdog);
         }
     }
 
