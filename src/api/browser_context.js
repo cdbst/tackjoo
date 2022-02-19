@@ -132,7 +132,6 @@ class BrowserContext {
     async __post_process_req_fail(error, sleep){
         this.__remove_aws_cookies();
         this.__remove_akam_cookies();
-        console.error(error);
 
         return new Promise((resolve, reject) =>{
             try{
@@ -370,7 +369,7 @@ class BrowserContext {
             return false;
         }
 
-        let result = await this.open_main_page();
+        let result = await this.open_main_page(retry === true ? this.__req_retry_cnt : 1);
         if(result == false){
             this.in_progress_login = false;
             log.error(common.get_log_str('browser_context.js', 'login', 'Cannot open main page'));
@@ -779,8 +778,8 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'get_product_sku_inventory', e));
-                this.open_page(product_url, 1); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
+                await this.open_page(product_url, 1); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
             }
         }
 
