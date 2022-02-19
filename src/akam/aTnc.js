@@ -1164,9 +1164,10 @@
                         var Ih = function(Vh) {
                             Wn(Vh, AU);
                         };
-                        var Ah = function(Eh) {
-                            Wn(Eh, MT);
+                        var Ah = function(Eh, __callback) {
+                            Wn(Eh, MT, __callback);
                         };
+                        window.gen_sensor_data = Ah.bind(this);
                         var Rh = function(ch) {
                             Wn(ch, XT);
                         };
@@ -2123,7 +2124,7 @@
                             zp(kT(vj)),
                             K1++);
                         }
-                        function Wn(XK, jK) {
+                        function Wn(XK, jK, __callback) {
                             var TK = function UK(wK, mK, JK) {
                                 try {
                                     var rK = vj;
@@ -2155,9 +2156,9 @@
                                 } catch (pK) {}
                             }(XK, jK, I3[V3.KA("RNI24", pj)].bmak[V3.CR("0_0$=", DS)]);
                             QZ += TK[V3.ZR("\"\x00", hg)],
-                            VG && UT(MT, jK) && (Px = VT,
+                            true && UT(MT, jK) && (Px = VT,
                             rj(hq, [Ux, VT]),
-                            zp(kT(vj)));
+                            zp(kT(vj), __callback));
                         }
                         function Xh(NK, kK) {
                             var HK = rj(hq, [Rg, AU, NK, kK, I3[V3.KA("RNI24", pj)].bmak[V3.CR("0_0$=", DS)]]);
@@ -2268,24 +2269,12 @@
                             LH = kT(vj)),
                             UT(hJ(VT), mb) || rT(OH, mb);
                         }
-                        function Jb(rb, Sb, sb) {
-                            var xb;
-                            jm(fm(vj), I3[V3.KA("RNI24", pj)][V3.gO(":p%x\x40QWu36N\"\"", Pj)]) ? xb = new I3[V3.KA("RNI24", pj)][V3.gO(":p%x\x40QWu36N\"\"", Pj)]() : jm(fm(vj), I3[V3.KA("RNI24", pj)][V3.KO(";-P\r\t!XD", Lk)]) ? (xb = new I3[V3.KA("RNI24", pj)][V3.KO(";-P\r\t!XD", Lk)]())[V3.sL("U>\b", Zb)] = function() {
-                                this[V3.xL("U3\'R\"", Gb)] = XT,
-                                sm(this[V3.GL("0\"\x07\\\rIGQFS3+J\x3f1", Jn)], I3[V3.sV("aR87B>8", mk)]) && this[V3.GL("0\"\x07\\\rIGQFS3+J\x3f1", Jn)]();
-                            }
-                            : xb = new I3[V3.KA("RNI24", pj)][V3.PO("*M)\t\b-_UWQ", hk)](V3.SL("j\x3f1D\"9O37u1\v8\x00", Gb)),
-                            xb[V3.ZL("[UBI", K0)](V3.FL("<1i", Vb), rb, Sb),
-                            jm(fm(vj), xb[V3.CV(jw, Fb, br)]) && (xb[V3.CV(jw, Fb, br)] = kT(vj));
+                        function Jb(rb, Sb, sb, __callback) {
+
                             var fb = (V3.fL("\\%-X>$<\r\x00C}", cN))[V3.r3(Uw, [vs, VT], UU)](qf, V3.nL("t", Vw));
-                            xb[V3.GL("0\"\x07\\\rIGQFS3+J\x3f1", Jn)] = function() {
-                                zT(xb[V3.xL("U3\'R\"", Gb)], MT) && sb && sb(xb);
-                            }
-                            ,
-                            xb[V3.hL("\"3\r\r", nb)](fb),
-                            t1 = vj;
+                            if(__callback) __callback(fb);
                         }
-                        function zp(hb) {
+                        function zp(hb, __callback) {
                             var pb = kT(VT);
                             (Lb() || function Nb() {
                                 var kb = hJ(VT);
@@ -2308,10 +2297,10 @@
                                         }());
                                     } catch (vb) {}
                                 return zT(kb, vj);
-                            }() || t1) && (Jb(h1, hb, dH),
+                            }() || t1) && (Jb(h1, hb, dH, __callback),
                             Qx += VT,
                             pb = kT(vj)),
-                            Lf && (pb || Jb(h1, hb, dH));
+                            Lf && (pb || Jb(h1, hb, dH, __callback));
                         }
                         if (I3[V3.KA("RNI24", pj)]._cf = I3[V3.KA("RNI24", pj)]._cf || [],
                         I3[V3.KA("RNI24", pj)].bmak = I3[V3.KA("RNI24", pj)].bmak && I3[V3.KA("RNI24", pj)].bmak[V3.T3(PU, QU, WU)](V3.NL("&_\"M\v&", Bb)) && I3[V3.KA("RNI24", pj)].bmak[V3.T3(PU, QU, WU)](V3.Sc("0\n6V;", RF)) ? I3[V3.KA("RNI24", pj)].bmak : WJ(Oq, [V3.Sc("0\n6V;", RF), kT(vj), V3.kL("_FHxT#.B%", lb), function Pb() {

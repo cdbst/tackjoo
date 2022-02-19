@@ -52,7 +52,13 @@ function get_sensor_data(__callback){
     });
 }
 
-window.electron.register_get_sensor_data(get_sensor_data);
+function get_sensor_data_v2(__callback){
+    window.gen_sensor_data(get_mouse_event(), (sensor_data)=>{
+        __callback(sensor_data);
+    });
+}
+
+window.electron.register_get_sensor_data(get_sensor_data_v2);
 
 
 
