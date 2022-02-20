@@ -33,7 +33,8 @@ contextBridge.exposeInMainWorld('electron', {
     deleteLoginInfo : _deleteLoginInfo,
     getAppVersion : _getAppVersion,
     openDirectory : _openDirectory,
-    getAppPath : _getAppPath
+    getAppPath : _getAppPath,
+    restartToUpdate : _restartToUpdate,
 });
 
 let get_sensor_data = undefined;
@@ -408,4 +409,9 @@ function _getAppPath(__callback){
     ipcRenderer.once('get-app-path-reply' + ipc_data.id, (_event, app_path) => {
         __callback(app_path);
     });
+}
+
+function _restartToUpdate(){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('restart-to-update', ipc_data);
 }

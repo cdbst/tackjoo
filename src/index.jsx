@@ -28,6 +28,24 @@ class Index extends React.Component {
     }
 
     onSignedIn(){
+
+        const cur_app_version = window.electron.getAppVersion();
+
+        CommonUtils.checkUpdate(cur_app_version, (err, result) =>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                return;
+            }
+
+            if(result === false){
+                Index.g_sys_msg_q.enqueue('알림', `현재 버전이 최신 버전입니다. (${cur_app_version})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            }else{
+                Index.g_prompt_modal.popModal('경고', <p>새로운 버전이 확인되었습니다. 확인 버튼을 누르면 재시작과 동시에 프로그램이 업데이트 됩니다.</p>, (is_ok)=>{
+                    if(is_ok) window.electron.restartToUpdate();
+                });
+            }
+        });
+
         Index.g_product_mngr.loadProductInfoList();
         this.setState(_ => ({
             signed_in : true
@@ -68,6 +86,31 @@ class CommonUtils {
         .then((res_json)=>{
             __callback(res_json);
         })
+    }
+    static checkUpdate(cur_version, __callback){
+
+        CommonUtils.fetchReleaseNote((release_info_obj)=>{
+
+            if(release_info_obj.length === 0){
+                __callback('최신 버전 정보를 확인 할 수 없습니다.(1)', undefined);
+                return;
+            }
+
+            const latest_version = release_info_obj[0].name;
+            if(latest_version === undefined){
+                __callback('최신 버전 정보를 확인 할 수 없습니다.(2)', undefined);
+                return;  
+            }
+
+            const latest_version_arr = latest_version.split('.');
+            if(latest_version_arr.length !== 3){
+                __callback('최신 버전 정보를 확인 할 수 없습니다.(3)', undefined);
+                return;
+            }
+
+            const result = common.compare_version(cur_version, latest_version);
+            __callback(undefined, result === -1);
+        });
     }
 }
 
