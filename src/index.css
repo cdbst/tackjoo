@@ -286,7 +286,7 @@ tbody tr:hover td {
 #schedule-time-input{
     background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
     width: 310px !important;
-    color: white !important;
+    color: var(--color) !important;
 }
 /* End to Task Edit Modal */
 
