@@ -257,7 +257,7 @@ class TaskEditModal extends React.Component {
 
         let selected_schedule = undefined;
         
-        if(this.state.selected_product.sell_type != common.SELL_TYPE.normal){
+        if(this.state.use_reservation){
             selected_schedule = this.schedule_time_input_instance.selectedDates;
             if(selected_schedule.length == 0){
                 Index.g_sys_msg_q.enqueue('에러', "작업 예약(시작) 시간을 설정하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);

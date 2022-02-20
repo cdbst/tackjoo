@@ -112,7 +112,7 @@ class TaskTableItem extends React.Component {
     onClickStatusBtn(is_play_btn){
 
         if(this.state.status == common.TASK_STATUS.READY && this.isPossibleToPlay() == false){
-            Index.g_sys_msg_q.enqueue('에러', '상품 판매시작 이전에 작업을 시작할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            Index.g_sys_msg_q.enqueue('에러', '상품 출시시간 혹은 예약시간 이전에는 작업을 시작할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
             return;
         }
 
@@ -171,10 +171,10 @@ class TaskTableItem extends React.Component {
             case common.TASK_STATUS.READY : 
                 const cur_server_time = Index.g_server_clock.getServerTime();
                 const task_info = this.props.task_info;
-                if(task_info.product_info.sell_type === common.SELL_TYPE.custom){
-                    return task_info.schedule_time <= cur_server_time;
-                }else{
+                if(task_info.product_info.open_time !== undefined){
                     return task_info.product_info.open_time <= cur_server_time;
+                }else{
+                    return task_info.schedule_time < cur_server_time;
                 }
             case common.TASK_STATUS.PAUSE : 
                 return true;
