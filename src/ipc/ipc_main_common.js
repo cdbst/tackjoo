@@ -1,4 +1,4 @@
-const { ipcMain, shell, clipboard } = require("electron");
+const { ipcMain, shell, clipboard, app } = require("electron");
 const log = require('electron-log');
 const common = require('../common/common');
 const path = require('path');
@@ -39,6 +39,22 @@ function register(){
         }catch(err){
             log.error(common.get_log_str('ipc_main_common.js', 'get-app-path-callback', err));
         }
+    });
+
+    ipcMain.on('restart-to-update', (event, data) =>{
+        (async ()=>{
+            try{
+                const app_update_info_path = require('../user_file_path').USER_FILE_PATH.APP_UPDATE_INFO;
+                const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
+                await UserFileManager.write(app_update_info_path, { update : true });
+
+                app.relaunch();
+                app.exit();
+                
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'restart-to-update-callback', err));
+            }
+        })();
     });
 }
 

@@ -40,8 +40,8 @@ class Index extends React.Component {
             if(result === false){
                 Index.g_sys_msg_q.enqueue('알림', `현재 버전이 최신 버전입니다. (${cur_app_version})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
             }else{
-                Index.g_prompt_modal.popModal('경고', <p>새로운 버전이 확인되었습니다. 창을 닫으면 프로그램이 업데이트 됩니다.</p>, (is_ok)=>{
-                    console.log(is_ok);
+                Index.g_prompt_modal.popModal('경고', <p>새로운 버전이 확인되었습니다. 확인 버튼을 누르면 재시작과 동시에 프로그램이 업데이트 됩니다.</p>, (is_ok)=>{
+                    if(is_ok) window.electron.restartToUpdate();
                 });
             }
         });

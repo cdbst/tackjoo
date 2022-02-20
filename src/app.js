@@ -47,6 +47,21 @@ function create_window() {
  */
 let update_win = undefined;
 
+async function check_update(){
+    try{
+        const app_update_info_path = require('./user_file_path.js').USER_FILE_PATH.APP_UPDATE_INFO;
+        const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
+        const update_info = await UserFileManager.read(app_update_info_path);
+
+        return update_info.update;
+
+    }catch(error){
+        log.error(common.get_log_str('app.js', 'check_update', error));
+        return false;
+    }
+    
+}
+
 function send_message_to_update_win(message) {
     if(update_win === undefined) return;
     update_win.webContents.send('message', message);
@@ -102,18 +117,35 @@ autoUpdater.on('download-progress', (progress_obj) => {
     send_progess_to_update_win(progress_obj.percent);
 })
 autoUpdater.on('update-downloaded', (info) => {
-    send_message_to_update_win('다운로드 완료. 다시 시작하는 중..');
-    autoUpdater.quitAndInstall(false, true);
+
+    (async ()=>{
+        try{
+            const app_update_info_path = require('./user_file_path').USER_FILE_PATH.APP_UPDATE_INFO;
+            const UserFileManager = require("./api/user_file_mngr.js").UserFileManager;
+            await UserFileManager.write(app_update_info_path, { update : false });
+        }catch(err){
+            log.error(common.get_log_str('app.js', 'update-downloaded-callback', err));
+        }finally{
+            send_message_to_update_win('다운로드 완료. 다시 시작하는 중..');
+            autoUpdater.quitAndInstall(false, true);
+        }
+    })();
 });
 
-app.whenReady().then(() => {
-    log.info(common.get_log_str('app.js', 'whenReady', '=======App start'));
+app.whenReady().then(async () => {
+
+    const start_update = await check_update();
+    log.info(common.get_log_str('app.js', 'whenReady', '=======App start : ' + start_update));
 
     if(process.env.BUILD_ENV === 'develop'){
         create_window();
     }else{
-        create_update_window();
-        autoUpdater.checkForUpdatesAndNotify();
+        if(start_update){
+            create_update_window();
+            autoUpdater.checkForUpdatesAndNotify();
+        }else{
+            create_window();
+        }
     }
 
     //for mac platform
@@ -122,8 +154,12 @@ app.whenReady().then(() => {
             if(process.env.BUILD_ENV === 'develop'){
                 create_window();
             }else{
-                create_update_window();
-                autoUpdater.checkForUpdatesAndNotify();
+                if(start_update){
+                    create_update_window();
+                    autoUpdater.checkForUpdatesAndNotify();
+                }else{
+                    create_window();
+                }
             }
         }
     });
