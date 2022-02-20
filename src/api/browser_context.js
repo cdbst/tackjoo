@@ -739,11 +739,6 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        let params = {
-            productId : product_info.product_id,
-            _ : new Date().getTime()
-        };
-
         let req_url = undefined;
         if(product_info.category === 'snkrs'){
             req_url = BrowserContext.NIKE_URL + '/kr/launch/productSkuInventory';
@@ -752,8 +747,12 @@ class BrowserContext {
         }
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
-
             try{
+                const params = {
+                    productId : product_info.product_id, 
+                    _ : new Date().getTime()
+                };
+
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers, params);
 
                 if(res.status != 200){
@@ -778,8 +777,9 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'get_product_sku_inventory', e));
-                await this.__post_process_req_fail(e, this.__req_retry_interval);
-                await this.open_page(product_url, 1); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
+                const p_open_page = this.open_page(product_url, 1); // get_product_sku_inventory 요청은 실패시 재시도 하려면 임의의 page 요청을 한번 해야한다.
+                const p_timeout =  this.__post_process_req_fail(e, this.__req_retry_interval);
+                await Promise.all([p_open_page, p_timeout]);
             }
         }
 
@@ -998,14 +998,15 @@ class BrowserContext {
             req_url = BrowserContext.NIKE_URL + '/kr/ko_kr/checkout/request';
         }
 
-        let params = {
-            pay_method: billing_info.pay_method === 'kakaopay' ? 'point' : billing_info.pay_method,
-            gToken: '',
-            _: new Date().getTime()
-        }
-
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
+
+                const params = {
+                    pay_method: billing_info.pay_method === 'kakaopay' ? 'point' : billing_info.pay_method,
+                    gToken: '',
+                    _: new Date().getTime()
+                }
+
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers, params);
 
                 if(res.status != 200){
