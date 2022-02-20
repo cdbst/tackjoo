@@ -172,9 +172,9 @@ class TaskTableItem extends React.Component {
                 const cur_server_time = Index.g_server_clock.getServerTime();
                 const task_info = this.props.task_info;
                 if(task_info.product_info.open_time !== undefined){
-                    return task_info.product_info.open_time <= cur_server_time;
+                    return task_info.product_info.open_time <= cur_server_time && task_info.schedule_time <= cur_server_time;
                 }else{
-                    return task_info.schedule_time < cur_server_time;
+                    return task_info.schedule_time <= cur_server_time;
                 }
             case common.TASK_STATUS.PAUSE : 
                 return true;
