@@ -18,6 +18,8 @@ class TaskEditModal extends React.Component {
         this.setLoadingStatus = this.setLoadingStatus.bind(this);
         this.setCustomURLProduct = this.setCustomURLProduct.bind(this);
 
+        this.onChangeUseReservation = this.onChangeUseReservation.bind(this);
+
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
 
@@ -25,7 +27,8 @@ class TaskEditModal extends React.Component {
             filtered_product_info_list : this.product_info_list,
             selected_product : undefined,
             account_info_list : [],
-            proxy_info_list : []
+            proxy_info_list : [],
+            use_reservation : true
         };
 
         this.ref_options_size = React.createRef();
@@ -191,12 +194,23 @@ class TaskEditModal extends React.Component {
         let selected_product_id = product_id == undefined ? _filtered_product_info_list[0]._id : product_id;
         
         this.onChangeProduct(selected_product_id, (err, _product_info) =>{
-            let new_state = {filtered_product_info_list : _filtered_product_info_list};
+
+            let new_state = { 
+                filtered_product_info_list : _filtered_product_info_list,
+            };
+
             if(_product_info){
-                new_state['selected_product'] = _product_info;
+                new_state.selected_product = _product_info;
+                new_state.use_reservation = _product_info.sell_type !== common.SELL_TYPE.normal;
             }
             this.setState(_ => (new_state));
         });
+    }
+
+    onChangeUseReservation(e){
+        this.setState(_ => ({
+            use_reservation : e.target.checked
+        }));
     }
 
     onSubmitTaskInfo(){
@@ -243,7 +257,7 @@ class TaskEditModal extends React.Component {
 
         let selected_schedule = undefined;
         
-        if(this.state.selected_product.sell_type != common.SELL_TYPE.normal){
+        if(this.state.use_reservation){
             selected_schedule = this.schedule_time_input_instance.selectedDates;
             if(selected_schedule.length == 0){
                 Index.g_sys_msg_q.enqueue('에러', "작업 예약(시작) 시간을 설정하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -305,10 +319,12 @@ class TaskEditModal extends React.Component {
 
         let product_sell_type = this.state.selected_product == undefined ? undefined : this.state.selected_product.sell_type;
 
-        if(open_time_str != ''){
-            this.schedule_time_input_instance.setDate(open_time_str, false);
-        }else if(product_sell_type === common.SELL_TYPE.custom ){
-            this.schedule_time_input_instance.setDate(common.get_formatted_date_str(new Date(), true), false);
+        if(this.schedule_time_input_instance !== undefined && this.state.use_reservation){
+            if(open_time_str != ''){
+                this.schedule_time_input_instance.setDate(open_time_str, false);
+            }else{
+                this.schedule_time_input_instance.setDate(common.get_formatted_date_str(new Date(), true), false);
+            }
         }
 
         let porxy_alias_list = this.state.proxy_info_list.map((proxy_info => proxy_info.alias));
@@ -322,10 +338,11 @@ class TaskEditModal extends React.Component {
         porxy_alias_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
         porxy__id_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
 
-
-
         let modal_title_text = '';
         if(this.state.selected_product) modal_title_text = this.state.selected_product.sell_type === common.SELL_TYPE.custom ? '커스텀 작업 생성하기' : product_desc_name;
+
+        const show_product_open_time = ![common.SELL_TYPE.normal, common.SELL_TYPE.custom].includes(product_sell_type);
+        const show_custom_product_name_input = product_sell_type == common.SELL_TYPE.custom;
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -344,14 +361,16 @@ class TaskEditModal extends React.Component {
                                     <img ref={this.ref_product_img} className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
+                            <div className="row" style={{display : show_custom_product_name_input ? 'none' : ''}}>
+                                <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_type} label="유형" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
-                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
+                                <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_product} label="상품" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
-                                <div className="col-md-12" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'none' : 'block'}}>
+                            </div>
+                            <div className="row" style={{display : show_custom_product_name_input ? '' : 'none'}}>
+                                <div className="col-md-12">
                                     <div className="form-floating">
                                         <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME} style={{"--width" : "100%"}} placeholder="조던 1 하이 XXX" />
                                         <label className="common-input-label" htmlFor={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME}>상품 이름 입력란</label>
@@ -359,32 +378,46 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <hr/>
-                            <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
-                                <div className="row" >
-                                    <div className="col-md-2">
-                                        <label className="task-edit-modal-option-label">시작</label>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
-                                    </div>
-                                    <div className="col-md-2 ">
-                                        <label className="task-edit-modal-option-label">종료</label> 
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
-                                    </div>
+                            <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
+                                <div className="col-md-2">
+                                    <label className="task-edit-modal-option-label">시작</label>
                                 </div>
-                                <hr/>
-                                <div className="row">
-                                    <div className="col-md-3">
-                                        <label className="task-edit-modal-option-label">예약시간</label>
-                                    </div>
-                                    <div className="col-md-9">
-                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
-                                    </div>
+                                <div className="col-md-4">
+                                    <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
                                 </div>
-                                <hr/>
+                                <div className="col-md-2 ">
+                                    <label className="task-edit-modal-option-label">종료</label> 
+                                </div>
+                                <div className="col-md-4">
+                                    <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
+                                </div>
                             </div>
+                            <hr style={{display : show_product_open_time ? '' : 'none'}}/>
+                            <div className="row">
+                                <div className="col-md-2" style={{marginTop: 8}}>
+                                    <label className="task-edit-modal-option-label">예약</label>
+                                </div>
+                                <div className="col-md-8">
+                                    <input 
+                                        id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} 
+                                        className="modal-select form-control" 
+                                        disabled={!this.state.use_reservation}
+                                        style={{'--width' : '450px', '--color' : this.state.use_reservation ? 'white' : 'transparent'}}
+                                    />
+                                </div>
+                                <div className="col-md-2">
+                                    <div className="form-check form-switch" style={{marginTop: 8}}>
+                                        <input 
+                                            className="form-check-input" 
+                                            key={this.state.use_reservation ? 'use-reservation-true' : 'use-reservation-false'} 
+                                            type="checkbox" role="switch" 
+                                            onChange={this.onChangeUseReservation.bind(this)} 
+                                            defaultChecked={this.state.use_reservation}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
                             <div className="row">
                                 <div className="col-md-5">
                                     <LabelMultipleSelectDual 
