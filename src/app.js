@@ -21,7 +21,7 @@ function create_window() {
             minWidth : 1620,
             minHeight : 1080,
             webPreferences: {
-                devTools: false,
+                //devTools: false,
                 //sandbox: true,
                 nodeIntegration: true,
                 preload: path.join(__dirname, "preload.js"),
@@ -33,7 +33,7 @@ function create_window() {
         app.main_browser_window = win;
         IpcM.register(win);
     
-        //win.webContents.openDevTools();
+        win.webContents.openDevTools();
         win.setMenuBarVisibility(false);
         win.loadFile(path.join(__dirname, "index.html"));
     }catch(e){

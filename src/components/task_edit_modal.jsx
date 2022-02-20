@@ -322,10 +322,11 @@ class TaskEditModal extends React.Component {
         porxy_alias_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
         porxy__id_list.unshift(''); // 프록시를 선택하지 않는 옵션을 추가한다.
 
-
-
         let modal_title_text = '';
         if(this.state.selected_product) modal_title_text = this.state.selected_product.sell_type === common.SELL_TYPE.custom ? '커스텀 작업 생성하기' : product_desc_name;
+
+        const show_product_open_time = ![common.SELL_TYPE.normal, common.SELL_TYPE.custom].includes(product_sell_type);
+        const show_custom_product_name_input = product_sell_type == common.SELL_TYPE.custom;
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -344,14 +345,16 @@ class TaskEditModal extends React.Component {
                                     <img ref={this.ref_product_img} className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
+                            <div className="row" style={{display : show_custom_product_name_input ? 'none' : ''}}>
+                                <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_type} label="유형" options={sell_type_list} h_on_change={this.onChangeType.bind(this)}/>
                                 </div>
-                                <div className="col-md-6" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'block' : 'none'}}>
+                                <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_product} label="상품" options={product_name_list} option_keys={product_id_list} h_on_change={this.onChangeProduct.bind(this)}/>
                                 </div>
-                                <div className="col-md-12" style={{display : product_sell_type != common.SELL_TYPE.custom ? 'none' : 'block'}}>
+                            </div>
+                            <div className="row" style={{display : show_custom_product_name_input ? '' : 'none'}}>
+                                <div className="col-md-12">
                                     <div className="form-floating">
                                         <input type="text" className="form-control" id={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME} style={{"--width" : "100%"}} placeholder="조던 1 하이 XXX" />
                                         <label className="common-input-label" htmlFor={this.EL_ID_MODAL_INPUT_CUSTOM_PRODUCT_NAME}>상품 이름 입력란</label>
@@ -359,32 +362,30 @@ class TaskEditModal extends React.Component {
                                 </div>
                             </div>
                             <hr/>
-                            <div style={{display : product_sell_type != common.SELL_TYPE.normal ? 'block' : 'none'}}>
-                                <div className="row" >
-                                    <div className="col-md-2">
-                                        <label className="task-edit-modal-option-label">시작</label>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
-                                    </div>
-                                    <div className="col-md-2 ">
-                                        <label className="task-edit-modal-option-label">종료</label> 
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
-                                    </div>
+                            <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
+                                <div className="col-md-2">
+                                    <label className="task-edit-modal-option-label">시작</label>
                                 </div>
-                                <hr/>
-                                <div className="row">
-                                    <div className="col-md-3">
-                                        <label className="task-edit-modal-option-label">예약시간</label>
-                                    </div>
-                                    <div className="col-md-9">
-                                        <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
-                                    </div>
+                                <div className="col-md-4">
+                                    <label>{open_time_str == '' ? 'Unknown' : open_time_str}</label>
                                 </div>
-                                <hr/>
+                                <div className="col-md-2 ">
+                                    <label className="task-edit-modal-option-label">종료</label> 
+                                </div>
+                                <div className="col-md-4">
+                                    <label>{close_time_str == '' ? 'Unknown' : close_time_str}</label>
+                                </div>
                             </div>
+                            <hr style={{display : show_product_open_time ? '' : 'none'}}/>
+                            <div className="row">
+                                <div className="col-md-2">
+                                    <label className="task-edit-modal-option-label">예약</label>
+                                </div>
+                                <div className="col-md-9">
+                                    <input id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} className="modal-select form-control" style={{'--width' : '450px'}}/>
+                                </div>
+                            </div>
+                            <hr/>
                             <div className="row">
                                 <div className="col-md-5">
                                     <LabelMultipleSelectDual 
