@@ -206,7 +206,7 @@ function _playTask(_task_info, _product_info, _billing_info, _settings_info, __c
             }
         }
 
-        __callback(data.status);
+        __callback(data.status, data.size_info);
     };
 
     task_ipc_handler_map[_task_info._id] = task_evt_handler;

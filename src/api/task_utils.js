@@ -170,7 +170,7 @@ module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
 
         const res_data = await browser_context.add_to_cart(product_info, size_info);
         if(res_data === undefined) return undefined;
-        if('sku_id' in res_data === false) return res_data;
+        if('sku_id' in res_data === false) return size_info;
 
         size_info_has_quantity = size_info_has_quantity.filter(si => si.sku_id !== res_data.sku_id);
         const rand_idx = common.get_random_int(0, size_info_has_quantity.length - 1);

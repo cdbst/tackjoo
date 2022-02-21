@@ -70,7 +70,9 @@ class TaskTableItem extends React.Component {
             return;
         }
 
-        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, Index.g_settings_info.settings_info, (status) =>{
+        window.electron.playTask(this.props.task_info, product_info, Index.g_billing_info, Index.g_settings_info.settings_info, (status, size_info) =>{
+
+            this.checked_out_size_info = size_info;
 
             this.setTaskStatus(status, ()=>{
                 this.ref_status_btn.current.disabled = false;
@@ -225,6 +227,8 @@ class TaskTableItem extends React.Component {
         const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
         const proxy_ip = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.ip;
 
+        const status_text = this.state.status === common.TASK_STATUS.DONE ? `${this.state.status}(${this.checked_out_size_info.name})` : this.state.status;
+
         return(
             <tr>
                 <td style={{width : this.props.type_col_width, maxWidth : this.props.type_col_width}}>
@@ -249,7 +253,7 @@ class TaskTableItem extends React.Component {
                     <span>{schedule_time_str}</span>
                 </td>
                 <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}} >
-                    <span className='custom-color-text' style={{'--text-color' : status_text_color}}>{this.state.status}</span>
+                    <span className='custom-color-text' style={{'--text-color' : status_text_color}}>{status_text}</span>
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
