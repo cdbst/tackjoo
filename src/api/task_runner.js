@@ -25,6 +25,7 @@ class TaskRunner{
         this.close_pay_window = this.close_pay_window.bind(this);
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
+        this.set_checked_out_size_info = this.set_checked_out_size_info.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -88,6 +89,10 @@ class TaskRunner{
     async gen_sensor_data(){
         let sensor_data = await gen_sensor_data();
         return sensor_data;
+    }
+
+    set_checked_out_size_info(checked_out_size_info){
+        this.task_info.checked_out_size_info = checked_out_size_info;
     }
 
     open_kakaopay_window(url){
@@ -277,7 +282,7 @@ class TaskRunner{
         if(error){
             this.reject(error);
         }else{
-            this.resolve();
+            this.resolve(this.task_info);
         }
         this.running = false;
     }

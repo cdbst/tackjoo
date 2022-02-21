@@ -136,10 +136,12 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
         // STEP5 : Add product to cart.
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ADD_TO_CART]);
-        const res_data = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
-        if(res_data == undefined){
+        const size_info_in_cart = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
+        if(size_info_in_cart == undefined){
             throw new AddToCartError(product_info, size_info, "Fail with add to cart");
         }
+
+        global.MainThreadApiCaller.call('set_checked_out_size_info', [size_info_in_cart]);
 
         // STEP6 : open checkout page
         const open_checkout_page_result = await TaskUtils.open_checkout_page(browser_context, product_info);
