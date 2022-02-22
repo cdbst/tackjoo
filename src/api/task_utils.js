@@ -129,11 +129,18 @@ module.exports.login = async (browser_context) => {
 
 module.exports.open_product_page = async (browser_context, product_info, retry_cnt) => {
 
-    const new_product_info = await browser_context.open_product_page(product_info.url, retry_cnt);
+    const p_open_product_info = browser_context.open_product_page(product_info.url, retry_cnt);
+    const p_subscribe_product_info = global.MainThreadApiCaller.call('subscribe_product_info', [product_info.url]);
+    const new_product_info = await Promise.race([p_open_product_info, p_subscribe_product_info]);
+
     if(new_product_info == undefined){
         return undefined;
     }
-    return common.merge_object(product_info, new_product_info);
+
+    common.merge_object(product_info, new_product_info)
+    global.MainThreadApiCaller.call('notify_product_info', [product_info]);
+
+    return product_info;
 }
 
 module.exports.get_product_sku_inventory = async (browser_context, product_info, watchdog, settings_info) => {
@@ -142,16 +149,22 @@ module.exports.get_product_sku_inventory = async (browser_context, product_info,
 
     if(watchdog){
         do{
-            sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info);
-            //browser_context.open_main_page();
+            const p_get_sku_inventory_info = browser_context.get_product_sku_inventory(product_info.url, product_info);
+            const p_subscribe_sku_inventory_info = global.MainThreadApiCaller.call('subscribe_sku_inventory_info', [product_info]);
+            sku_inventory_info = await Promise.race([p_get_sku_inventory_info, p_subscribe_sku_inventory_info]);
+
             await common.async_sleep(settings_info.restock_watchdog_interval * 1000);
             if(sku_inventory_info == undefined) continue;
         }while(sku_inventory_info.usable === false)
     }else{
-        sku_inventory_info = await browser_context.get_product_sku_inventory(product_info.url, product_info);
-        if(sku_inventory_info == undefined){
-            return undefined;
-        }
+
+        const p_get_sku_inventory_info = browser_context.get_product_sku_inventory(product_info.url, product_info);
+        const p_subscribe_sku_inventory_info = global.MainThreadApiCaller.call('subscribe_sku_inventory_info', [product_info]);
+        sku_inventory_info = await Promise.race([p_get_sku_inventory_info, p_subscribe_sku_inventory_info]);
+
+    }
+    if(sku_inventory_info !== undefined){
+        global.MainThreadApiCaller.call('notify_sku_inventory_info', [product_info, sku_inventory_info]);
     }
     return sku_inventory_info;
 }

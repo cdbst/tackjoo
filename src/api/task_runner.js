@@ -11,6 +11,9 @@ const OCREngine = require('./ocr_engine').OCREngine;
 const AuthEngine = require('../api/auth_engine.js').AuthEngine;
 const EventWait = require('./event_wait').EventWait;
 
+const ProductInfoShareManager = require('../api/res_data_share_mngr').ProductInfoShareManager;
+const SkuInventoryInfoShareManager = require('../api/res_data_share_mngr').SkuInventoryInfoShareManager;
+
 class TaskRunner{
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
 
@@ -44,6 +47,25 @@ class TaskRunner{
 
         this.checkout_wait = new EventWait();
     }
+
+    async subscribe_product_info(product_url){
+        const product_info = await ProductInfoShareManager.subscribe(product_url);
+        return product_info;
+    }
+
+    notify_product_info(product_info){
+        ProductInfoShareManager.invoke_all(product_info.url, product_info);
+    }
+
+    async subscribe_sku_inventory_info(product_info){
+        const sku_inventory_info = await SkuInventoryInfoShareManager.subscribe(product_info.product_id);
+        return sku_inventory_info;
+    }
+
+    notify_sku_inventory_info(product_info, sku_inventory_info){
+        SkuInventoryInfoShareManager.invoke_all(product_info.product_id, sku_inventory_info);
+    }
+
 
     on_recv_api_call(data){
 
