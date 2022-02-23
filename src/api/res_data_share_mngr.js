@@ -69,11 +69,11 @@ class ResDataShareManager{
         if(this.cache_timeout === 0 ) return;
 
         this.res_data_cache_dict[request_id] = res_data;
-        setInterval(()=>{
+        setTimeout(()=>{
             if(request_id in this.res_data_cache_dict){
                 delete this.res_data_cache_dict[request_id];
             }
-        }, 10000)
+        }, this.cache_timeout);
     }
 
     get_res_data_form_cache(request_id){
