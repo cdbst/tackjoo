@@ -157,15 +157,10 @@ module.exports.get_product_sku_inventory = async (browser_context, product_info,
             if(sku_inventory_info == undefined) continue;
         }while(sku_inventory_info.usable === false)
     }else{
-
-        const p_get_sku_inventory_info = browser_context.get_product_sku_inventory(product_info.url, product_info);
-        const p_subscribe_sku_inventory_info = global.MainThreadApiCaller.call('subscribe_sku_inventory_info', [product_info]);
-        sku_inventory_info = await Promise.race([p_get_sku_inventory_info, p_subscribe_sku_inventory_info]);
-
+        
+        sku_inventory_info = await global.MainThreadApiCaller.call('subscribe_sku_inventory_info', [product_info]);
     }
-    if(sku_inventory_info !== undefined){
-        global.MainThreadApiCaller.call('notify_sku_inventory_info', [product_info, sku_inventory_info]);
-    }
+
     return sku_inventory_info;
 }
 

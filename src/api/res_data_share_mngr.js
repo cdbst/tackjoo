@@ -1,3 +1,4 @@
+const { BrowserContext } = require("./browser_context");
 
 class ResDataShareManager{
     constructor(cache_timeout){
@@ -12,24 +13,32 @@ class ResDataShareManager{
         this.cache_timeout = cache_timeout;
     }
 
-    subscribe(request_id){
+    subscribe(product_info){
+        
+        const product_id = product_info.product_id;
 
-        return new Promise((resolve, reject) =>{
+        return new Promise(async (resolve, reject) =>{
 
-            const cached_res_data = this.get_res_data_form_cache(request_id);
+            const cached_res_data = this.get_res_data_form_cache(product_id);
             if(cached_res_data !== undefined) resolve(cached_res_data);
 
-            if(request_id in this.subscriber_dict === false){
-                this.subscriber_dict[request_id] = {
-                    subscribers : [],
-                    invoke_inprogress : false
-                };
-            }
-
-            this.subscriber_dict[request_id].subscribers.push({
+            const subscriber = {
                 resolve : resolve,
                 reject : reject
-            });
+            };
+
+            if(product_id in this.subscriber_dict === false){
+                this.subscriber_dict[product_id] = {
+                    subscribers : [subscriber],
+                    borwser_context : undefined
+                };
+
+                this.subscriber_dict[product_id].borwser_context = new BrowserContext();
+                const sku_inventory_info = await this.subscriber_dict[product_id].borwser_context.get_product_sku_inventory(product_info.url, product_info);
+                this.invoke_all(product_id, sku_inventory_info);
+            }else{
+                this.subscriber_dict[product_id].subscribers.push(subscriber);
+            }
         });
     }
 
@@ -50,37 +59,34 @@ class ResDataShareManager{
     //     }
     // }
 
-    invoke_all(request_id, res_data){
+    invoke_all(product_id, sku_inventory_info){
         
-        if(request_id in this.subscriber_dict === false) return;
-        if(this.subscriber_dict[request_id].invoke_inprogress) return;
-
-        this.subscriber_dict[request_id].invoke_inprogress = true;
-        this.register_res_data_to_cache(request_id, res_data);
+        if(product_id in this.subscriber_dict === false) return;
         
-        this.subscriber_dict[request_id].subscribers.forEach((subscriber)=>{
-            subscriber.resolve(res_data);
+        this.register_res_data_to_cache(product_id, sku_inventory_info);
+        
+        this.subscriber_dict[product_id].subscribers.forEach((subscriber)=>{
+            subscriber.resolve(sku_inventory_info);
         });
-        delete this.subscriber_dict[request_id];
+        delete this.subscriber_dict[product_id];
     }
 
-    register_res_data_to_cache(request_id, res_data){
+    register_res_data_to_cache(product_id, sku_inventory_info){
 
         if(this.cache_timeout === 0 ) return;
 
-        this.res_data_cache_dict[request_id] = res_data;
+        this.res_data_cache_dict[product_id] = sku_inventory_info;
         setTimeout(()=>{
-            if(request_id in this.res_data_cache_dict){
-                delete this.res_data_cache_dict[request_id];
+            if(product_id in this.res_data_cache_dict){
+                delete this.res_data_cache_dict[product_id];
             }
         }, this.cache_timeout);
     }
 
-    get_res_data_form_cache(request_id){
-        if(request_id in this.res_data_cache_dict === false) return undefined;
-        else return this.res_data_cache_dict[request_id];
+    get_res_data_form_cache(product_id){
+        if(product_id in this.res_data_cache_dict === false) return undefined;
+        else return this.res_data_cache_dict[product_id];
     }
 }
 
-module.exports.ProductInfoShareManager = new ResDataShareManager(10000);
-module.exports.SkuInventoryInfoShareManager = new ResDataShareManager(0);
+module.exports.SkuInventoryInfoShareManager = new ResDataShareManager(5000);
