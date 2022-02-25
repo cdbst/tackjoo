@@ -123,6 +123,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
     
     if(product_info.sell_type == common.SELL_TYPE.draw){
 
+        global.MainThreadApiCaller.call('set_checked_out_size_info', [size_info]);
+
         // STEP5 : Apply THE DRAW.
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_DRAW]);
         let draw_entry_data = await TaskUtils.apply_draw(browser_context, product_info, size_info);
