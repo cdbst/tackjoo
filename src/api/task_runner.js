@@ -58,7 +58,7 @@ class TaskRunner{
     }
 
     async subscribe_sku_inventory_info(product_info){
-        const sku_inventory_info = await SkuInventoryInfoShareManager.subscribe(product_info);
+        const sku_inventory_info = await SkuInventoryInfoShareManager.subscribe(product_info.product_id);
         return sku_inventory_info;
     }
 
