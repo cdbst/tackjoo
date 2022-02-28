@@ -1,26 +1,21 @@
 
 class ContentsNewProduct extends React.Component {
 
-    proxy_edit_modal_id = 'proxy-edit-modal';
-    proxy_bulk_edit_modal_id = 'proxy-bulk-edit-modal';
-
     constructor(props) {
         super(props);
 
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__getTableItems = this.__getTableItems.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
-
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
 
-        this.__mount = false;
+        this.__product_info_list = [];
 
         this.state = {
             product_table_list : []
         };
 
-        this.__ref_watch_btn = React.createRef();
-
+        this.__mount = false;
         this.__setupColumnsWidth();
     }
 
@@ -31,7 +26,8 @@ class ContentsNewProduct extends React.Component {
         this.kream_price_col_width = 160;
         this.actions_col_width = 240;
         this.soldout_status_col_width = 140;
-        this.name_col_width = 'calc( 100% - ' + (this.actions_col_width + this.kream_price_col_width + this.price_col_width + this.image_col_width + this.soldout_status_col_width) + 'px)';
+        this.release_date_col_width = 190;
+        this.name_col_width = 'calc( 100% - ' + (this.actions_col_width + this.kream_price_col_width + this.price_col_width + this.image_col_width + this.soldout_status_col_width + this.release_date_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -53,15 +49,14 @@ class ContentsNewProduct extends React.Component {
     __getTableItems(product_info_list){
 
         return product_info_list.map((product_info) =>
-            <ProxyTableItem
+            <NewProductTableItem
                 image_col_width={this.image_col_width}
                 name_col_width={this.name_col_width}
                 price_col_width={this.price_col_width}
                 kream_price_col_width={this.kream_price_col_width}
                 actions_col_width={this.actions_col_width}
+                release_date_col_width={this.release_date_col_width}
                 soldout_status_col_width={this.soldout_status_col_width}
-                h_modify={this.onClickModifyProxyInfo.bind(this)}
-                h_remove={this.onClickRemoveProxyInfo.bind(this)}
                 product_info={product_info}
                 key={product_info._id}
             />
@@ -70,19 +65,14 @@ class ContentsNewProduct extends React.Component {
 
     __onClickWatchBtn(status){
 
-        //set disable button
-        this.__ref_watch_btn.current.setDisabled(true);
-
         if(status){
-            window.electron.startWatchingNewReleased((stop, product_info_list)=>{
-                // TODO: set enable button
-                console.log('startWatchingNewReleased -- callback : ' + stop);
-                this.__ref_watch_btn.current.setDisabled(false);
-                if(product_info_list === false) return;
+            window.electron.startWatchingNewReleased((stop, new_product_info_list)=>{
+                
+                if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
-                console.log(product_info_list);
+                this.__product_info_list = this.__product_info_list.concat(new_product_info_list);
+                this.__updateTableItems();
             });
-
         }else{
             window.electron.stopWatchingNewReleased();
         }
@@ -111,6 +101,7 @@ class ContentsNewProduct extends React.Component {
                                 <th scope="col" style={{width : this.price_col_width, maxWidth : this.price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.kream_price_col_width, maxWidth : this.kream_price_col_width}}>크림 시세</th>
                                 <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
+                                <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
@@ -122,7 +113,6 @@ class ContentsNewProduct extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <ToggleButton
-                                ref={this.__ref_watch_btn}
                                 h_on_click={this.__onClickWatchBtn.bind(this)}
                                 init_state={false}
                                 set_btn_label={"감시 취소"}

@@ -327,3 +327,13 @@ tbody tr:hover td {
 
 
 /*End to TextareaModal */
+
+
+/* start to new product table item */
+
+.new-product-table-item-img{
+    height: 80px !important;
+    width: 80px !important;
+}
+
+/* End to new product table item */
