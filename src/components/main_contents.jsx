@@ -14,6 +14,7 @@ class MainContents extends React.Component {
                 <ContentsProxies />
                 <ContentsSettings />
                 <ContentsTheDraw />
+                <ContentsNewProduct />
             </div>
         );
     }

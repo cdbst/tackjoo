@@ -38,6 +38,14 @@ function register(){
         })();
     });
 
+    ipcMain.on('start-watching-new-released', async(event, data) =>{
+        event.reply('start-watching-new-released-reply' + data.id, {stop : false, product_info_list : undefined});
+    });
+
+    ipcMain.on('stop-watching-new-released', async(event, data) =>{
+        console.log('test2');
+    });
+
 }
 
 
