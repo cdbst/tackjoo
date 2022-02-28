@@ -727,6 +727,61 @@ function parse_product_img_url_from_new_released_product_page($){
 }
 
 
+function parse_product_list_from_new_released_page($){
+    const product_list_divs = $('.a-product');
+
+    const product_info_list = [];
+
+    product_list_divs.each((idx, product_info_div)=>{
+        //get product
+        const product_info = common.get_product_info_obj_scheme();
+        common.update_product_info_obj(product_info, 'category', 'new_released');
+        common.update_product_info_obj(product_info, '_id', common.uuidv4());
+
+        // TODO : [주위] 현재는 확인 불가하지만 Notify Me로 등장하는 것들이 있음. Notify me의 경우 normal type이 될 수 없음.
+        common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal); 
+
+        const el_name_inputs = parser_common.get_specific_tag_nodes(product_info_div, ['input'], [], ['name']);
+        el_name_inputs.forEach((el_name_input)=>{
+            if(el_name_input.attribs.name === 'productId'){
+                common.update_product_info_obj(product_info, 'product_id', el_name_input.attribs.value);
+            }else if(el_name_input.attribs.name === 'producturl'){
+                common.update_product_info_obj(product_info, 'url', common.NIKE_URL + el_name_input.attribs.value);
+            }else if(el_name_input.attribs.name === 'productmodel'){
+                common.update_product_info_obj(product_info, 'model_id', el_name_input.attribs.value);
+            }
+        });
+
+        const el_title_span = parser_common.get_specific_tag_nodes(product_info_div, [], ['item-title']);
+        let product_name = parser_common.get_specific_child_text_nodes(el_title_span[0])[0].data.trim();
+        product_name = parser_common.strip_usless_string(product_name)
+        common.update_product_info_obj(product_info, 'name', product_name);
+
+        const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, ['a'], [], ['productcategory']);
+        const item_attr_name = el_category_a[0].attribs.productcategory;
+        const item_attr = `itemAttributes[${item_attr_name}_SIZE]`;
+        common.update_product_info_obj(product_info, 'item_attr', item_attr);
+
+        const el_price_p = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-display-price'], []);
+        const price = parser_common.get_specific_child_text_nodes(el_price_p[0])[0].data.trim();
+        common.update_product_info_obj(product_info, 'price', price);
+        
+        const el_soldout_bedge_div = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-soldout-badge'], []);
+        const soldout = el_soldout_bedge_div[0].attribs.class.includes('isActive');
+        common.update_product_info_obj(product_info, 'soldout', soldout);
+
+        const el_proudct_img = parser_common.get_specific_tag_nodes(product_info_div, ['img'], [], []);
+        const proudct_img_url = el_proudct_img[1].attribs.src;
+        common.update_product_info_obj(product_info, 'img_url', proudct_img_url);
+
+        product_info_list.push(product_info);
+    });
+
+    return product_info_list;
+}
+
+
 module.exports.get_product_list_info_from_feed_page = get_product_list_info_from_feed_page;
 module.exports.get_product_info_from_product_page = get_product_info_from_product_page;
 module.exports.update_product_info_as_sku_inventory_info = update_product_info_as_sku_inventory_info;
+module.exports.parse_product_list_from_new_released_page = parse_product_list_from_new_released_page;
