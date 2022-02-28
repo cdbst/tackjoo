@@ -74,7 +74,7 @@ class ContentsNewProduct extends React.Component {
         if(status){
             window.electron.startWatchingNewReleased((stop, product_info_list)=>{
                 // TODO: set enable button
-                console.log('startWatchingNewReleased -- callback');
+                console.log('startWatchingNewReleased -- callback : ' + stop);
                 this.__ref_watch_btn.current.setDisabled(false);
                 if(product_info_list === false) return;
             });
