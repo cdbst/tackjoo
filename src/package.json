@@ -1,8 +1,8 @@
 {
   "name": "tackjoo",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "TACKJOO Business app",
-  "appid": "com.cdbst.snkrsbotkr",
+  "appid": "com.cdbst.tackjoo",
   "copyright": "Copyright on cdbst all right reserved.",
   "main": "app.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cdbst/snkrs_bot_kr.git"
+    "url": "git+https://github.com/cdbst/tackjoo.git"
   },
   "keywords": [
     "electrion",
@@ -27,9 +27,9 @@
   "author": "cdbst",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/cdbst/snkrs_bot_kr/issues"
+    "url": "https://github.com/cdbst/tackjoo/issues"
   },
-  "homepage": "https://github.com/cdbst/snkrs_bot_kr#readme",
+  "homepage": "https://github.com/cdbst/tackjoo#readme",
   "dependencies": {
     "async-mutex": "^0.3.2",
     "axios": "^0.24.0",
