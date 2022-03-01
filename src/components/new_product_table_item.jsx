@@ -37,9 +37,6 @@ class NewProductTableItem extends React.Component {
 
     render(){
 
-        const soldout_status_font_color = this.getSoldOutStatusFontColor();
-        const cur_server_date = Index.g_server_clock.getServerTime();
-
         return(
             <tr>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
@@ -55,10 +52,10 @@ class NewProductTableItem extends React.Component {
                     <span></span>
                 </td>
                 <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
-                    <span>{common.get_formatted_date_str(cur_server_date, true)}</span>
+                    <span>{common.get_formatted_date_str(this.props.product_info.released_date, true)}</span>
                 </td>
                 <td style={{width : this.props.soldout_status_col_width, maxWidth : this.props.soldout_status_col_width}}>
-                    <span className='custom-color-text' style={{'--text-color' : soldout_status_font_color}}>{this.props.product_info.soldout ? '품절' : '구매가능'}</span>
+                    <span className='custom-color-text' style={{'--text-color' : this.getSoldOutStatusFontColor()}}>{this.props.product_info.soldout ? '품절' : '구매가능'}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

@@ -774,6 +774,8 @@ function parse_product_list_from_new_released_page($){
         const proudct_img_url = el_proudct_img[1].attribs.src;
         common.update_product_info_obj(product_info, 'img_url', proudct_img_url);
 
+        common.update_product_info_obj(product_info, 'released_date', new Date());
+
         product_info_list.push(product_info);
     });
 
