@@ -10,6 +10,7 @@ class ContentsNewProduct extends React.Component {
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
         this.onRemoveProduct = this.onRemoveProduct.bind(this);
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
+        this.onCreateTask = this.onCreateTask.bind(this);
 
         this.__product_info_list = [];
 
@@ -70,9 +71,14 @@ class ContentsNewProduct extends React.Component {
                 soldout_status_col_width={this.soldout_status_col_width}
                 product_info={product_info}
                 h_on_remove={this.onRemoveProduct.bind(this)}
+                h_on_create_task={this.onCreateTask.bind(this)}
                 key={product_info._id}
             />
         );
+    }
+
+    onCreateTask(product_info){
+        this.props.contents_task_ref.current.create_quick_task(product_info);
     }
 
     __onClickWatchBtn(status){
@@ -82,6 +88,7 @@ class ContentsNewProduct extends React.Component {
                 
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
+                Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 this.__product_info_list = this.__product_info_list.concat(new_product_info_list);
                 this.__updateTableItems();
             });

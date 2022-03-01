@@ -18,6 +18,7 @@ class ContentsTasks extends React.Component {
         this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
         this.__createNewTask = this.__createNewTask.bind(this);
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
+        this.create_quick_task = this.create_quick_task.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
@@ -217,6 +218,10 @@ class ContentsTasks extends React.Component {
                 action_col_width={this.action_col_width}
             />
         );
+    }
+
+    create_quick_task(product_info){
+        console.log(product_info);
     }
 
     render() {

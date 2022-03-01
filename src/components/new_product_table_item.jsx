@@ -24,7 +24,7 @@ class NewProductTableItem extends React.Component {
     }
 
     onClickCreateTask(){
-        console.log('onClickCreateTask');
+        this.props.h_on_create_task(this.props.product_info);
     }
 
     onClickGoLink(){
