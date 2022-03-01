@@ -175,6 +175,8 @@ class ProductManager{
 
     static get_size_name_by_friendly_size_name(product_info, friendly_name){
 
+        if(friendly_name === '무작위') return '무작위';
+
         let size_name = undefined;
 
         for(var i = 0; i < product_info.size_info_list.length; i++){

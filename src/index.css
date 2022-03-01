@@ -327,3 +327,23 @@ tbody tr:hover td {
 
 
 /*End to TextareaModal */
+
+
+/* start to new product table item */
+
+.new-product-table-item-img{
+    height: 80px !important;
+    width: 80px !important;
+}
+
+/* End to new product table item */
+
+
+/* start to contents settings */
+.contents-settings-contents-wrapper{
+    height: 800px !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+/* End to contents settings */

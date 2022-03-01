@@ -152,6 +152,7 @@
             draw_id : undefined,
             item_attr : undefined,
             product_options : undefined,
+            released_date : undefined,
             _id : undefined
         };
     }

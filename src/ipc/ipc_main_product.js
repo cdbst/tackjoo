@@ -1,5 +1,6 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("../api/browser_context.js").BrowserContext;
+const NewReleasedProductWatchdog = require('../api/new_released_product_watchdog').NewReleasedProductWatchdog;
 
 const log = require('electron-log');
 const common = require('../common/common');
@@ -36,6 +37,33 @@ function register(){
                 event.reply('get-product-info-reply' + data.id, {err : undefined, data : product_info});
             }
         })();
+    });
+
+    let product_watchdog = null;
+
+    ipcMain.on('start-watching-new-released', (event, data) =>{
+
+        const settings_info = data.payload.settings_info;
+        product_watchdog = new NewReleasedProductWatchdog(settings_info.new_product_watch_interval, settings_info.new_product_watch_max_ret);
+       
+        (async()=>{
+            try{
+                await product_watchdog.start_watch((new_product_list)=>{
+                    event.reply('start-watching-new-released-reply' + data.id, {stop : false, product_info_list : new_product_list}); // watchdog이 정상 동작하는 것을 알려주기 위한 ipc 통신임.
+                });   
+            }finally{
+                product_watchdog = null;
+                event.reply('start-watching-new-released-reply' + data.id, {stop : true, product_info_list : undefined}); // watchdog이 중지됐을 때 ipc로 중지 상태임을 알린다.
+            }
+        })();
+
+        event.reply('start-watching-new-released-reply' + data.id, {stop : false, product_info_list : undefined}); // watchdog이 정상 동작하는 것을 알려주기 위한 ipc 통신임.
+    });
+
+    ipcMain.on('stop-watching-new-released', async(event, data) =>{
+        if(product_watchdog !== null){
+            product_watchdog.stop_watch();
+        }
     });
 
 }

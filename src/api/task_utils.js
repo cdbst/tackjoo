@@ -76,6 +76,13 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
 
     if(product_info.size_info_list.length == 0){
         return undefined;
+    }else if(task_info.size_name === '무작위'){
+
+        const size_info_list_has_quantity = this.get_size_info_list_has_quantity(product_info);
+        if(size_info_list_has_quantity.length == 0) return undefined;
+
+        return size_info_list_has_quantity[common.get_random_int(0, size_info_list_has_quantity.length -1)];
+
     }else if(product_info.size_info_list.length === 1){ // free size일 경우 처리.
         const maybe_free_size_info = product_info.size_info_list[0];
         if(maybe_free_size_info.name === 'FREE' || maybe_free_size_info.friendly_name === 'FREE'){

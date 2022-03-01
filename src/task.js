@@ -102,11 +102,18 @@ async function main(browser_context, task_info, product_info, billing_info, sett
             global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.GET_PRODUCT_INFO]);
         }
 
-        const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog, settings_info);
-        if(sku_inventory_info == undefined){
-            throw new GetSkuInventoryError("Cannot gathering product inventory info");
+        if(product_info.product_options === undefined || product_info.product_options.length === 0){
+            product_info = await TaskUtils.open_product_page(browser_context, product_info);
+            if(product_info == undefined){
+                throw new OpenProductPageError("Cannot open product page info - normal product");
+            }
+        }else{
+            const sku_inventory_info = await TaskUtils.get_product_sku_inventory(browser_context, product_info, task_info.watchdog, settings_info);
+            if(sku_inventory_info == undefined){
+                throw new GetSkuInventoryError("Cannot gathering product inventory info");
+            }
+            product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
         }
-        product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
     }
 
     // STEP3 : Check validation : Product Info is possible to tasking.

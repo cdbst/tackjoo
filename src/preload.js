@@ -35,6 +35,8 @@ contextBridge.exposeInMainWorld('electron', {
     openDirectory : _openDirectory,
     getAppPath : _getAppPath,
     restartToUpdate : _restartToUpdate,
+    startWatchingNewReleased : _startWatchingNewReleased,
+    stopWatchingNewReleased : _stopWatchingNewReleased,
 });
 
 let get_sensor_data = undefined;
@@ -191,7 +193,7 @@ function _getLoggedInAccountInfoList(__callback){
     });
 }
 
-let task_ipc_handler_map = {};
+const task_ipc_handler_map = {};
 
 function _playTask(_task_info, _product_info, _billing_info, _settings_info, __callback){
     
@@ -414,4 +416,26 @@ function _getAppPath(__callback){
 function _restartToUpdate(){
     let ipc_data = get_ipc_data();
     ipcRenderer.send('restart-to-update', ipc_data);
+}
+
+function _startWatchingNewReleased(settings_info, __callback){
+    let ipc_data = get_ipc_data({settings_info : settings_info});
+    ipcRenderer.send('start-watching-new-released', ipc_data);
+
+    const watch_evt_handler = (_event, {stop, product_info_list}) => {
+
+        if(stop){
+            ipcRenderer.removeListener('start-watching-new-released-reply' + ipc_data.id, watch_evt_handler);
+            __callback(true, undefined);
+        }else{
+            __callback(false, product_info_list);
+        }
+    }
+
+    ipcRenderer.on('start-watching-new-released-reply' + ipc_data.id, watch_evt_handler);
+}
+
+function _stopWatchingNewReleased(){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('stop-watching-new-released', ipc_data);
 }
