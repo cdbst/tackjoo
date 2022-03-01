@@ -18,7 +18,6 @@ class NewReleasedProductWatchdog{
         this.open_new_released_page_test = this.open_new_released_page_test.bind(this);
 
         this.browser_context = new BrowserContext();
-        this.cur_snapshot = undefined;
         this.watch_interval = watch_interval;
         this.watch_max_ret = watch_max_ret;
 
