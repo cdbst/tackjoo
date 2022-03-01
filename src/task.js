@@ -198,10 +198,3 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         process.exit(0);
     }
 }
-
-async function watch_new_released_product(){
-    const browser_context = new BrowserContext();
-
-    const new_released_page = browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
-    
-}
