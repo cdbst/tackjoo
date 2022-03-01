@@ -68,7 +68,7 @@ class NewReleasedProductWatchdog{
 
             let prev_product_info_list = undefined;
 
-            let test_toggle = true;
+            //let test_toggle = true;
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
 
             while(ret_remain--){
@@ -76,8 +76,9 @@ class NewReleasedProductWatchdog{
                 if(this.watch_max_ret === 0) ret_remain++;
                 if(this.stopped) break;
 
-                //const res = await this.browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
-                const res = this.open_new_released_page_test(test_toggle);
+                const res = await this.browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases', 1);
+                //const res = this.open_new_released_page_test(test_toggle);
+                if(res === undefined || res.data === undefined) continue;
                 const $ = cheerio.load(res.data);
                 const new_product_info_list = parse_product_list_from_new_released_page($);
 
@@ -89,7 +90,7 @@ class NewReleasedProductWatchdog{
                 prev_product_info_list = new_product_info_list;
 
                 await common.async_sleep(this.watch_interval * 1000);
-                test_toggle = !test_toggle;
+                //test_toggle = !test_toggle;
             }
 
             this.watchdog_resolver();
