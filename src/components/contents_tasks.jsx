@@ -339,6 +339,8 @@ class ContentsTasks extends React.Component {
             const friendly_size_name = '무작위';
             const schedule_time = Index.g_server_clock.getServerTime();
 
+            Index.g_sys_msg_q.enqueue('빠른 작업 생성 안내', `${account_email} 계정으로 '${product_info.name}' 상품 1개를 즉시 구매합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
             if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
                 this.__get_appropreate_to_tasking_proxy_infos((proxy_infos)=>{
 
