@@ -4,6 +4,9 @@ class NewProductTableItem extends React.Component {
         super(props);
 
         this.getSoldOutStatusFontColor = this.getSoldOutStatusFontColor.bind(this);
+        this.onClickCreateTask = this.onClickCreateTask.bind(this);
+        this.onClickGoLink = this.onClickGoLink.bind(this);
+        this.onClickRemove = this.onClickRemove.bind(this);
 
         this.__mount = false;
     }
@@ -18,6 +21,18 @@ class NewProductTableItem extends React.Component {
 
     getSoldOutStatusFontColor(){
         return this.props.product_info.soldout ? '#dc3545' : '#0dcaf0';
+    }
+
+    onClickCreateTask(){
+        console.log('onClickCreateTask');
+    }
+
+    onClickGoLink(){
+        window.electron.openExternalWebPage(this.props.product_info.url);
+    }
+
+    onClickRemove(){
+        this.props.h_on_remove(this.props.product_info._id)
     }
 
     render(){
@@ -39,7 +54,7 @@ class NewProductTableItem extends React.Component {
                     <span></span>
                 </td>
                 <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
-                    <span>{common.get_formatted_date_str(new Date())}</span>
+                    <span>{common.get_formatted_date_str(new Date(), true)}</span>
                 </td>
                 <td style={{width : this.props.soldout_status_col_width, maxWidth : this.props.soldout_status_col_width}}>
                     <span className='custom-color-text' style={{'--text-color' : soldout_status_font_color}}>{this.props.product_info.soldout ? '품절' : '구매가능'}</span>
@@ -47,13 +62,18 @@ class NewProductTableItem extends React.Component {
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-warning" >
+                            <button type="button" className="btn btn-info" onClick={this.onClickCreateTask.bind(this)}>
+                                <img src="./res/img/clipboard-plus-fill.svg" style={{width:24, height:24}}/>
+                            </button>
+                        </div>
+                        <div className="float-start button-wrapper-inner-table">
+                            <button type="button" className="btn btn-warning" onClick={this.onClickGoLink.bind(this)}>
                                 <img src="./res/img/link.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-info" >
-                                <img src="./res/img/info-circle-fill.svg" style={{width:24, height:24}}/>
+                            <button type="button" className="btn btn-danger" onClick={this.onClickRemove.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                     </div>

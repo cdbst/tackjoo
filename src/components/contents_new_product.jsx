@@ -8,6 +8,8 @@ class ContentsNewProduct extends React.Component {
         this.__getTableItems = this.__getTableItems.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
+        this.onRemoveProduct = this.onRemoveProduct.bind(this);
+        this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
 
         this.__product_info_list = [];
 
@@ -38,6 +40,15 @@ class ContentsNewProduct extends React.Component {
         this.__mount = false;
     }
 
+    onRemoveProduct(product_id){
+
+        Index.g_prompt_modal.popModal('경고', <p>상품을 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+            this.__product_info_list = this.__product_info_list.filter((product_info)=> product_info._id !== product_id);
+            this.__updateTableItems();
+        });
+    }
+
     __updateTableItems(){
         if(this.__mount == false) return;
         const table_items = this.__getTableItems(this.__product_info_list);
@@ -58,6 +69,7 @@ class ContentsNewProduct extends React.Component {
                 release_date_col_width={this.release_date_col_width}
                 soldout_status_col_width={this.soldout_status_col_width}
                 product_info={product_info}
+                h_on_remove={this.onRemoveProduct.bind(this)}
                 key={product_info._id}
             />
         );
@@ -76,6 +88,14 @@ class ContentsNewProduct extends React.Component {
         }else{
             window.electron.stopWatchingNewReleased();
         }
+    }
+
+    __onClickRemoveAll(){
+        Index.g_prompt_modal.popModal('경고', <p>모든 상품을 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+            this.__product_info_list = [];
+            this.__updateTableItems();
+        });
     }
 
     render() {
@@ -100,8 +120,8 @@ class ContentsNewProduct extends React.Component {
                                 <th scope="col" style={{width : this.name_col_width, maxWidth : this.name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.price_col_width, maxWidth : this.price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.kream_price_col_width, maxWidth : this.kream_price_col_width}}>크림 시세</th>
-                                <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
                                 <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
+                                <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
@@ -122,7 +142,7 @@ class ContentsNewProduct extends React.Component {
                                 btn_class={"btn-primary btn-footer-inside"}
                             />
                             
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={console.log('test')}>
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)} >
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
                         </div>
