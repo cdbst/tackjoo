@@ -336,7 +336,7 @@ class ContentsTasks extends React.Component {
             }
             
             const account_email = account_emails[common.get_random_int(0, account_emails.length - 1)];
-            const friendly_size_name = "무작위";
+            const friendly_size_name = '무작위';
             const schedule_time = Index.g_server_clock.getServerTime();
 
             if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
