@@ -19,6 +19,7 @@ class TaskTableItem extends React.Component {
 
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
+        this.isIdleState = this.isIdleState.bind(this);
 
         this.ref_status_btn = React.createRef();
 
@@ -211,6 +212,11 @@ class TaskTableItem extends React.Component {
 
         if(this.state.status == common.TASK_STATUS.READY) return false;
         else return !this.isPossibleToPlay();
+    }
+
+    isIdleState(){
+        const idle_status_list = [common.TASK_STATUS.DONE, common.TASK_STATUS.FAIL, common.TASK_STATUS.PAUSE, common.TASK_STATUS.READY];
+        return idle_status_list.includes(this.state.status);
     }
 
     render(){

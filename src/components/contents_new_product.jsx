@@ -91,8 +91,11 @@ class ContentsNewProduct extends React.Component {
 
     __onClickWatchBtn(status){
 
+        this.__ref_watch_btn.setDisabled(true);
+
         if(status){
             window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
+                this.__ref_watch_btn.setDisabled(false);
                 if(stop) this.__ref_watch_btn.setBtnState(false);
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
