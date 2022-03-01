@@ -240,7 +240,7 @@ class ContentsSettings extends React.Component {
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
-                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL} desc={ContentsSettings.OPTION_TEXT.RESTOCK_WATCHDOG_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL} desc={ContentsSettings.OPTION_TEXT.RESTOCK_WATCHDOG_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/> <br />
                                 <SettingsSubTitle sub_title="<신상품 관련 설정>" /> <br />
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_MAX_RET} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_MAX_RET} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
