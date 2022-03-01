@@ -337,3 +337,13 @@ tbody tr:hover td {
 }
 
 /* End to new product table item */
+
+
+/* start to contents settings */
+.contents-settings-contents-wrapper{
+    height: 800px !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+/* End to contents settings */

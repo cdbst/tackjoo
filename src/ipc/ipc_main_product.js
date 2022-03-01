@@ -5,8 +5,6 @@ const NewReleasedProductWatchdog = require('../api/new_released_product_watchdog
 const log = require('electron-log');
 const common = require('../common/common');
 
-
-
 function register(){
 
     ipcMain.on('get-product-info-list', (event, data) => {
@@ -41,19 +39,19 @@ function register(){
         })();
     });
 
-    const product_watchdog = null;
+    let product_watchdog = null;
 
     ipcMain.on('start-watching-new-released', (event, data) =>{
 
         const settings_info = data.payload.settings_info;
-        const product_watchdog = new NewReleasedProductWatchdog(settings_info.new_product_watch_interval);
+        product_watchdog = new NewReleasedProductWatchdog(settings_info.new_product_watch_interval, settings_info.new_product_watch_max_ret);
        
         (async()=>{
             try{
                 await product_watchdog.start_watch((new_product_list)=>{
                     event.reply('start-watching-new-released-reply' + data.id, {stop : false, product_info_list : new_product_list}); // watchdog이 정상 동작하는 것을 알려주기 위한 ipc 통신임.
-                });
-            }catch(err){
+                });   
+            }finally{
                 product_watchdog = null;
                 event.reply('start-watching-new-released-reply' + data.id, {stop : true, product_info_list : undefined}); // watchdog이 중지됐을 때 ipc로 중지 상태임을 알린다.
             }

@@ -10,7 +10,7 @@ class NewReleasedProductWatchdog{
      * 
      * @param {number} watch_interval 몇 초 간격으로 새로운 제품을 확인할지 (초단위)
      */
-    constructor(watch_interval){
+    constructor(watch_interval, watch_max_ret){
 
         this.start_watch = this.start_watch.bind(this);
         this.stop_watch = this.stop_watch.bind(this);
@@ -20,6 +20,8 @@ class NewReleasedProductWatchdog{
         this.browser_context = new BrowserContext();
         this.cur_snapshot = undefined;
         this.watch_interval = watch_interval;
+        this.watch_max_ret = watch_max_ret;
+
         this.watchdog_resolver = undefined;
         this.watchdog_rejecter = undefined;
         this.stopped = false;
@@ -67,7 +69,12 @@ class NewReleasedProductWatchdog{
             let prev_product_info_list = undefined;
 
             let test_toggle = true;
-            while(this.stopped === false){
+            let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
+
+            while(ret_remain--){
+
+                if(this.watch_max_ret === 0) ret_remain++;
+                if(this.stopped) break;
 
                 //const res = await this.browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
                 const res = this.open_new_released_page_test(test_toggle);
@@ -84,6 +91,8 @@ class NewReleasedProductWatchdog{
                 await common.async_sleep(this.watch_interval * 1000);
                 test_toggle = !test_toggle;
             }
+
+            this.watchdog_resolver();
         });
     }
 

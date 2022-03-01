@@ -10,7 +10,9 @@ class ContentsSettings extends React.Component {
         NIKE_LOGIN_SESSION_TIMEOUT : 'login-session-timeout-input',
         RESTOCK_WATCHDOG_INTERVAL : 'task-watchdog-ret-interval-input',
         /** 신상품 관련 설정 */
-        NEW_PRODUCT_WATCH_INTERVAL : 'new-product-watch-interval-input'
+        NEW_PRODUCT_WATCH_INTERVAL : 'new-product-watch-interval-input',
+        NEW_PRODUCT_WATCH_MAX_RET : 'new-product-watch-max-ret-input',
+        NEW_PRODUCT_CREATE_TASK_USE_PROXY : 'new-product-create-task-use-proxy-input',
     }
 
     static OPTION_TEXT = {
@@ -23,7 +25,9 @@ class ContentsSettings extends React.Component {
         NIKE_LOGIN_SESSION_TIMEOUT : '나이키 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
         RESTOCK_WATCHDOG_INTERVAL : '상품 입고 확인을 몇 초 간격으로 진행할지 설정합니다. (기본 값 : 3)',
         /** 신상품 관련 설정 */
-        NEW_PRODUCT_WATCH_INTERVAL : '신상품을 감시하는 주기를 몇초 간격으로 할지 지정합니다. (기본 값: 1)'
+        NEW_PRODUCT_WATCH_INTERVAL : '신상품을 감시하는 주기를 몇초 간격으로 할지 지정합니다. (기본 값: 1)',
+        NEW_PRODUCT_WATCH_MAX_RET : '신상품을 감시를 최대 몇 회 진행할지 지정합니다. (기본 값: 0, 무기한 감시하려면 0 입력)',
+        NEW_PRODUCT_CREATE_TASK_USE_PROXY : '신상품을 구매하기 위한 작업 생성시 프록시를 활용할지 설정합니다. (기본 값: 0, 프록시 미사용시 0 입력)'
     }
 
     constructor(props) {
@@ -122,12 +126,18 @@ class ContentsSettings extends React.Component {
         let new_product_watch_interval = settings_info.new_product_watch_interval == undefined ? '' : settings_info.new_product_watch_interval;
         this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL, new_product_watch_interval);
 
+        let new_product_watch_max_ret = settings_info.new_product_watch_max_ret == undefined ? '' : settings_info.new_product_watch_max_ret;
+        this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_MAX_RET, new_product_watch_max_ret);
+
+        let new_product_create_task_use_proxy = settings_info.new_product_create_task_use_proxy == undefined ? '' : settings_info.new_product_create_task_use_proxy;
+        this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_CREATE_TASK_USE_PROXY, new_product_create_task_use_proxy);
+
     }
 
     getCurrentSettingsInfo(){
 
         let http_req_ret_cnt = this.inputValue(ContentsSettings.INPUT_ID.HTTP_REQ_RET_CNT);
-        http_req_ret_cnt = http_req_ret_cnt  == '' ? undefined : parseInt(http_req_ret_cnt);
+        http_req_ret_cnt = http_req_ret_cnt  == '' ? undefined : parseFloat(http_req_ret_cnt);
 
         let http_req_ret_interval = this.inputValue(ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL);
         http_req_ret_interval = http_req_ret_interval  == '' ? undefined : parseFloat(http_req_ret_interval);
@@ -136,22 +146,28 @@ class ContentsSettings extends React.Component {
         http_req_timeout = http_req_timeout  == '' ? undefined : parseFloat(http_req_timeout);
 
         let http_max_req_within_same_ip = this.inputValue(ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP);
-        http_max_req_within_same_ip = http_max_req_within_same_ip  == '' ? undefined : parseInt(http_max_req_within_same_ip);
+        http_max_req_within_same_ip = http_max_req_within_same_ip  == '' ? undefined : parseFloat(http_max_req_within_same_ip);
 
         let task_ret_cnt = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_COUNT);
-        task_ret_cnt = task_ret_cnt  == '' ? undefined : parseInt(task_ret_cnt);
+        task_ret_cnt = task_ret_cnt  == '' ? undefined : parseFloat(task_ret_cnt);
 
         let task_ret_interval = this.inputValue(ContentsSettings.INPUT_ID.TASK_RET_INTERVAL);
         task_ret_interval = task_ret_interval  == '' ? undefined : parseFloat(task_ret_interval);
 
         let nike_login_session_timeout = this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT);
-        nike_login_session_timeout = nike_login_session_timeout  == '' ? undefined : parseInt(nike_login_session_timeout);
+        nike_login_session_timeout = nike_login_session_timeout  == '' ? undefined : parseFloat(nike_login_session_timeout);
 
         let restock_watchdog_interval = this.inputValue(ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL);
-        restock_watchdog_interval = restock_watchdog_interval  == '' ? undefined : parseInt(restock_watchdog_interval);
+        restock_watchdog_interval = restock_watchdog_interval  == '' ? undefined : parseFloat(restock_watchdog_interval);
 
         let new_product_watch_interval = this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL);
-        new_product_watch_interval = new_product_watch_interval  == '' ? undefined : parseInt(new_product_watch_interval);
+        new_product_watch_interval = new_product_watch_interval  == '' ? undefined : parseFloat(new_product_watch_interval);
+
+        let new_product_watch_max_ret = this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_MAX_RET);
+        new_product_watch_max_ret = new_product_watch_max_ret  == '' ? undefined : parseFloat(new_product_watch_max_ret);
+
+        let new_product_create_task_use_proxy = this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_CREATE_TASK_USE_PROXY);
+        new_product_create_task_use_proxy = new_product_create_task_use_proxy  == '' ? undefined : parseFloat(new_product_create_task_use_proxy);
 
         return {
             http_req_ret_cnt : http_req_ret_cnt,
@@ -162,7 +178,9 @@ class ContentsSettings extends React.Component {
             task_ret_interval : task_ret_interval,
             nike_login_session_timeout : nike_login_session_timeout,
             restock_watchdog_interval : restock_watchdog_interval,
-            new_product_watch_interval : new_product_watch_interval
+            new_product_watch_interval : new_product_watch_interval,
+            new_product_watch_max_ret : new_product_watch_max_ret,
+            new_product_create_task_use_proxy : new_product_create_task_use_proxy
         }
     }
 
@@ -210,22 +228,26 @@ class ContentsSettings extends React.Component {
                         </div>
                     </div>
                     <br/>
-                    <div className="row">
-                        <div className="col-md-8">
-                            <SettingsSubTitle sub_title="<HTTP 요청 설정>" /> <br />
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_CNT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_CNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr />
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/> <br />
-                            <SettingsSubTitle sub_title="<Task 설정>" /> <br />
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL} desc={ContentsSettings.OPTION_TEXT.RESTOCK_WATCHDOG_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
-                            <SettingsSubTitle sub_title="<신상품 관련 설정>" /> <br />
-                            <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
-                        </div>
-                        <div className="col-md-4">
+                    <div className="contents-settings-contents-wrapper">
+                        <div className="row">
+                            <div className="col-md-8">
+                                <SettingsSubTitle sub_title="<HTTP 요청 설정>" /> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_CNT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_CNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/> <br />
+                                <SettingsSubTitle sub_title="<Task 설정>" /> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL} desc={ContentsSettings.OPTION_TEXT.RESTOCK_WATCHDOG_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
+                                <SettingsSubTitle sub_title="<신상품 관련 설정>" /> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_MAX_RET} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_MAX_RET} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_CREATE_TASK_USE_PROXY} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_CREATE_TASK_USE_PROXY} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/>
+                            </div>
+                            <div className="col-md-4">
+                            </div>
                         </div>
                     </div>
                     <div className="row footer">

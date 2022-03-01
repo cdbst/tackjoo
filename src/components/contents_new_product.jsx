@@ -12,14 +12,22 @@ class ContentsNewProduct extends React.Component {
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
         this.onCreateTask = this.onCreateTask.bind(this);
 
+        this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
+
         this.__product_info_list = [];
 
         this.state = {
             product_table_list : []
         };
 
+        this.__ref_watch_btn = undefined;
+
         this.__mount = false;
         this.__setupColumnsWidth();
+    }
+
+    __watchBtnRefCb(element){
+        this.__ref_watch_btn = element;
     }
 
     __setupColumnsWidth(){
@@ -85,7 +93,7 @@ class ContentsNewProduct extends React.Component {
 
         if(status){
             window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
-                
+                if(stop) this.__ref_watch_btn.setBtnState(false);
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
                 Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
@@ -140,6 +148,7 @@ class ContentsNewProduct extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <ToggleButton
+                                ref={this.__watchBtnRefCb.bind(this)}
                                 h_on_click={this.__onClickWatchBtn.bind(this)}
                                 init_state={false}
                                 set_btn_label={"감시 취소"}

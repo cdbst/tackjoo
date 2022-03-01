@@ -24,6 +24,12 @@ class ToggleButton extends React.Component {
         this.__ref_btn.current.disabled = status;
     }
 
+    setBtnState(status){
+        this.setState(_ => ({
+            set : status
+        }));
+    }
+
     render(){
 
         const btn_img_src = this.state.set ? this.props.set_img_src : this.props.unset_img_src;

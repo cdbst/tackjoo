@@ -17,7 +17,9 @@ class AppSettings{
             task_ret_interval : 1,
             nike_login_session_timeout : 60, // 분 단위
             restock_watchdog_interval: 3,
-            new_product_watch_interval: 1
+            new_product_watch_interval: 1,
+            new_product_watch_max_ret: 0,
+            new_product_create_task_use_proxy : 0,
         }
     }
 
