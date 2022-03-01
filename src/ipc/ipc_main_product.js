@@ -41,9 +41,12 @@ function register(){
         })();
     });
 
-    const product_watchdog = new NewReleasedProductWatchdog(3);
+    const product_watchdog = null;
 
     ipcMain.on('start-watching-new-released', (event, data) =>{
+
+        const settings_info = data.payload.settings_info;
+        const product_watchdog = new NewReleasedProductWatchdog(settings_info.new_product_watch_interval);
        
         (async()=>{
             try{
@@ -51,6 +54,7 @@ function register(){
                     event.reply('start-watching-new-released-reply' + data.id, {stop : false, product_info_list : new_product_list}); // watchdog이 정상 동작하는 것을 알려주기 위한 ipc 통신임.
                 });
             }catch(err){
+                product_watchdog = null;
                 event.reply('start-watching-new-released-reply' + data.id, {stop : true, product_info_list : undefined}); // watchdog이 중지됐을 때 ipc로 중지 상태임을 알린다.
             }
         })();
@@ -59,7 +63,9 @@ function register(){
     });
 
     ipcMain.on('stop-watching-new-released', async(event, data) =>{
-        product_watchdog.stop_watch();
+        if(product_watchdog !== null){
+            product_watchdog.stop_watch();
+        }
     });
 
 }

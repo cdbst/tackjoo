@@ -84,7 +84,7 @@ class ContentsNewProduct extends React.Component {
     __onClickWatchBtn(status){
 
         if(status){
-            window.electron.startWatchingNewReleased((stop, new_product_info_list)=>{
+            window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
                 
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 

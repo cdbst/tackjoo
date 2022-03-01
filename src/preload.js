@@ -418,8 +418,8 @@ function _restartToUpdate(){
     ipcRenderer.send('restart-to-update', ipc_data);
 }
 
-function _startWatchingNewReleased(__callback){
-    let ipc_data = get_ipc_data();
+function _startWatchingNewReleased(settings_info, __callback){
+    let ipc_data = get_ipc_data({settings_info : settings_info});
     ipcRenderer.send('start-watching-new-released', ipc_data);
 
     const watch_evt_handler = (_event, {stop, product_info_list}) => {
