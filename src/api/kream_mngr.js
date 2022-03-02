@@ -35,7 +35,7 @@ async function get_kream_product_price(product_info){
         headers : get_req_headers(),
         params : {
             per_page : 10,
-            keyword : product_info.model_id + '',
+            keyword : product_info.model_id,
             request_key : uuidv4()
         }
     };

@@ -9,10 +9,22 @@ class NewProductTableItem extends React.Component {
         this.onClickRemove = this.onClickRemove.bind(this);
 
         this.__mount = false;
+
+        this.state = {
+            kream_price : undefined
+        }
     }
 
     componentDidMount(){
         this.__mount = true;
+        window.electron.getKreamTradePrice(this.props.product_info, (err, recently_trade_price)=>{
+
+            if(err) return;
+
+            this.setState(_ => ({
+                kream_price : recently_trade_price
+            }));
+        });
     }
 
     componentWillUnmount(){
@@ -49,6 +61,9 @@ class NewProductTableItem extends React.Component {
                     <span>{this.props.product_info.price}</span>
                 </td>
                 <td style={{width : this.props.kream_price_col_width, maxWidth : this.props.kream_price_col_width}}>
+                    <span>{this.state.kream_price === undefined ? '확인불가' : this.state.kream_price}</span>
+                </td>
+                <td style={{width : this.props.price_gap_col_width, maxWidth : this.props.price_gap_col_width}}>
                     <span></span>
                 </td>
                 <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
