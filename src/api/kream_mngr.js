@@ -56,6 +56,8 @@ async function get_kream_product_price(product_info){
             else if(is_valid_currency_format(recently_trade_price)) return recently_trade_price;
         }
 
+        return undefined;
+
     }catch(err){
         log.error(get_log_str('kream_mngr.js', 'get_kream_product_price', err));
         return undefined;
