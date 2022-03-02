@@ -41,6 +41,11 @@
         return String(password).match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);
     }
 
+    exports.is_valid_currency_format = function(currency_str){
+        var regex = RegExp(/^(?!0\.00)[1-9]\d{0,2}(,\d{3})*(\.\d\d)?$/);
+        return regex.test(currency_str);
+    }
+
     exports.async_sleep = function(time_out) {
         return new Promise((resolve, reject) =>{
             try{
@@ -223,6 +228,25 @@
         var seconds = paded_time_str(date.getSeconds());
 
         return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
+    }
+
+    exports.get_YYYYMMDDhhmmss = function(date){
+
+        if(date == undefined) return '';
+
+        const paded_time_str = (val) =>{
+            return val < 10 ? '0' + val.toString() : val.toString();
+        };
+
+        var year = date.getFullYear().toString();
+        var month = paded_time_str(date.getMonth() + 1);
+        var day = paded_time_str(date.getDate());
+
+        var hour = paded_time_str(date.getHours());
+        var min = paded_time_str(date.getMinutes());
+        var seconds = paded_time_str(date.getSeconds());
+
+        return [year, month, day, hour, min, seconds].join('');
     }
 
     exports.add_minutes = function(date, minutes){

@@ -39,7 +39,8 @@ contextBridge.exposeInMainWorld('electron', {
     stopWatchingNewReleased : _stopWatchingNewReleased,
     notifyNewProduct : _notifyNewProduct,
     notifyNewProductList : _notifyNewProductList,
-    registerchangeAppTab : _registerchangeAppTab
+    registerchangeAppTab : _registerchangeAppTab,
+    getKreamTradePrice : _getKreamTradePrice,
 });
 
 
@@ -463,4 +464,13 @@ function _notifyNewProduct(product_info){
 function _notifyNewProductList(product_info_list){
     const ipc_data = get_ipc_data({product_info_list : product_info_list});
     ipcRenderer.send('notify-new-product-list', ipc_data);
+}
+
+function _getKreamTradePrice(product_info, __callback){
+    let ipc_data = get_ipc_data({product_info : product_info});
+    ipcRenderer.send('get-kream-trade-price', ipc_data);
+
+    ipcRenderer.once('get-kream-trade-price-reply' + ipc_data.id, (_event, kream_trade_price_info) => {
+        __callback(kream_trade_price_info.err, kream_trade_price_info.data);
+    });
 }
