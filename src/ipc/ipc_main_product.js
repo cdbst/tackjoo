@@ -1,6 +1,7 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("../api/browser_context.js").BrowserContext;
 const NewReleasedProductWatchdog = require('../api/new_released_product_watchdog').NewReleasedProductWatchdog;
+const { get_kream_product_price } = require('../api/kream_mngr');
 
 const log = require('electron-log');
 const common = require('../common/common');
@@ -66,6 +67,25 @@ function register(){
         }
     });
 
+    ipcMain.on('get-kream-trade-price', async(event, data) =>{
+
+        const product_info = data.payload.product_info;
+        
+        (async()=>{
+            try{
+                const trade_price_info = await get_kream_product_price(product_info);
+                if(trade_price_info === undefined){
+                    event.reply('get-kream-trade-price-reply' + data.id, {err : '크림에서 가격정보를 찾을수 없습니다.', data : undefined});
+                }else{
+                    event.reply('get-kream-trade-price-reply' + data.id, {err : undefined, data : trade_price_info});
+                }
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_product.js', 'get-kream-trade-price-callback', err));
+                event.reply('get-kream-trade-price-reply' + data.id, {err : err.message, data : undefined});
+            }
+        })();
+        
+    });
 }
 
 
