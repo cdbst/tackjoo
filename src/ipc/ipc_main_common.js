@@ -2,6 +2,7 @@ const { ipcMain, shell, clipboard, app } = require("electron");
 const log = require('electron-log');
 const common = require('../common/common');
 const path = require('path');
+const { notify_new_product } = require('../api/notification_mngr');
 
 function register(){
 
@@ -55,6 +56,20 @@ function register(){
                 log.error(common.get_log_str('ipc_main_common.js', 'restart-to-update-callback', err));
             }
         })();
+    });
+
+    ipcMain.on('notify-new-product', (event, data) =>{
+        
+        try{
+            const product_info = data.payload.product_info;
+            notify_new_product(product_info, (e)=>{
+                app.main_browser_window.focus();
+            });
+            
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_common.js', 'notify-new-product-callback', err));
+        }
+        
     });
 }
 

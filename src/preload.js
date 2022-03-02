@@ -37,6 +37,7 @@ contextBridge.exposeInMainWorld('electron', {
     restartToUpdate : _restartToUpdate,
     startWatchingNewReleased : _startWatchingNewReleased,
     stopWatchingNewReleased : _stopWatchingNewReleased,
+    notifyNewProduct : _notifyNewProduct
 });
 
 let get_sensor_data = undefined;
@@ -438,4 +439,9 @@ function _startWatchingNewReleased(settings_info, __callback){
 function _stopWatchingNewReleased(){
     let ipc_data = get_ipc_data();
     ipcRenderer.send('stop-watching-new-released', ipc_data);
+}
+
+function _notifyNewProduct(product_info){
+    let ipc_data = get_ipc_data({product_info : product_info});
+    ipcRenderer.send('notify-new-product', ipc_data);
 }

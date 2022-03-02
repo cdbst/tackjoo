@@ -103,6 +103,7 @@ class ContentsNewProduct extends React.Component {
 
                 new_product_info_list.forEach((product_info)=>{
                     this.__product_info_list.push(product_info);
+                    window.electron.notifyNewProduct(product_info);
                 });
 
                 this.__updateTableItems();
