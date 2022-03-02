@@ -1,10 +1,15 @@
 const { ipcMain, shell, clipboard, app } = require("electron");
 const log = require('electron-log');
 const common = require('../common/common');
+const util = require("./ipc_util.js");
 const path = require('path');
-const { notify_new_product } = require('../api/notification_mngr');
+const { notify_new_product, notify_new_product_list } = require('../api/notification_mngr');
 
-function register(){
+let g_win = undefined;
+
+function register(win){
+
+    g_win = win;
 
     ipcMain.on('open-external-webpage', (event, data) => {
         try{
@@ -63,13 +68,33 @@ function register(){
         try{
             const product_info = data.payload.product_info;
             notify_new_product(product_info, (e)=>{
-                app.main_browser_window.focus();
+
+                app.main_browser_window.focus(); // desktop notification 클릭시 app을 강제로 포커싱시킨다.
+
+                const data = util.get_ipc_data({tab_el_id : 'new-product-tab'}); // app의 tab을 '신상품' 탭으로 변경시킨다.
+                g_win.webContents.send('change-app-tab', data);
             });
             
         }catch(err){
             log.error(common.get_log_str('ipc_main_common.js', 'notify-new-product-callback', err));
         }
+    });
+
+    ipcMain.on('notify-new-product-list', (event, data) =>{
         
+        try{
+            const product_info_list = data.payload.product_info_list;
+
+            notify_new_product_list(product_info_list, (e)=>{
+                app.main_browser_window.focus(); // desktop notification 클릭시 app을 강제로 포커싱시킨다.
+
+                const data = util.get_ipc_data({tab_el_id : 'new-product-tab'}); // app의 tab을 '신상품' 탭으로 변경시킨다.
+                g_win.webContents.send('change-app-tab', data);
+            });
+            
+        }catch(err){
+            log.error(common.get_log_str('ipc_main_common.js', 'notify-new-product-list-callback', err));
+        }
     });
 }
 

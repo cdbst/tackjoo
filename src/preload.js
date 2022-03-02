@@ -37,19 +37,23 @@ contextBridge.exposeInMainWorld('electron', {
     restartToUpdate : _restartToUpdate,
     startWatchingNewReleased : _startWatchingNewReleased,
     stopWatchingNewReleased : _stopWatchingNewReleased,
-    notifyNewProduct : _notifyNewProduct
+    notifyNewProduct : _notifyNewProduct,
+    notifyNewProductList : _notifyNewProductList,
+    registerchangeAppTab : _registerchangeAppTab
 });
 
-let get_sensor_data = undefined;
-function _register_get_sensor_data(_get_sensor_data){
-    get_sensor_data = _get_sensor_data;
-}
+
 
 /**
  * 
  * Renderer process IPC Listenrs
  */
 
+/** renderer process로부터 sensor data를 취득하기 위한 기능 */
+let get_sensor_data = undefined;
+function _register_get_sensor_data(_get_sensor_data){
+    get_sensor_data = _get_sensor_data;
+}
 ipcRenderer.on('gen-sensor-data', (event, _data) => {
 
     get_sensor_data((_sensor_data) =>{
@@ -60,6 +64,16 @@ ipcRenderer.on('gen-sensor-data', (event, _data) => {
 
         ipcRenderer.send('gen-sensor-data-reply' + _data.id, ipc_data);
     });
+});
+
+
+/** renderer process의 app tab을 임의로 변경하기 위한 기능 */
+let changeAppTab = undefined;
+function _registerchangeAppTab(_changeAppTab){
+    changeAppTab = _changeAppTab;
+}
+ipcRenderer.on('change-app-tab', (event, _data) => {
+    if(changeAppTab)changeAppTab(_data.payload.tab_el_id);
 });
 
 /**
@@ -442,6 +456,11 @@ function _stopWatchingNewReleased(){
 }
 
 function _notifyNewProduct(product_info){
-    let ipc_data = get_ipc_data({product_info : product_info});
+    const ipc_data = get_ipc_data({product_info : product_info});
     ipcRenderer.send('notify-new-product', ipc_data);
+}
+
+function _notifyNewProductList(product_info_list){
+    const ipc_data = get_ipc_data({product_info_list : product_info_list});
+    ipcRenderer.send('notify-new-product-list', ipc_data);
 }
