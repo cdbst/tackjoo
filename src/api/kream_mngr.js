@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { uuidv4, get_log_str } = require('../common/common');
+const { uuidv4, get_log_str, is_valid_currency_format } = require('../common/common');
 const log = require('electron-log');
 const cheerio = require('cheerio');
 
@@ -40,13 +40,19 @@ async function get_kream_product_price(product_info){
         }
     };
     
+    let retry = 6;
+
     try{
         const res = await axios(axios_req_cfg);
         if(res.data === undefined || res.data.items === undefined || res.data.items.length === 0) return undefined;
 
         const product_meta_info = res.data.items[0];
-        const recently_trade_price = await parse_kream_product_page(product_meta_info.id);
-        return recently_trade_price;
+
+        while(retry--){
+            const recently_trade_price = await parse_kream_product_page(product_meta_info.id);
+            if(recently_trade_price === undefined) return undefined;
+            else if(is_valid_currency_format(recently_trade_price)) return recently_trade_price;
+        }
 
     }catch(err){
         log.error(get_log_str('kream_mngr.js', 'get_kream_product_price', err));
@@ -61,12 +67,17 @@ async function parse_kream_product_page(kream_product_id){
         url: 'https://kream.co.kr/products/' + kream_product_id
     };
 
-    const res = await axios(axios_req_cfg);
-    const $ = cheerio.load(res.data);
-    const el_num_list = $('.num');
+    try{
+        const res = await axios(axios_req_cfg);
+        const $ = cheerio.load(res.data);
+        const el_num_list = $('.num');
 
-    const recently_trade_price = el_num_list[0].children[0].data;
-    return recently_trade_price + ' 원';
+        const recently_trade_price = el_num_list[0].children[0].data;
+        return recently_trade_price;
+    }catch(err){
+        log.error(get_log_str('kream_mngr.js', 'parse_kream_product_page', err));
+        return undefined;
+    }   
 }
 
 module.exports.get_kream_product_price = get_kream_product_price;

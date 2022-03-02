@@ -41,6 +41,11 @@
         return String(password).match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);
     }
 
+    exports.is_valid_currency_format = function(currency_str){
+        var regex = RegExp(/^(?!0\.00)[1-9]\d{0,2}(,\d{3})*(\.\d\d)?$/);
+        return regex.test(currency_str);
+    }
+
     exports.async_sleep = function(time_out) {
         return new Promise((resolve, reject) =>{
             try{
