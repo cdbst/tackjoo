@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { uuidv4, get_log_str, is_valid_currency_format } = require('../common/common');
+const { uuidv4, get_log_str, is_valid_currency_format, get_YYYYMMDDhhmmss } = require('../common/common');
 const log = require('electron-log');
 const cheerio = require('cheerio');
 
@@ -22,7 +22,7 @@ function get_req_headers(){
         'sec-fetch-site': 'same-origin',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
         'x-kream-api-version': 7,
-        'x-kream-client-datetime': '20220302145815+0900',
+        'x-kream-client-datetime': get_YYYYMMDDhhmmss(new Date()) + '+0900',
         'x-kream-device-id': 'web;' + uuidv4()
     };
 }
@@ -42,13 +42,13 @@ async function get_kream_product_price(product_info){
         }
     };
     
-    let retry = 6;
-
     try{
         const res = await axios(axios_req_cfg);
         if(res.data === undefined || res.data.items === undefined || res.data.items.length === 0) return undefined;
 
         const product_meta_info = res.data.items[0];
+
+        let retry = 6;
 
         while(retry--){
             const recently_trade_price = await parse_kream_product_page(product_meta_info.id);
