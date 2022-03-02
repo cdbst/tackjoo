@@ -29,13 +29,15 @@ function get_req_headers(){
 
 async function get_kream_product_price(product_info){
 
+    if(product_info.model_id === undefined) return undefined;
+
     const axios_req_cfg = {
         method: 'GET',
         url: KREAM_API_URL + '/p/products/suggest',
         headers : get_req_headers(),
         params : {
             per_page : 10,
-            keyword : product_info.model_id,
+            keyword : product_info.model_id.trim(),
             request_key : uuidv4()
         }
     };
