@@ -30,6 +30,7 @@ class Index extends React.Component {
     onSignedIn(){
 
         const cur_app_version = window.electron.getAppVersion();
+        window.electron.registerchangeAppTab(CommonUtils.changeAppTab);
 
         CommonUtils.checkUpdate(cur_app_version, (err, result) =>{
             if(err){
@@ -111,6 +112,12 @@ class CommonUtils {
             const result = common.compare_version(cur_version, latest_version);
             __callback(undefined, result === -1);
         });
+    }
+
+    static changeAppTab(tab_el_id){
+        const tab_menu_to_show = document.querySelector('#' + tab_el_id);
+        const el_bs_tab_menu_to_show = bootstrap.Tab.getOrCreateInstance(tab_menu_to_show);
+        el_bs_tab_menu_to_show.show();
     }
 }
 

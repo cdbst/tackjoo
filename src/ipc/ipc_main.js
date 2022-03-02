@@ -20,7 +20,7 @@ function register(win){
     IpcMainProxy.register();
     IpcMainSettings.register();
     IpcMainTheDraw.register();
-    IpcMainCommon.register();
+    IpcMainCommon.register(win);
 }
 
 module.exports.register = register;
