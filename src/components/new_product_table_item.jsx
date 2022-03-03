@@ -107,8 +107,8 @@ class NewProductTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-info" onClick={this.onClickCreateTask.bind(this)}>
+                        <div className="float-start button-wrapper-inner-table" >
+                            <button type="button" className="btn btn-info" onClick={this.onClickCreateTask.bind(this)} disabled={this.props.product_info.soldout}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>

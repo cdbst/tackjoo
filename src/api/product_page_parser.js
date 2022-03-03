@@ -1,6 +1,7 @@
 const common = require('../common/common.js');
 const parser_common = require('./page_parser_common');
 const log = require('electron-log');
+const _ = require('lodash');
 
 function get_sell_type(sell_type_string){
 
@@ -741,8 +742,8 @@ function parse_product_list_from_new_released_page($){
             common.update_product_info_obj(product_info, 'category', 'new_released');
             common.update_product_info_obj(product_info, '_id', common.uuidv4());
     
-            // TODO : [주위] 현재는 확인 불가하지만 Notify Me로 등장하는 것들이 있음. Notify me의 경우 normal type이 될 수 없음.
-            common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal); 
+            // TODO : [주의] 현재는 확인 불가하지만 Notify Me로 등장하는 것들이 있음. Notify me의 경우 normal type이 될 수 없음.
+            common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
     
             const el_name_inputs = parser_common.get_specific_tag_nodes(product_info_div, ['input'], [], ['name']);
             el_name_inputs.forEach((el_name_input)=>{
@@ -760,7 +761,7 @@ function parse_product_list_from_new_released_page($){
             product_name = parser_common.strip_usless_string(product_name)
             common.update_product_info_obj(product_info, 'name', product_name);
     
-            const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, ['a'], [], ['productcategory']);
+            const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, [], ['a-product-image-link']);
             const item_attr_name = el_category_a[0].attribs.productcategory;
             const item_attr = `itemAttributes[${item_attr_name}_SIZE]`;
             common.update_product_info_obj(product_info, 'item_attr', item_attr);
@@ -778,7 +779,39 @@ function parse_product_list_from_new_released_page($){
             common.update_product_info_obj(product_info, 'img_url', proudct_img_url);
     
             common.update_product_info_obj(product_info, 'released_date', new Date());
-    
+
+            //parse cnadidate color products
+            const el_sub_color_list = parser_common.get_specific_tag_nodes(product_info_div, ['li']);
+
+            el_sub_color_list.forEach((el_sub_color_info)=>{
+
+                const el_a_input_radio = parser_common.get_specific_tag_nodes(el_sub_color_info, ['a']);
+
+                const sub_color_product_url = common.NIKE_URL + el_a_input_radio[0].attribs.href;
+                if(sub_color_product_url === product_info.url) return;
+
+                const sub_color_product_info = _.clone(product_info);
+                common.update_product_info_obj(sub_color_product_info, 'url', sub_color_product_url);
+
+                //DM5208-010
+                const model_id_regex = /[A-Z0-9]{6}-[0-9]{3}/;
+                const model_id = model_id_regex.exec(sub_color_product_url)[0];
+                common.update_product_info_obj(sub_color_product_info, 'model_id', model_id);
+
+                const soldout = el_sub_color_info.attribs.class.includes('isSoldout');
+                common.update_product_info_obj(sub_color_product_info, 'soldout', soldout);
+
+                const el_product_img = parser_common.get_specific_tag_nodes(el_sub_color_info, ['img']);
+                const img_url = el_product_img[0].attribs.src;
+                common.update_product_info_obj(sub_color_product_info, 'img_url', img_url);
+
+                common.update_product_info_obj(sub_color_product_info, 'product_id', undefined);
+                common.update_product_info_obj(sub_color_product_info, '_id', common.uuidv4()); // TODO update model_id
+
+                product_info_list.push(sub_color_product_info);
+
+            }); // 한 item이지만 복수개의 색상이 존재하는 제품에 대한 처리이다.
+
             product_info_list.push(product_info);
 
         }catch(err){
