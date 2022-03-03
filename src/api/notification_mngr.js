@@ -11,6 +11,7 @@ module.exports.notify_new_product = (product_info, __on_click_cb)=>{
     });
 
     notification.on('click', __on_click_cb);
+    this.set_taskbar_flash(true);
     notification.show();
     
 }
@@ -35,6 +36,11 @@ module.exports.notify_new_product_list = (product_info_list, __on_click_cb)=>{
     });
 
     notification.on('click', __on_click_cb);
+    this.set_taskbar_flash(true);
     notification.show();
-    
+}
+
+module.exports.set_taskbar_flash = (setting) => {
+    if(setting) app.main_browser_window.once('focus', ()=> app.main_browser_window.flashFrame(false));
+    app.main_browser_window.flashFrame(setting);
 }
