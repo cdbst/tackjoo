@@ -81,7 +81,7 @@ class NewReleasedProductWatchdog{
                     if(this.watch_max_ret === 0) ret_remain++;
 
                     if(accumulated_fail_cnt === 10){
-                        notify_text('감시 기능이 중지되었습니다.', '신상품 페이지로부터 더 이상 상품 정보를 얻을수 없는 상태입니다.');
+                        notify_text('신상품 감시기능 중지', '신상품 페이지로부터 더 이상 상품 정보를 얻을수 없는 상태입니다.');
                         this.watchdog_rejecter('cannot receive product information form new release page.');
                         return;
                     }
@@ -121,6 +121,7 @@ class NewReleasedProductWatchdog{
                 }
             }
 
+            notify_text('신상품 감시기능 중지', `신상품을 감시하는 기능이 정지되었습니다. (${this.watch_max_ret}회 감시 완료)`);
             this.watchdog_resolver();
         });
     }
