@@ -104,6 +104,7 @@ class ContentsNewProduct extends React.Component {
                 this.__ref_watch_btn.setDisabled(false);
 
                 if(stop){
+                    this.__ref_watch_btn.setBtnState(false);
                     Index.g_sys_msg_q.enqueue('알림', `신상품을 감시하는 기능이 중지됐습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
                     return;
                 }

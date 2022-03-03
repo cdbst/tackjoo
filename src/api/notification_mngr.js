@@ -54,7 +54,7 @@ module.exports.notify_text = (title, body, __on_click_cb)=>{
         icon: path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico'))
     });
 
-    if(__on_click_cb ) notification.on('click', __on_click_cb);
+    if(__on_click_cb) notification.on('click', __on_click_cb);
     this.set_taskbar_flash(true);
     notification.show();
 }
