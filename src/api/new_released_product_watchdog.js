@@ -70,8 +70,6 @@ class NewReleasedProductWatchdog{
             this.watchdog_rejecter = reject;
 
             let prev_product_info_list = undefined;
-
-            //let test_toggle = true;
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
             let accumulated_fail_cnt = 0;
 
@@ -92,7 +90,7 @@ class NewReleasedProductWatchdog{
                     }
     
                     const res = await this.browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases', 1);
-                    //const res = this.open_new_released_page_test(test_toggle);
+                    
                     if(res === undefined || res.data === undefined){
                         accumulated_fail_cnt++;
                         continue;
@@ -113,7 +111,6 @@ class NewReleasedProductWatchdog{
                     prev_product_info_list = new_product_info_list;
                     accumulated_fail_cnt = 0; // 누적 에러 값을 초기화 시킨다.
                     await common.async_sleep(this.watch_interval * 1000);
-                    //test_toggle = !test_toggle;
                     
                 }catch(err){
                     log.error(common.get_log_str('new_released_product_watchdog.js', 'start_watch-inner-promise', err));
