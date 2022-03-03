@@ -182,13 +182,13 @@ class ContentsTasks extends React.Component {
         let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
 
             const task_info = task_table_item.props.task_info;
-            if(task_info.account_id != task_info_to_check.account_id) return false;
+            if(task_info.account_id !== task_info_to_check.account_id) return false;
 
-            if(task_info_to_check.product_info.sell_type == common.SELL_TYPE.draw && task_info.product_info._id == task_info_to_check_product_info._id) return true;
+            if(task_info_to_check.product_info.sell_type === common.SELL_TYPE.draw && task_info.product_info._id === task_info_to_check.product_info._id) return true;
             else return false;
         });
 
-        return duplicated.length != 0;
+        return duplicated.length !== 0;
     }
 
     onRemoveTask(task_id){
