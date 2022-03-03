@@ -6,12 +6,17 @@ const IpcM = require('./ipc/ipc_main');
 const common = require('./common/common');
 const app_cfg = require('./app_config');
 const { autoUpdater } = require("electron-updater");
+const package_json = require('./package.json');
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = true;
 
 app_cfg.set_log('info', false);
+
+if (process.platform === 'win32'){
+    app.setAppUserModelId(package_json.name);
+}
 
 function create_window() {
     try{
