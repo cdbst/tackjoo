@@ -42,7 +42,7 @@ class NewReleasedProductWatchdog{
             const new_product_info = new_released_product_list[i];
             let already_exists = false;
             a_list.every((a_product_info)=>{
-                if(a_product_info.product_id === new_product_info.product_id){
+                if(a_product_info.url === new_product_info.url){
                     already_exists = true;
                     return false;
                 }
