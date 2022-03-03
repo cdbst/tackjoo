@@ -44,3 +44,17 @@ module.exports.set_taskbar_flash = (setting) => {
     if(setting) app.main_browser_window.once('focus', ()=> app.main_browser_window.flashFrame(false));
     app.main_browser_window.flashFrame(setting);
 }
+
+module.exports.notify_text = (title, body, __on_click_cb)=>{
+    
+    const notification = new Notification({
+        title: title,
+        body: body,
+        silent: false,
+        icon: path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico'))
+    });
+
+    if(__on_click_cb ) notification.on('click', __on_click_cb);
+    this.set_taskbar_flash(true);
+    notification.show();
+}
