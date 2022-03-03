@@ -120,6 +120,7 @@ class ContentsNewProduct extends React.Component {
                 this.__updateTableItems();
             });
         }else{
+            Index.g_sys_msg_q.enqueue('알림', `신상품의 감시를 정지하도록 시도합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
             window.electron.stopWatchingNewReleased();
         }
     }
