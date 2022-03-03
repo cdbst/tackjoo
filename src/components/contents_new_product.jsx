@@ -96,9 +96,18 @@ class ContentsNewProduct extends React.Component {
         this.__ref_watch_btn.setDisabled(true);
 
         if(status){
+
+            Index.g_sys_msg_q.enqueue('알림', `신상품을 감시하는 기능이 시작되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
             window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
+
                 this.__ref_watch_btn.setDisabled(false);
-                if(stop) this.__ref_watch_btn.setBtnState(false);
+
+                if(stop){
+                    Index.g_sys_msg_q.enqueue('알림', `신상품을 감시하는 기능이 중지됐습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                    return;
+                }
+
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
                 Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
