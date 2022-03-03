@@ -64,7 +64,7 @@ class NewReleasedProductWatchdog{
     start_watch(__callback){
 
         this.stopped = false;
-        
+
         return new Promise(async (resolve, reject)=>{
             this.watchdog_resolver = resolve;
             this.watchdog_rejecter = reject;
@@ -114,6 +114,7 @@ class NewReleasedProductWatchdog{
     
                     await common.async_sleep(this.watch_interval * 1000);
                     //test_toggle = !test_toggle;
+                    accumulated_fail_cnt = 0; // 누적 에러 값을 초기화 시킨다.
 
                 }catch(err){
                     log.error(common.get_log_str('new_released_product_watchdog.js', 'start_watch-inner-promise', err));
