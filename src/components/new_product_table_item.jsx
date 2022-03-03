@@ -67,7 +67,7 @@ class NewProductTableItem extends React.Component {
 
     render(){
 
-        const kream_price_str = this.state.kream_price === undefined ? '확인불가' : this.state.kream_price + ' 원';
+        const kream_price_str = this.state.kream_price === undefined ? '정보없음' : this.state.kream_price + ' 원';
 
         let price_gap_str = '';
         let price_gap = 0;
