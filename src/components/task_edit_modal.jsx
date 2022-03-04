@@ -19,6 +19,7 @@ class TaskEditModal extends React.Component {
         this.setCustomURLProduct = this.setCustomURLProduct.bind(this);
 
         this.onChangeUseReservation = this.onChangeUseReservation.bind(this);
+        this.onClickProductImg = this.onClickProductImg.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
@@ -282,6 +283,12 @@ class TaskEditModal extends React.Component {
         bs_obj_modal.hide();
     }
 
+    onClickProductImg(){
+        if(this.state.selected_product === undefined) return;
+        if(this.state.selected_product.url === undefined || this.state.selected_product.url === '') return;
+        window.electron.openExternalWebPage(this.state.selected_product.url);
+    }
+
     render(){
 
         let sell_type_list = ProductManager.getValueList(this.product_info_list, 'sell_type', false);
@@ -343,6 +350,11 @@ class TaskEditModal extends React.Component {
 
         const show_product_open_time = ![common.SELL_TYPE.normal, common.SELL_TYPE.custom].includes(product_sell_type);
         const show_custom_product_name_input = product_sell_type == common.SELL_TYPE.custom;
+
+        let model_id = '';
+        if(this.state.selected_product !== undefined && this.state.selected_product.model_id !== undefined){
+            model_id = this.state.selected_product.model_id;
+        }
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -358,7 +370,12 @@ class TaskEditModal extends React.Component {
                                     <div ref={this.ref_loading_div} className="tesk-edit-modal-loding-div d-flex align-items-center justify-content-center">
                                         <div className="spinner-border tesk-edit-modal-spinner-product" role="status"/>    
                                     </div>
-                                    <img ref={this.ref_product_img} className="rounded tesk-edit-modal-product-img" src={product_img_url} alt={product_desc_name}/>
+                                    <img ref={this.ref_product_img} 
+                                        className="rounded tesk-edit-modal-product-img" 
+                                        src={product_img_url} 
+                                        alt={product_desc_name} 
+                                        onClick={this.onClickProductImg.bind(this)}
+                                    />
                                 </div>
                             </div>
                             <div className="row" style={{display : show_custom_product_name_input ? 'none' : ''}}>
@@ -437,6 +454,15 @@ class TaskEditModal extends React.Component {
                                 </label>
                                 <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
+                                <div className="col-md-2">
+                                    <label className="task-edit-modal-option-label">모델</label>
+                                </div>
+                                <div className="col-md-4">
+                                    <label>{model_id}</label>
                                 </div>
                             </div>
                         </div>
