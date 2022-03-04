@@ -14,7 +14,7 @@ class NewProductTableItem extends React.Component {
         this.__mount = false;
 
         this.state = {
-            kream_price : undefined
+            kream_product_info : undefined
         }
     }
 
@@ -25,7 +25,7 @@ class NewProductTableItem extends React.Component {
             if(err) return;
 
             this.setState(_ => ({
-                kream_price : kream_product_info.price
+                kream_product_info : kream_product_info
             }));
         });
     }
@@ -39,7 +39,7 @@ class NewProductTableItem extends React.Component {
     }
 
     getKreamPriceFontColor(){
-        return this.state.kream_price === undefined ? '#dc3545' : '#ffffff';
+        return this.state.kream_product_info === undefined ? '#dc3545' : '#ffffff';
     }
 
     onClickCreateTask(){
@@ -67,13 +67,14 @@ class NewProductTableItem extends React.Component {
 
     render(){
 
-        const kream_price_str = this.state.kream_price === undefined ? '정보없음' : this.state.kream_price;
+        const kream_price_str = this.state.kream_product_info === undefined ? '정보없음' : this.state.kream_product_info.price;
+        const kream_interest_str = this.state.kream_product_info === undefined ? '' : this.state.kream_product_info.interest;
 
         let price_gap_str = '';
         let price_gap = 0;
         
-        if(this.state.kream_price){
-            price_gap = this.getPriceGap(this.state.kream_price, this.props.product_info.price);
+        if(this.state.kream_product_info){
+            price_gap = this.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
             price_gap_str = new Intl.NumberFormat('ko-KR').format(price_gap);
             let yield_percent =  (price_gap / this.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
             yield_percent = yield_percent.toFixed(1);
@@ -101,6 +102,9 @@ class NewProductTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.price_gap_col_width, maxWidth : this.props.price_gap_col_width}}>
                     <span className='custom-color-text' style={{'--text-color' : price_gap_str_font_color}}>{price_gap_str}</span>
+                </td>
+                <td style={{width : this.props.kream_interest_col_width, maxWidth : this.props.kream_interest_col_width}}>
+                    <span >{kream_interest_str}</span>
                 </td>
                 <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
                     <span>{common.get_formatted_date_str(this.props.product_info.released_date, true)}</span>

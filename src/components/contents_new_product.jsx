@@ -35,11 +35,12 @@ class ContentsNewProduct extends React.Component {
         this.image_col_width = 98;
         this.price_col_width = 140;
         this.kream_price_col_width = 140;
-        this.price_gap_col_width = 200;
-        this.actions_col_width = 240;
-        this.soldout_status_col_width = 120;
-        this.release_date_col_width = 190;
-        this.model_id_col_width = 140;
+        this.price_gap_col_width = 180;
+        this.actions_col_width = 204;
+        this.soldout_status_col_width = 102;
+        this.release_date_col_width = 165;
+        this.model_id_col_width = 127;
+        this.kream_interest_col_width = 106;
         this.name_col_width = 'calc( 100% - ' + (this.price_gap_col_width + this.actions_col_width + this.kream_price_col_width + this.price_col_width + this.image_col_width + this.soldout_status_col_width + this.release_date_col_width) + 'px)';
     }
 
@@ -81,6 +82,7 @@ class ContentsNewProduct extends React.Component {
                 model_id_col_width={this.model_id_col_width}
                 soldout_status_col_width={this.soldout_status_col_width}
                 price_gap_col_width={this.price_gap_col_width}
+                kream_interest_col_width={this.kream_interest_col_width}
                 product_info={product_info}
                 h_on_remove={this.onRemoveProduct.bind(this)}
                 h_on_create_task={this.onCreateTask.bind(this)}
@@ -160,6 +162,7 @@ class ContentsNewProduct extends React.Component {
                                 <th scope="col" style={{width : this.price_col_width, maxWidth : this.price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.kream_price_col_width, maxWidth : this.kream_price_col_width}}>크림가격</th>
                                 <th scope="col" style={{width : this.price_gap_col_width, maxWidth : this.price_gap_col_width}}>시세차익</th>
+                                <th scope="col" style={{width : this.kream_interest_col_width, maxWidth : this.kream_interest_col_width}}>크림관심도</th>
                                 <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
                                 <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
