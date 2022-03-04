@@ -9,6 +9,7 @@ class TaskTableItem extends React.Component {
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
+        this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
         this.onPlayTask = this.onPlayTask.bind(this);
@@ -139,6 +140,12 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    onClickProductImg(){
+        if(this.props.task_info.product_info === undefined) return;
+        if(this.props.task_info.product_info.url === undefined || this.props.task_info.product_info.url === '') return;
+        window.electron.openExternalWebPage(this.props.task_info.product_info.url);
+    }
+
     getStatusFontColor(){
 
         if(this.state.status == common.TASK_STATUS.DONE){
@@ -237,8 +244,14 @@ class TaskTableItem extends React.Component {
 
         return(
             <tr>
-                <td style={{width : this.props.type_col_width, maxWidth : this.props.type_col_width}}>
-                    <span>{product_info.sell_type}</span>
+                <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
+                    <img 
+                        className="rounded product-table-item-img" 
+                        src={product_info.img_url} 
+                        alt={product_info.name}
+                        style={{cursor: 'pointer'}}
+                        onClick={this.onClickProductImg.bind(this)}
+                    />
                 </td>
                 <td style={{width : this.props.product_col_width, maxWidth : this.props.product_col_width}}>
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={product_name}>{product_name}</div>

@@ -338,9 +338,9 @@ tbody tr:hover td {
 
 /* start to new product table item */
 
-.new-product-table-item-img{
-    height: 80px !important;
-    width: 80px !important;
+.product-table-item-img{
+    height: 60px !important;
+    width: 60px !important;
 }
 
 /* End to new product table item */

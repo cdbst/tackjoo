@@ -131,8 +131,11 @@ class TaskEditModal extends React.Component {
 
             this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
                 this.setState(_ => ({
-                    selected_product : product_info
-                }));
+                    selected_product : product_info,
+                    kream_product_info : undefined,
+                }), () =>{
+                    this.getKreamProductInfo();
+                });
             });
         });
     }
@@ -191,7 +194,8 @@ class TaskEditModal extends React.Component {
             this.setState(_ => ({ 
                 selected_product : product_info,
                 kream_product_info : undefined
-            }), ()=>{ this.getKreamProductInfo(); 
+            }), ()=>{ 
+                this.getKreamProductInfo(); 
             });
         });
     }
