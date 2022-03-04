@@ -269,13 +269,13 @@ tbody tr:hover td {
 
 /* Start to Task Edit Modal */
 .tesk-edit-modal-product-img{
-    height: 280px !important;
-    width: 280px !important;
+    height: 250px !important;
+    width: 250px !important;
     cursor: pointer !important;
 }
 
 .tesk-edit-modal-loding-div{
-    height: 300px !important;
+    height: 250px !important;
 }
 
 .tesk-edit-modal-spinner-product{
