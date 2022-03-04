@@ -21,6 +21,9 @@ class TaskEditModal extends React.Component {
         this.onChangeUseReservation = this.onChangeUseReservation.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
 
+        this.onClickKreamPrice = this.onClickKreamPrice.bind(this);
+        this.onClickProductModelID = this.onClickProductModelID.bind(this);
+
         this.getKreamProductInfo = this.getKreamProductInfo.bind(this);
 
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
@@ -150,7 +153,6 @@ class TaskEditModal extends React.Component {
 
         window.electron.getKreamProductInfo(this.state.selected_product, (err, kream_product_info)=>{
             if(err) return;
-            console.log(kream_product_info);
             this.setState(_ => ({ kream_product_info : kream_product_info }));
         });
     }
@@ -301,6 +303,17 @@ class TaskEditModal extends React.Component {
         if(this.state.selected_product === undefined) return;
         if(this.state.selected_product.url === undefined || this.state.selected_product.url === '') return;
         window.electron.openExternalWebPage(this.state.selected_product.url);
+    }
+
+    onClickKreamPrice(){
+        if(this.state.kream_product_info === undefined) return undefined;
+        window.electron.openExternalWebPage(this.state.kream_product_info.url);
+    }
+
+    onClickProductModelID(){
+        if(this.state.selected_product === undefined) return undefined;
+        Index.g_sys_msg_q.enqueue('알림', '상품의 모델ID가 클립보드에 저장되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        window.electron.writeTextToClipboard(this.state.selected_product.model_id);
     }
 
     render(){
@@ -483,17 +496,20 @@ class TaskEditModal extends React.Component {
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
                                 <label className="col-md-3 col-form-label font-weight-bold task-edit-modal-option-label">크림가격</label>
-                                <label className={`col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`}>
-                                    {kream_price_str}
+                                <label 
+                                    className={`col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`} 
+                                    onClick={this.onClickKreamPrice.bind(this)}
+                                    style={{cursor: 'pointer'}}
+                                > {kream_price_str}
                                 </label>
                             </div>
                             <hr/>
-                            <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
+                            <div className="row">
                                 <div className="col-md-2">
                                     <label className="task-edit-modal-option-label">모델</label>
                                 </div>
                                 <div className="col-md-4">
-                                    <label>{model_id}</label>
+                                    <label onClick={this.onClickProductModelID.bind(this)} style={{cursor: 'pointer'}}>{model_id}</label>
                                 </div>
                                 <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
