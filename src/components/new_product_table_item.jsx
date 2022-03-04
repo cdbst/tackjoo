@@ -90,6 +90,9 @@ class NewProductTableItem extends React.Component {
                 <td style={{width : this.props.name_col_width, maxWidth : this.props.name_col_width}}>
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.product_info.name}>{this.props.product_info.name}</div>
                 </td>
+                <td style={{width : this.props.model_id_col_width, maxWidth : this.props.model_id_col_width}}>
+                    <span >{this.props.product_info.model_id}</span>
+                </td>
                 <td style={{width : this.props.price_col_width, maxWidth : this.props.price_col_width}}>
                     <span >{this.props.product_info.price}</span>
                 </td>
