@@ -236,17 +236,17 @@
             return val < 10 ? '0' + val.toString() : val.toString();
         };
 
-        var year = date.getFullYear().toString();
+        var year = date.getFullYear().toString().substring(2);
         var month = paded_time_str(date.getMonth() + 1);
         var day = paded_time_str(date.getDate());
 
-        if(with_time == false) return [year, month, day].join('-');
+        if(with_time == false) return [year, month, day].join('.');
 
         var hour = paded_time_str(date.getHours());
         var min = paded_time_str(date.getMinutes());
         var seconds = paded_time_str(date.getSeconds());
 
-        return [year, month, day].join('-') + ' ' + [hour, min, seconds].join(':');
+        return [year, month, day].join('.') + ' ' + [hour, min, seconds].join(':');
     }
 
     exports.get_YYYYMMDDhhmmss = function(date){
