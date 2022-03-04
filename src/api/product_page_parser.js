@@ -728,6 +728,12 @@ function parse_product_img_url_from_new_released_product_page($){
 }
 
 
+/**
+ * new release page에서 상품 정보들을 파싱하여 product list info로 반환합니다.
+ * 
+ * @param {object} $ parsed new release web page object
+ * @returns {object} new release page에서 파싱된 product info 리스트
+ */
 function parse_product_list_from_new_released_page($){
     const product_list_divs = $('.a-product');
 
@@ -783,34 +789,11 @@ function parse_product_list_from_new_released_page($){
             //parse cnadidate color products
             const el_sub_color_list = parser_common.get_specific_tag_nodes(product_info_div, ['li']);
 
-            el_sub_color_list.forEach((el_sub_color_info)=>{
-
-                const el_a_input_radio = parser_common.get_specific_tag_nodes(el_sub_color_info, ['a']);
-
-                const sub_color_product_url = common.NIKE_URL + el_a_input_radio[0].attribs.href;
-                if(sub_color_product_url === product_info.url) return;
-
-                const sub_color_product_info = _.clone(product_info);
-                common.update_product_info_obj(sub_color_product_info, 'url', sub_color_product_url);
-
-                //DM5208-010
-                const model_id_regex = /[A-Z0-9]{6}-[0-9]{3}/;
-                const model_id = model_id_regex.exec(sub_color_product_url)[0];
-                common.update_product_info_obj(sub_color_product_info, 'model_id', model_id);
-
-                const soldout = el_sub_color_info.attribs.class.includes('isSoldout');
-                common.update_product_info_obj(sub_color_product_info, 'soldout', soldout);
-
-                const el_product_img = parser_common.get_specific_tag_nodes(el_sub_color_info, ['img']);
-                const img_url = el_product_img[0].attribs.src;
-                common.update_product_info_obj(sub_color_product_info, 'img_url', img_url);
-
-                common.update_product_info_obj(sub_color_product_info, 'product_id', undefined);
-                common.update_product_info_obj(sub_color_product_info, '_id', common.uuidv4()); // TODO update model_id
-
-                product_info_list.push(sub_color_product_info);
-
-            }); // 한 item이지만 복수개의 색상이 존재하는 제품에 대한 처리이다.
+            // sub color들에대한 상품 정보들을 파싱한다.
+            const sub_product_info_list = parse_sub_color_product_info_list(el_sub_color_list, product_info);
+            sub_product_info_list.forEach((sub_product_info) =>{
+                product_info_list.push(sub_product_info);
+            });
 
             product_info_list.push(product_info);
 
@@ -821,6 +804,48 @@ function parse_product_list_from_new_released_page($){
     });
 
     return product_info_list;
+}
+
+/**
+ * new release page에 있는 하나의 product info feed elemnet에 속한 sub color html element object로부터 
+ * 여러 색상의 상품 정보를 취득하여 product info를 파싱합니다
+ * 
+ * @param {object} el_sub_color_list sub color 상품 정보를 포함하고 있는 html element 객체
+ * @param {object} representative_product_info main 제품 으로 표현중인 상품 정보에 대한 객체
+ */
+function parse_sub_color_product_info_list(el_sub_color_list, representative_product_info){
+
+    const sub_product_info_list = [];
+
+    el_sub_color_list.forEach((el_sub_color_info)=>{
+
+        const el_a_input_radio = parser_common.get_specific_tag_nodes(el_sub_color_info, ['a']);
+
+        const sub_color_product_url = common.NIKE_URL + el_a_input_radio[0].attribs.href;
+        if(sub_color_product_url === representative_product_info.url) return; // 메인 제품은 파싱하지 않는다.
+
+        const sub_color_product_info = _.clone(representative_product_info);
+        common.update_product_info_obj(sub_color_product_info, 'url', sub_color_product_url);
+
+        const model_id_regex = /[A-Z0-9]{6}-[0-9]{3}/;
+        const model_id = model_id_regex.exec(sub_color_product_url)[0];
+        common.update_product_info_obj(sub_color_product_info, 'model_id', model_id);
+
+        const soldout = el_sub_color_info.attribs.class.includes('isSoldout');
+        common.update_product_info_obj(sub_color_product_info, 'soldout', soldout);
+
+        const el_product_img = parser_common.get_specific_tag_nodes(el_sub_color_info, ['img']);
+        const img_url = el_product_img[0].attribs.src;
+        common.update_product_info_obj(sub_color_product_info, 'img_url', img_url);
+
+        common.update_product_info_obj(sub_color_product_info, 'product_id', undefined);
+        common.update_product_info_obj(sub_color_product_info, '_id', common.uuidv4()); // TODO update model_id
+
+        sub_product_info_list.push(sub_color_product_info);
+
+    }); // 한 item이지만 복수개의 색상이 존재하는 제품에 대한 처리이다.
+
+    return sub_product_info_list;
 }
 
 
