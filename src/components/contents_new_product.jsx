@@ -32,7 +32,7 @@ class ContentsNewProduct extends React.Component {
 
     __setupColumnsWidth(){
 
-        this.image_col_width = 180;
+        this.image_col_width = 98;
         this.price_col_width = 160;
         this.kream_price_col_width = 160;
         this.price_gap_col_width = 200;
