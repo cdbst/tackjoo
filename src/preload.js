@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld('electron', {
     notifyNewProduct : _notifyNewProduct,
     notifyNewProductList : _notifyNewProductList,
     registerchangeAppTab : _registerchangeAppTab,
-    getKreamTradePrice : _getKreamTradePrice,
+    getKreamProductInfo : _getKreamProductInfo,
 });
 
 
@@ -466,7 +466,7 @@ function _notifyNewProductList(product_info_list){
     ipcRenderer.send('notify-new-product-list', ipc_data);
 }
 
-function _getKreamTradePrice(product_info, __callback){
+function _getKreamProductInfo(product_info, __callback){
     let ipc_data = get_ipc_data({product_info : product_info});
     ipcRenderer.send('get-kream-trade-price', ipc_data);
 

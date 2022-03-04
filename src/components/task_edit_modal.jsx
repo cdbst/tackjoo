@@ -21,6 +21,8 @@ class TaskEditModal extends React.Component {
         this.onChangeUseReservation = this.onChangeUseReservation.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
 
+        this.getKreamProductInfo = this.getKreamProductInfo.bind(this);
+
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
 
@@ -143,6 +145,16 @@ class TaskEditModal extends React.Component {
     onModalClosed(e){
     }
 
+    getKreamProductInfo(){
+        if(this.state.selected_product === undefined) return;
+
+        window.electron.getKreamProductInfo(this.state.selected_product, (err, kream_product_info)=>{
+            if(err) return;
+            console.log(kream_product_info);
+            this.setState(_ => ({ kream_product_info : kream_product_info }));
+        });
+    }
+
     onChangeProduct(selected_key, __callback = undefined){
 
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
@@ -174,11 +186,8 @@ class TaskEditModal extends React.Component {
                 return;
             } 
             
-            this.setState(_ => ({
-                selected_product : product_info
-            }));
+            this.setState(_ => ({ selected_product : product_info }), ()=>{ this.getKreamProductInfo(); });
         });
-
     }
 
     onChangeType(type_name, product_id = undefined){
@@ -204,7 +213,7 @@ class TaskEditModal extends React.Component {
                 new_state.selected_product = _product_info;
                 new_state.use_reservation = _product_info.sell_type !== common.SELL_TYPE.normal;
             }
-            this.setState(_ => (new_state));
+            this.setState(_ => (new_state), ()=>{ this.getKreamProductInfo(); });
         });
     }
 
@@ -449,12 +458,9 @@ class TaskEditModal extends React.Component {
                             <hr/>
                             <div className="row">
                                 <label className="col-md-2 col-form-label font-weight-bold task-edit-modal-option-label">가격</label>
-                                <label className="col-sm-4 col-form-label font-weight-bold task-edit-modal-option-label">
+                                <label className="col-md-4 col-form-label font-weight-bold task-edit-modal-option-label">
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
-                                <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
-                                </div>
                             </div>
                             <hr/>
                             <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
@@ -463,6 +469,9 @@ class TaskEditModal extends React.Component {
                                 </div>
                                 <div className="col-md-4">
                                     <label>{model_id}</label>
+                                </div>
+                                <div className="col-md-6">
+                                    <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>
