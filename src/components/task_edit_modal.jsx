@@ -186,7 +186,11 @@ class TaskEditModal extends React.Component {
                 return;
             } 
             
-            this.setState(_ => ({ selected_product : product_info }), ()=>{ this.getKreamProductInfo(); });
+            this.setState(_ => ({ 
+                selected_product : product_info,
+                kream_product_info : undefined
+            }), ()=>{ this.getKreamProductInfo(); 
+            });
         });
     }
 
@@ -207,6 +211,7 @@ class TaskEditModal extends React.Component {
 
             let new_state = { 
                 filtered_product_info_list : _filtered_product_info_list,
+                kream_product_info : undefined
             };
 
             if(_product_info){
@@ -364,6 +369,22 @@ class TaskEditModal extends React.Component {
         if(this.state.selected_product !== undefined && this.state.selected_product.model_id !== undefined){
             model_id = this.state.selected_product.model_id;
         }
+
+        //kream 시세 정보를 표시하기 위한 코드
+        let kream_price_label_class_name = 'task-edit-modal-option-label-verbose';
+        let kream_price_str = '정보 없음';
+
+        if(this.state.selected_product !== undefined && this.state.kream_product_info !== undefined){
+            const price_gap = common.getPriceGap(this.state.kream_product_info.price, this.state.selected_product.price);
+            if(price_gap > 0){
+                kream_price_label_class_name = 'task-edit-modal-option-label-info';
+            }else if(price_gap < 0){
+                kream_price_label_class_name = 'task-edit-modal-option-label-danger';
+            }
+
+            kream_price_str = this.state.kream_product_info.price;
+        }
+
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -460,6 +481,10 @@ class TaskEditModal extends React.Component {
                                 <label className="col-md-2 col-form-label font-weight-bold task-edit-modal-option-label">가격</label>
                                 <label className="col-md-4 col-form-label font-weight-bold task-edit-modal-option-label">
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
+                                </label>
+                                <label className="col-md-3 col-form-label font-weight-bold task-edit-modal-option-label">크림가격</label>
+                                <label className={`col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`}>
+                                    {kream_price_str}
                                 </label>
                             </div>
                             <hr/>

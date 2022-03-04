@@ -46,6 +46,17 @@
         return regex.test(currency_str);
     }
 
+    exports.getNumberByCurrencyStr = function(currency_str){
+        return parseInt(currency_str.replace(/\D/g, ''));
+    }
+
+    exports.getPriceGap = function(a, b){
+        const a_price = this.getNumberByCurrencyStr(a);
+        const b_price = this.getNumberByCurrencyStr(b);
+
+        return a_price - b_price;
+    }
+
     exports.async_sleep = function(time_out) {
         return new Promise((resolve, reject) =>{
             try{

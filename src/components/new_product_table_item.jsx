@@ -9,8 +9,6 @@ class NewProductTableItem extends React.Component {
         this.onClickGoKreamLink = this.onClickGoKreamLink.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
-        this.getPriceGap = this.getPriceGap.bind(this);
-        this.getNumberByCurrencyStr = this.getNumberByCurrencyStr.bind(this);
 
         this.__mount = false;
 
@@ -61,17 +59,6 @@ class NewProductTableItem extends React.Component {
         window.electron.openExternalWebPage(this.props.product_info.url);
     }
 
-    getNumberByCurrencyStr(currency_str){
-        return parseInt(currency_str.replace(/\D/g, ''));
-    }
-
-    getPriceGap(a, b){
-        const a_price = this.getNumberByCurrencyStr(a);
-        const b_price = this.getNumberByCurrencyStr(b);
-
-        return a_price - b_price;
-    }
-
     render(){
 
         const kream_price_str = this.state.kream_product_info === undefined ? '정보없음' : this.state.kream_product_info.price;
@@ -81,9 +68,9 @@ class NewProductTableItem extends React.Component {
         let price_gap = 0;
         
         if(this.state.kream_product_info){
-            price_gap = this.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
+            price_gap = common.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
             price_gap_str = new Intl.NumberFormat('ko-KR').format(price_gap);
-            let yield_percent =  (price_gap / this.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
+            let yield_percent =  (price_gap / common.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
             yield_percent = yield_percent.toFixed(1);
             price_gap_str = `${price_gap_str}(${yield_percent}%)`;
         }

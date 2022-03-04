@@ -289,6 +289,12 @@ tbody tr:hover td {
 .task-edit-modal-option-label-danger{
     color: #dc3545 !important;
 }
+.task-edit-modal-option-label-info{
+    color: #0dcaf0 !important;
+}
+.task-edit-modal-option-label-verbose{
+    color: #ffffff !important;
+}
 
 #schedule-time-input{
     background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
