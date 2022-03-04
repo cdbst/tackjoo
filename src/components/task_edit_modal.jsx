@@ -21,6 +21,11 @@ class TaskEditModal extends React.Component {
         this.onChangeUseReservation = this.onChangeUseReservation.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
 
+        this.onClickKreamPrice = this.onClickKreamPrice.bind(this);
+        this.onClickProductModelID = this.onClickProductModelID.bind(this);
+
+        this.getKreamProductInfo = this.getKreamProductInfo.bind(this);
+
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
         this.selected_product_size = undefined;
 
@@ -143,6 +148,15 @@ class TaskEditModal extends React.Component {
     onModalClosed(e){
     }
 
+    getKreamProductInfo(){
+        if(this.state.selected_product === undefined) return;
+
+        window.electron.getKreamProductInfo(this.state.selected_product, (err, kream_product_info)=>{
+            if(err) return;
+            this.setState(_ => ({ kream_product_info : kream_product_info }));
+        });
+    }
+
     onChangeProduct(selected_key, __callback = undefined){
 
         let selected_product = this.product_info_list.find((product) => { return product._id == selected_key });
@@ -174,11 +188,12 @@ class TaskEditModal extends React.Component {
                 return;
             } 
             
-            this.setState(_ => ({
-                selected_product : product_info
-            }));
+            this.setState(_ => ({ 
+                selected_product : product_info,
+                kream_product_info : undefined
+            }), ()=>{ this.getKreamProductInfo(); 
+            });
         });
-
     }
 
     onChangeType(type_name, product_id = undefined){
@@ -198,13 +213,14 @@ class TaskEditModal extends React.Component {
 
             let new_state = { 
                 filtered_product_info_list : _filtered_product_info_list,
+                kream_product_info : undefined
             };
 
             if(_product_info){
                 new_state.selected_product = _product_info;
                 new_state.use_reservation = _product_info.sell_type !== common.SELL_TYPE.normal;
             }
-            this.setState(_ => (new_state));
+            this.setState(_ => (new_state), ()=>{ this.getKreamProductInfo(); });
         });
     }
 
@@ -289,6 +305,17 @@ class TaskEditModal extends React.Component {
         window.electron.openExternalWebPage(this.state.selected_product.url);
     }
 
+    onClickKreamPrice(){
+        if(this.state.kream_product_info === undefined) return undefined;
+        window.electron.openExternalWebPage(this.state.kream_product_info.url);
+    }
+
+    onClickProductModelID(){
+        if(this.state.selected_product === undefined) return undefined;
+        Index.g_sys_msg_q.enqueue('알림', '상품의 모델ID가 클립보드에 저장되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        window.electron.writeTextToClipboard(this.state.selected_product.model_id);
+    }
+
     render(){
 
         let sell_type_list = ProductManager.getValueList(this.product_info_list, 'sell_type', false);
@@ -355,6 +382,22 @@ class TaskEditModal extends React.Component {
         if(this.state.selected_product !== undefined && this.state.selected_product.model_id !== undefined){
             model_id = this.state.selected_product.model_id;
         }
+
+        //kream 시세 정보를 표시하기 위한 코드
+        let kream_price_label_class_name = 'task-edit-modal-option-label-verbose';
+        let kream_price_str = '정보 없음';
+
+        if(this.state.selected_product !== undefined && this.state.kream_product_info !== undefined){
+            const price_gap = common.getPriceGap(this.state.kream_product_info.price, this.state.selected_product.price);
+            if(price_gap > 0){
+                kream_price_label_class_name = 'task-edit-modal-option-label-info';
+            }else if(price_gap < 0){
+                kream_price_label_class_name = 'task-edit-modal-option-label-danger';
+            }
+
+            kream_price_str = this.state.kream_product_info.price;
+        }
+
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -449,20 +492,27 @@ class TaskEditModal extends React.Component {
                             <hr/>
                             <div className="row">
                                 <label className="col-md-2 col-form-label font-weight-bold task-edit-modal-option-label">가격</label>
-                                <label className="col-sm-4 col-form-label font-weight-bold task-edit-modal-option-label">
+                                <label className="col-md-4 col-form-label font-weight-bold task-edit-modal-option-label">
                                     {this.state.selected_product == undefined ? '' : this.state.selected_product.price}
                                 </label>
-                                <div className="col-md-6">
-                                    <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
-                                </div>
+                                <label className="col-md-3 col-form-label font-weight-bold task-edit-modal-option-label">크림가격</label>
+                                <label 
+                                    className={`col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`} 
+                                    onClick={this.onClickKreamPrice.bind(this)}
+                                    style={{cursor: 'pointer'}}
+                                > {kream_price_str}
+                                </label>
                             </div>
                             <hr/>
-                            <div className="row" style={{display : show_product_open_time ? '' : 'none'}}>
+                            <div className="row">
                                 <div className="col-md-2">
                                     <label className="task-edit-modal-option-label">모델</label>
                                 </div>
                                 <div className="col-md-4">
-                                    <label>{model_id}</label>
+                                    <label onClick={this.onClickProductModelID.bind(this)} style={{cursor: 'pointer'}}>{model_id}</label>
+                                </div>
+                                <div className="col-md-6">
+                                    <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
                                 </div>
                             </div>
                         </div>
