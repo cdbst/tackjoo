@@ -20,12 +20,12 @@ class NewProductTableItem extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
-        window.electron.getKreamTradePrice(this.props.product_info, (err, recently_trade_price)=>{
+        window.electron.getKreamTradePrice(this.props.product_info, (err, kream_product_info)=>{
 
             if(err) return;
 
             this.setState(_ => ({
-                kream_price : recently_trade_price
+                kream_price : kream_product_info.price
             }));
         });
     }
@@ -67,7 +67,7 @@ class NewProductTableItem extends React.Component {
 
     render(){
 
-        const kream_price_str = this.state.kream_price === undefined ? '정보없음' : this.state.kream_price + ' 원';
+        const kream_price_str = this.state.kream_price === undefined ? '정보없음' : this.state.kream_price;
 
         let price_gap_str = '';
         let price_gap = 0;

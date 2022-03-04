@@ -68,6 +68,25 @@
         return target;
     }
 
+    exports.get_kream_product_info_obj_scheme = function (){
+        return {
+            product_id : undefined,
+            url : undefined,
+            price: undefined,
+            interest : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_kream_product_info_obj = function(kream_product_info, key, value){
+        if(key in this.get_kream_product_info_obj_scheme() == false){
+            throw 'kream product info object is not includes property : ' + key;
+        }
+
+        kream_product_info[key] = value;
+        return kream_product_info;
+    }
+
     exports.get_thedraw_item_obj_scheme = function (){
         return {
             product_name : undefined,
