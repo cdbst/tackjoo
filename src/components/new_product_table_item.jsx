@@ -6,8 +6,9 @@ class NewProductTableItem extends React.Component {
         this.getSoldOutStatusFontColor = this.getSoldOutStatusFontColor.bind(this);
         this.getKreamPriceFontColor = this.getKreamPriceFontColor.bind(this);
         this.onClickCreateTask = this.onClickCreateTask.bind(this);
-        this.onClickGoLink = this.onClickGoLink.bind(this);
+        this.onClickGoKreamLink = this.onClickGoKreamLink.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
+        this.onClickProductImg = this.onClickProductImg.bind(this);
         this.getPriceGap = this.getPriceGap.bind(this);
         this.getNumberByCurrencyStr = this.getNumberByCurrencyStr.bind(this);
 
@@ -46,12 +47,18 @@ class NewProductTableItem extends React.Component {
         this.props.h_on_create_task(this.props.product_info);
     }
 
-    onClickGoLink(){
-        window.electron.openExternalWebPage(this.props.product_info.url);
+    onClickGoKreamLink(){
+        if(this.state.kream_product_info === undefined) return undefined;
+        window.electron.openExternalWebPage(this.state.kream_product_info.url);
     }
 
     onClickRemove(){
         this.props.h_on_remove(this.props.product_info._id)
+    }
+
+    onClickProductImg(){
+        if(this.props.product_info.url === undefined || this.props.product_info.url === '') return;
+        window.electron.openExternalWebPage(this.props.product_info.url);
     }
 
     getNumberByCurrencyStr(currency_str){
@@ -86,7 +93,14 @@ class NewProductTableItem extends React.Component {
         return(
             <tr>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
-                    <img ref={this.ref_product_img} className="rounded new-product-table-item-img" src={this.props.product_info.img_url} alt={this.props.product_info.name}/>
+                    <img 
+                        ref={this.ref_product_img} 
+                        className="rounded new-product-table-item-img" 
+                        src={this.props.product_info.img_url} 
+                        alt={this.props.product_info.name}
+                        onClick={this.onClickProductImg.bind(this)}
+                        style={{cursor: 'pointer'}}
+                    />
                 </td>
                 <td style={{width : this.props.name_col_width, maxWidth : this.props.name_col_width}}>
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.product_info.name}>{this.props.product_info.name}</div>
@@ -120,8 +134,8 @@ class NewProductTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-warning" onClick={this.onClickGoLink.bind(this)}>
-                                <img src="./res/img/link.svg" style={{width:24, height:24}}/>
+                            <button type="button" className="btn btn-warning" onClick={this.onClickGoKreamLink.bind(this)} disabled={this.state.kream_product_info === undefined}>
+                                <img src="./res/img/kream-logo.png" style={{width:24, height:24}}/>
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table">
