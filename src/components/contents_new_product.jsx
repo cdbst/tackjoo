@@ -33,12 +33,13 @@ class ContentsNewProduct extends React.Component {
     __setupColumnsWidth(){
 
         this.image_col_width = 98;
-        this.price_col_width = 160;
-        this.kream_price_col_width = 160;
+        this.price_col_width = 140;
+        this.kream_price_col_width = 140;
         this.price_gap_col_width = 200;
         this.actions_col_width = 240;
-        this.soldout_status_col_width = 140;
+        this.soldout_status_col_width = 120;
         this.release_date_col_width = 190;
+        this.model_id_col_width = 140;
         this.name_col_width = 'calc( 100% - ' + (this.price_gap_col_width + this.actions_col_width + this.kream_price_col_width + this.price_col_width + this.image_col_width + this.soldout_status_col_width + this.release_date_col_width) + 'px)';
     }
 
@@ -77,6 +78,7 @@ class ContentsNewProduct extends React.Component {
                 kream_price_col_width={this.kream_price_col_width}
                 actions_col_width={this.actions_col_width}
                 release_date_col_width={this.release_date_col_width}
+                model_id_col_width={this.model_id_col_width}
                 soldout_status_col_width={this.soldout_status_col_width}
                 price_gap_col_width={this.price_gap_col_width}
                 product_info={product_info}
@@ -154,6 +156,7 @@ class ContentsNewProduct extends React.Component {
                             <tr>
                                 <th scope="col" style={{width : this.image_col_width, maxWidth : this.image_col_width}}>이미지</th>
                                 <th scope="col" style={{width : this.name_col_width, maxWidth : this.name_col_width}}>상품명</th>
+                                <th scope="col" style={{width : this.model_id_col_width, maxWidth : this.model_id_col_width}}>모델(스타일)</th>
                                 <th scope="col" style={{width : this.price_col_width, maxWidth : this.price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.kream_price_col_width, maxWidth : this.kream_price_col_width}}>크림가격</th>
                                 <th scope="col" style={{width : this.price_gap_col_width, maxWidth : this.price_gap_col_width}}>시세차익</th>
