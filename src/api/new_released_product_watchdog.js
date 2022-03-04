@@ -54,7 +54,8 @@ class NewReleasedProductWatchdog{
             }
         }
 
-        return new_released_product_list;
+        const new_released_product_list_unique = _.uniqBy(new_released_product_list, (pi)=>(pi.url)); // 중복을 제거함.
+        return new_released_product_list_unique;
     }
 
     /**
