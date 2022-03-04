@@ -269,8 +269,9 @@ tbody tr:hover td {
 
 /* Start to Task Edit Modal */
 .tesk-edit-modal-product-img{
-    height: 300px !important;
-    width: 300px !important;
+    height: 280px !important;
+    width: 280px !important;
+    cursor: pointer !important;
 }
 
 .tesk-edit-modal-loding-div{
