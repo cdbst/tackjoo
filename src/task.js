@@ -23,6 +23,8 @@ browser_context.update_settings(settings_info);
 let remain_ret_cnt = settings_info.task_ret_cnt;
 const task_ret_interval = settings_info.task_ret_interval * 1000;
 
+global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
+
 process.on('unhandledRejection', (err) => {
 
     log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
@@ -32,6 +34,7 @@ process.on('unhandledRejection', (err) => {
         remain_ret_cnt--;
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
+            global.MainThreadApiCaller.call('close_pay_window', []);
             main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
@@ -49,8 +52,6 @@ parentPort.on('message', (data)=>{
         process.exit(data.code);
     }
 })
-
-global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
 main(browser_context, task_info, product_info, billing_info, settings_info);
 
@@ -194,6 +195,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
         }
+
+        throw new CheckOutRequestError("Fail with checkout request"); // 테스트 코드
 
         process.exit(0);
     }
