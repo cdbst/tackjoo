@@ -131,7 +131,11 @@ class ProductManager{
     }
 
     static getProductDescName(product_info){
-        return product_info.name + ' (' + product_info.alt_name + ')';
+        if(product_info.alt_name === undefined || product_info.alt_name === ''){
+            return product_info.name;
+        }else{
+            return product_info.name + ' (' + product_info.alt_name + ')';
+        }
     }
 
     static getProductDescNameList(product_info_list){
