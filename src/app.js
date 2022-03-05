@@ -18,6 +18,24 @@ if (process.platform === 'win32'){
     app.setAppUserModelId(package_json.name);
 }
 
+ // desktop notification 클릭시 app을 강제로 포커싱시킨다.
+app.focusOnWindow = function(){
+
+    if(app.main_browser_window === undefined) return;
+    app.main_browser_window.focus();
+
+    app.main_browser_window.setAlwaysOnTop(true);
+    if (app.main_browser_window.isMaximized()) {
+        app.main_browser_window.maximize();
+    } else {
+        app.main_browser_window.showInactive();
+    }
+
+    app.main_browser_window.setAlwaysOnTop(false);
+    app.main_browser_window.focus();
+    app.focus({ steal: true });
+}
+
 function create_window() {
     try{
         const win = new BrowserWindow({
