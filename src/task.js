@@ -34,7 +34,7 @@ process.on('unhandledRejection', (err) => {
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
-            global.MainThreadApiCaller.call('close_pay_window', []);
+            global.MainThreadApiCaller.call('close_pay_window', [true]);
             main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
@@ -195,8 +195,6 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(checkout_result == undefined){
             throw new CheckOutRequestError("Fail with checkout request");
         }
-
-        throw new CheckOutRequestError("Fail with checkout request"); // 테스트 코드
 
         process.exit(0);
     }

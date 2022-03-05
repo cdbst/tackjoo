@@ -41,6 +41,7 @@ class TaskRunner{
         this.resolve = undefined;
         this.reject = undefined;
         this.pay_window = undefined;
+        this.prevent_task_end_flag = false; // 작업 재시도 상황에서, 현재 열려 있는 pay window를 닫게 되는데, 이때 task가 종료되지 못하게 하려는 목적의 flag 변수이다.
 
         this.checkout_wait = new EventWait();
     }
@@ -145,6 +146,12 @@ class TaskRunner{
         this.pay_window.setModalView(path.resolve(path.join(app.getAppPath(), 'checkout_wait.html')));
 
         this.pay_window.attach_window_close_event_hooker(()=>{
+            
+            if(this.prevent_task_end_flag){
+                this.prevent_task_end_flag = !this.prevent_task_end_flag;
+                return;
+            }
+
             if(pay_done == false)this.end_task(new Error('Kakaopay connection is closed. canceled by user'));
         });
 
@@ -210,6 +217,12 @@ class TaskRunner{
         this.pay_window.setModalView(path.resolve(path.join(app.getAppPath(), 'checkout_wait.html')));
 
         this.pay_window.attach_window_close_event_hooker(()=>{
+            
+            if(this.prevent_task_end_flag){
+                this.prevent_task_end_flag = !this.prevent_task_end_flag;
+                return;
+            }
+
             if(pay_done == false)this.end_task(new Error('Payco connection is closed. canceled by user'));
             else this.end_task();
         });
@@ -263,8 +276,9 @@ class TaskRunner{
         });
     }
 
-    close_pay_window(){
+    close_pay_window(to_retry = false){
         if(this.pay_window == undefined) return;
+        this.prevent_task_end_flag = to_retry;
         this.pay_window.close();
         this.pay_window = undefined;
     }
