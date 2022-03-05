@@ -86,8 +86,8 @@ function register(win){
             const product_info_list = data.payload.product_info_list;
 
             notify_new_product_list(product_info_list, (e)=>{
-                app.main_browser_window.focus(); // desktop notification 클릭시 app을 강제로 포커싱시킨다.
-
+                
+                app.focusOnWindow();
                 const data = util.get_ipc_data({tab_el_id : 'new-product-tab'}); // app의 tab을 '신상품' 탭으로 변경시킨다.
                 g_win.webContents.send('change-app-tab', data);
             });
