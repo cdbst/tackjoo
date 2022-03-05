@@ -41,6 +41,7 @@
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "node-notifier": "^10.0.1",
     "systeminformation": "^5.9.17",
     "tesseract.js": "^2.1.5"
   },

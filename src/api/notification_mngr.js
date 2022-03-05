@@ -1,4 +1,5 @@
-const { Notification, app } = require("electron");
+const { app } = require("electron");
+const notifier = require('node-notifier');
 const path = require('path');
 
 module.exports.notify_new_product = (product_info, __on_click_cb)=>{
@@ -32,16 +33,22 @@ module.exports.set_taskbar_flash = (setting) => {
     app.main_browser_window.flashFrame(setting);
 }
 
-module.exports.notify_text = (title, body, __on_click_cb)=>{
+module.exports.notify_text = (title, message, __on_click_cb)=>{
     
-    const notification = new Notification({
-        title: title,
-        body: body,
-        silent: false,
-        icon: path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico'))
-    });
+    notifier.notify(
+        {
+            title: title,
+            message: message,
+            icon: path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico')), // Absolute path (doesn't work on balloons)
+            sound: true, // Only Notification Center or Windows Toasters
+            wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait or notify-send as it does not support the wait option
+        },
+        function (err, response, metadata) {
+            // Response is response from notification
+            // Metadata contains activationType, activationAt, deliveredAt
+            if(__on_click_cb) __on_click_cb();
+        }
+    );
 
-    if(__on_click_cb) notification.on('click', __on_click_cb);
     this.set_taskbar_flash(true);
-    notification.show();
 }
