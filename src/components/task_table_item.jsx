@@ -17,6 +17,7 @@ class TaskTableItem extends React.Component {
         this.setTaskStatus = this.setTaskStatus.bind(this);
         this.getStatusBtnSrc = this.getStatusBtnSrc.bind(this);
         this.getStatusFontColor = this.getStatusFontColor.bind(this);
+        this.getProductDescNameFontColor = this.getProductDescNameFontColor.bind(this);
 
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
@@ -165,6 +166,20 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    getProductDescNameFontColor(){
+        if(this.props.task_info.product_info.sell_type === common.SELL_TYPE.draw){
+            return '#ffc107'// Yellow
+        }else if(this.props.task_info.product_info.sell_type === common.SELL_TYPE.ftfs){
+            return '#0dcaf0'// Blue
+        }else if(this.props.task_info.product_info.sell_type === common.SELL_TYPE.notify){
+            return '#9575cd'; // purple
+        }else if(this.props.task_info.product_info.sell_type === common.SELL_TYPE.custom){
+            return '#dc3545'// Red
+        }else{
+            return '#ffffff'// White
+        }
+    }
+
     getStatusBtnSrc(){
 
         if(this.state.status == common.TASK_STATUS.READY){
@@ -228,14 +243,17 @@ class TaskTableItem extends React.Component {
 
     render(){
         
-        let product_info = this.props.task_info.product_info;
-        let product_name = ProductManager.getProductDescName(product_info);
-        let open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
-        let schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
-        let display_size_name = this.props.task_info.friendly_size_name == undefined ?  this.props.task_info.size_name : this.props.task_info.friendly_size_name;
+        const product_info = this.props.task_info.product_info;
 
-        let status_btn = this.getStatusBtnSrc(this.state.status);
-        let status_text_color = this.getStatusFontColor(this.state.status);
+        const product_name = ProductManager.getProductDescName(product_info);
+        const product_name_font_color = this.getProductDescNameFontColor();
+
+        const open_time_str = product_info.open_time == undefined ? '' : common.get_formatted_date_str(product_info.open_time, true);
+        const schedule_time_str = this.props.task_info.schedule_time == undefined ? '' : common.get_formatted_date_str(this.props.task_info.schedule_time, true);
+        const display_size_name = this.props.task_info.friendly_size_name == undefined ?  this.props.task_info.size_name : this.props.task_info.friendly_size_name;
+
+        const status_btn = this.getStatusBtnSrc(this.state.status);
+        const status_text_color = this.getStatusFontColor(this.state.status);
 
         const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
         const proxy_ip = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.ip;
@@ -254,7 +272,11 @@ class TaskTableItem extends React.Component {
                     />
                 </td>
                 <td style={{width : this.props.product_col_width, maxWidth : this.props.product_col_width}}>
-                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={product_name}>{product_name}</div>
+                    <div 
+                        className="cut-text custom-color-text-light" 
+                        style={{width : '21vw', maxWidth : '21vw', '--text-color' : product_name_font_color}} 
+                        title={product_name}> {product_name}
+                    </div>
                 </td>
                 <td style={{width : this.props.size_col_width, maxWidth : this.props.size_col_width}}>
                     <span>{display_size_name}</span>

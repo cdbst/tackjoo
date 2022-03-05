@@ -30,6 +30,9 @@ body {
     color: var(--text-color) !important;
     font-weight: bold;
 }
+.custom-color-text-light{
+    color: var(--text-color) !important;
+}
 
 .common-input-label{
     color : #83f195 !important;
