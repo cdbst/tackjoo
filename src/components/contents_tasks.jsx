@@ -37,7 +37,7 @@ class ContentsTasks extends React.Component {
     }
 
     __setupColumnsWidth(){
-        this.type_col_width = 124.5;
+        this.image_col_width = 70;
         this.size_col_width = 65;
         this.account_col_width = 210;
         this.proxy_col_width = 140;
@@ -46,7 +46,7 @@ class ContentsTasks extends React.Component {
         this.status_col_width = 220;
         this.action_col_width = 145.5;
 
-        let cols_width_without_product_col = this.type_col_width + 
+        let cols_width_without_product_col = this.image_col_width + 
             this.size_col_width + 
             this.account_col_width + 
             this.open_time_col_width + 
@@ -210,7 +210,7 @@ class ContentsTasks extends React.Component {
                 h_remove={this.onRemoveTask.bind(this)}
                 task_info={task_info}
                 ref={task_ref}
-                type_col_width={this.type_col_width}
+                image_col_width={this.image_col_width}
                 product_col_width={this.product_col_width}
                 size_col_width={this.size_col_width}
                 account_col_width={this.account_col_width}
@@ -379,7 +379,7 @@ class ContentsTasks extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col" style={{width : this.type_col_width, maxWidth : this.type_col_width}}>구매방식</th>
+                                <th scope="col" style={{width : this.image_col_width, maxWidth : this.image_col_width}}>이미지</th>
                                 <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정</th>

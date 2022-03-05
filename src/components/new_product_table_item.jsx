@@ -81,8 +81,7 @@ class NewProductTableItem extends React.Component {
             <tr>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
-                        ref={this.ref_product_img} 
-                        className="rounded new-product-table-item-img" 
+                        className="rounded product-table-item-img" 
                         src={this.props.product_info.img_url} 
                         alt={this.props.product_info.name}
                         onClick={this.onClickProductImg.bind(this)}
