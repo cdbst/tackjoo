@@ -29,9 +29,9 @@ process.on('unhandledRejection', (err) => {
 
     log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
 
-    if(remain_ret_cnt > 0){
+    if(remain_ret_cnt-- > 0){
+
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
-        remain_ret_cnt--;
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
             global.MainThreadApiCaller.call('close_pay_window', []);
