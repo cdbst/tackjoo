@@ -23,15 +23,18 @@ browser_context.update_settings(settings_info);
 let remain_ret_cnt = settings_info.task_ret_cnt;
 const task_ret_interval = settings_info.task_ret_interval * 1000;
 
+global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
+
 process.on('unhandledRejection', (err) => {
 
     log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
 
-    if(remain_ret_cnt > 0){
+    if(remain_ret_cnt-- > 0){
+
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
-        remain_ret_cnt--;
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
+            global.MainThreadApiCaller.call('close_pay_window', [true]); // 작업 실패 상황인데 현재 pay window가 open 상태라면 pay window를 닫아야 함.
             main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
@@ -49,8 +52,6 @@ parentPort.on('message', (data)=>{
         process.exit(data.code);
     }
 })
-
-global.MainThreadApiCaller = new TaskUtils.MainThreadApiCaller(parentPort);
 
 main(browser_context, task_info, product_info, billing_info, settings_info);
 
