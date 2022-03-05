@@ -34,7 +34,7 @@ process.on('unhandledRejection', (err) => {
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
-            global.MainThreadApiCaller.call('close_pay_window', [true]);
+            global.MainThreadApiCaller.call('close_pay_window', [true]); // 작업 실패 상황인데 현재 pay window가 open 상태라면 pay window를 닫아야 함.
             main(browser_context, task_info, product_info, billing_info, settings_info);
         });
     }else{
