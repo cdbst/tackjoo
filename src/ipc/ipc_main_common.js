@@ -83,10 +83,9 @@ function register(win){
     ipcMain.on('notify-new-product-list', (event, data) =>{
         
         try{
-            const product_info_list = data.payload.product_info_list;
+            let notifier = notify_new_product_list(data.payload.product_info_list);
 
-            notify_new_product_list(product_info_list, (e)=>{
-                
+            notifier.once('click', ()=>{
                 app.focusOnWindow();
                 const data = util.get_ipc_data({tab_el_id : 'new-product-tab'}); // app의 tab을 '신상품' 탭으로 변경시킨다.
                 g_win.webContents.send('change-app-tab', data);
