@@ -1,16 +1,18 @@
-const { app } = require("electron");
-const notifier = require('node-notifier');
+const { app, Notification } = require("electron");
 const path = require('path');
+const common = require('../common/common');
 
-module.exports.notify_new_product = (product_info, __on_click_cb)=>{
+const notifier_queue = {}
+
+module.exports.notify_new_product = (product_info)=>{
     
     const title = '새로운 상품 등록을 확인했습니다.';
     const body = `${product_info.name}(${product_info.model_id})\n${product_info.price}`;
 
-    this.notify_text(title, body, __on_click_cb);
+    return this.notify_text(title, body);
 }
 
-module.exports.notify_new_product_list = (product_info_list, __on_click_cb)=>{
+module.exports.notify_new_product_list = (product_info_list)=>{
 
     if(product_info_list.length === 0) throw new Error('product info list is empty');
 
@@ -25,7 +27,7 @@ module.exports.notify_new_product_list = (product_info_list, __on_click_cb)=>{
         body = `${main_product_info.name}등 ${product_info_list.length}개`
     }
 
-    this.notify_text(title, body, __on_click_cb);
+    return this.notify_text(title, body);
 }
 
 module.exports.set_taskbar_flash = (setting) => {
@@ -33,22 +35,27 @@ module.exports.set_taskbar_flash = (setting) => {
     app.main_browser_window.flashFrame(setting);
 }
 
-module.exports.notify_text = (title, message, __on_click_cb)=>{
-    
-    notifier.notify(
-        {
-            title: title,
-            message: message,
-            icon: path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico')), // Absolute path (doesn't work on balloons)
-            sound: true, // Only Notification Center or Windows Toasters
-            wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait or notify-send as it does not support the wait option
-        },
-        function (err, response, metadata) {
-            // Response is response from notification
-            // Metadata contains activationType, activationAt, deliveredAt
-            if(__on_click_cb) __on_click_cb();
-        }
-    );
+module.exports.notify_text = (title, message)=>{
 
+    const notifier = new Notification({
+        title: title,
+        body: message,
+        icon : path.resolve(path.join(app.getAppPath(), 'res', 'img', 'icon.ico')),
+        silent : false,
+    });
+
+    notifier.show();
     this.set_taskbar_flash(true);
+
+    const notifier_id = common.uuidv4();
+    notifier_queue[notifier_id] = notifier;
+    notifier.once('close', ()=>{
+        delete notifier[notifier_id];
+    });
+    notifier.once('click', ()=>{
+        delete notifier[notifier_id];
+    });
+
+
+    return notifier;
 }
