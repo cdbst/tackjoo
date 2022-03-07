@@ -7,7 +7,7 @@ function get_sell_type(sell_type_string){
 
     let sell_type = undefined;
 
-    let text = parser_common.strip_usless_string(sell_type_string).toLowerCase();
+    let text = parser_common.strip_useless_string(sell_type_string).toLowerCase();
 
     if(text.includes(common.SELL_TYPE.normal.toLowerCase())){
         sell_type = common.SELL_TYPE.normal;
@@ -480,7 +480,7 @@ function get_product_info_script_from_product_page($){
 function parse_product_id_from_product_page(product_info_script){
 
     let script_code = product_info_script.childNodes[0].data;
-    script_code = parser_common.strip_usless_string(script_code);
+    script_code = parser_common.strip_useless_string(script_code);
 
     let product_id = script_code.split('var productInfo = {')[1].split(',', 1)[0].replace('id : ', '');
     return product_id;
@@ -489,7 +489,7 @@ function parse_product_id_from_product_page(product_info_script){
 function parse_model_id_from_product_page(product_info_script){
 
     let script_code = product_info_script.childNodes[0].data;
-    script_code = parser_common.strip_usless_string(script_code);
+    script_code = parser_common.strip_useless_string(script_code);
 
     let model_id = script_code.split('model : ')[1].split(',', 1)[0].trim().replace(/\'/gi, '');
     return model_id;
@@ -764,7 +764,7 @@ function parse_product_list_from_new_released_page($){
     
             const el_title_span = parser_common.get_specific_tag_nodes(product_info_div, [], ['item-title']);
             let product_name = parser_common.get_specific_child_text_nodes(el_title_span[0])[0].data.trim();
-            product_name = parser_common.strip_usless_string(product_name)
+            product_name = parser_common.strip_useless_string(product_name)
             common.update_product_info_obj(product_info, 'name', product_name);
     
             const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, [], ['a-product-image-link']);

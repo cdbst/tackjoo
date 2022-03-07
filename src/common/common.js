@@ -123,14 +123,19 @@
 
     exports.get_order_info_obj_scheme = function (){
         return {
-            product_name : undefined,
-            product_size : undefined,
-            product_price : undefined,
-            product_link : undefined,
-            draw_result : undefined,
-            draw_date : undefined,
+            name : undefined,
+            size : undefined,
+            price : undefined,
+            quantity : undefined,
+            url : undefined,
+            img_url : undefined,
+            status : undefined,
+            date : undefined,
             account_email : undefined,
-            account_pwd : undefined,
+            account_id : undefined,
+            is_cancelable : undefined,
+            model_id: undefined,
+            order_id : undefined,
             _id : undefined
         };
     }

@@ -37,13 +37,12 @@ function register(){
 
 async function get_order_info_list(browser_context){
 
-    let result = await browser_context.login(false);
+    const result = await browser_context.login(false);
     if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
 
-    let order_info_list = await browser_context.open_order_list_page();
+    const order_info_list = await browser_context.open_order_list_page();
     if(order_info_list == undefined) return {error : `정보 취득 실패 : ${browser_context.email}`, data : undefined};
-
-    return {error : undefined, data : order_info_list}
+    else return {error : undefined, data : order_info_list}
 }
 
 module.exports.register = register;

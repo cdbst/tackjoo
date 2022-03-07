@@ -1216,15 +1216,15 @@ class BrowserContext {
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders', headers);
 
                 if(res.status != 200){
-                    throw new Error('open_draw_list_page : response ' + res.status);
+                    throw new Error('open_order_list_page : response ' + res.status);
                 }
     
                 const $ = cheerio.load(res.data);
-                //const the_draw_item_list = parse_order_list_page($, this);
-                return the_draw_item_list.length == 0 ? undefined :  the_draw_item_list; // return the draw item list;
+                const order_info_list = parse_order_list_page($, this);
+                return order_info_list.length === 0 ? undefined :  order_info_list; // return the draw item list;
 
             }catch(e){
-                log.error(common.get_log_str('browser_context.js', 'open_draw_list_page', e));
+                log.error(common.get_log_str('browser_context.js', 'open_order_list_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

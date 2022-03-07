@@ -127,7 +127,7 @@ function get_elem_attr_value(elem, attr_name){
     return elem.attribs[attr_name];
 }
 
-function strip_usless_string(string){
+function strip_useless_string(string){
     return string.replace(/(\t|\n)/gi, '').trim();
 }
 
@@ -139,4 +139,4 @@ module.exports.get_specific_tag_nodes = get_specific_tag_nodes;
 module.exports.get_data_tag_value = get_data_tag_value;
 module.exports.get_data_tag_elem = get_data_tag_elem;
 module.exports.get_elem_attr_value = get_elem_attr_value;
-module.exports.strip_usless_string = strip_usless_string;
+module.exports.strip_useless_string = strip_useless_string;
