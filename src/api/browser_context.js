@@ -370,7 +370,9 @@ class BrowserContext {
             return false;
         }
 
-        let result = await this.open_main_page(retry === true ? this.__req_retry_cnt : 1);
+        const retry_cnt = retry === true ? this.__req_retry_cnt : 1;
+
+        let result = await this.open_main_page(retry_cnt);
         if(result == false){
             this.in_progress_login = false;
             log.error(common.get_log_str('browser_context.js', 'login', 'Cannot open main page'));
@@ -417,7 +419,7 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload);
                 
