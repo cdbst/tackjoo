@@ -5,6 +5,7 @@ class NewProductTableItem extends React.Component {
 
         this.getSoldOutStatusFontColor = this.getSoldOutStatusFontColor.bind(this);
         this.getKreamPriceFontColor = this.getKreamPriceFontColor.bind(this);
+        this.getProductNameColor = this.getProductNameColor.bind(this);
         this.onClickCreateTask = this.onClickCreateTask.bind(this);
         this.onClickGoKreamLink = this.onClickGoKreamLink.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
@@ -36,6 +37,21 @@ class NewProductTableItem extends React.Component {
 
     getSoldOutStatusFontColor(){
         return this.props.product_info.soldout ? '#dc3545' : '#0dcaf0';
+    }
+
+    getProductNameColor(yield_ratio){
+        yield_ratio = parseFloat(yield_ratio);
+        if(yield_ratio < 0){
+            return '#dc3545'; // red
+        }else if(yield_ratio <= 20){
+            return '#ffffff'; // white
+        }else if(yield_ratio <= 60){
+            return '#0dcaf0'; // blue
+        }else if(yield_ratio <= 100){
+            return '#9575cd'; // purple
+        }else{
+            return '#ffc107'; // yellow
+        }
     }
 
     getKreamPriceFontColor(){
@@ -75,13 +91,17 @@ class NewProductTableItem extends React.Component {
 
         let price_gap_str = '';
         let price_gap = 0;
+
+        let product_name_font_clolr = '#ffffff';
         
         if(this.state.kream_product_info){
             price_gap = common.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
             price_gap_str = new Intl.NumberFormat('ko-KR').format(price_gap);
-            let yield_percent =  (price_gap / common.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
-            yield_percent = yield_percent.toFixed(1);
-            price_gap_str = `${price_gap_str}(${yield_percent}%)`;
+            let yield_ratio =  (price_gap / common.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
+            yield_ratio = yield_ratio.toFixed(1);
+            price_gap_str = `${price_gap_str}(${yield_ratio}%)`;
+
+            product_name_font_clolr = this.getProductNameColor(yield_ratio);
         }
 
         const price_gap_str_font_color = price_gap > 0 ? '#0dcaf0' : '#dc3545';
@@ -98,7 +118,12 @@ class NewProductTableItem extends React.Component {
                     />
                 </td>
                 <td style={{width : this.props.name_col_width, maxWidth : this.props.name_col_width}}>
-                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.product_info.name}>{this.props.product_info.name}</div>
+                    <div 
+                        className="cut-text custom-color-text" 
+                        style={{width : '21vw', maxWidth : '21vw', '--text-color' : product_name_font_clolr}} 
+                        title={this.props.product_info.name}>
+                        {this.props.product_info.name}
+                    </div>
                 </td>
                 <td style={{width : this.props.model_id_col_width, maxWidth : this.props.model_id_col_width}}>
                     <span >{this.props.product_info.model_id}</span>
