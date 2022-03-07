@@ -1,4 +1,5 @@
 class AppSettings{
+
     constructor(){
 
         this.saveAppSettings = this.saveAppSettings.bind(this);
@@ -25,11 +26,11 @@ class AppSettings{
     }
 
     updateSetting(property, value){
-        this[property] = value;
+        this.settings_info[property] = value;
     }
 
     getSetting(property){
-        return this[property];
+        return this.settings_info[property];
     }
 
     updateSettings(settings_info){

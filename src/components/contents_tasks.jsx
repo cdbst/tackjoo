@@ -334,9 +334,10 @@ class ContentsTasks extends React.Component {
                 Index.g_sys_msg_q.enqueue('에러', '작업을 하기위한 계정이 하나도 존재하지 않습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
-            
+            const opt_quick_task_config = Index.g_settings_info.getSetting('new_product_quick_task_judge_size');
+
             const account_email = account_emails[common.get_random_int(0, account_emails.length - 1)];
-            const friendly_size_name = '무작위';
+            const friendly_size_name = opt_quick_task_config === 0 ? common.SPECIAL_SIZE_OPTS.MIDDLE : common.SPECIAL_SIZE_OPTS.RANDOM;
             const schedule_time = Index.g_server_clock.getServerTime();
 
             Index.g_sys_msg_q.enqueue('빠른 작업 생성 안내', `${account_email} 계정으로 '${product_info.name}' 상품 1개를 즉시 구매합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);

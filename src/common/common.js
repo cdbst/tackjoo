@@ -308,6 +308,11 @@
         notify :'Notify Me',
         custom: 'Custom'
     };
+
+    exports.SPECIAL_SIZE_OPTS = {
+        MIDDLE : '중간', 
+        RANDOM : '무작위'
+    };
     
     exports.TASK_STATUS = {
         READY : '준비중', //아직 open time이 전이라 play 할 수 없는 상태임.
