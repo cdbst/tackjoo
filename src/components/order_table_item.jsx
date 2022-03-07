@@ -44,6 +44,9 @@ class OrderTableItem extends React.Component {
                 <td style={{width : this.props.product_name_col_width, maxWidth : this.props.product_name_col_width}}>
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.order_info.name}>{this.props.order_info.name}</div>
                 </td>
+                <td style={{width : this.props.product_model_id_col_width, maxWidth : this.props.product_model_id_col_width}}>
+                    <div >{this.props.order_info.model_id}</div>
+                </td>
                 <td style={{width : this.props.product_size_col_width, maxWidth : this.props.product_size_col_width}}>
                     <span>{this.props.order_info.size}</span>
                 </td>

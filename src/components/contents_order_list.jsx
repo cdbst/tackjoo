@@ -41,7 +41,8 @@ class ContentsOrderList extends React.Component {
         this.order_status_col_width = 120;
         this.actions_col_width = 240;
         this.product_img_col_width = 70;
-        this.product_name_col_width = 'calc( 100% - ' + (this.product_img_col_width + this.account_col_width + this.order_date_col_width + this.order_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
+        this.product_model_id_col_width = 120;
+        this.product_name_col_width = 'calc( 100% - ' + (this.product_model_id_col_width + this.product_img_col_width + this.account_col_width + this.order_date_col_width + this.order_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -155,6 +156,7 @@ class ContentsOrderList extends React.Component {
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
                 product_img_col_width = {this.product_img_col_width}
+                product_model_id_col_width = {this.product_model_id_col_width}
                 order_info = {order_info}
                 key={order_info._id}
             />
@@ -191,6 +193,7 @@ class ContentsOrderList extends React.Component {
                                 <th scope="col" style={{width : this.product_img_col_width, maxWidth : this.product_img_col_width}}>이미지</th>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정명</th>
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
+                                <th scope="col" style={{width : this.product_model_id_col_width, maxWidth : this.product_model_id_col_width}}>모델</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>구매일시</th>
