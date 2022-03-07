@@ -37,10 +37,11 @@ class ContentsOrderList extends React.Component {
         this.account_col_width = 240;
         this.product_size_col_width = 120;
         this.product_price_col_width = 180;
-        this.order_date_col_width = 240;
+        this.order_date_col_width = 120;
         this.order_status_col_width = 120;
         this.actions_col_width = 240;
-        this.product_name_col_width = 'calc( 100% - ' + (this.account_col_width + this.order_date_col_width + this.order_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
+        this.product_img_col_width = 70;
+        this.product_name_col_width = 'calc( 100% - ' + (this.product_img_col_width + this.account_col_width + this.order_date_col_width + this.order_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -79,23 +80,6 @@ class ContentsOrderList extends React.Component {
     }
 
     setFilters(order_info_list){
-
-        // return {
-        //     name : undefined,
-        //     size : undefined,
-        //     price : undefined,
-        //     quantity : undefined,
-        //     url : undefined,
-        //     img_url : undefined,
-        //     status : undefined,
-        //     date : undefined,
-        //     account_email : undefined,
-        //     account_id : undefined,
-        //     is_cancelable : undefined,
-        //     model_id: undefined,
-        //     order_id : undefined,
-        //     _id : undefined
-        // };
 
         let product_name_list = common.getValuesFromObjList(order_info_list, 'name');
         product_name_list.unshift('');
@@ -170,6 +154,7 @@ class ContentsOrderList extends React.Component {
                 order_status_col_width = {this.order_status_col_width}
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
+                product_img_col_width = {this.product_img_col_width}
                 order_info = {order_info}
                 key={order_info._id}
             />
@@ -203,6 +188,7 @@ class ContentsOrderList extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
+                                <th scope="col" style={{width : this.product_img_col_width, maxWidth : this.product_img_col_width}}>이미지</th>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정명</th>
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>

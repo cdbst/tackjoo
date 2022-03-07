@@ -27,10 +27,17 @@ class OrderTableItem extends React.Component {
 
     render(){
 
-        console.log(this.props.order_info);
-
         return(
             <tr>
+                <td style={{width : this.props.product_img_col_width, maxWidth : this.props.product_img_col_width}}>
+                    <img 
+                        className="rounded product-table-item-img" 
+                        src={this.props.order_info.img_url} 
+                        alt={this.props.order_info.name}
+                        onClick={this.onClickGoLinkBtn.bind(this)}
+                        style={{cursor: 'pointer'}}
+                    />
+                </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.order_info.account_email}>{this.props.order_info.account_email}</div>
                 </td>
