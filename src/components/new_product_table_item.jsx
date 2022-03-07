@@ -9,6 +9,7 @@ class NewProductTableItem extends React.Component {
         this.onClickGoKreamLink = this.onClickGoKreamLink.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
+        this.onDBClickTableItem = this.onDBClickTableItem.bind(this);
 
         this.__mount = false;
 
@@ -59,6 +60,14 @@ class NewProductTableItem extends React.Component {
         window.electron.openExternalWebPage(this.props.product_info.url);
     }
 
+    onDBClickTableItem(){
+        if(this.props.product_info.soldout){
+            Index.g_sys_msg_q.enqueue('에러', `품절된 상품은 구매하지 못합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 1500);
+            return;
+        }
+        this.props.h_on_create_task(this.props.product_info);
+    }
+
     render(){
 
         const kream_price_str = this.state.kream_product_info === undefined ? '정보없음' : this.state.kream_product_info.price;
@@ -78,7 +87,7 @@ class NewProductTableItem extends React.Component {
         const price_gap_str_font_color = price_gap > 0 ? '#0dcaf0' : '#dc3545';
 
         return(
-            <tr>
+            <tr onDoubleClick={this.onDBClickTableItem.bind(this)}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 
