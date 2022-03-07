@@ -71,11 +71,11 @@ function register(){
 
     ipcMain.on('get-kream-trade-price', async(event, data) =>{
 
-        const product_info = data.payload.product_info;
+        const model_id = data.payload.model_id;
         
         (async()=>{
             try{
-                const kream_product_info = await get_kream_product_info(product_info);
+                const kream_product_info = await get_kream_product_info(model_id);
                 if(kream_product_info === undefined){
                     event.reply('get-kream-trade-price-reply' + data.id, {err : '크림에서 가격정보를 찾을수 없습니다.', data : undefined});
                 }else{

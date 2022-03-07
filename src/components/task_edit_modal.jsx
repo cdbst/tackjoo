@@ -154,7 +154,7 @@ class TaskEditModal extends React.Component {
     getKreamProductInfo(){
         if(this.state.selected_product === undefined) return;
 
-        window.electron.getKreamProductInfo(this.state.selected_product, (err, kream_product_info)=>{
+        window.electron.getKreamProductInfo(this.state.selected_product.model_id, (err, kream_product_info)=>{
             if(err) return;
             this.setState(_ => ({ kream_product_info : kream_product_info }));
         });

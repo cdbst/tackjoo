@@ -476,8 +476,8 @@ function _notifyNewProductList(product_info_list){
     ipcRenderer.send('notify-new-product-list', ipc_data);
 }
 
-function _getKreamProductInfo(product_info, __callback){
-    let ipc_data = get_ipc_data({product_info : product_info});
+function _getKreamProductInfo(model_id, __callback){
+    let ipc_data = get_ipc_data({model_id : model_id});
     ipcRenderer.send('get-kream-trade-price', ipc_data);
 
     ipcRenderer.once('get-kream-trade-price-reply' + ipc_data.id, (_event, kream_trade_price_info) => {

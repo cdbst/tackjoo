@@ -28,9 +28,9 @@ function get_req_headers(){
     };
 }
 
-async function get_kream_product_info(product_info){
+async function get_kream_product_info(model_id){
 
-    if(product_info.model_id === undefined) return undefined;
+    if(model_id === undefined) return undefined;
 
     const axios_req_cfg = {
         method: 'GET',
@@ -38,7 +38,7 @@ async function get_kream_product_info(product_info){
         headers : get_req_headers(),
         params : {
             per_page : 10,
-            keyword : product_info.model_id.trim(),
+            keyword : model_id.trim(),
             request_key : uuidv4()
         }
     };

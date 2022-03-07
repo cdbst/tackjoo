@@ -21,14 +21,6 @@ class NewProductTableItem extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
-        window.electron.getKreamProductInfo(this.props.product_info, (err, kream_product_info)=>{
-
-            if(err) return;
-
-            this.setState(_ => ({
-                kream_product_info : kream_product_info
-            }));
-        });
     }
 
     componentWillUnmount(){
