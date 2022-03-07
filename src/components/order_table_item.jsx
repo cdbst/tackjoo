@@ -4,6 +4,7 @@ class OrderTableItem extends React.Component {
         super(props);
 
         this.onClickGoLinkBtn = this.onClickGoLinkBtn.bind(this);
+        this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
         this.onClickCancelOrder = this.onClickCancelOrder.bind(this);
 
         this.__mount = false;
@@ -11,14 +12,6 @@ class OrderTableItem extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
-        window.electron.getKreamProductInfo(this.props.order_info.model_id, (err, kream_product_info)=>{
-
-            if(err) return;
-
-            this.setState(_ => ({
-                kream_product_info : kream_product_info
-            }));
-        });
     }
 
     componentWillUnmount(){
@@ -29,8 +22,22 @@ class OrderTableItem extends React.Component {
         window.electron.openExternalWebPage(this.props.order_info.url);
     }
 
+    onClickKreamLinkBtn(){
+        window.electron.getKreamProductInfo(this.props.order_info.model_id, (err, kream_product_info)=>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', `해당 상품을 크림에서 찾을수 없습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                return;
+            }
+
+            window.electron.openExternalWebPage(kream_product_info.url);
+        });
+    }
+
     onClickCancelOrder(){
-        
+        Index.g_prompt_modal.popModal('경고', <p>정말로 주문을 취소하시겠 습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+        });
     }
 
     render(){
@@ -69,14 +76,14 @@ class OrderTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-warning" onClick={this.onClickGoLinkBtn.bind(this)}>
-                                <img src="./res/img/link.svg" style={{width:24, height:24}}/>
+                        <div className="float-start button-wrapper-inner-table" title="크림 바로가기">
+                            <button type="button" className="btn btn-warning" onClick={this.onClickKreamLinkBtn.bind(this)}>
+                                <img src="./res/img/kream-logo.png" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="주문 취소하기">
                             <button type="button" className="btn btn-info" onClick={this.onClickCancelOrder.bind(this)}>
-                                <img src="./res/img/x-circle-fill.svg" style={{width:24, height:24}}/>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                     </div>
