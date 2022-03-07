@@ -1,4 +1,4 @@
-class ContentsCheckouts extends React.Component {
+class ContentsOrderList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -145,7 +145,7 @@ class ContentsCheckouts extends React.Component {
     __getTableItems(draw_item_list){
 
         return draw_item_list.map((draw_item) =>
-            <CheckoutTableItem
+            <OrderTableItem
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
                 product_price_col_width = {this.product_price_col_width}
@@ -162,7 +162,7 @@ class ContentsCheckouts extends React.Component {
     render() {
 
         return (
-            <div className="tab-pane fade" id="checkouts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.CHECKOUTS}>
+            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.CHECKOUTS}>
                 <div className="container-fluid">
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>

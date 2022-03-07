@@ -1,4 +1,4 @@
-class CheckoutTableItem extends React.Component {
+class OrderTableItem extends React.Component {
 
     constructor(props) {
         super(props);
