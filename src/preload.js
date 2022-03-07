@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('electron', {
     notifyNewProductList : _notifyNewProductList,
     registerchangeAppTab : _registerchangeAppTab,
     getKreamProductInfo : _getKreamProductInfo,
+    loadOrderListInfo : _loadOrderListInfo,
 });
 
 
@@ -350,6 +351,15 @@ function _loadTheDrawItemList(__callback){
 
     ipcRenderer.once('load-thedraw-item-list-reply' + ipc_data.id, (_event, thedraw_item_list_info) => {
         __callback(thedraw_item_list_info.err, thedraw_item_list_info.data);
+    });
+}
+
+function _loadOrderListInfo(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-order-info-list', ipc_data);
+
+    ipcRenderer.once('load-order-info-list-reply' + ipc_data.id, (_event, order_info_list_info) => {
+        __callback(order_info_list_info.err, order_info_list_info.data);
     });
 }
 

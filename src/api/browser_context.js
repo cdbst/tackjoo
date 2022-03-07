@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const thedraw_list_page_parser = require('./thedraw_list_page_parser');
+const { parse_order_list_page } = require('./order_list_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -1191,6 +1192,33 @@ class BrowserContext {
     
                 const $ = cheerio.load(res.data);
                 const the_draw_item_list = thedraw_list_page_parser.parse_thedraw_item_list($, this);
+                return the_draw_item_list.length == 0 ? undefined :  the_draw_item_list; // return the draw item list;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_draw_list_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async open_order_list_page(){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_draw_list_page : response ' + res.status);
+                }
+    
+                const $ = cheerio.load(res.data);
+                //const the_draw_item_list = parse_order_list_page($, this);
                 return the_draw_item_list.length == 0 ? undefined :  the_draw_item_list; // return the draw item list;
 
             }catch(e){

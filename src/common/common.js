@@ -121,6 +121,31 @@
         return thedraw_item;
     }
 
+    exports.get_order_info_obj_scheme = function (){
+        return {
+            product_name : undefined,
+            product_size : undefined,
+            product_price : undefined,
+            product_link : undefined,
+            draw_result : undefined,
+            draw_date : undefined,
+            account_email : undefined,
+            account_pwd : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_order_info_obj = function(order_info, key, value){
+        if(key in this.get_order_info_obj_scheme() == false){
+            throw 'order info object is not includes property : ' + key;
+        }
+
+        order_info[key] = value;
+        return order_info;
+    }
+
+
+
     exports.get_task_info_obj_scheme = function (){
         return {
             product_info : undefined,

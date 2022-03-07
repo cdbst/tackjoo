@@ -61,7 +61,7 @@ class ContentsOrderList extends React.Component {
 
         Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-        window.electron.loadTheDrawItemList((err, order_item_list) =>{
+        window.electron.loadOrderListInfo((err, order_item_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
 
