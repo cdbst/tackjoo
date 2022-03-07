@@ -11,19 +11,24 @@ function register(){
         (async ()=>{
             try{
                 const browser_context_list = BrowserContextManager.get_all_browser_contexts();
-                const errors = [];
-                const order_info_list = [];
-    
+
+                const order_info_list_promise_list = [];
+
                 for(var i = 0; i < browser_context_list.length; i++){
                     const browser_context = browser_context_list[i];
-    
-                    const {error, data} = await get_order_info_list(browser_context);
-                    if(error != undefined){
-                        errors.push(error);
-                    }else{
-                        order_info_list.push.apply(order_info_list, data);
-                    }
+                    const p_order_info_list = get_order_info_list(browser_context);
+                    order_info_list_promise_list.push(p_order_info_list);
+                    await common.async_sleep(1000);
                 }
+
+                const results = await Promise.all(order_info_list_promise_list);
+                const errors = [];
+                const order_info_list = [];
+
+                results.forEach((result)=>{
+                    if(result.error !== undefined) errors.push(result.error);
+                    if(result.data !== undefined) order_info_list.push.apply(order_info_list, result.data);
+                })
     
                 event.reply('load-order-info-list-reply' + data.id, {err : errors.join('\n'), data : order_info_list});
     
