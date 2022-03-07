@@ -1238,12 +1238,21 @@ class BrowserContext {
 
     async cancel_order(order_info){
 
+        const payload_obj = {
+            orderItemId : parseInt(order_info.order_item_id), 
+            quantity : parseInt(order_info.quantity.replace(/\D/g, '')),
+            csrfToken : this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
         const headers = {
-            accept: '*/*',
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
             'cache-control': 'no-cache',
-            //'content-length': 82
+            'content-length': payload.length,
             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'origin': BrowserContext.NIKE_URL,
             'pragma': 'no-cache',
@@ -1258,16 +1267,11 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        const params = {
-            orderItemId : order_info.order_item_id, 
-            quantity : order_info.quantity,
-            csrfToken : this.csrfToken
-        };
-        
+
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
                 
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + 'TODO', headers, params);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + order_info.order_id, headers, payload);
 
                 if(res.status != 200){
                     throw new Error('cancel_order : response ' + res.status);

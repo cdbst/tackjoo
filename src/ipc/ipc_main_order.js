@@ -54,7 +54,7 @@ function register(){
                 let result = await browser_context.login(false);
                 if(result === false) throw new Error('Login fail');
 
-                await browser_context.open_order_list_page();
+                await browser_context.open_order_list_page(false);
                 result = await browser_context.cancel_order(order_info);
     
                 event.reply('cancel-order-reply' + data.id, {err : undefined, data : result});
