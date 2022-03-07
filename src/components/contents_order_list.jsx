@@ -11,20 +11,20 @@ class ContentsOrderList extends React.Component {
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
 
-        this.thedraw_item_list = [];
+        this.order_item_list = [];
 
         this.state = {
-           checkout_table_item_list : [],
+           order_table_item_list : [],
            opt_list_product_name : [],
            opt_list_account_email : [],
-           opt_list_draw_date : [],
-           opt_list_draw_result : [],
+           opt_list_order_date : [],
+           opt_list_order_status : [],
         };
 
         this.__ref_sel_product_name = React.createRef();
         this.__ref_sel_account_name = React.createRef();
-        this.__ref_sel_checkout_date = React.createRef();
-        this.__ref_sel_progress_status = React.createRef();
+        this.__ref_sel_order_date = React.createRef();
+        this.__ref_sel_order_status = React.createRef();
         this.__ref_load_btn = React.createRef();
 
         this.__mount = false;
@@ -37,10 +37,10 @@ class ContentsOrderList extends React.Component {
         this.account_col_width = 240;
         this.product_size_col_width = 120;
         this.product_price_col_width = 180;
-        this.checkout_date_col_width = 240;
-        this.progress_status_col_width = 120;
+        this.order_date_col_width = 240;
+        this.order_status_col_width = 120;
         this.actions_col_width = 240;
-        this.product_name_col_width = 'calc( 100% - ' + (this.account_col_width + this.checkout_date_col_width + this.progress_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
+        this.product_name_col_width = 'calc( 100% - ' + (this.account_col_width + this.order_date_col_width + this.order_status_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -59,62 +59,62 @@ class ContentsOrderList extends React.Component {
 
         this.__ref_load_btn.current.setLoadingStatus(true);
 
-        Index.g_sys_msg_q.enqueue('안내', '서버로부터 THE DRAW 당첨 결과를 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-        window.electron.loadTheDrawItemList((err, thedraw_item_list) =>{
+        window.electron.loadTheDrawItemList((err, order_item_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            if(thedraw_item_list.length == 0) return;
-            Index.g_sys_msg_q.enqueue('안내', 'THE DRAW 당첨결과를 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(order_item_list.length == 0) return;
+            Index.g_sys_msg_q.enqueue('안내', '주문내역을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-            this.thedraw_item_list = thedraw_item_list;
-            this.setFilters(this.thedraw_item_list);
+            this.order_item_list = order_item_list;
+            this.setFilters(this.order_item_list);
 
             this.clearContents(()=>{
-                this.setContents(this.thedraw_item_list);
+                this.setContents(this.order_item_list);
             });
         });
     }
 
-    setFilters(thedraw_item_list){
+    setFilters(order_item_list){
 
-        let product_name_list = common.getValuesFromObjList(thedraw_item_list, 'product_name');
+        let product_name_list = common.getValuesFromObjList(order_item_list, 'product_name');
         product_name_list.unshift('');
-        let account_email_list = common.getValuesFromObjList(thedraw_item_list, 'account_email');
+        let account_email_list = common.getValuesFromObjList(order_item_list, 'account_email');
         account_email_list.unshift('');
-        let draw_date_list = common.getValuesFromObjList(thedraw_item_list, 'draw_date', common.get_formatted_date_str);
+        let draw_date_list = common.getValuesFromObjList(order_item_list, 'draw_date', common.get_formatted_date_str);
         draw_date_list.unshift('');
-        let draw_result_list = common.getValuesFromObjList(thedraw_item_list, 'draw_result');
+        let draw_result_list = common.getValuesFromObjList(order_item_list, 'draw_result');
         draw_result_list.unshift('');
 
         this.setState({
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
-            opt_list_draw_date : draw_date_list,
-            opt_list_draw_result : draw_result_list,
+            opt_list_order_date : draw_date_list,
+            opt_list_order_status : draw_result_list,
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
-            this.__ref_sel_checkout_date.current.setValue('');
-            this.__ref_sel_progress_status.current.setValue('');
+            this.__ref_sel_order_date.current.setValue('');
+            this.__ref_sel_order_status.current.setValue('');
         });
     }
 
-    setContents(thedraw_item_list){
+    setContents(order_item_list){
         
-        let checkout_table_item_list = this.__getTableItems(thedraw_item_list);
+        let order_table_item_list = this.__getTableItems(order_item_list);
 
         this.setState(_ => ({
-            checkout_table_item_list : checkout_table_item_list,
+            order_table_item_list : order_table_item_list,
         }));
     }
 
     clearContents(__callback){
         
         this.setState({
-            checkout_table_item_list : [],
+            order_table_item_list : [],
         }, () => {
             if(__callback)__callback();
         });
@@ -124,14 +124,14 @@ class ContentsOrderList extends React.Component {
         
         const cur_sel_product_name = this.__ref_sel_product_name.current.getSelectedOptionValue();
         const cur_sel_account_email = this.__ref_sel_account_name.current.getSelectedOptionValue();
-        const cur_sel_draw_date = this.__ref_sel_checkout_date.current.getSelectedOptionValue();
-        const cur_sel_draw_result = this.__ref_sel_progress_status.current.getSelectedOptionValue();
+        const cur_sel_order_date = this.__ref_sel_order_date.current.getSelectedOptionValue();
+        const cur_sel_order_status = this.__ref_sel_order_status.current.getSelectedOptionValue();
 
-        const filtered_thedraw_item_list = this.thedraw_item_list.filter((draw_item) =>{
+        const filtered_order_item_list = this.order_item_list.filter((draw_item) =>{
             if( (cur_sel_product_name == '' || cur_sel_product_name == draw_item.product_name) &&
                 (cur_sel_account_email == '' || cur_sel_account_email == draw_item.account_email) &&
-                (cur_sel_draw_date == '' || cur_sel_draw_date == common.get_formatted_date_str(draw_item.draw_date)) &&
-                (cur_sel_draw_result == '' || cur_sel_draw_result == draw_item.draw_result)
+                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(draw_item.draw_date)) &&
+                (cur_sel_order_status == '' || cur_sel_order_status == draw_item.draw_result)
             ){
                 return true;
             }else{
@@ -139,22 +139,22 @@ class ContentsOrderList extends React.Component {
             }
         });
 
-        this.setContents(filtered_thedraw_item_list);
+        this.setContents(filtered_order_item_list);
     }
 
-    __getTableItems(draw_item_list){
+    __getTableItems(order_item_list){
 
-        return draw_item_list.map((draw_item) =>
+        return order_item_list.map((order_item) =>
             <OrderTableItem
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
                 product_price_col_width = {this.product_price_col_width}
-                checkout_date_col_width = {this.checkout_date_col_width}
-                progress_status_col_width = {this.progress_status_col_width}
+                order_date_col_width = {this.order_date_col_width}
+                order_status_col_width = {this.order_status_col_width}
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
-                draw_item = {draw_item}
-                key={draw_item._id}
+                draw_item = {order_item} // TODO: must be fixed.
+                key={order_item._id}
             />
         );
     }
@@ -176,10 +176,10 @@ class ContentsOrderList extends React.Component {
                             <LabelSelect ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <LabelSelect ref={this.__ref_sel_checkout_date} label="구매일시" options={this.state.opt_list_draw_date} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_order_date} label="구매일시" options={this.state.opt_list_order_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-2">
-                            <LabelSelect ref={this.__ref_sel_progress_status} label="진행단계" options={this.state.opt_list_draw_result} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_order_status} label="진행단계" options={this.state.opt_list_order_status} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                     </div>
                     <div className="table-wrapper">
@@ -190,13 +190,13 @@ class ContentsOrderList extends React.Component {
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>가격</th>
-                                <th scope="col" style={{width : this.checkout_date_col_width, maxWidth : this.checkout_date_col_width}}>구매일시</th>
-                                <th scope="col" style={{width : this.progress_status_col_width, maxWidth : this.progress_status_col_width}}>진행단계</th>
+                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>구매일시</th>
+                                <th scope="col" style={{width : this.order_status_col_width, maxWidth : this.order_status_col_width}}>진행단계</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.checkout_table_item_list}
+                            {this.state.order_table_item_list}
                         </tbody>
                     </table>
                     </div>

@@ -55,10 +55,10 @@ class OrderTableItem extends React.Component {
                 <td style={{width : this.props.product_price_col_width, maxWidth : this.props.product_price_col_width}}>
                     <span>{this.props.draw_item.product_price}</span>
                 </td>
-                <td style={{width : this.props.checkout_date_col_width, maxWidth : this.props.checkout_date_col_width}}>
+                <td style={{width : this.props.order_date_col_width, maxWidth : this.props.order_date_col_width}}>
                     <span>{common.get_formatted_date_str(this.props.draw_item.draw_date)}</span>
                 </td>
-                <td style={{width : this.props.progress_status_col_width, maxWidth : this.props.progress_status_col_width}}>
+                <td style={{width : this.props.order_status_col_width, maxWidth : this.props.order_status_col_width}}>
                     <span className='custom-color-text' style={{'--text-color' : draw_result_font_color}}>{this.props.draw_item.draw_result}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
@@ -70,7 +70,7 @@ class OrderTableItem extends React.Component {
                         </div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-info" onClick={this.onClickCancelOrder.bind(this)}>
-                                <img src="./res/img/info-circle-fill.svg" style={{width:24, height:24}}/>
+                                <img src="./res/img/x-circle-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                     </div>
