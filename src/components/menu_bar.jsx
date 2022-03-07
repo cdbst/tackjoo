@@ -9,7 +9,8 @@ class MenuBar extends React.Component {
         PROXIES : "proxies-tab",
         SETTINGS : "settings-tab",
         THEDRAW : "thedraw-tab",
-        NEW_PRODUCT : 'new-product-tab'
+        NEW_PRODUCT : 'new-product-tab',
+        CHECKOUTS : 'checkouts-tab'
     }
 
     constructor(props) {
@@ -61,12 +62,15 @@ class MenuBar extends React.Component {
                         <a className="nav-link" id={MenuBar.MENU_ID.BILLING} data-bs-toggle="tab" href="#billing" role="tab" aria-controls="billing" aria-selected="false">결제관리</a>
                     </li>
                     <li className="nav-item" role="presentation">
+                        <a className="nav-link" id={MenuBar.MENU_ID.CHECKOUTS} data-bs-toggle="tab" href="#checkouts" role="tab" aria-controls="checkouts" aria-selected="false">구매내역</a>
+                    </li>
+                    <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.PROXIES} data-bs-toggle="tab" href="#proxies" role="tab" aria-controls="proxies" aria-selected="false">프록시</a>
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 600px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 700px)'}}>
                         <li className="nav-item">
                             <a className="nav-link">{this.state.server_time}</a>
                         </li>

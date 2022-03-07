@@ -16,6 +16,7 @@ class MainContents extends React.Component {
                 <ContentsSettings />
                 <ContentsTheDraw />
                 <ContentsNewProduct contents_task_ref={this.__ref_contents_tasks}/>
+                <ContentsCheckouts />
             </div>
         );
     }
