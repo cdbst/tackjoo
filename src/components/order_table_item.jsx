@@ -37,6 +37,20 @@ class OrderTableItem extends React.Component {
     onClickCancelOrder(){
         Index.g_prompt_modal.popModal('경고', <p>정말로 주문을 취소하시겠 습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
+
+            window.electron.cancelOrder(this.props.order_info, (error, result) =>{
+                if(error){
+                    Index.g_sys_msg_q.enqueue('에러', `주문을 취소하는 과정에서 알 수 없는 오류가 발생했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    return;
+                }else if(result ===  false){
+                    Index.g_sys_msg_q.enqueue('에러', `주문 취소 요청이 실패했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    return;
+                }
+
+                Index.g_sys_msg_q.enqueue('알림', `성공적으로 주문을 취소했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                //TODO 테이블 업데이트.
+            });
+
         });
     }
 

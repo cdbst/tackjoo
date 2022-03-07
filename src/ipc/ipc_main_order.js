@@ -52,8 +52,9 @@ function register(){
                 }
 
                 await browser_context.open_order_list_page();
+                const result = await browser_context.cancel_order(order_info);
     
-                event.reply('cancel-order-reply' + data.id, {err : undefined, data : true});
+                event.reply('cancel-order-reply' + data.id, {err : undefined, data : result});
     
             }catch(err){
                 log.error(common.get_log_str('ipc_main_proxy.js', 'cancel-order-callback', err));
