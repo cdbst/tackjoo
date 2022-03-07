@@ -1,4 +1,5 @@
 class AppSettings{
+
     constructor(){
 
         this.saveAppSettings = this.saveAppSettings.bind(this);
@@ -20,15 +21,16 @@ class AppSettings{
             new_product_watch_interval: 1,
             new_product_watch_max_ret: 0,
             new_product_create_task_use_proxy : 0,
+            new_product_quick_task_judge_size : 0
         }
     }
 
     updateSetting(property, value){
-        this[property] = value;
+        this.settings_info[property] = value;
     }
 
     getSetting(property){
-        return this[property];
+        return this.settings_info[property];
     }
 
     updateSettings(settings_info){
