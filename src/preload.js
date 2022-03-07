@@ -42,6 +42,7 @@ contextBridge.exposeInMainWorld('electron', {
     registerchangeAppTab : _registerchangeAppTab,
     getKreamProductInfo : _getKreamProductInfo,
     loadOrderListInfo : _loadOrderListInfo,
+    cancelOrder : _cancelOrder,
 });
 
 
@@ -482,5 +483,14 @@ function _getKreamProductInfo(model_id, __callback){
 
     ipcRenderer.once('get-kream-trade-price-reply' + ipc_data.id, (_event, kream_trade_price_info) => {
         __callback(kream_trade_price_info.err, kream_trade_price_info.data);
+    });
+}
+
+function _cancelOrder(order_info, __callback){
+    let ipc_data = get_ipc_data({order_info : order_info});
+    ipcRenderer.send('cancel-order', ipc_data);
+
+    ipcRenderer.once('cancel-order-reply' + ipc_data.id, (_event, result_info) => {
+        __callback(result_info.err, result_info.data);
     });
 }

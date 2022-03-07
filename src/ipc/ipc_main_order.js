@@ -38,6 +38,29 @@ function register(){
             }
         })();
     });
+
+    ipcMain.on('cancel-order', (event, data) => {
+
+        const order_info = data.payload.order_info;
+
+        (async ()=>{
+            try{
+                const browser_context = BrowserContextManager.get(order_info.account_id);
+        
+                if(browser_context === undefined){
+                    throw new Error('Cannot found browser context');
+                }
+
+                await browser_context.open_order_list_page();
+    
+                event.reply('cancel-order-reply' + data.id, {err : undefined, data : true});
+    
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_proxy.js', 'cancel-order-callback', err));
+                event.reply('cancel-order-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
 }
 
 async function get_order_info_list(browser_context){

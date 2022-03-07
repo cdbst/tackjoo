@@ -136,6 +136,7 @@
             is_cancelable : undefined,
             model_id: undefined,
             order_id : undefined,
+            order_item_id : undefined,
             _id : undefined
         };
     }

@@ -1205,7 +1205,7 @@ class BrowserContext {
         return undefined;
     }
 
-    async open_order_list_page(){
+    async open_order_list_page(parse = true){
 
         let headers = this.__get_open_page_header();
         headers['sec-fetch-site'] = 'same-origin';
@@ -1219,9 +1219,13 @@ class BrowserContext {
                     throw new Error('open_order_list_page : response ' + res.status);
                 }
     
-                const $ = cheerio.load(res.data);
-                const order_info_list = parse_order_list_page($, this);
-                return order_info_list.length === 0 ? undefined :  order_info_list; // return the draw item list;
+                if(parse === true){
+                    const $ = cheerio.load(res.data);
+                    const order_info_list = parse_order_list_page($, this);
+                    return order_info_list.length === 0 ? undefined :  order_info_list;
+                }else{
+                    return undefined;
+                }
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'open_order_list_page', e));
@@ -1230,6 +1234,62 @@ class BrowserContext {
         }
 
         return undefined;
+    }
+
+    async cancel_order(order_info){
+
+        const headers = {
+            accept: '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            //'content-length': 82
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        const params = {
+            orderItemId : order_info.order_item_id, 
+            quantity : order_info.quantity,
+            csrfToken : this.csrfToken
+        };
+        
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + 'TODO', headers, params);
+
+                if(res.status != 200){
+                    throw new Error('cancel_order : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('cancel_order : unexpected data : data is not object type');
+                }
+    
+                if(('result' in res.data) === false){
+                    throw new Error('cancel_order : unexpected data : \'result\' information is not exist.');
+                }
+
+                return res.data.result;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'cancel_order', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 const common = require('../common/common.js');
-const { get_specific_tag_nodes, get_specific_child_text_nodes, strip_useless_string } = require('./page_parser_common');
+const { get_specific_tag_nodes, get_specific_child_text_nodes, strip_useless_string, get_data_tag_elem, get_elem_attr_value } = require('./page_parser_common');
 const log = require('electron-log');
 
 function parse_order_list_page($, browser_context){
@@ -14,6 +14,13 @@ function parse_order_list_page($, browser_context){
             common.update_order_info_obj(order_info, '_id', common.uuidv4());
             common.update_order_info_obj(order_info, 'account_email', browser_context.email);
             common.update_order_info_obj(order_info, 'account_id', browser_context.id);
+
+            //parse order item id
+            const el_input_order_item_id = get_data_tag_elem($, 'input', 'name', 'orderItemId'); // product name
+            if(el_input_order_item_id === undefined) throw new Error('cannot parse order item id input');
+            const order_item_id = get_elem_attr_value(el_input_order_item_id, 'value');
+            if(order_item_id === undefined) throw new Error('cannot parse order item id value');
+            common.update_order_info_obj(order_info, 'order_item_id', order_item_id);
 
             //parse order date
             const el_span_order_date = get_specific_tag_nodes(el, [], ['date']);
