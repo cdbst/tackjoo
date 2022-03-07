@@ -20,6 +20,7 @@ class AppSettings{
             new_product_watch_interval: 1,
             new_product_watch_max_ret: 0,
             new_product_create_task_use_proxy : 0,
+            new_product_quick_task_judge_size : 0
         }
     }
 
