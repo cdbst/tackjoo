@@ -19,7 +19,7 @@ function parse_order_list_page($, browser_context){
             const el_span_order_date = get_specific_tag_nodes(el, [], ['date']);
             if(el_span_order_date.length === 0) throw new Error('cannot parse order date');
             const order_date = el_span_order_date[0].children[0].data.trim();
-            common.update_order_info_obj(order_info, 'date', order_date);
+            common.update_order_info_obj(order_info, 'date', new Date(order_date));
 
             //parse price 
             const el_span_order_price = get_specific_tag_nodes(el, [], ['total-price']);
@@ -66,7 +66,7 @@ function parse_order_list_page($, browser_context){
             //parse status info
             const el_div_status_type = get_specific_tag_nodes(el, [], ['status-type']);
             if(el_div_status_type.length === 0) throw new Error('cannot parse status info div');
-            const el_text_of_status_div = get_specific_child_text_nodes(el_div_status_type[0]);
+            const el_text_of_status_div = get_specific_child_text_nodes(el_div_status_type[0]).reverse();
             
             let status = undefined;
             el_text_of_status_div.every((el_text) =>{

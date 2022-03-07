@@ -11,7 +11,7 @@ class ContentsOrderList extends React.Component {
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
 
-        this.order_item_list = [];
+        this.order_info_list = [];
 
         this.state = {
            order_table_item_list : [],
@@ -61,39 +61,56 @@ class ContentsOrderList extends React.Component {
 
         Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-        window.electron.loadOrderListInfo((err, order_item_list) =>{
+        window.electron.loadOrderListInfo((err, order_info_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            if(order_item_list.length == 0) return;
+            if(order_info_list.length == 0) return;
             Index.g_sys_msg_q.enqueue('안내', '주문내역을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-            this.order_item_list = order_item_list;
-            this.setFilters(this.order_item_list);
+            this.order_info_list = order_info_list;
+            this.setFilters(this.order_info_list);
 
             this.clearContents(()=>{
-                this.setContents(this.order_item_list);
+                this.setContents(this.order_info_list);
             });
         });
     }
 
-    setFilters(order_item_list){
+    setFilters(order_info_list){
 
-        let product_name_list = common.getValuesFromObjList(order_item_list, 'product_name');
+        // return {
+        //     name : undefined,
+        //     size : undefined,
+        //     price : undefined,
+        //     quantity : undefined,
+        //     url : undefined,
+        //     img_url : undefined,
+        //     status : undefined,
+        //     date : undefined,
+        //     account_email : undefined,
+        //     account_id : undefined,
+        //     is_cancelable : undefined,
+        //     model_id: undefined,
+        //     order_id : undefined,
+        //     _id : undefined
+        // };
+
+        let product_name_list = common.getValuesFromObjList(order_info_list, 'name');
         product_name_list.unshift('');
-        let account_email_list = common.getValuesFromObjList(order_item_list, 'account_email');
+        let account_email_list = common.getValuesFromObjList(order_info_list, 'account_email');
         account_email_list.unshift('');
-        let draw_date_list = common.getValuesFromObjList(order_item_list, 'draw_date', common.get_formatted_date_str);
-        draw_date_list.unshift('');
-        let draw_result_list = common.getValuesFromObjList(order_item_list, 'draw_result');
-        draw_result_list.unshift('');
+        let order_date_list = common.getValuesFromObjList(order_info_list, 'date', common.get_formatted_date_str);
+        order_date_list.unshift('');
+        let order_status_list = common.getValuesFromObjList(order_info_list, 'status');
+        order_status_list.unshift('');
 
         this.setState({
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
-            opt_list_order_date : draw_date_list,
-            opt_list_order_status : draw_result_list,
+            opt_list_order_date : order_date_list,
+            opt_list_order_status : order_status_list,
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
@@ -102,9 +119,9 @@ class ContentsOrderList extends React.Component {
         });
     }
 
-    setContents(order_item_list){
+    setContents(order_info_list){
         
-        let order_table_item_list = this.__getTableItems(order_item_list);
+        let order_table_item_list = this.__getTableItems(order_info_list);
 
         this.setState(_ => ({
             order_table_item_list : order_table_item_list,
@@ -127,11 +144,11 @@ class ContentsOrderList extends React.Component {
         const cur_sel_order_date = this.__ref_sel_order_date.current.getSelectedOptionValue();
         const cur_sel_order_status = this.__ref_sel_order_status.current.getSelectedOptionValue();
 
-        const filtered_order_item_list = this.order_item_list.filter((draw_item) =>{
-            if( (cur_sel_product_name == '' || cur_sel_product_name == draw_item.product_name) &&
-                (cur_sel_account_email == '' || cur_sel_account_email == draw_item.account_email) &&
-                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(draw_item.draw_date)) &&
-                (cur_sel_order_status == '' || cur_sel_order_status == draw_item.draw_result)
+        const filtered_order_info_list = this.order_info_list.filter((order_info) =>{
+            if( (cur_sel_product_name == '' || cur_sel_product_name == order_info.name) &&
+                (cur_sel_account_email == '' || cur_sel_account_email == order_info.account_email) &&
+                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(order_info.date)) &&
+                (cur_sel_order_status == '' || cur_sel_order_status == order_info.status)
             ){
                 return true;
             }else{
@@ -139,12 +156,12 @@ class ContentsOrderList extends React.Component {
             }
         });
 
-        this.setContents(filtered_order_item_list);
+        this.setContents(filtered_order_info_list);
     }
 
-    __getTableItems(order_item_list){
+    __getTableItems(order_info_list){
 
-        return order_item_list.map((order_item) =>
+        return order_info_list.map((order_info) =>
             <OrderTableItem
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
@@ -153,8 +170,8 @@ class ContentsOrderList extends React.Component {
                 order_status_col_width = {this.order_status_col_width}
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
-                draw_item = {order_item} // TODO: must be fixed.
-                key={order_item._id}
+                order_info = {order_info}
+                key={order_info._id}
             />
         );
     }
