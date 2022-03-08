@@ -34,13 +34,14 @@ class ContentsTheDraw extends React.Component {
 
     __setupColumnsWidth(){
 
+        this.image_col_width = 70;
         this.account_col_width = 240;
         this.product_size_col_width = 120;
         this.product_price_col_width = 180;
         this.draw_date_col_width = 240;
         this.draw_result_col_width = 120;
         this.actions_col_width = 240;
-        this.product_name_col_width = 'calc( 100% - ' + (this.account_col_width + this.draw_date_col_width + this.draw_result_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
+        this.product_name_col_width = 'calc( 100% - ' + (this.image_col_width + this.account_col_width + this.draw_date_col_width + this.draw_result_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -70,9 +71,9 @@ class ContentsTheDraw extends React.Component {
             Index.g_sys_msg_q.enqueue('안내', 'THE DRAW 당첨결과를 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.thedraw_item_list = thedraw_item_list;
-            this.setFilters(this.thedraw_item_list);
 
             this.clearContents(()=>{
+                this.setFilters(this.thedraw_item_list);
                 this.setContents(this.thedraw_item_list);
             });
         });
@@ -82,10 +83,20 @@ class ContentsTheDraw extends React.Component {
 
         let product_name_list = common.getValuesFromObjList(thedraw_item_list, 'product_name');
         product_name_list.unshift('');
+
         let account_email_list = common.getValuesFromObjList(thedraw_item_list, 'account_email');
         account_email_list.unshift('');
-        let draw_date_list = common.getValuesFromObjList(thedraw_item_list, 'draw_date', common.get_formatted_date_str);
+
+        let draw_date_list = common.getValuesFromObjList(thedraw_item_list, 'draw_date');
+        draw_date_list.sort((a, b)=>{ 
+            if(a > b) return -1;
+            else if(a < b) return 1;
+            else return 0;
+        });
+        draw_date_list = draw_date_list.map((date)=> common.get_formatted_date_str(date));
+        draw_date_list = [...new Set(draw_date_list)];
         draw_date_list.unshift('');
+        
         let draw_result_list = common.getValuesFromObjList(thedraw_item_list, 'draw_result');
         draw_result_list.unshift('');
 
@@ -93,7 +104,7 @@ class ContentsTheDraw extends React.Component {
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
             opt_list_draw_date : draw_date_list,
-            opt_list_draw_result : draw_result_list,
+            opt_list_draw_result : draw_result_list
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
@@ -115,7 +126,15 @@ class ContentsTheDraw extends React.Component {
         
         this.setState({
             draw_table_item_list : [],
+            opt_list_product_name : [],
+            opt_list_account_email : [],
+            opt_list_draw_date : [],
+            opt_list_draw_result : []
         }, () => {
+            this.__ref_sel_product_name.current.setValue('');
+            this.__ref_sel_account_name.current.setValue('');
+            this.__ref_sel_draw_date.current.setValue('');
+            this.__ref_sel_draw_result.current.setValue('');
             if(__callback)__callback();
         });
     }
@@ -153,6 +172,7 @@ class ContentsTheDraw extends React.Component {
                 draw_result_col_width = {this.draw_result_col_width}
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
+                image_col_width = {this.image_col_width}
                 draw_item = {draw_item}
                 key={draw_item._id}
             />
@@ -186,6 +206,7 @@ class ContentsTheDraw extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
+                                <th scope="col" style={{width : this.image_col_width, maxWidth : this.image_col_width}}>이미지</th>
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정명</th>
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>

@@ -104,6 +104,7 @@
             product_size : undefined,
             product_price : undefined,
             product_link : undefined,
+            product_img_url : undefined,
             draw_result : undefined,
             draw_date : undefined,
             account_email : undefined,

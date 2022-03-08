@@ -7,6 +7,7 @@ class TheDrawTableItem extends React.Component {
         this.onPopAccountInfo = this.onPopAccountInfo.bind(this);
         this.getDrawResultFontColor = this.getDrawResultFontColor.bind(this);
         this.getAccountInfoTag = this.getAccountInfoTag.bind(this);
+        this.onClickProductImg = this.onClickProductImg.bind(this);
 
         this.__mount = false;
     }
@@ -57,6 +58,10 @@ class TheDrawTableItem extends React.Component {
         Index.g_prompt_modal.popModal('계정 정보', this.getAccountInfoTag(), ()=>{});
     }
 
+    onClickProductImg(){
+        window.electron.openExternalWebPage(this.props.draw_item.product_link);
+    }
+
     getDrawResultFontColor(){
 
         if(this.props.draw_item.draw_result == '당첨'){
@@ -74,6 +79,15 @@ class TheDrawTableItem extends React.Component {
 
         return(
             <tr>
+                <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
+                    <img 
+                        className="rounded product-table-item-img" 
+                        src={this.props.draw_item.product_img_url} 
+                        alt={this.props.draw_item.product_name}
+                        onClick={this.onClickProductImg.bind(this)}
+                        style={{cursor: 'pointer'}}
+                    />
+                </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.draw_item.account_email}>{this.props.draw_item.account_email}</div>
                 </td>
