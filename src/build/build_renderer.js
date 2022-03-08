@@ -5,6 +5,7 @@ var gulp = require('gulp');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+const javascriptObfuscator = require('gulp-javascript-obfuscator');
 
 const includes = ['./index.js', './components', './akam'];
 
@@ -41,6 +42,7 @@ function build_scripts(scripts) {
         .pipe(babel())
         .pipe(concat('index.min.js'))
         .pipe(uglify())
+        .pipe(javascriptObfuscator())
         .pipe(gulp.dest('dist'));
     }catch(e){
         console.error(e);
