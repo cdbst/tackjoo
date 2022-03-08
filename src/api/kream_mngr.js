@@ -38,7 +38,7 @@ async function get_kream_product_info(model_id){
         headers : get_req_headers(),
         params : {
             per_page : 10,
-            keyword : model_id.trim(),
+            keyword : model_id.replace('-', '').trim(),
             request_key : uuidv4()
         }
     };
