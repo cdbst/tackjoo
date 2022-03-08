@@ -56,8 +56,11 @@ class OrderTableItem extends React.Component {
                 }
 
                 Index.g_sys_msg_q.enqueue('알림', `${this.props.order_info.account_email} 계정으로 주문한 ${this.props.order_info.name} 상품의 주문을 성공적으로 취소했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-                //TODO 테이블 업데이트.
 
+                const updated_order_info = _.clone(this.props.order_info);
+                updated_order_info.is_cancelable = false;
+                updated_order_info.status = '취소완료';
+                this.props.h_update_order_info(updated_order_info);
             });
 
         });

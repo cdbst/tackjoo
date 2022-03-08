@@ -10,6 +10,7 @@ class ContentsOrderList extends React.Component {
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
+        this.updateOrderInfo = this.updateOrderInfo.bind(this);
 
         this.order_info_list = [];
 
@@ -61,7 +62,7 @@ class ContentsOrderList extends React.Component {
 
         this.__ref_load_btn.current.setLoadingStatus(true);
 
-        Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.loadOrderListInfo((err, order_info_list) =>{
 
@@ -176,9 +177,21 @@ class ContentsOrderList extends React.Component {
                 product_img_col_width = {this.product_img_col_width}
                 product_model_id_col_width = {this.product_model_id_col_width}
                 order_info = {order_info}
+                h_update_order_info = {this.updateOrderInfo.bind(this)}
                 key={order_info._id}
             />
         );
+    }
+
+    updateOrderInfo(_order_info){
+
+        for(i = 0; i < this.order_info_list.length; i++){
+            if(this.order_info_list[i]._id !== _order_info._id) continue;
+            this.order_info_list[i] = _order_info;
+            break;
+        }
+
+        this.onChangeOption();
     }
 
     render() {
