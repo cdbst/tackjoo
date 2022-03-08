@@ -1182,13 +1182,15 @@ class BrowserContext {
         return undefined;
     }
 
-    async open_draw_list_page(){
+    async open_draw_list_page(__retry_cnt = undefined){
 
         let headers = this.__get_open_page_header();
         headers['sec-fetch-site'] = 'same-origin';
         headers['upgrade-insecure-requests'] = 1;
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
             try{
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/theDrawList', headers);
 
