@@ -84,10 +84,20 @@ class ContentsOrderList extends React.Component {
 
         let product_name_list = common.getValuesFromObjList(order_info_list, 'name');
         product_name_list.unshift('');
+
         let account_email_list = common.getValuesFromObjList(order_info_list, 'account_email');
         account_email_list.unshift('');
-        let order_date_list = common.getValuesFromObjList(order_info_list, 'date', common.get_formatted_date_str);
+
+        let order_date_list = common.getValuesFromObjList(order_info_list, 'date');
+        order_date_list.sort((a, b)=>{ 
+            if(a > b) return -1;
+            else if(a < b) return 1;
+            else return 0;
+        });
+        order_date_list = order_date_list.map((date)=> common.get_formatted_date_str(date));
+        order_date_list = [...new Set(order_date_list)];
         order_date_list.unshift('');
+
         let order_status_list = common.getValuesFromObjList(order_info_list, 'status');
         order_status_list.unshift('');
 
