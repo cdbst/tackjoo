@@ -38,6 +38,7 @@
     "cookie": "^0.4.1",
     "electron-log": "^4.4.1",
     "electron-updater": "^4.6.1",
+    "gulp-javascript-obfuscator": "^1.1.6",
     "json-diff": "^0.5.4",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
