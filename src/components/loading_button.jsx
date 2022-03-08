@@ -20,8 +20,11 @@ class LaodingButton extends React.Component {
     }
 
     render(){
+
+        const disabled = this.props.disabled === undefined ? false : this.props.disabled;
+
         return(
-            <button ref={this.__ref_btn} type="button" className={"btn " + this.props.btn_class} onClick={()=>{this.props.h_on_click()}}>
+            <button ref={this.__ref_btn} type="button" className={"btn " + this.props.btn_class} onClick={()=>{this.props.h_on_click()}} disabled={disabled}>
                 <img src={this.state.img_src} style={{width:24, height:24}}/>
                 {this.props.btn_label}
             </button>

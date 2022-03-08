@@ -40,7 +40,7 @@ function parse_thedraw_item_list($, browser_context){
             if(el_span_draw_result.length == 0) return;
 
             let draw_result = el_span_draw_result[0].children[0].data;
-            draw_result = parser_common.strip_usless_string(draw_result);
+            draw_result = parser_common.strip_useless_string(draw_result);
 
             let thedraw_item = common.get_thedraw_item_obj_scheme();
             common.update_thedraw_item_obj(thedraw_item, 'product_name', product_name);

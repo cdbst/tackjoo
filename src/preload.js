@@ -41,6 +41,8 @@ contextBridge.exposeInMainWorld('electron', {
     notifyNewProductList : _notifyNewProductList,
     registerchangeAppTab : _registerchangeAppTab,
     getKreamProductInfo : _getKreamProductInfo,
+    loadOrderListInfo : _loadOrderListInfo,
+    cancelOrder : _cancelOrder,
 });
 
 
@@ -353,6 +355,15 @@ function _loadTheDrawItemList(__callback){
     });
 }
 
+function _loadOrderListInfo(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-order-info-list', ipc_data);
+
+    ipcRenderer.once('load-order-info-list-reply' + ipc_data.id, (_event, order_info_list_info) => {
+        __callback(order_info_list_info.err, order_info_list_info.data);
+    });
+}
+
 function _openExternalWebPage(url){
     let ipc_data = get_ipc_data({url : url});
     ipcRenderer.send('open-external-webpage', ipc_data);
@@ -466,11 +477,20 @@ function _notifyNewProductList(product_info_list){
     ipcRenderer.send('notify-new-product-list', ipc_data);
 }
 
-function _getKreamProductInfo(product_info, __callback){
-    let ipc_data = get_ipc_data({product_info : product_info});
+function _getKreamProductInfo(model_id, __callback){
+    let ipc_data = get_ipc_data({model_id : model_id});
     ipcRenderer.send('get-kream-trade-price', ipc_data);
 
     ipcRenderer.once('get-kream-trade-price-reply' + ipc_data.id, (_event, kream_trade_price_info) => {
         __callback(kream_trade_price_info.err, kream_trade_price_info.data);
+    });
+}
+
+function _cancelOrder(order_info, __callback){
+    let ipc_data = get_ipc_data({order_info : order_info});
+    ipcRenderer.send('cancel-order', ipc_data);
+
+    ipcRenderer.once('cancel-order-reply' + ipc_data.id, (_event, result_info) => {
+        __callback(result_info.err, result_info.data);
     });
 }

@@ -121,6 +121,37 @@
         return thedraw_item;
     }
 
+    exports.get_order_info_obj_scheme = function (){
+        return {
+            name : undefined,
+            size : undefined,
+            price : undefined,
+            quantity : undefined,
+            url : undefined,
+            img_url : undefined,
+            status : undefined,
+            date : undefined,
+            account_email : undefined,
+            account_id : undefined,
+            is_cancelable : undefined,
+            model_id: undefined,
+            order_id : undefined,
+            order_item_id : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_order_info_obj = function(order_info, key, value){
+        if(key in this.get_order_info_obj_scheme() == false){
+            throw 'order info object is not includes property : ' + key;
+        }
+
+        order_info[key] = value;
+        return order_info;
+    }
+
+
+
     exports.get_task_info_obj_scheme = function (){
         return {
             product_info : undefined,

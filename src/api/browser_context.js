@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const thedraw_list_page_parser = require('./thedraw_list_page_parser');
+const { parse_order_list_page } = require('./order_list_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -59,6 +60,10 @@ class BrowserContext {
         this.open_page = this.open_page.bind(this);
         this.open_draw_list_page = this.open_draw_list_page.bind(this);
 
+        this.open_cancel_order_page = this.open_cancel_order_page.bind(this);
+        this.partial_cancel_calculator = this.partial_cancel_calculator.bind(this);
+        this.cancel_order = this.cancel_order.bind(this);
+        
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
 
@@ -369,7 +374,9 @@ class BrowserContext {
             return false;
         }
 
-        let result = await this.open_main_page(retry === true ? this.__req_retry_cnt : 1);
+        const retry_cnt = retry === true ? this.__req_retry_cnt : 1;
+
+        let result = await this.open_main_page(retry_cnt);
         if(result == false){
             this.in_progress_login = false;
             log.error(common.get_log_str('browser_context.js', 'login', 'Cannot open main page'));
@@ -416,7 +423,7 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/login_post.htm', headers, payload);
                 
@@ -1200,6 +1207,217 @@ class BrowserContext {
         }
 
         return undefined;
+    }
+
+    async open_order_list_page(__retry_cnt = undefined, parse = true){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_order_list_page : response ' + res.status);
+                }
+    
+                if(parse === true){
+                    const $ = cheerio.load(res.data);
+                    const order_info_list = parse_order_list_page($, this);
+                    return order_info_list.length === 0 ? undefined :  order_info_list;
+                }else{
+                    return undefined;
+                }
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_order_list_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+
+    async open_cancel_order_page(order_info, retry_cnt = undefined){
+
+        const headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest',
+        }
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                const params = {
+                    _ : new Date().getTime()
+                };
+
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + order_info.order_id, headers, params);
+
+                if(res.status != 200){
+                    throw new Error('open_cancel_order_page : response ' + res.status);
+                }
+
+                if(res.data.includes('주문 취소') === false){
+                    throw new Error('open_cancel_order_page : invalid res data');
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return true;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_cancel_order_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
+    }
+
+    async partial_cancel_calculator(order_info, retry_cnt = undefined){
+
+        const payload_obj = {
+            orderItemId : parseInt(order_info.order_item_id), 
+            quantity : parseInt(order_info.quantity.replace(/\D/g, '')),
+            csrfToken : this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/partial-cancel-calculator/' + order_info.order_id, headers, payload);
+
+                if(res.status != 200){
+                    throw new Error('partial_cancel_calculator : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('partial_cancel_calculator : unexpected data : data is not object type');
+                }
+    
+                if(('result' in res.data) === false){
+                    throw new Error('partial_cancel_calculator : unexpected data : \'result\' information is not exist.');
+                }
+
+                return res.data.result;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'partial_cancel_calculator', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
+    }
+
+    async cancel_order(order_info, retry_cnt = undefined){
+
+        const payload_obj = {
+            orderItemId : parseInt(order_info.order_item_id), 
+            quantity : parseInt(order_info.quantity.replace(/\D/g, '')),
+            csrfToken : this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + order_info.order_id, headers, payload);
+
+                if(res.status != 200){
+                    throw new Error('cancel_order : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('cancel_order : unexpected data : data is not object type');
+                }
+    
+                if(('result' in res.data) === false){
+                    throw new Error('cancel_order : unexpected data : \'result\' information is not exist.');
+                }
+
+                return res.data.result;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'cancel_order', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
     }
 }
 
