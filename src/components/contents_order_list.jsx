@@ -72,9 +72,9 @@ class ContentsOrderList extends React.Component {
             Index.g_sys_msg_q.enqueue('안내', '주문내역을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.order_info_list = order_info_list;
-            this.setFilters(this.order_info_list);
-
+            
             this.clearContents(()=>{
+                this.setFilters(this.order_info_list);
                 this.setContents(this.order_info_list);
             });
         });
@@ -127,7 +127,15 @@ class ContentsOrderList extends React.Component {
         
         this.setState({
             order_table_item_list : [],
+            opt_list_product_name : [],
+            opt_list_account_email : [],
+            opt_list_order_date : [],
+            opt_list_order_status : [],
         }, () => {
+            this.__ref_sel_product_name.current.setValue('');
+            this.__ref_sel_account_name.current.setValue('');
+            this.__ref_sel_order_date.current.setValue('');
+            this.__ref_sel_order_status.current.setValue('');
             if(__callback)__callback();
         });
     }
