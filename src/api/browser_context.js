@@ -60,6 +60,10 @@ class BrowserContext {
         this.open_page = this.open_page.bind(this);
         this.open_draw_list_page = this.open_draw_list_page.bind(this);
 
+        this.open_cancel_order_page = this.open_cancel_order_page.bind(this);
+        this.partial_cancel_calculator = this.partial_cancel_calculator.bind(this);
+        this.cancel_order = this.cancel_order.bind(this);
+        
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
 
@@ -1236,6 +1240,117 @@ class BrowserContext {
         return undefined;
     }
 
+
+    async open_cancel_order_page(order_info){
+
+        const headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest',
+        }
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                const params = {
+                    _ : new Date().getTime()
+                };
+
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + order_info.order_id, headers, params);
+
+                if(res.status != 200){
+                    throw new Error('open_cancel_order_page : response ' + res.status);
+                }
+
+                if(res.data.includes('주문 취소') === false){
+                    throw new Error('open_cancel_order_page : invalid res data');
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return true;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_cancel_order_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
+    }
+
+    async partial_cancel_calculator(order_info){
+
+        const payload_obj = {
+            orderItemId : parseInt(order_info.order_item_id), 
+            quantity : parseInt(order_info.quantity.replace(/\D/g, '')),
+            csrfToken : this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        for(var i = 0; i < this.__req_retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/partial-cancel-calculator/' + order_info.order_id, headers, payload);
+
+                if(res.status != 200){
+                    throw new Error('partial_cancel_calculator : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('partial_cancel_calculator : unexpected data : data is not object type');
+                }
+    
+                if(('result' in res.data) === false){
+                    throw new Error('partial_cancel_calculator : unexpected data : \'result\' information is not exist.');
+                }
+
+                return res.data.result;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'partial_cancel_calculator', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
+    }
+
     async cancel_order(order_info){
 
         const payload_obj = {
@@ -1267,7 +1382,6 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
                 
@@ -1294,6 +1408,8 @@ class BrowserContext {
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }
+
+        return false;
     }
 }
 
