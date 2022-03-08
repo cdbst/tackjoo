@@ -1241,7 +1241,7 @@ class BrowserContext {
     }
 
 
-    async open_cancel_order_page(order_info){
+    async open_cancel_order_page(order_info, retry_cnt = undefined){
 
         const headers = {
             'authority': BrowserContext.NIKE_DOMAIN_NAME,
@@ -1261,7 +1261,9 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest',
         }
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 const params = {
                     _ : new Date().getTime()
@@ -1290,7 +1292,7 @@ class BrowserContext {
         return false;
     }
 
-    async partial_cancel_calculator(order_info){
+    async partial_cancel_calculator(order_info, retry_cnt = undefined){
 
         const payload_obj = {
             orderItemId : parseInt(order_info.order_item_id), 
@@ -1321,7 +1323,9 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/partial-cancel-calculator/' + order_info.order_id, headers, payload);
@@ -1351,7 +1355,7 @@ class BrowserContext {
         return false;
     }
 
-    async cancel_order(order_info){
+    async cancel_order(order_info, retry_cnt = undefined){
 
         const payload_obj = {
             orderItemId : parseInt(order_info.order_item_id), 
@@ -1382,7 +1386,9 @@ class BrowserContext {
             'x-requested-with': 'XMLHttpRequest'
         };
 
-        for(var i = 0; i < this.__req_retry_cnt; i++){
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
             try{
                 
                 const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/order/cancel/' + order_info.order_id, headers, payload);

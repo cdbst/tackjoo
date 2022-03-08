@@ -54,13 +54,13 @@ function register(){
                 let result = await browser_context.login(false);
                 if(result === false) throw new Error('Login fail');
 
-                result = await browser_context.open_cancel_order_page(order_info);
+                result = await browser_context.open_cancel_order_page(order_info, 1);
                 if(result === false) throw new Error('open cancel page fail');
 
-                result = await browser_context.partial_cancel_calculator(order_info);
+                result = await browser_context.partial_cancel_calculator(order_info, 1);
                 if(result === false) throw new Error('partial cancel fail');
 
-                result = await browser_context.cancel_order(order_info);
+                result = await browser_context.cancel_order(order_info, 1);
                 if(result === false) throw new Error('cancel order fail');
     
                 event.reply('cancel-order-reply' + data.id, {err : undefined, data : result});
