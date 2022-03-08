@@ -70,9 +70,9 @@ class ContentsTheDraw extends React.Component {
             Index.g_sys_msg_q.enqueue('안내', 'THE DRAW 당첨결과를 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.thedraw_item_list = thedraw_item_list;
-            this.setFilters(this.thedraw_item_list);
 
             this.clearContents(()=>{
+                this.setFilters(this.thedraw_item_list);
                 this.setContents(this.thedraw_item_list);
             });
         });
@@ -93,7 +93,7 @@ class ContentsTheDraw extends React.Component {
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
             opt_list_draw_date : draw_date_list,
-            opt_list_draw_result : draw_result_list,
+            opt_list_draw_result : draw_result_list
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
@@ -115,7 +115,15 @@ class ContentsTheDraw extends React.Component {
         
         this.setState({
             draw_table_item_list : [],
+            opt_list_product_name : [],
+            opt_list_account_email : [],
+            opt_list_draw_date : [],
+            opt_list_draw_result : []
         }, () => {
+            this.__ref_sel_product_name.current.setValue('');
+            this.__ref_sel_account_name.current.setValue('');
+            this.__ref_sel_draw_date.current.setValue('');
+            this.__ref_sel_draw_result.current.setValue('');
             if(__callback)__callback();
         });
     }
