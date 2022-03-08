@@ -7,6 +7,8 @@ class OrderTableItem extends React.Component {
         this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
         this.onClickCancelOrder = this.onClickCancelOrder.bind(this);
 
+        this.__ref_cancel_order_btn = React.createRef();
+
         this.__mount = false;
     }
 
@@ -35,10 +37,16 @@ class OrderTableItem extends React.Component {
     }
 
     onClickCancelOrder(){
-        Index.g_prompt_modal.popModal('경고', <p>정말로 주문을 취소하시겠 습니까?</p>, (is_ok)=>{
+        Index.g_prompt_modal.popModal('경고', <p>{this.props.order_info.account_email}로 주문한 {this.props.order_info.name}의 구매를 정말로 취소하시겠 습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
 
+            this.__ref_cancel_order_btn.current.setLoadingStatus(true);
+            Index.g_sys_msg_q.enqueue('알림', `${this.props.order_info.account_email} 계정으로 주문한 ${this.props.order_info.name} 상품의 주문 취소를 요청합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
             window.electron.cancelOrder(this.props.order_info, (error, result) =>{
+
+                this.__ref_cancel_order_btn.current.setLoadingStatus(false);
+
                 if(error){
                     Index.g_sys_msg_q.enqueue('에러', `주문을 취소하는 과정에서 알 수 없는 오류가 발생했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                     return;
@@ -47,8 +55,9 @@ class OrderTableItem extends React.Component {
                     return;
                 }
 
-                Index.g_sys_msg_q.enqueue('알림', `성공적으로 주문을 취소했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                Index.g_sys_msg_q.enqueue('알림', `${this.props.order_info.account_email} 계정으로 주문한 ${this.props.order_info.name} 상품의 주문을 성공적으로 취소했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 //TODO 테이블 업데이트.
+
             });
 
         });
@@ -98,9 +107,13 @@ class OrderTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table" title={cancel_order_tooltip}>
-                            <button type="button" className="btn btn-danger" onClick={this.onClickCancelOrder.bind(this)} disabled={this.props.order_info.is_cancelable === false}>
-                                <img src="./res/img/x-circle-fill.svg" style={{width:24, height:24}}/>
-                            </button>
+                            <LaodingButton
+                                ref={this.__ref_cancel_order_btn}
+                                h_on_click={this.onClickCancelOrder.bind(this)}
+                                btn_class={"btn-danger"}
+                                img_src={"./res/img/x-circle-fill.svg"}
+                                disabled={this.props.order_info.is_cancelable === false}
+                            />
                         </div>
                     </div>
                 </td>
