@@ -360,7 +360,7 @@ class BrowserContext {
         }
     }
 
-    async login(retry = true){
+    async login(retry_cnt = undefined){
         if(this.in_progress_login){
             log.info(common.get_log_str('browser_context.js', 'login', 'inprogress login in work'));
             return false;
@@ -374,7 +374,7 @@ class BrowserContext {
             return false;
         }
 
-        const retry_cnt = retry === true ? this.__req_retry_cnt : 1;
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
 
         let result = await this.open_main_page(retry_cnt);
         if(result == false){
@@ -440,8 +440,6 @@ class BrowserContext {
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'login', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
-
-                if(retry == false) return false;
             }
         }
 
