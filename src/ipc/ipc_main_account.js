@@ -152,7 +152,7 @@ function register(){
                     return;
                 }
     
-                result = await borwser_context.login(false);
+                result = await borwser_context.login(5);
                 if(result){
                     event.reply('login-reply' + data.id, undefined);
                 }else{

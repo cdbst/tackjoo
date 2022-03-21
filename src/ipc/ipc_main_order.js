@@ -51,7 +51,7 @@ function register(){
                     throw new Error('Cannot found browser context');
                 }
 
-                let result = await browser_context.login(false);
+                let result = await browser_context.login(5);
                 if(result === false) throw new Error('Login fail');
 
                 result = await browser_context.open_cancel_order_page(order_info, 1);
@@ -75,7 +75,7 @@ function register(){
 
 async function get_order_info_list(browser_context){
 
-    const result = await browser_context.login(false);
+    const result = await browser_context.login(5);
     if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
 
     const order_info_list = await browser_context.open_order_list_page(1);

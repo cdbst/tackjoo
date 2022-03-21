@@ -41,7 +41,7 @@ function register(){
 
 async function get_thedraw_list_info(browser_context){
 
-    let result = await browser_context.login(false);
+    let result = await browser_context.login(5);
     if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
 
     let thedraw_item_list = await browser_context.open_draw_list_page(1);
