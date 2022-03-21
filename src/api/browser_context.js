@@ -1020,6 +1020,13 @@ class BrowserContext {
                     throw new Error('checkout_request : invalid response status : ' + res.status);
                 }
 
+                if(('isError' in res.data === true) && res.data['isError'] === true){
+
+                    if(('_global' in res.data === true) && res.data['_global'].includes('재고가 없습니다')){
+                        return undefined; // 재고가 없는 상태에서 계속 재시도 하는 것은 무의미 하므로 바로 종료 시킨다.
+                    }
+                }
+
                 if('total_amount' in res.data == false){
                     throw new Error('checkout_request : invalid response data ');
                 }
