@@ -1999,9 +1999,12 @@
                 var FT = function (NT) {
                   jT(NT, H2);
                 };
-                var pT = function (vT) {
-                  jT(vT, BF);
+
+                var pT = function (vT, __callback) {
+                  jT(vT, BF, __callback);
                 };
+                window.gen_sensor_data = pT.bind(this);
+
                 var JT = function (lT) {
                   jT(lT, OP);
                 };
@@ -4212,7 +4215,7 @@
                       tK(Q1, LP) &&
                       ((gJ = EP), WK(ls, [Tv, LP]), p0(kK(OK)), Q1++);
                 }
-                function jT(BZ, UZ) {
+                function jT(BZ, UZ, __callback) {
                   var mZ = (function DZ(sZ, VZ, LZ) {
                     try {
                       var KZ = OK;
@@ -4284,9 +4287,9 @@
                     } catch (GZ) {}
                   })(BZ, UZ, XH[HH.KI("/3._\t", w2)].bmak[HH.th("QBZS.", I4)]);
                   (Ub += mZ[HH.BY("5", rW)]),
-                    mJ &&
+                    true &&
                       d2(BF, UZ) &&
-                      ((gJ = LP), WK(ls, [Tv, LP]), p0(kK(OK)));
+                      ((gJ = LP), WK(ls, [Tv, LP]), p0(kK(OK), __callback));
                 }
                 function kT(MZ, TZ) {
                   var SZ = WK(ls, [
@@ -4461,45 +4464,17 @@
                     d2(pM(LP), KR) || tK(Bk, KR)
                   );
                 }
-                function PR(jR, FR, NR) {
-                  var pR;
-                  zb(
-                    Ob(OK),
-                    XH[HH.KI("/3._\t", w2)][HH.wU("x\n\bRd^P\x07#.>", DQ)]
-                  )
-                    ? (pR = new XH[HH.KI("/3._\t", w2)][
-                        HH.wU("x\n\bRd^P\x07#.>", DQ)
-                      ]())
-                    : zb(
-                        Ob(OK),
-                        XH[HH.KI("/3._\t", w2)][HH.WU("y6)0+Y.GGND2", VQ)]
-                      )
-                    ? ((pR = new XH[HH.KI("/3._\t", w2)][
-                        HH.WU("y6)0+Y.GGND2", VQ)
-                      ]())[HH.pm('MXWN"', PN)] = function () {
-                        (this[HH.vm("8U[eO\x40#", JR)] = OP),
-                          kF(
-                            this[HH.WC(hS, rS, dl)],
-                            XH[HH.X3("g\x07(>>Y", SP)]
-                          ) && this[HH.WC(hS, rS, dl)]();
-                      })
-                    : (pR = new XH[HH.KI("/3._\t", w2)][
-                        HH.tU("zB/+/h1HSXU", QQ)
-                      ](HH.Nm("l%/%CVcl>\t`", vR))),
-                    pR[HH.Jm("RSU", b5)](HH.lm("`1/v", N1), jR, FR),
-                    zb(Ob(OK), pR[HH.bm("/)\"s\fFSUU'19", lR)]) &&
-                      (pR[HH.bm("/)\"s\fFSUU'19", lR)] = kK(OK));
+                function PR(jR, FR, NR, __callback) {
+
                   var bR = HH.Gm('1\rLETS-"<>Q\\F\x00', b7)[HH.kI("SAWO", gv)](
                     wG,
                     HH.ZC(MN, zN, H2)
                   );
-                  (pR[HH.WC(hS, rS, dl)] = function () {
-                    VK(pR[HH.vm("8U[eO\x40#", JR)], BF) && NR && NR(pR);
-                  }),
-                    pR[HH.Mm("\rLR", GR)](bR),
-                    (k1 = OK);
+
+                  if(__callback) __callback(bR)
+
                 }
-                function p0(MR) {
+                function p0(MR, __callback) {
                   var TR = kK(LP);
                   (YR() ||
                     (function SR() {
@@ -4542,8 +4517,8 @@
                       return VK(qR, OK);
                     })() ||
                     k1) &&
-                    (PR(M1, MR, gk), (BJ += LP), (TR = kK(OK))),
-                    qG && (TR || PR(M1, MR, gk));
+                    (PR(M1, MR, gk, __callback), (BJ += LP), (TR = kK(OK))),
+                    qG && (TR || PR(M1, MR, gk, __callback));
                 }
                 if (
                   ((XH[HH.KI("/3._\t", w2)]._cf =
