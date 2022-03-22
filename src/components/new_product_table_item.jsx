@@ -140,11 +140,11 @@ class NewProductTableItem extends React.Component {
                 <td style={{width : this.props.kream_interest_col_width, maxWidth : this.props.kream_interest_col_width}}>
                     <span >{kream_interest_str}</span>
                 </td>
-                <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
-                    <span>{common.get_formatted_date_str(this.props.product_info.released_date, true)}</span>
-                </td>
                 <td style={{width : this.props.soldout_status_col_width, maxWidth : this.props.soldout_status_col_width}}>
                     <span className='custom-color-text' style={{'--text-color' : this.getSoldOutStatusFontColor()}}>{this.props.product_info.soldout ? '품절' : '구매가능'}</span>
+                </td>
+                <td style={{width : this.props.release_date_col_width, maxWidth : this.props.release_date_col_width}}>
+                    <span>{common.get_formatted_date_str(this.props.product_info.released_date, true)}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

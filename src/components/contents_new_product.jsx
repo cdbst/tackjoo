@@ -163,8 +163,8 @@ class ContentsNewProduct extends React.Component {
                                 <th scope="col" style={{width : this.kream_price_col_width, maxWidth : this.kream_price_col_width}}>크림가격</th>
                                 <th scope="col" style={{width : this.price_gap_col_width, maxWidth : this.price_gap_col_width}}>시세차익</th>
                                 <th scope="col" style={{width : this.kream_interest_col_width, maxWidth : this.kream_interest_col_width}}>크림관심도</th>
-                                <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
                                 <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
+                                <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
