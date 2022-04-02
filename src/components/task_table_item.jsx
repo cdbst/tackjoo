@@ -215,6 +215,10 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.ADD_TO_CART : 
                 return false;
+            case common.TASK_STATUS.IN_TO_CART : 
+                return false;
+            case common.TASK_STATUS.PREPARE_ORDER : 
+                return false;
             case common.TASK_STATUS.TRY_TO_DRAW : 
                 return false;
             case common.TASK_STATUS.TRY_TO_PAY : 

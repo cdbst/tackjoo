@@ -157,12 +157,14 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         global.MainThreadApiCaller.call('set_checked_out_size_info', [size_info_in_cart]);
 
         // STEP6 : open checkout page
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.IN_TO_CART]);
         const open_checkout_page_result = await TaskUtils.open_checkout_page(browser_context, product_info);
         if(open_checkout_page_result == false){
             throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
         }
 
         // STEP7 : chekcout singleship (registering buyer address info)
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.PREPARE_ORDER]);
         const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info, product_info);
         if(pay_prepare_payload == undefined){
             throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
