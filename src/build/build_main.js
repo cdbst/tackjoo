@@ -4,7 +4,7 @@ async function bundle(){
     
     try{
         await esbuild.build({
-            entryPoints: ['app.js', 'task.js', 'preload.js', 'payco_preload.js'],
+            entryPoints: ['app.js', 'task.js', 'preload.js', 'payco_preload.js', 'restock_watchdog_task.js'],
             bundle: true,
             outdir: 'dist',
             minify: true,
