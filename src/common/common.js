@@ -358,10 +358,12 @@
         ON_PAGE : '상품 페이지 여는 중',
         WAITING_FOR_RELEASE : '상품 입고 대기 중',
         ADD_TO_CART : '카트에 넣는 중',
+        IN_TO_CART : '카트에 담기 완료',
+        PREPARE_ORDER : '주문결제 준비 중',
         TRY_TO_DRAW : 'THE DRAW 준비 중',
         GET_PRODUCT_INFO : '상품 정보 확인 중',
-        TRY_TO_PAY : '결제 시도 중',
-        READY_TO_PAY : '결제 대기 중'
+        TRY_TO_PAY : '주문결제 요청 중',
+        READY_TO_PAY : '주문결제 대기 중'
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);
