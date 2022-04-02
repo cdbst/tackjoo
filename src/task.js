@@ -16,6 +16,7 @@ const task_info = workerData.task_info;
 let product_info = workerData.product_info;
 const billing_info = workerData.billing_info;
 const settings_info = workerData.settings_info;
+let g_sku_inventory_info = workerData.sku_inventory_info;
 
 browser_context.proxy_info = task_info.proxy_info;
 browser_context.update_settings(settings_info);
@@ -30,7 +31,7 @@ process.on('unhandledRejection', (err) => {
     log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
 
     if(remain_ret_cnt-- > 0){
-
+        g_sku_inventory_info = false // 최초 알고 있던 재고 정보가 오래된 정보일 수 있으므로 task 재시도시 초기화 시킨다.
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
@@ -95,6 +96,8 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(product_info == undefined){
             throw new OpenProductPageError("Cannot open product page info - custom product");
         }
+    }else if(task_info.watchdog && g_sku_inventory_info !== undefined){
+        product_page_parser.update_product_info_as_sku_inventory_info(product_info, g_sku_inventory_info);
     }else{
         // STEP2 : Get Sku inventory information
         if(task_info.watchdog){

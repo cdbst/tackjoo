@@ -10,8 +10,12 @@ const log = require('electron-log');
 const OCREngine = require('./ocr_engine').OCREngine;
 const AuthEngine = require('../api/auth_engine.js').AuthEngine;
 const EventWait = require('./event_wait').EventWait;
+const { ProductRestockWatchdog } = require('../api/product_restock_watchdog');
 
 class TaskRunner{
+
+    TASK_JS_PATH = path.resolve(path.join(app.getAppPath(), 'task.js'));
+
     constructor(browser_context, task_info, product_info, billing_info, settings_info, message_cb){
 
         this.start = this.start.bind(this);
@@ -26,6 +30,7 @@ class TaskRunner{
         this.sync_browser_context = this.sync_browser_context.bind(this);
         this.send_message = this.send_message.bind(this);
         this.set_checked_out_size_info = this.set_checked_out_size_info.bind(this);
+        this.stop_watch_restock = this.stop_watch_restock.bind(this);
 
         this.browser_context = browser_context;
         this.task_info = task_info;
@@ -44,6 +49,9 @@ class TaskRunner{
         this.prevent_task_end_flag = false; // 작업 재시도 상황에서, 현재 열려 있는 pay window를 닫게 되는데, 이때 task가 종료되지 못하게 하려는 목적의 flag 변수이다.
 
         this.checkout_wait = new EventWait();
+
+        //TODO 반드시 지울 것
+        //this.task_info.watchdog = true;
     }
 
     on_recv_api_call(data){
@@ -233,22 +241,35 @@ class TaskRunner{
         if(AuthEngine.is_authorized() === false) throw new TaskCanceledError(this, 'Unauthorized user.');
         this.running = true;
 
-        return new Promise((resolve, reject)=>{
+
+        return new Promise(async (resolve, reject)=>{
 
             this.resolve = resolve;
             this.reject = reject;
 
-            const task_js_path = path.resolve(path.join(app.getAppPath(), 'task.js'));
+            let sku_inventory_info = undefined;
+
+            if(this.task_info.watchdog === true){
+                try{
+                    this.send_message(common.TASK_STATUS.WAITING_FOR_RELEASE);
+                    sku_inventory_info = await ProductRestockWatchdog.on_watch(this.product_info, this.settings_info);
+                }catch(err){
+                    log.warn(common.get_log_str('task_runner.js', 'ProductRestockWatchdog.on_watch - catch', err.message));
+                    reject(err);
+                    return;
+                }
+            }
 
             this.checkout_wait.set();
-            this.worker = new Worker(task_js_path, {
+            this.worker = new Worker(this.TASK_JS_PATH, {
                 workerData : {
                     browser_context : JSON.stringify(this.browser_context),
                     task_info : this.task_info,
                     product_info : this.product_info,
                     billing_info : this.billing_info,
                     settings_info : this.settings_info,
-                    log_path : log.transports.file.resolvePath()
+                    log_path : log.transports.file.resolvePath(),
+                    sku_inventory_info : sku_inventory_info
                 }
             });
 
@@ -283,14 +304,23 @@ class TaskRunner{
         this.pay_window = undefined;
     }
 
+    stop_watch_restock(){
+        if(this.task_info.watchdog !== true) return;
+        
+        ProductRestockWatchdog.off_watch(this.product_info);
+        this.reject('stop watch restock');
+    }
+
     stop(){
         this.canceled = true;
         if(this.worker != undefined) this.worker.postMessage({ type: 'exit', code: 1 });
+        this.stop_watch_restock();
         this.close_pay_window();
         this.running = false;
     }
 
     async end_task(error){
+
         this.close_pay_window();
         await this.browser_context.open_main_page(1);
         if(error){
