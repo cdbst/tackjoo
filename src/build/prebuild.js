@@ -27,7 +27,8 @@ const cleanup_files = [
     'app.js',
     'task.js',
     'preload.js',
-    'payco_preload.js'
+    'payco_preload.js',
+    'restock_watchdog_task.js'
 ]
 
 const cleanup_dirs = [
