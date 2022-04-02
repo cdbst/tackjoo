@@ -50,8 +50,6 @@ class TaskRunner{
 
         this.checkout_wait = new EventWait();
 
-        //TODO 반드시 지울 것
-        //this.task_info.watchdog = true;
     }
 
     on_recv_api_call(data){
