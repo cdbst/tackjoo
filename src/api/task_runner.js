@@ -252,7 +252,7 @@ class TaskRunner{
             if(this.task_info.watchdog === true){
                 try{
                     this.send_message(common.TASK_STATUS.WAITING_FOR_RELEASE);
-                    sku_inventory_info = await ProductRestockWatchdog.on_watch(this.product_info, this.settings_info);
+                    sku_inventory_info = await ProductRestockWatchdog.on_watch(this.product_info, this.settings_info, this.task_info.proxy_info);
                 }catch(err){
                     log.warn(common.get_log_str('task_runner.js', 'ProductRestockWatchdog.on_watch - catch', err.message));
                     reject(err);

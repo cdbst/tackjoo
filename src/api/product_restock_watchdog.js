@@ -16,7 +16,7 @@ class ProductRestockWatchdog{
         this.watchdog_list = {};
     }
 
-    on_watch(product_info, settings_info) {
+    on_watch(product_info, settings_info, proxy_info) {
 
         if(product_info.product_id in this.watchdog_list === false) {
 
@@ -27,14 +27,14 @@ class ProductRestockWatchdog{
                 watcher_cnt : 0
             };
 
-            this.watchdog_list[product_info.product_id].watchdog_promise = this.gen_watchdog_worker(product_info, settings_info);
+            this.watchdog_list[product_info.product_id].watchdog_promise = this.gen_watchdog_worker(product_info, settings_info, proxy_info);
         }
 
         this.watchdog_list[product_info.product_id].watcher_cnt++;
         return this.watchdog_list[product_info.product_id].watchdog_promise;
     }
 
-    gen_watchdog_worker(product_info, settings_info){
+    gen_watchdog_worker(product_info, settings_info, proxy_info){
 
         return new Promise((resolve, reject) =>{
             try{
@@ -43,6 +43,7 @@ class ProductRestockWatchdog{
                     workerData : {
                         product_info : product_info,
                         settings_info : settings_info,
+                        proxy_info : proxy_info,
                         log_path : log.transports.file.resolvePath()
                     }
                 });

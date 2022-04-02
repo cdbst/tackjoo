@@ -8,6 +8,8 @@ app_cfg.set_log('info', false, workerData.log_path);
 
 const product_info = workerData.product_info;
 const settings_info = workerData.settings_info;
+const proxy_info = workerData.proxy_info;
+
 
 process.on('unhandledRejection', (err) => {
 
@@ -19,10 +21,11 @@ process.on('exit', (code) => {
     log.info(common.get_log_str('restock_watchdog_task.js', 'main', 'restock watchdog task thread exit with : ' + code));
 });
 
-main(product_info, settings_info);
+main(product_info, settings_info, proxy_info);
 
-async function main(product_info, settings_info){
+async function main(product_info, settings_info, proxy_info){
     const browser_context = new BrowserContext();
+    browser_context.proxy_info = proxy_info;
 
     let sku_inventory_info = undefined;
 
