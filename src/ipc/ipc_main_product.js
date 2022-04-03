@@ -43,9 +43,8 @@ function register(){
     let product_watchdog = null;
 
     ipcMain.on('start-watching-new-released', (event, data) =>{
-
-        const settings_info = data.payload.settings_info;
-        product_watchdog = new NewReleasedProductWatchdog(settings_info.new_product_watch_interval, settings_info.new_product_watch_max_ret);
+        
+        product_watchdog = new NewReleasedProductWatchdog(data.payload.settings_info);
        
         (async()=>{
             try{

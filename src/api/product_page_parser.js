@@ -732,9 +732,10 @@ function parse_product_img_url_from_new_released_product_page($){
  * new release page에서 상품 정보들을 파싱하여 product list info로 반환합니다.
  * 
  * @param {object} $ parsed new release web page object
+ * @param {boolean} replace_url 상품 url을 '/kr/ko_kr/'에서 '/kr/launch/'로 대체시킬지 여부
  * @returns {object} new release page에서 파싱된 product info 리스트
  */
-function parse_product_list_from_new_released_page($){
+function parse_product_list_from_new_released_page($, replace_url){
     const product_list_divs = $('.a-product');
 
     if(product_list_divs.length === 0) return [];
@@ -756,7 +757,9 @@ function parse_product_list_from_new_released_page($){
                 if(el_name_input.attribs.name === 'productId'){
                     common.update_product_info_obj(product_info, 'product_id', el_name_input.attribs.value);
                 }else if(el_name_input.attribs.name === 'producturl'){
-                    common.update_product_info_obj(product_info, 'url', common.NIKE_URL + el_name_input.attribs.value);
+                    let product_url = el_name_input.attribs.value;
+                    if(replace_url) product_url = product_url.replace('/kr/ko_kr/', '/kr/launch/');
+                    common.update_product_info_obj(product_info, 'url', common.NIKE_URL + product_url);
                 }else if(el_name_input.attribs.name === 'productmodel'){
                     common.update_product_info_obj(product_info, 'model_id', el_name_input.attribs.value);
                 }
