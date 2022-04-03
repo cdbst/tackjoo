@@ -23,6 +23,7 @@ class ContentsNewProduct extends React.Component {
         this.loadWhitelistInfolist = this.loadWhitelistInfolist.bind(this);
         this.loadBlacklistInfolist = this.loadBlacklistInfolist.bind(this);
         this.checkProductInfoWithWhiteList = this.checkProductInfoWithWhiteList.bind(this);
+        this.checkProductInfoWithBlackList = this.checkProductInfoWithBlackList.bind(this);
         this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
         this.__onCancelSubmitBlacklistInfo = this.__onCancelSubmitBlacklistInfo.bind(this);
         this.__onSubmitBlacklistInfo = this.__onSubmitBlacklistInfo.bind(this);
@@ -149,6 +150,22 @@ class ContentsNewProduct extends React.Component {
         });
     }
 
+    checkProductInfoWithBlackList(product_info){
+
+        let exists_in_blacklist = false;
+        
+        this.blacklist_info_list.filter((blacklist_info) => blacklist_info !== '').every((blacklist_info)=>{
+            if(product_info.name.includes(blacklist_info) || product_info.model_id.includes(blacklist_info)){
+                exists_in_blacklist = true;
+                return false;
+            }else{
+                return true;
+            }
+        });
+
+        return exists_in_blacklist;
+    }
+
     __onClickWatchBtn(status){
 
         this.__ref_watch_btn.setDisabled(true);
@@ -174,7 +191,9 @@ class ContentsNewProduct extends React.Component {
 
                 new_product_info_list.forEach((product_info)=>{
                     this.__product_info_list.push(product_info);
-                    this.checkProductInfoWithWhiteList(product_info);
+                    if(this.checkProductInfoWithBlackList(product_info) === false){
+                        this.checkProductInfoWithWhiteList(product_info);
+                    }
                 });
 
                 this.__updateTableItems();
