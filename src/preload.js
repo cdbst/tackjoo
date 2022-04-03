@@ -44,7 +44,9 @@ contextBridge.exposeInMainWorld('electron', {
     loadOrderListInfo : _loadOrderListInfo,
     cancelOrder : _cancelOrder,
     saveNewProductWhiteListInfo : _saveNewProductWhiteListInfo,
-    loadNewProductWhiteListInfo : _loadNewProductWhiteListInfo
+    loadNewProductWhiteListInfo : _loadNewProductWhiteListInfo,
+    saveNewProductBlackListInfo : _saveNewProductBlackListInfo,
+    loadNewProductBlackListInfo : _loadNewProductBlackListInfo
 });
 
 /**
@@ -519,5 +521,32 @@ function _loadNewProductWhiteListInfo(__callback){
 
     ipcRenderer.once('load-new-released-product-whitelist-info-reply' + ipc_data.id, (_event, whitelist_info) => {
         __callback(whitelist_info.err, whitelist_info.data);
+    });
+}
+
+function _saveNewProductBlackListInfo(blacklist_info, __callback){
+
+    if(blacklist_info == undefined || typeof blacklist_info !== 'object'){
+        __callback('blacklist_info info to save is not valid data.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({blacklist_info : blacklist_info});
+    
+    ipcRenderer.send('save-new-released-product-blacklist-info', ipc_data);
+
+    ipcRenderer.once('save-new-released-product-blacklist-info-reply' + ipc_data.id, (_event, save_result) => {
+        __callback(save_result.err);
+    });
+}
+
+function _loadNewProductBlackListInfo(__callback){
+
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('load-new-released-product-blacklist-info', ipc_data);
+
+    ipcRenderer.once('load-new-released-product-blacklist-info-reply' + ipc_data.id, (_event, blacklist_info) => {
+        __callback(blacklist_info.err, blacklist_info.data);
     });
 }

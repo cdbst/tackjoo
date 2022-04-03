@@ -61,6 +61,32 @@ function register(){
             }
         })();
     });
+
+    ipcMain.on('save-new-released-product-blacklist-info', async(event, data) =>{
+        (async()=>{
+            try{
+                const blacklist_info = { blacklist_info : data.payload.blacklist_info };
+            
+                await UserFileManager.write(USER_FILE_PATH.NEW_RELEASED_PRODUCT_BLACKLIST_INFO, blacklist_info);
+                event.reply('save-new-released-product-blacklist-info-reply' + data.id, {err : undefined});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_new_product.js', 'save-new-released-product-blacklist-info-callback', err));
+                event.reply('save-new-released-product-blacklist-info-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
+
+    ipcMain.on('load-new-released-product-blacklist-info', async(event, data) =>{
+        (async()=>{
+            try{
+                const file_data = await UserFileManager.read(USER_FILE_PATH.NEW_RELEASED_PRODUCT_BLACKLIST_INFO);
+                event.reply('load-new-released-product-blacklist-info-reply' + data.id, {err : undefined, data : file_data.blacklist_info});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_new_product.js', 'load-new-released-product-blacklist-info-callback', err));
+                event.reply('load-new-released-product-blacklist-info-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
 }
 
 

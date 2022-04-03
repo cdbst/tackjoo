@@ -9,6 +9,7 @@ class TextareaEditModal extends React.Component {
         this.onModalshown = this.onModalshown.bind(this);
         this.onCancelSubmit = this.onCancelSubmit.bind(this);
         this.__hideModal = this.__hideModal.bind(this);
+        this.setTextEditValue = this.setTextEditValue.bind(this);
 
         this.EL_ID_MODAL_TEXTAREA = 'modal-textarea-' + this.props.id;
 
@@ -31,17 +32,12 @@ class TextareaEditModal extends React.Component {
 
         this.editor.setOption('theme', 'midnight');
 
-        if(this.props.on_load_textedit) {
+        if(this.props.on_load_textedit) this.props.on_load_textedit();
+    }
 
-            this.props.on_load_textedit((whitelist_info_list)=>{
-                let whitelist_text = '';
-                whitelist_info_list.forEach((whitelist_info)=>{
-                    whitelist_text += `${whitelist_info.keyword}:${whitelist_info.task_cnt}\n`;
-                });
-
-                this.editor.setValue(whitelist_text);
-            });
-        }
+    setTextEditValue(value){
+        this.editor.setValue(value);
+        this.editor.refresh();
     }
 
     onModalshown(e){
@@ -68,7 +64,7 @@ class TextareaEditModal extends React.Component {
         e.preventDefault();
 
         //Idd Item Needed;
-        if(this.props.h_cancel) this.props.h_cancel(this.editor);
+        if(this.props.h_cancel) this.props.h_cancel();
         this.__hideModal();
     }
 
