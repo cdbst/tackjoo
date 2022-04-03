@@ -1,6 +1,8 @@
 
 class ContentsNewProduct extends React.Component {
 
+    WHITELIST_EDIT_MODAL_ID = 'filter-edit-modal';
+
     constructor(props) {
         super(props);
 
@@ -10,7 +12,14 @@ class ContentsNewProduct extends React.Component {
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
         this.onRemoveProduct = this.onRemoveProduct.bind(this);
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
+        this.__onSubmitFilterInfo = this.__onSubmitFilterInfo.bind(this);
+        this.__conCancelSubmitFilterInfo = this.__conCancelSubmitFilterInfo.bind(this);
         this.onCreateTask = this.onCreateTask.bind(this);
+        this.showWhitelistEditModal = this.showWhitelistEditModal.bind(this);
+        this.updateWhiteInfolist = this.updateWhiteInfolist.bind(this);
+        this.loadWhiteInfolist = this.loadWhiteInfolist.bind(this);
+
+        this.whitelist_info_list = [];
 
         this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
 
@@ -50,6 +59,36 @@ class ContentsNewProduct extends React.Component {
 
     componentWillUnmount(){
         this.__mount = false;
+    }
+
+    updateWhiteInfolist(whitelist_info_list){
+
+        this.whitelist_info_list = whitelist_info_list;
+
+        window.electron.saveNewProductWhiteListInfo(this.whitelist_info_list, (err)=>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', `화이트리스트를 저장하는 저장하지 못했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            Index.g_sys_msg_q.enqueue('안내', `화이트리스트를 성공적으로 저장했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
+    }
+
+    loadWhiteInfolist(__callback){
+
+        console.log('loadWhiteInfolist');
+
+        window.electron.loadNewProductWhiteListInfo((err, whitelist_info_list)=>{
+            if(err){
+                //Index.g_sys_msg_q.enqueue('에러', `화이트리스트를 불러오지 못했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+            
+            Index.g_sys_msg_q.enqueue('안내', `화이트리스트를 성공적으로 불러왔습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            this.whitelist_info_list = whitelist_info_list;
+            __callback(whitelist_info_list);
+        });
     }
 
     onRemoveProduct(product_id){
@@ -138,11 +177,82 @@ class ContentsNewProduct extends React.Component {
         });
     }
 
+    __conCancelSubmitFilterInfo(text_editor_obj){
+
+        let whitelist_text = '';
+        this.whitelist_info_list.forEach((whitelist_info)=>{
+            whitelist_text += `${whitelist_info.keyword}:${whitelist_info.task_cnt}\n`;
+        });
+        text_editor_obj.setValue(whitelist_text);
+        text_editor_obj.refresh();
+    }
+
+    __onSubmitFilterInfo(_whitelist_info_list){
+        const whitelist_info_list = _whitelist_info_list.split('\n');
+        const error_messages = [];
+        const whitelist_info_obj_list = [];
+
+        for(var i = 0; i < whitelist_info_list.length; i++){
+            const whitelist_info = whitelist_info_list[i];
+
+            if(whitelist_info.trim() === '') continue; // 공백라인은 생략한다.
+
+            const keyword_taskcnt_info_array = whitelist_info.split(':');
+            if(keyword_taskcnt_info_array.length < 2){
+                error_messages.push(`[${i + 1}]번째 줄의 입력값이 올바르지 않습니다. (${whitelist_info})`);
+                continue;
+            }
+
+            const task_cnt = keyword_taskcnt_info_array.pop().trim();
+            const keyword = keyword_taskcnt_info_array.join(':').trim();
+            
+            //유효성 검사 : 작업 생성 개수 정보가 올바른 포멧인지 확인 필요.
+            if(new RegExp('^[0-9]+$').test(task_cnt) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 작업 생성 수량 값이 올바른 형태가 아닙니다. (${whitelist_info})`);
+                continue;
+            }
+
+            if(keyword === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 키워드 또는 제품 코드 값이 빈상태 입니다. (${whitelist_info})`);
+                continue;
+            }
+
+            const whitelist_info_obj = {
+                keyword: keyword,
+                task_cnt: task_cnt,
+                _id: common.uuidv4()
+            };
+            whitelist_info_obj_list.push(whitelist_info_obj);            
+        }
+        
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showWhitelistEditModal()});
+            return;
+        }
+
+        this.updateWhiteInfolist(whitelist_info_obj_list);
+    }
+
+
+    showWhitelistEditModal(){
+        const el_modal = document.getElementById(this.WHITELIST_EDIT_MODAL_ID);
+        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
     render() {
 
         return (
             <div className="tab-pane fade" id="new-product" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.NEW_PRODUCT}>
                 <div className="container-fluid">
+                    <TextareaEditModal 
+                        id={this.WHITELIST_EDIT_MODAL_ID} 
+                        h_submit={this.__onSubmitFilterInfo.bind(this)}
+                        h_cancel={this.__conCancelSubmitFilterInfo.bind(this)}
+                        title="필터 설정"
+                        desc="한 줄당 필터 하나 👉 상품키워드 또는 제품코드:생성할 작업 수량(조던 1 로우:2)"
+                        on_load_textedit={this.loadWhiteInfolist.bind(this)}
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -188,6 +298,9 @@ class ContentsNewProduct extends React.Component {
                             
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)} >
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.WHITELIST_EDIT_MODAL_ID} >
+                                <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 화이트리스트
                             </button>
                         </div>
                     </div>

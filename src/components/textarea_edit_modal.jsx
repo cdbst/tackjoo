@@ -7,6 +7,8 @@ class TextareaEditModal extends React.Component {
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
+        this.onCancelSubmit = this.onCancelSubmit.bind(this);
+        this.__hideModal = this.__hideModal.bind(this);
 
         this.EL_ID_MODAL_TEXTAREA = 'modal-textarea-' + this.props.id;
 
@@ -24,13 +26,27 @@ class TextareaEditModal extends React.Component {
         const textarea = document.getElementById(this.EL_ID_MODAL_TEXTAREA);
 
         this.editor = CodeMirror.fromTextArea(textarea, {
-            lineNumbers: true
+            lineNumbers: true,
         });
+
         this.editor.setOption('theme', 'midnight');
+
+        if(this.props.on_load_textedit) {
+
+            this.props.on_load_textedit((whitelist_info_list)=>{
+                let whitelist_text = '';
+                whitelist_info_list.forEach((whitelist_info)=>{
+                    whitelist_text += `${whitelist_info.keyword}:${whitelist_info.task_cnt}\n`;
+                });
+
+                this.editor.setValue(whitelist_text);
+            });
+        }
     }
 
     onModalshown(e){
         this.editor.focus();
+        this.editor.refresh();
     }
 
     onModalClosed(e){
@@ -44,8 +60,19 @@ class TextareaEditModal extends React.Component {
         e.preventDefault();
 
         //Idd Item Needed;
-        this.props.h_submit(this.editor.getValue());
+        if(this.props.h_submit) this.props.h_submit(this.editor.getValue());
+        this.__hideModal();
+    }
 
+    onCancelSubmit(e){
+        e.preventDefault();
+
+        //Idd Item Needed;
+        if(this.props.h_cancel) this.props.h_cancel(this.editor);
+        this.__hideModal();
+    }
+
+    __hideModal(){
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         
@@ -70,8 +97,8 @@ class TextareaEditModal extends React.Component {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmit.bind(this)}>생성</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" onClick={this.onCancelSubmit.bind(this)}>취소</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmit.bind(this)}>확인</button>
                         </div>
                     </div>
                 </div>
