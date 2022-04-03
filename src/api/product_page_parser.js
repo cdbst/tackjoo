@@ -118,8 +118,7 @@ function get_snkrs_product_info_from_product_page ($) {
         common.update_product_info_obj(_product_info, 'name', product_name);
 
         const product_alt_name = parse_product_alt_name_from_product_page($);
-        if(product_alt_name == undefined) return undefined;
-        common.update_product_info_obj(_product_info, 'alt_name', product_alt_name);
+        common.update_product_info_obj(_product_info, 'alt_name', product_alt_name === undefined ? '' : product_alt_name);
         
         let price = parse_price_from_product_page($);
         if(price == undefined) return undefined;
