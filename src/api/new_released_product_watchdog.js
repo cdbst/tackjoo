@@ -12,7 +12,7 @@ class NewReleasedProductWatchdog{
      * 
      * @param {number} watch_interval 몇 초 간격으로 새로운 제품을 확인할지 (초단위)
      */
-    constructor(watch_interval, watch_max_ret){
+    constructor(settings_info){
 
         this.start_watch = this.start_watch.bind(this);
         this.stop_watch = this.stop_watch.bind(this);
@@ -20,8 +20,9 @@ class NewReleasedProductWatchdog{
         this.open_new_released_page_test = this.open_new_released_page_test.bind(this);
 
         this.browser_context = new BrowserContext();
-        this.watch_interval = watch_interval;
-        this.watch_max_ret = watch_max_ret;
+        this.watch_interval = settings_info.new_product_watch_interval;
+        this.watch_max_ret = settings_info.new_product_watch_max_ret;
+        this.use_snkrs_url = settings_info.new_product_quick_task_use_snkrs_url === 1 ? true : false;
 
         this.watchdog_resolver = undefined;
         this.watchdog_rejecter = undefined;
@@ -98,7 +99,7 @@ class NewReleasedProductWatchdog{
                     } 
     
                     const $ = cheerio.load(res.data);
-                    const new_product_info_list = parse_product_list_from_new_released_page($);
+                    const new_product_info_list = parse_product_list_from_new_released_page($, this.use_snkrs_url);
                     if(new_product_info_list.length === 0){
                         accumulated_fail_cnt++;
                         continue;
