@@ -18,8 +18,10 @@ class ContentsNewProduct extends React.Component {
         this.showWhitelistEditModal = this.showWhitelistEditModal.bind(this);
         this.updateWhiteInfolist = this.updateWhiteInfolist.bind(this);
         this.loadWhiteInfolist = this.loadWhiteInfolist.bind(this);
+        this.checkProductInfoWithWhiteList = this.checkProductInfoWithWhiteList.bind(this);
 
         this.whitelist_info_list = [];
+
 
         this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
 
@@ -134,6 +136,18 @@ class ContentsNewProduct extends React.Component {
         this.props.contents_task_ref.current.create_quick_task(product_info);
     }
 
+    checkProductInfoWithWhiteList(product_info){
+        
+        this.whitelist_info_list.forEach((whitelist_info)=>{
+            const task_cnt = parseInt(whitelist_info.task_cnt);
+            if(task_cnt === 0) return;
+            if(product_info.name.includes(whitelist_info.keyword) === false && product_info.model_id.includes(whitelist_info.keyword) === false) return;
+            for(var i = 0; i < task_cnt; i++){
+                this.onCreateTask(product_info);
+            }
+        });
+    }
+
     __onClickWatchBtn(status){
 
         this.__ref_watch_btn.setDisabled(true);
@@ -159,6 +173,7 @@ class ContentsNewProduct extends React.Component {
 
                 new_product_info_list.forEach((product_info)=>{
                     this.__product_info_list.push(product_info);
+                    this.checkProductInfoWithWhiteList(product_info);
                 });
 
                 this.__updateTableItems();
