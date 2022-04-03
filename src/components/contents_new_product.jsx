@@ -95,11 +95,14 @@ class ContentsNewProduct extends React.Component {
 
     onRemoveProduct(product_id){
 
-        Index.g_prompt_modal.popModal('경고', <p>상품을 삭제하시겠습니까?</p>, (is_ok)=>{
-            if(is_ok == false) return;
-            this.__product_info_list = this.__product_info_list.filter((product_info)=> product_info._id !== product_id);
-            this.__updateTableItems();
-        });
+        this.__product_info_list = this.__product_info_list.filter((product_info)=> product_info._id !== product_id);
+        this.__updateTableItems();
+
+        // Index.g_prompt_modal.popModal('경고', <p>상품을 삭제하시겠습니까?</p>, (is_ok)=>{
+        //     if(is_ok == false) return;
+        //     this.__product_info_list = this.__product_info_list.filter((product_info)=> product_info._id !== product_id);
+        //     this.__updateTableItems();
+        // });
     }
 
     __updateTableItems(){
