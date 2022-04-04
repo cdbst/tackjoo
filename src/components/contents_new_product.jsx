@@ -200,6 +200,9 @@ class ContentsNewProduct extends React.Component {
 
     genQuickTaskAutomatically(new_product_info_list){
 
+        const use_auto_task = Index.g_settings_info.getSetting('new_product_quick_task_use_auto_task');
+        if(use_auto_task === 0) return;
+
         const quick_task_list = [];
 
         new_product_info_list.forEach((product_info)=>{
