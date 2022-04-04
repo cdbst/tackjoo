@@ -27,6 +27,7 @@ class ContentsNewProduct extends React.Component {
         this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
         this.__onCancelSubmitBlacklistInfo = this.__onCancelSubmitBlacklistInfo.bind(this);
         this.__onSubmitBlacklistInfo = this.__onSubmitBlacklistInfo.bind(this);
+        this.genQuickTaskAutomatically = this.genQuickTaskAutomatically.bind(this);
 
         this.whitelist_info_list = [];
         this.blacklist_info_list = [];
@@ -139,15 +140,21 @@ class ContentsNewProduct extends React.Component {
     }
 
     checkProductInfoWithWhiteList(product_info){
+
+        let create_task_cnt = 0;
         
-        this.whitelist_info_list.forEach((whitelist_info)=>{
+        this.whitelist_info_list.every((whitelist_info)=>{
             const task_cnt = parseInt(whitelist_info.task_cnt);
-            if(task_cnt === 0) return;
-            if(product_info.name.includes(whitelist_info.keyword) === false && product_info.model_id.includes(whitelist_info.keyword) === false) return;
-            for(var i = 0; i < task_cnt; i++){
-                this.onCreateTask(product_info);
+            if(task_cnt === 0) return true;
+            if(product_info.name.includes(whitelist_info.keyword) || product_info.model_id.includes(whitelist_info.keyword)){
+                create_task_cnt = task_cnt;
+                return false;
+            }else{
+                return true;
             }
         });
+
+        return create_task_cnt;
     }
 
     checkProductInfoWithBlackList(product_info){
@@ -164,6 +171,28 @@ class ContentsNewProduct extends React.Component {
         });
 
         return exists_in_blacklist;
+    }
+
+    genQuickTaskAutomatically(new_product_info_list){
+
+        const quick_task_list = [];
+
+        new_product_info_list.forEach((product_info)=>{
+            
+            if(product_info.soldout || this.checkProductInfoWithBlackList(product_info)) return;
+
+            const task_cnt = this.checkProductInfoWithWhiteList(product_info);
+            if(task_cnt === 0) return;
+                
+            quick_task_list.push({
+                product_info : product_info,
+                task_cnt : task_cnt
+            });    
+        });
+
+        console.log(quick_task_list);
+        //TODO : 화이트리스트 우선순위에 따라 quick_task_list를 정렬한다.
+
     }
 
     __onClickWatchBtn(status){
@@ -186,15 +215,14 @@ class ContentsNewProduct extends React.Component {
 
                 if(new_product_info_list === undefined || new_product_info_list.length === 0) return;
 
-                //Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-                window.electron.notifyNewProductList(new_product_info_list);
+                this.genQuickTaskAutomatically(new_product_info_list);
 
                 new_product_info_list.forEach((product_info)=>{
                     this.__product_info_list.push(product_info);
-                    if(product_info.soldout === false && this.checkProductInfoWithBlackList(product_info) === false){
-                        this.checkProductInfoWithWhiteList(product_info);
-                    }
                 });
+
+                //Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                window.electron.notifyNewProductList(new_product_info_list);
 
                 this.__updateTableItems();
             });
@@ -262,8 +290,25 @@ class ContentsNewProduct extends React.Component {
     }
 
     __onSubmitBlacklistInfo(_blacklist_info_list){
+
+        const blacklist_info_list = _blacklist_info_list.split('\n');
+        const error_messages = [];
+
+        for(var i = 0; i < blacklist_info_list.length; i++){
+            const blacklist_info = blacklist_info_list[i];
+
+            if(blacklist_info.trim() === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 입력 값이 비어있는 상태입니다.`);
+                continue;
+            }
+        }
+
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showBlacklistEditModal()});
+            return;
+        }
         
-        this.updateBlacklistInfolist(_blacklist_info_list.split('\n'));
+        this.updateBlacklistInfolist(blacklist_info_list);
     }
 
     __onCancelSubmitWhitelistInfo(){
@@ -283,7 +328,10 @@ class ContentsNewProduct extends React.Component {
         for(var i = 0; i < whitelist_info_list.length; i++){
             const whitelist_info = whitelist_info_list[i];
 
-            if(whitelist_info.trim() === '') continue; // 공백라인은 생략한다.
+            if(whitelist_info.trim() === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 입력 값이 비어있는 상태입니다.`);
+                continue;
+            }
 
             const keyword_taskcnt_info_array = whitelist_info.split(':');
             if(keyword_taskcnt_info_array.length < 2){
