@@ -28,6 +28,7 @@ class ContentsNewProduct extends React.Component {
         this.__onCancelSubmitBlacklistInfo = this.__onCancelSubmitBlacklistInfo.bind(this);
         this.__onSubmitBlacklistInfo = this.__onSubmitBlacklistInfo.bind(this);
         this.genQuickTaskAutomatically = this.genQuickTaskAutomatically.bind(this);
+        this.onFilterChanged = this.onFilterChanged.bind(this);
 
         this.whitelist_info_list = [];
         this.blacklist_info_list = [];
@@ -75,6 +76,7 @@ class ContentsNewProduct extends React.Component {
     updateWhiteInfolist(whitelist_info_list){
 
         this.whitelist_info_list = whitelist_info_list;
+        this.__updateTableItems();
 
         window.electron.saveNewProductWhiteListInfo(this.whitelist_info_list, (err)=>{
             if(err){
@@ -108,6 +110,7 @@ class ContentsNewProduct extends React.Component {
 
     __updateTableItems(){
         if(this.__mount == false) return;
+
         const table_items = this.__getTableItems(this.__product_info_list);
         this.setState(_ => ({
             product_table_list : table_items
@@ -116,8 +119,20 @@ class ContentsNewProduct extends React.Component {
 
     __getTableItems(product_info_list){
 
-        return product_info_list.map((product_info) =>
-            <NewProductTableItem
+        const table_items = [];
+
+        const filter_opt = this.__ref_sel_whitelist_filter.current.getSelectedOptionValue();
+        const use_filter = filter_opt === '적용';
+
+        product_info_list.forEach((product_info) => {
+
+            let display = '';
+            if(use_filter){
+                const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
+                display = white_list_idx === -1 ? 'none' : '';
+            }
+
+            table_items.push(<NewProductTableItem
                 image_col_width={this.image_col_width}
                 name_col_width={this.name_col_width}
                 price_col_width={this.price_col_width}
@@ -132,22 +147,29 @@ class ContentsNewProduct extends React.Component {
                 h_on_remove={this.onRemoveProduct.bind(this)}
                 h_on_create_task={this.onCreateTask.bind(this)}
                 key={product_info._id}
-            />
-        );
+                display={display}
+            />);
+        });
+            
+        return table_items;
     }
 
     onCreateTask(product_info){
         this.props.contents_task_ref.current.create_quick_task(product_info);
     }
 
-    checkProductInfoWithWhiteList(product_info){
+    onFilterChanged(){
+        this.__updateTableItems();
+    }
+
+    checkProductInfoWithWhiteList(product_info, ignore_task_cnt = false){
 
         let create_task_cnt = 0;
         let white_list_idx = -1;
         
         this.whitelist_info_list.every((whitelist_info, idx)=>{
             const task_cnt = parseInt(whitelist_info.task_cnt);
-            if(task_cnt === 0) return true;
+            if(ignore_task_cnt === false && task_cnt === 0) return true;
             if(product_info.name.includes(whitelist_info.keyword) || product_info.model_id.includes(whitelist_info.keyword)){
                 create_task_cnt = task_cnt;
                 white_list_idx = idx;
@@ -423,7 +445,14 @@ class ContentsNewProduct extends React.Component {
                         <h4 className="contents-title">{`신상품(${this.state.product_table_list.length})`}</h4>
                         </div>
                         <div className="col-md-3">
-                            <LabelSelect ref={this.__ref_sel_whitelist_filter} label="화이트리스트" options={['미적용', '적용']} label_col_class="col-md-4" select_col_class="col-md-4"/>
+                            <LabelSelect 
+                                ref={this.__ref_sel_whitelist_filter} 
+                                label="화이트리스트" 
+                                options={['미적용', '적용']} 
+                                label_col_class="col-md-4" 
+                                select_col_class="col-md-4"
+                                h_on_change={this.onFilterChanged.bind(this)}
+                            />
                         </div>
                     </div>
                     <div className="table-wrapper">
