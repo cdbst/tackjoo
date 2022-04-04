@@ -40,6 +40,7 @@ class ContentsNewProduct extends React.Component {
         this.__ref_watch_btn = undefined;
         this.__ref_whitelist_edit_modal = React.createRef();
         this.__ref_blacklist_edit_modal = React.createRef();
+        this.__ref_sel_whitelist_filter = React.createRef();
 
         this.__mount = false;
         this.__setupColumnsWidth();
@@ -416,14 +417,13 @@ class ContentsNewProduct extends React.Component {
                         on_load_textedit={this.loadBlacklistInfolist.bind(this)}
                         ref={this.__ref_blacklist_edit_modal}
                     />
-
                     <br/>
-                    <div className="row">
-                        <div className="col">
-                            <h4 className="contents-title">{`신상품(${this.state.product_table_list.length})`}</h4>
+                    <div className="row" style={{marginBottom:'15px'}}>
+                        <div className="col-md-2">
+                        <h4 className="contents-title">{`신상품(${this.state.product_table_list.length})`}</h4>
                         </div>
-                        <div className="col">
-                            {/* <a>TEST : search item interface</a> */}
+                        <div className="col-md-3">
+                            <LabelSelect ref={this.__ref_sel_whitelist_filter} label="화이트리스트" options={['미적용', '적용']} label_col_class="col-md-4" select_col_class="col-md-4"/>
                         </div>
                     </div>
                     <div className="table-wrapper">
