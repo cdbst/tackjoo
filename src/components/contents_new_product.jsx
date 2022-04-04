@@ -142,19 +142,21 @@ class ContentsNewProduct extends React.Component {
     checkProductInfoWithWhiteList(product_info){
 
         let create_task_cnt = 0;
+        let white_list_idx = -1;
         
-        this.whitelist_info_list.every((whitelist_info)=>{
+        this.whitelist_info_list.every((whitelist_info, idx)=>{
             const task_cnt = parseInt(whitelist_info.task_cnt);
             if(task_cnt === 0) return true;
             if(product_info.name.includes(whitelist_info.keyword) || product_info.model_id.includes(whitelist_info.keyword)){
                 create_task_cnt = task_cnt;
+                white_list_idx = idx;
                 return false;
             }else{
                 return true;
             }
         });
 
-        return create_task_cnt;
+        return [create_task_cnt, white_list_idx];
     }
 
     checkProductInfoWithBlackList(product_info){
@@ -181,18 +183,27 @@ class ContentsNewProduct extends React.Component {
             
             if(product_info.soldout || this.checkProductInfoWithBlackList(product_info)) return;
 
-            const task_cnt = this.checkProductInfoWithWhiteList(product_info);
+            const [task_cnt, white_list_idx] = this.checkProductInfoWithWhiteList(product_info);
             if(task_cnt === 0) return;
                 
             quick_task_list.push({
                 product_info : product_info,
-                task_cnt : task_cnt
+                task_cnt : task_cnt,
+                white_list_idx : white_list_idx
             });    
         });
 
-        console.log(quick_task_list);
-        //TODO : 화이트리스트 우선순위에 따라 quick_task_list를 정렬한다.
+        if(quick_task_list.length === 0) return;
 
+        quick_task_list.sort((a, b) =>{
+            return a.white_list_idx - b.white_list_idx;
+        });
+
+        quick_task_list.forEach((quick_task_item) =>{
+            for(var i = 0; i < quick_task_item.task_cnt; i++){
+                this.props.contents_task_ref.current.create_quick_task(quick_task_item.product_info);
+            }
+        });
     }
 
     __onClickWatchBtn(status){
