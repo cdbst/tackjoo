@@ -191,7 +191,7 @@ class ContentsNewProduct extends React.Component {
 
                 new_product_info_list.forEach((product_info)=>{
                     this.__product_info_list.push(product_info);
-                    if(this.checkProductInfoWithBlackList(product_info) === false){
+                    if(product_info.soldout === false && this.checkProductInfoWithBlackList(product_info) === false){
                         this.checkProductInfoWithWhiteList(product_info);
                     }
                 });
