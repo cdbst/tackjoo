@@ -127,10 +127,11 @@ class ContentsNewProduct extends React.Component {
         product_info_list.forEach((product_info) => {
 
             let display = '';
-            if(use_filter){
-                const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
-                display = white_list_idx === -1 ? 'none' : '';
-            }
+            let background = 'transparent';
+            const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
+            if(use_filter) display = white_list_idx === -1 ? 'none' : '';
+            else background = white_list_idx === -1 ? 'transparent' : '#F2ACAA';
+            
 
             table_items.push(<NewProductTableItem
                 image_col_width={this.image_col_width}
@@ -148,6 +149,7 @@ class ContentsNewProduct extends React.Component {
                 h_on_create_task={this.onCreateTask.bind(this)}
                 key={product_info._id}
                 display={display}
+                background={background}
             />);
         });
             

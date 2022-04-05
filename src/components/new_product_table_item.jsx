@@ -107,7 +107,7 @@ class NewProductTableItem extends React.Component {
         const price_gap_str_font_color = price_gap > 0 ? '#0dcaf0' : '#dc3545';
 
         return(
-            <tr onDoubleClick={this.onDBClickTableItem.bind(this)} style={{display : this.props.display}}>
+            <tr onDoubleClick={this.onDBClickTableItem.bind(this)} style={{display : this.props.display, background : this.props.background}}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 
