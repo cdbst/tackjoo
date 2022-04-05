@@ -9,6 +9,7 @@ const IpcMainTheDraw = require('./ipc_main_thedraw');
 const IpcMainCommon = require('./ipc_main_common');
 const IpcMainAppAuth = require('./ipc_main_app_auth');
 const IpcMainOrder = require('./ipc_main_order');
+const IpcMainNewProduct = require('./ipc_main_new_product');
 
 function register(win){
     // IPC Responses
@@ -23,6 +24,7 @@ function register(win){
     IpcMainTheDraw.register();
     IpcMainCommon.register(win);
     IpcMainOrder.register();
+    IpcMainNewProduct.register();
 }
 
 module.exports.register = register;
