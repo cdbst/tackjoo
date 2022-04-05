@@ -15,6 +15,7 @@ class ContentsAccounts extends React.Component {
         this.getTableItems = this.getTableItems.bind(this);
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
+        this.getAccountInfoList = this.getAccountInfoList.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
@@ -62,6 +63,10 @@ class ContentsAccounts extends React.Component {
                 }
             }
         });
+    }
+
+    getAccountInfoList(){
+        return this.state.account_info;
     }
 
     __updateAccountInfo(_account_info){
