@@ -25,7 +25,7 @@ class ContentsSettings extends React.Component {
         HTTP_MAX_REQ_WITHIN_SAME_IP : 'HTTP 요청시 하나의 IP에서 동시에 몇개의 요청까지 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
         TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)',
-        NIKE_LOGIN_SESSION_TIMEOUT : '나이키 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
+        NIKE_LOGIN_SESSION_TIMEOUT : '공식홈페이지 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
         RESTOCK_WATCHDOG_INTERVAL : '상품 입고 확인을 몇 초 간격으로 진행할지 설정합니다. (기본 값 : 3)',
         /** 신상품 관련 설정 */
         NEW_PRODUCT_WATCH_INTERVAL : '신상품을 감시하는 주기를 몇초 간격으로 할지 지정합니다. (기본 값: 1)',
