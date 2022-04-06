@@ -71,7 +71,7 @@ class NewReleasedProductWatchdog{
             this.watchdog_resolver = resolve;
             this.watchdog_rejecter = reject;
 
-            let prev_product_info_list = undefined;
+            let prev_product_info_list = [];
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
             let accumulated_fail_cnt = 0;
 
