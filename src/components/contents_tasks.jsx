@@ -135,34 +135,36 @@ class ContentsTasks extends React.Component {
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
 
-        window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '작업을 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
-                return;
-            }
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const account_info = account_info_list.find((account_info) => account_info.email === account_email);
 
-            if(schedule_time != undefined) schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
+        if(account_info === undefined){
+            Index.g_sys_msg_q.enqueue('에러', '작업을 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+            return;
+        }
 
-            let task_info_obj = common.get_task_info_obj_scheme();
-            const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+        if(schedule_time != undefined) schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
 
-            common.update_task_info_obj(task_info_obj, 'product_info', product_info);
-            common.update_task_info_obj(task_info_obj, 'size_name', size_name);
-            common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
-            common.update_task_info_obj(task_info_obj, 'account_email', account_email);
-            common.update_task_info_obj(task_info_obj, 'account_id', account_id);
-            common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
-            common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
-            common.update_task_info_obj(task_info_obj, 'watchdog', watchdog);
-            common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
+        let task_info_obj = common.get_task_info_obj_scheme();
+        const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
 
-            if(this.__checkTaskDuplicated(task_info_obj)){
-                Index.g_sys_msg_q.enqueue('에러', `중복된 작업은 생성할 수 없습니다. ${product_info.name}(${account_email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
-                return;
-            }
+        common.update_task_info_obj(task_info_obj, 'product_info', product_info);
+        common.update_task_info_obj(task_info_obj, 'size_name', size_name);
+        common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
+        common.update_task_info_obj(task_info_obj, 'account_email', account_info.email);
+        common.update_task_info_obj(task_info_obj, 'account_id', account_info.id);
+        common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+        common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
+        common.update_task_info_obj(task_info_obj, 'watchdog', watchdog);
+        common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
 
-            this.__push_task_table_item(task_info_obj);
-        });
+        if(this.__checkTaskDuplicated(task_info_obj)){
+            Index.g_sys_msg_q.enqueue('에러', `중복된 작업은 생성할 수 없습니다. ${product_info.name}(${account_info.email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
+
+        this.__push_task_table_item(task_info_obj);
+        
     }
 
     __push_task_table_item(task_info){
@@ -174,7 +176,7 @@ class ContentsTasks extends React.Component {
 
         this.setState({
             task_table_item_list: this.state.task_table_item_list
-        });        
+        });
     }
 
     __checkTaskDuplicated(task_info_to_check){
@@ -225,7 +227,7 @@ class ContentsTasks extends React.Component {
 
     __get_appropreate_to_tasking_account_email(){
 
-        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList()
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
 
         if(account_info_list.length === 0){
             return undefined;
