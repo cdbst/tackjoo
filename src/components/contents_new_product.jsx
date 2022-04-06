@@ -242,7 +242,7 @@ class ContentsNewProduct extends React.Component {
             }else{
                 this.props.contents_task_ref.current.create_quick_task(product_info);
             }
-        }, 40);
+        }, 100);
     }
 
     __onClickWatchBtn(status){
