@@ -86,7 +86,7 @@ class ServerClock{
         };
         xhr.onerror = function (e) {
             console.error(xhr.statusText);
-            Index.g_sys_msg_q.enqueue('에러', '나이키 서버시간 정보를 가져오는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 8000);
+            Index.g_sys_msg_q.enqueue('에러', '공식 홈페이지 서버시간 정보를 가져오는데 실패했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 8000);
         };
 
         before_req_timestamp = new Date();
