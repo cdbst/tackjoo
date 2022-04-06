@@ -227,11 +227,22 @@ class ContentsNewProduct extends React.Component {
             return a.white_list_idx - b.white_list_idx;
         });
 
+        const quick_task_product_list = [];
+
         quick_task_list.forEach((quick_task_item) =>{
             for(var i = 0; i < quick_task_item.task_cnt; i++){
-                this.props.contents_task_ref.current.create_quick_task(quick_task_item.product_info);
+                quick_task_product_list.push(quick_task_item.product_info);
             }
         });
+
+        const timer = setInterval(()=>{
+            const product_info = quick_task_product_list.shift();
+            if(product_info === undefined){
+                clearInterval(timer);
+            }else{
+                this.props.contents_task_ref.current.create_quick_task(product_info);
+            }
+        }, 40);
     }
 
     __onClickWatchBtn(status){
