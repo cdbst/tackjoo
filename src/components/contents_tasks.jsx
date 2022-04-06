@@ -20,8 +20,8 @@ class ContentsTasks extends React.Component {
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
         this.create_quick_task = this.create_quick_task.bind(this);
 
-        this.__get_appropreate_to_tasking_account_emails = this.__get_appropreate_to_tasking_account_emails.bind(this);
-        this.__get_appropreate_to_tasking_proxy_infos = this.__get_appropreate_to_tasking_proxy_infos.bind(this);
+        this.__get_appropreate_to_tasking_account_email = this.__get_appropreate_to_tasking_account_email.bind(this);
+        this.__get_appropreate_to_tasking_proxy_info = this.__get_appropreate_to_tasking_proxy_info.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
@@ -135,34 +135,36 @@ class ContentsTasks extends React.Component {
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
 
-        window.electron.getAccountIDbyEmail(account_email, (err, account_id) =>{
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '작업을 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
-                return;
-            }
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const account_info = account_info_list.find((account_info) => account_info.email === account_email);
 
-            if(schedule_time != undefined) schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
+        if(account_info === undefined){
+            Index.g_sys_msg_q.enqueue('에러', '작업을 등록하는 과정에서 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 4000);
+            return;
+        }
 
-            let task_info_obj = common.get_task_info_obj_scheme();
-            const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+        if(schedule_time != undefined) schedule_time = this.__adjectScheduleTime(product_info, schedule_time);
 
-            common.update_task_info_obj(task_info_obj, 'product_info', product_info);
-            common.update_task_info_obj(task_info_obj, 'size_name', size_name);
-            common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
-            common.update_task_info_obj(task_info_obj, 'account_email', account_email);
-            common.update_task_info_obj(task_info_obj, 'account_id', account_id);
-            common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
-            common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
-            common.update_task_info_obj(task_info_obj, 'watchdog', watchdog);
-            common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
+        let task_info_obj = common.get_task_info_obj_scheme();
+        const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
 
-            if(this.__checkTaskDuplicated(task_info_obj)){
-                Index.g_sys_msg_q.enqueue('에러', `중복된 작업은 생성할 수 없습니다. ${product_info.name}(${account_email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
-                return;
-            }
+        common.update_task_info_obj(task_info_obj, 'product_info', product_info);
+        common.update_task_info_obj(task_info_obj, 'size_name', size_name);
+        common.update_task_info_obj(task_info_obj, 'friendly_size_name', friendly_size_name);
+        common.update_task_info_obj(task_info_obj, 'account_email', account_info.email);
+        common.update_task_info_obj(task_info_obj, 'account_id', account_info.id);
+        common.update_task_info_obj(task_info_obj, 'schedule_time', schedule_time);
+        common.update_task_info_obj(task_info_obj, 'proxy_info', proxy_info);
+        common.update_task_info_obj(task_info_obj, 'watchdog', watchdog);
+        common.update_task_info_obj(task_info_obj, '_id', common.uuidv4());
 
-            this.__push_task_table_item(task_info_obj);
-        });
+        if(this.__checkTaskDuplicated(task_info_obj)){
+            Index.g_sys_msg_q.enqueue('에러', `중복된 작업은 생성할 수 없습니다. ${product_info.name}(${account_info.email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
+
+        this.__push_task_table_item(task_info_obj);
+        
     }
 
     __push_task_table_item(task_info){
@@ -174,7 +176,7 @@ class ContentsTasks extends React.Component {
 
         this.setState({
             task_table_item_list: this.state.task_table_item_list
-        });        
+        });
     }
 
     __checkTaskDuplicated(task_info_to_check){
@@ -223,142 +225,141 @@ class ContentsTasks extends React.Component {
         );
     }
 
-    __get_appropreate_to_tasking_account_emails(__callback){
+    __get_appropreate_to_tasking_account_email(){
 
-        window.electron.getAccountInfo( (err, __account_info_list) => {
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
 
-            if(__account_info_list.length === 0){
-                __callback([]);
-                return;
-            }
+        if(account_info_list.length === 0){
+            return undefined;
+        }
 
-            // 첫번째로 아예 task로 등록되지 않은 계정부터 찾는다.
-            const account_status_dict = {};
-            __account_info_list.accounts.forEach((account_info)=>{
-                account_status_dict[account_info.email] = 0;
-            });
-
-            for(const task_ref of Object.values(this.__table_item_ref_dict)){
-                const task_account_email = task_ref.current.props.task_info.account_email;
-                if(task_ref.current.isIdleState()){
-                    account_status_dict[task_account_email] = Math.max(account_status_dict[task_account_email], 1);
-                }else{
-                    account_status_dict[task_account_email] = Math.max(account_status_dict[task_account_email], 2);
-                }
-            }
-
-            // 두번째로, idle 한 것부터 찾는다.
-            const unregistred_account_emails = [];
-            const idle_account_emails = [];
-            const busy_account_emails = [];
-
-            for(const [account_email, status] of Object.entries(account_status_dict)){
-                if(status === 0){
-                    unregistred_account_emails.push(account_email);
-                }else if(status === 1){
-                    idle_account_emails.push(account_email);
-                }else{
-                    busy_account_emails.push(account_email);
-                }
-            }
-
-            if(unregistred_account_emails.length > 0){
-                __callback(unregistred_account_emails);
-            }else if(idle_account_emails.length > 0){
-                __callback(idle_account_emails);
-            }else{
-                __callback(busy_account_emails);
+        // 첫번째로 아예 task로 등록되지 않은 계정부터 찾는다.
+        const account_status_dict = {};
+        account_info_list.forEach((account_info)=>{
+            account_status_dict[account_info.email] = {
+                status : 0,
+                count : 0
             }
         });
+
+        for(const task_ref of Object.values(this.__table_item_ref_dict)){
+
+            const task_account_email = task_ref.current.props.task_info.account_email;
+            account_status_dict[task_account_email].count++;
+            account_status_dict[task_account_email].status = Math.max(account_status_dict[task_account_email].status, task_ref.current.isIdleState() ? 1 : 2);
+        }
+
+        // 두번째로, idle 한 것부터 찾는다.
+        const unregistred_account_emails = [];
+        const idle_account_emails = [];
+        const busy_account_emails = [];
+
+        for(const [account_email, status_info] of Object.entries(account_status_dict)){
+            if(status_info.status === 0){
+                unregistred_account_emails.push(account_email);
+            }else if(status_info.status === 1){
+                idle_account_emails.push(account_email);
+            }else{
+                busy_account_emails.push(account_email);
+            }
+        }
+
+        const sort = (a, b) => {
+            return account_status_dict[b].count - account_status_dict[a].count;
+        };
+
+        idle_account_emails.sort(sort);
+        busy_account_emails.sort(sort);
+
+        if(unregistred_account_emails.length > 0){
+            return unregistred_account_emails.pop();
+        }else if(idle_account_emails.length > 0){
+            return idle_account_emails.pop();
+        }else if(busy_account_emails.length > 0){
+            return busy_account_emails.pop();
+        }else{
+            return undefined;
+        }
     }
 
-    __get_appropreate_to_tasking_proxy_infos(__callback){
+    __get_appropreate_to_tasking_proxy_info(){
 
-        window.electron.loadProxyInfo( (err, proxy_info_list) => {
+        const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
-            if(proxy_info_list.length === 0){
-                __callback([]);
-                return;
-            }
+        if(proxy_info_list.length === 0){
+            return undefined;
+        }
 
-            // 첫번째로 아예 task로 등록되지 않은 계정부터 찾는다.
-            const proxy_status_dict = {};
-            proxy_info_list.forEach((proxy_info)=>{
-                proxy_status_dict[proxy_info._id] = {
-                    proxy_info : proxy_info,
-                    status : 0,
-                }
-            });
-
-            for(const task_ref of Object.values(this.__table_item_ref_dict)){
-
-                const proxy_info = task_ref.current.props.task_info.proxy_info;
-                if(proxy_info === undefined) continue;
-
-                if(task_ref.current.isIdleState()){
-                    proxy_status_dict[proxy_info._id].status = Math.max(proxy_status_dict[proxy_info._id].status, 1);
-                }else{
-                    proxy_status_dict[proxy_info._id].status = Math.max(proxy_status_dict[proxy_info._id].status, 2);
-                }
-            }
-
-            const unregistred_proxy_infos = [];
-            const idle_proxy_infos = [];
-            const busy_proxy_infos = [];
-
-            for(const data of Object.values(proxy_status_dict)){
-                if(data.status === 0){
-                    unregistred_proxy_infos.push(data.proxy_info);
-                }else if(data.status === 1){
-                    idle_proxy_infos.push(data.proxy_info);
-                }else{
-                    busy_proxy_infos.push(data.proxy_info);
-                }
-            }
-
-            if(unregistred_proxy_infos.length > 0){
-                __callback(unregistred_proxy_infos);
-            }else if(idle_proxy_infos.length > 0){
-                __callback(idle_proxy_infos);
-            }else{
-                __callback(busy_proxy_infos);
+        // 첫번째로 아예 task로 등록되지 않은 계정부터 찾는다.
+        const proxy_status_dict = {};
+        proxy_info_list.forEach((proxy_info)=>{
+            proxy_status_dict[proxy_info._id] = {
+                proxy_info : proxy_info,
+                status : 0,
+                count : 0
             }
         });
+
+        for(const task_ref of Object.values(this.__table_item_ref_dict)){
+
+            const proxy_info = task_ref.current.props.task_info.proxy_info;
+            if(proxy_info === undefined) continue;
+            proxy_status_dict[proxy_info._id].count++;
+            proxy_status_dict[proxy_info._id].status = Math.max(proxy_status_dict[proxy_info._id].status, task_ref.current.isIdleState() ? 1 : 2);
+        }
+
+        const unregistred_proxy_infos = [];
+        const idle_proxy_infos = [];
+        const busy_proxy_infos = [];
+
+        for(const data of Object.values(proxy_status_dict)){
+            if(data.status === 0){
+                unregistred_proxy_infos.push(data.proxy_info);
+            }else if(data.status === 1){
+                idle_proxy_infos.push(data.proxy_info);
+            }else{
+                busy_proxy_infos.push(data.proxy_info);
+            }
+        }
+
+        const sort = (a, b) => {
+            return proxy_status_dict[b._id].count - proxy_status_dict[a._id].count;
+        };
+
+        idle_proxy_infos.sort(sort);
+        busy_proxy_infos.sort(sort);
+
+        if(unregistred_proxy_infos.length > 0){
+            return unregistred_proxy_infos.pop();
+        }else if(idle_proxy_infos.length > 0){
+            return idle_proxy_infos.pop();
+        }else if(busy_proxy_infos.length > 0){
+            return busy_proxy_infos.pop();
+        }else {
+            return undefined;
+        }
     }
 
     create_quick_task(product_info){
 
-        this.__get_appropreate_to_tasking_account_emails((account_emails)=>{
-            
-            if(account_emails.length === 0){
-                Index.g_sys_msg_q.enqueue('에러', '작업을 하기위한 계정이 하나도 존재하지 않습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-            const opt_quick_task_config = Index.g_settings_info.getSetting('new_product_quick_task_judge_size');
+        const account_email = this.__get_appropreate_to_tasking_account_email();
 
-            const account_email = account_emails[common.get_random_int(0, account_emails.length - 1)];
-            const friendly_size_name = opt_quick_task_config === 0 ? common.SPECIAL_SIZE_OPTS.MIDDLE : common.SPECIAL_SIZE_OPTS.RANDOM;
-            const schedule_time = Index.g_server_clock.getServerTime();
+        if(account_email === undefined){
+            Index.g_sys_msg_q.enqueue('에러', '작업을 하기위한 계정이 하나도 존재하지 않습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+        const opt_quick_task_config = Index.g_settings_info.getSetting('new_product_quick_task_judge_size');
 
-            Index.g_sys_msg_q.enqueue('빠른 작업 생성 안내', `${account_email} 계정으로 '${product_info.name}' 상품 1개를 즉시 구매합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        const friendly_size_name = opt_quick_task_config === 0 ? common.SPECIAL_SIZE_OPTS.MIDDLE : common.SPECIAL_SIZE_OPTS.RANDOM;
+        const schedule_time = Index.g_server_clock.getServerTime();
 
-            if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
-                this.__get_appropreate_to_tasking_proxy_infos((proxy_infos)=>{
+        let proxy_info = undefined;
+        if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
+            proxy_info = this.__get_appropreate_to_tasking_proxy_info();
+        }
 
-                    let proxy_info = undefined;
-
-                    if(proxy_infos.length > 0){
-                        proxy_info = proxy_infos[common.get_random_int(0, proxy_infos.length - 1)];
-                    }
-
-                    this.__createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, false);
-
-                });
-            }else{
-                this.__createNewTask(product_info, friendly_size_name, account_email, schedule_time, undefined, false);
-            }
-
-        });
+        this.__createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, false);
+        Index.g_sys_msg_q.enqueue('빠른 작업 생성 안내', `${account_email} 계정으로 '${product_info.name}' 상품 1개를 즉시 구매합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 1500);
     }
 
     render() {

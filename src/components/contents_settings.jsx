@@ -30,7 +30,7 @@ class ContentsSettings extends React.Component {
         /** 신상품 관련 설정 */
         NEW_PRODUCT_WATCH_INTERVAL : '신상품을 감시하는 주기를 몇초 간격으로 할지 지정합니다. (기본 값: 1)',
         NEW_PRODUCT_WATCH_MAX_RET : '신상품을 감시를 최대 몇 회 진행할지 지정합니다. (기본 값: 0, 무기한 감시하려면 0 입력)',
-        NEW_PRODUCT_CREATE_TASK_USE_PROXY : '신상품을 구매하기 위한 작업 생성시 프록시를 활용할지 설정합니다. (기본 값: 0, 프록시 미사용시 0 입력)',
+        NEW_PRODUCT_CREATE_TASK_USE_PROXY : '신상품을 구매하기 위한 작업 생성시 프록시를 활용할지 설정합니다. (기본 값: 0, [0: 미사용] [1: 사용])',
         NEW_PRODUCT_QUICK_TASK_JUDGE_SIZE : '신상품을 구매할 때, 제품의 구매 옵션을 무작위로 할지, 중간 옵션을 우선으로 할지 지정합니다. (기본 값: 0, [0: 중간] [1: 무작위])',
         NEW_PRODUCT_QUICK_TASK_USE_SNKRS_URL : '신상품을 구매할 때 launch url을 기반으로 작업을 생성할지 지정합니다. (기본 값: 0, [0: 미사용] [1: 사용])',
         NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK : '신상품 감지시 화이트리스트에 포함된 상품이라면 즉시 구매하는 기능을 사용할지 설정합니다. (기본 값: 0, [0: 미사용] [1: 사용])',

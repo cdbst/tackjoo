@@ -13,6 +13,7 @@ class ContentsProxies extends React.Component {
         this.onCreateProxyInfo = this.onCreateProxyInfo.bind(this);
         this.onCreateProxyInfoList = this.onCreateProxyInfoList.bind(this);
         this.onModifyProxyInfo = this.onModifyProxyInfo.bind(this);
+        this.getProxyInfoList = this.getProxyInfoList.bind(this);
 
         this.onClickRemoveProxyInfo = this.onClickRemoveProxyInfo.bind(this);
         this.onClickModifyProxyInfo = this.onClickModifyProxyInfo.bind(this);
@@ -102,6 +103,10 @@ class ContentsProxies extends React.Component {
 
     componentWillUnmount(){
         this.__mount = false;
+    }
+
+    getProxyInfoList(){
+        return this.__proxy_info_list;
     }
 
     __updateTableItems(){
