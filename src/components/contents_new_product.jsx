@@ -442,7 +442,7 @@ class ContentsNewProduct extends React.Component {
                         h_submit={this.__onSubmitWhitelistInfo.bind(this)}
                         h_cancel={this.__onCancelSubmitWhitelistInfo.bind(this)}
                         title="화이트리스트 설정"
-                        desc="한 줄당 하나의 항목 입력 👉 상품키워드 또는 제품코드:생성할 작업 수량 [예> 조던 1 로우:2]"
+                        desc="한 줄당 하나의 항목 입력, 상위에 있을수록 작업생성 우선순위가 높음. 👉 (상품키워드 또는 제품코드):(생성할 작업 수량) [예) 조던 1 로우:2]"
                         on_load_textedit={this.loadWhitelistInfolist.bind(this)}
                         ref={this.__ref_whitelist_edit_modal}
                     />
