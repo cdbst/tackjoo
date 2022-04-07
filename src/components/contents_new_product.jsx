@@ -91,6 +91,7 @@ class ContentsNewProduct extends React.Component {
     updateBlacklistInfolist(blacklist_info_list){
 
         this.blacklist_info_list = blacklist_info_list;
+        this.__updateTableItems();
 
         window.electron.saveNewProductBlackListInfo(this.blacklist_info_list, (err)=>{
             if(err){
@@ -129,8 +130,9 @@ class ContentsNewProduct extends React.Component {
             let display = '';
             let background = 'transparent';
             const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
-            if(use_filter) display = white_list_idx === -1 ? 'none' : '';
-            else background = white_list_idx === -1 ? 'transparent' : '#F2ACAA';
+            const includes_blacklist = this.checkProductInfoWithBlackList(product_info);
+            if(use_filter) display = (white_list_idx === -1 || includes_blacklist) ? 'none' : '';
+            else background = (white_list_idx === -1 || includes_blacklist) ? 'transparent' : '#ffb3b3';
             
 
             table_items.push(<NewProductTableItem
