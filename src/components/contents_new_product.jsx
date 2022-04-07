@@ -442,7 +442,7 @@ class ContentsNewProduct extends React.Component {
                         h_submit={this.__onSubmitWhitelistInfo.bind(this)}
                         h_cancel={this.__onCancelSubmitWhitelistInfo.bind(this)}
                         title="화이트리스트 설정"
-                        desc="한 줄당 필터 하나 👉 상품키워드 또는 제품코드:생성할 작업 수량(조던 1 로우:2)"
+                        desc="한 줄당 하나의 항목 입력 👉 상품키워드 또는 제품코드:생성할 작업 수량 [예> 조던 1 로우:2]"
                         on_load_textedit={this.loadWhitelistInfolist.bind(this)}
                         ref={this.__ref_whitelist_edit_modal}
                     />
@@ -451,7 +451,7 @@ class ContentsNewProduct extends React.Component {
                         h_submit={this.__onSubmitBlacklistInfo.bind(this)}
                         h_cancel={this.__onCancelSubmitBlacklistInfo.bind(this)}
                         title="블랙리스트 설정"
-                        desc="한 줄당 필터 하나 👉 상품키워드 또는 제품코드를 라인단위로 입력"
+                        desc="블랙리스트에 해당하는 상품은 작업으로 생성하지 않습니다. 👉 상품키워드 또는 제품코드를 라인단위로 입력"
                         on_load_textedit={this.loadBlacklistInfolist.bind(this)}
                         ref={this.__ref_blacklist_edit_modal}
                     />
@@ -483,7 +483,7 @@ class ContentsNewProduct extends React.Component {
                                 <th scope="col" style={{width : this.price_gap_col_width, maxWidth : this.price_gap_col_width}}>시세차익</th>
                                 <th scope="col" style={{width : this.kream_interest_col_width, maxWidth : this.kream_interest_col_width}}>크림관심도</th>
                                 <th scope="col" style={{width : this.soldout_status_col_width, maxWidth : this.soldout_status_col_width}}>재고 상태</th>
-                                <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>출시 일자</th>
+                                <th scope="col" style={{width : this.release_date_col_width, maxWidth : this.release_date_col_width}}>감지 시간</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
