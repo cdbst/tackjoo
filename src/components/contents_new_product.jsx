@@ -343,6 +343,11 @@ class ContentsNewProduct extends React.Component {
 
     __onSubmitBlacklistInfo(_blacklist_info_list){
 
+        if(_blacklist_info_list === ''){
+            this.updateBlacklistInfolist([]);
+            return;
+        }
+
         const blacklist_info_list = _blacklist_info_list.split('\n');
         const error_messages = [];
 
@@ -373,6 +378,12 @@ class ContentsNewProduct extends React.Component {
     }
 
     __onSubmitWhitelistInfo(_whitelist_info_list){
+
+        if(_whitelist_info_list === ''){
+            this.updateWhiteInfolist([]);
+            return;
+        }
+
         const whitelist_info_list = _whitelist_info_list.split('\n');
         const error_messages = [];
         const whitelist_info_obj_list = [];
