@@ -187,7 +187,7 @@ class ContentsTheDraw extends React.Component {
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
                         <div className="col-md-2">
-                            <h4 className="contents-title">THE DRAW</h4>
+                            <h4 className="contents-title">응모</h4>
                         </div>
                         <div className="col-md-2">
                             <LabelSelect ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
