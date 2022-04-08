@@ -191,7 +191,7 @@ class ContentsNewProduct extends React.Component {
         let exists_in_blacklist = false;
         
         this.blacklist_info_list.filter((blacklist_info) => blacklist_info !== '').every((blacklist_info)=>{
-            if(product_info.name.includes(blacklist_info) || product_info.model_id.includes(blacklist_info)){
+            if(product_info.name.includes(blacklist_info) || product_info.model_id.includes(blacklist_info) || product_info.url.includes(blacklist_info)){
                 exists_in_blacklist = true;
                 return false;
             }else{
