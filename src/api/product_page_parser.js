@@ -792,7 +792,7 @@ function parse_product_list_from_new_released_page($, replace_url){
             const el_sub_color_list = parser_common.get_specific_tag_nodes(product_info_div, ['li']);
 
             // sub color들에대한 상품 정보들을 파싱한다.
-            const sub_product_info_list = parse_sub_color_product_info_list(el_sub_color_list, product_info);
+            const sub_product_info_list = parse_sub_color_product_info_list(el_sub_color_list, product_info, replace_url);
             if(sub_product_info_list.length > 0){
 
                 sub_product_info_list.forEach((sub_product_info) =>{
@@ -818,8 +818,9 @@ function parse_product_list_from_new_released_page($, replace_url){
  * 
  * @param {object} el_sub_color_list sub color 상품 정보를 포함하고 있는 html element 객체
  * @param {object} representative_product_info main 제품 으로 표현 중인 상품 정보에 대한 객체
+ * @param {boolean} replace_url 상품 url을 '/kr/ko_kr/'에서 '/kr/launch/'로 대체시킬지 여부
  */
-function parse_sub_color_product_info_list(el_sub_color_list, representative_product_info){
+function parse_sub_color_product_info_list(el_sub_color_list, representative_product_info, replace_url){
 
     const sub_product_info_list = [];
 
@@ -828,7 +829,8 @@ function parse_sub_color_product_info_list(el_sub_color_list, representative_pro
         const sub_color_product_info = _.clone(representative_product_info);
 
         const el_a_input_radio = parser_common.get_specific_tag_nodes(el_sub_color_info, ['a']);
-        const sub_color_product_url = common.NIKE_URL + el_a_input_radio[0].attribs.href;
+        let sub_color_product_url = common.NIKE_URL + el_a_input_radio[0].attribs.href;
+        if(replace_url) sub_color_product_url = sub_color_product_url.replace('/kr/ko_kr/', '/kr/launch/');
         common.update_product_info_obj(sub_color_product_info, 'url', sub_color_product_url);
 
         const model_id_regex = /[A-Z0-9]{6}-[0-9]{3}/;

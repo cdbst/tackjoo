@@ -113,6 +113,7 @@ class NewProductTableItem extends React.Component {
                         className="rounded product-table-item-img" 
                         src={this.props.product_info.img_url} 
                         alt={this.props.product_info.name}
+                        title={this.props.product_info.url}
                         onClick={this.onClickProductImg.bind(this)}
                         style={{cursor: 'pointer'}}
                     />
