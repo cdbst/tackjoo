@@ -1,6 +1,6 @@
 const common = require('../common/common.js');
 const parser_common = require('./page_parser_common');
-
+const log = require('electron-log');
 
 function parse_kakaopay_prepare_payload_from_checkout_page($){
 
@@ -135,7 +135,56 @@ function set_const_kakaopay_prepare_payload(payload){
     return common.merge_object(payload, const_payload);
 }
 
+function get_billing_info_from_checkout_page($){
+    try{
+        const el_buyer_name_input = $('#address\\.fullName');
+        if(el_buyer_name_input.length === 0){
+            throw new Error('Cannot found buyer name input element');
+        }
+        const buyer_name = el_buyer_name_input[0].attribs.value.trim();
+
+        const el_phone_num_input = $('#address\\.phonePrimary\\.phoneNumber');
+        if(el_phone_num_input.length === 0){
+            throw new Error('Cannot found phone number input element');
+        }
+        const phone_num = el_phone_num_input[0].attribs.value.trim();
+
+        const el_buyer_addr1_input = $('#address\\.addressLine1');
+        if(el_buyer_addr1_input.length === 0){
+            throw new Error('Cannot found buyer address 1 input element');
+        }
+        const buyer_addr1 = el_buyer_addr1_input[0].attribs.value.trim();
+
+        const el_buyer_addr2_input = $('#address\\.addressLine2');
+        if(el_buyer_addr2_input.length === 0){
+            throw new Error('Cannot found buyer address 2 input element');
+        }
+        const buyer_addr2 = el_buyer_addr2_input[0].attribs.value.trim();
+
+        const el_postal_code_input = $('#address\\.postalCode');
+        if(el_postal_code_input.length === 0){
+            throw new Error('Cannot found postal number input element');
+        }
+        const postal_code = el_postal_code_input[0].attribs.value.trim();
+
+        const billing_info = {
+            buyer_addr1 : buyer_addr1,
+            buyer_addr2 : buyer_addr2,
+            buyer_name : buyer_name,
+            phone_num : phone_num,
+            postal_code : postal_code,
+        };
+
+        return billing_info;
+
+    }catch(err){
+        log.error(common.get_log_str('checkout_page_parser.js', 'get_billing_info_from_checkout_page', e));
+        return undefined;
+    } 
+}
+
 
 
 module.exports.parse_kakaopay_prepare_payload_from_checkout_page = parse_kakaopay_prepare_payload_from_checkout_page;
 module.exports.parse_payco_prepare_payload_from_checkout_page = parse_payco_prepare_payload_from_checkout_page;
+module.exports.get_billing_info_from_checkout_page = get_billing_info_from_checkout_page;

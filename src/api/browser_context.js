@@ -965,7 +965,8 @@ class BrowserContext {
                     throw new Error('open_checkout_page : cannot store page informations');                    
                 }
 
-                return true;
+                const billing_info = checkout_page_parser.get_billing_info_from_checkout_page($);
+                return billing_info;
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'open_checkout_page', e));
@@ -973,7 +974,7 @@ class BrowserContext {
             }
         }
         
-        return false;
+        return undefined;
     }
 
     async checkout_request(billing_info, product_info){

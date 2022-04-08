@@ -1,5 +1,7 @@
 class ContentsBilling extends React.Component {
 
+    
+
     constructor(props) {
         super(props);
 
@@ -17,6 +19,8 @@ class ContentsBilling extends React.Component {
         this.registerOnHideTabEvent = this.registerOnHideTabEvent.bind(this);
         this.getDefaultBillingInfo = this.getDefaultBillingInfo.bind(this);
         this.onChangePayMethod = this.onChangePayMethod.bind(this);
+        this.onChangeInputUseDefaultDeliveryAddr = this.onChangeInputUseDefaultDeliveryAddr.bind(this);
+        this.setVisibilityDeliveryInfo = this.setVisibilityDeliveryInfo.bind(this);
 
         this.ref_buyer_name = React.createRef();
         this.ref_phone_num = React.createRef();
@@ -27,10 +31,13 @@ class ContentsBilling extends React.Component {
         this.el_sel_pay_method = 'select-pay-method';
 
         this.el_div_payco_info = 'div-payco-info';
+        this.el_div_delivery_info = 'div-delivery-info';
+        this.el_div_addr_search = 'div-addr-search';
         this.el_input_payco_email = 'input-payco-email';
         this.el_input_payco_pwd = 'input-payco-pwd';
         this.el_input_payco_checkout_pwd = 'input-payco-checkout-pwd';
         this.el_input_payco_birthday = 'input-payco-birthday';
+        this.el_input_use_default_delivery_addr = 'input-use-default-delivery-addr';
 
         this.__mount = false;
 
@@ -58,7 +65,8 @@ class ContentsBilling extends React.Component {
                 pay_pwd: '',
                 checkout_pwd: '',
                 birthday: ''
-            }
+            },
+            use_default_addr: false
         }
     }
 
@@ -96,6 +104,7 @@ class ContentsBilling extends React.Component {
         const cur_pay_pwd = document.getElementById(this.el_input_payco_pwd).value;
         const cur_checkout_pwd = document.getElementById(this.el_input_payco_checkout_pwd).value;
         const cur_birthday = document.getElementById(this.el_input_payco_birthday).value;
+        const use_default_addr = document.getElementById(this.el_input_use_default_delivery_addr).checked;
 
         return billing_info = {
             buyer_name : this.ref_buyer_name.current.value,
@@ -109,7 +118,8 @@ class ContentsBilling extends React.Component {
                 pay_pwd : cur_pay_pwd === undefined ? '' : cur_pay_pwd,
                 checkout_pwd : cur_checkout_pwd === undefined ? '' : cur_checkout_pwd,
                 birthday : cur_birthday === undefined ? '' : cur_birthday,
-            }
+            },
+            use_default_addr : use_default_addr
         };
     }
 
@@ -127,33 +137,38 @@ class ContentsBilling extends React.Component {
         document.getElementById(this.el_input_payco_pwd).value = billing_info.payco_info.pay_pwd;
         document.getElementById(this.el_input_payco_checkout_pwd).value = billing_info.payco_info.checkout_pwd;
         document.getElementById(this.el_input_payco_birthday).value = billing_info.payco_info.birthday;
+        document.getElementById(this.el_input_use_default_delivery_addr).checked = billing_info.use_default_addr;
 
         const el_payco_info_div = document.getElementById(this.el_div_payco_info);
         el_payco_info_div.style.visibility = billing_info.pay_method !== 'payco' ? 'hidden' : 'visible';
+
+        this.setVisibilityDeliveryInfo(!billing_info.use_default_addr);
     }
 
     static isValidBillingInfo(billing_info){
 
         try{
-            if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
-                return '받으시는 분 이름이 지정되지 않았습니다.';
-            }
-    
-            if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
-                return '받으시는 분 전화번호가 지정되지 않았습니다.';
-            }
-    
-            if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
-                return '받으시는 분 주소가 지정되지 않았습니다.';
-            }
-    
-            
-            if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
-                return '받으시는 분 세부 주소가 지정되지 않았습니다.';
-            }
-    
-            if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
-                return '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.';
+
+            if(billing_info.use_default_addr === false){
+                if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
+                    return '받으시는 분 이름이 지정되지 않았습니다.';
+                }
+        
+                if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
+                    return '받으시는 분 전화번호가 지정되지 않았습니다.';
+                }
+        
+                if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
+                    return '받으시는 분 주소가 지정되지 않았습니다.';
+                }
+        
+                if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
+                    return '받으시는 분 세부 주소가 지정되지 않았습니다.';
+                }
+        
+                if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
+                    return '주소 지정시 검색 버튼을 통해 우편번호를 검색하세요.';
+                }
             }
     
             if(billing_info.pay_method === 'payco'){
@@ -311,6 +326,19 @@ class ContentsBilling extends React.Component {
         this.ref_postcode.current.innerText  = '(' + value + ')';
     }
 
+    setVisibilityDeliveryInfo(setting){
+        const el_delivery_info_div = document.getElementById(this.el_div_delivery_info);
+        el_delivery_info_div.style.display = setting ? 'block' : 'none';
+
+        const el_addr_search_div = document.getElementById(this.el_div_addr_search);
+        el_addr_search_div.style.display = setting ? 'block' : 'none';
+    }
+
+    onChangeInputUseDefaultDeliveryAddr(){
+        const use_default_addr = document.getElementById(this.el_input_use_default_delivery_addr).checked;
+        this.setVisibilityDeliveryInfo(!use_default_addr);
+    }
+
     render() {
 
         return (
@@ -323,38 +351,44 @@ class ContentsBilling extends React.Component {
                         </div>
                     </div>
                     <br/>
+                    <div className="form-switch mb-3">
+                        <input id={this.el_input_use_default_delivery_addr} type="checkbox" className="form-check-input" style={{marginRight: '5px'}} onChange={this.onChangeInputUseDefaultDeliveryAddr.bind(this)}/>
+                        <label htmlFor={this.el_input_use_default_delivery_addr} className="form-check-label">계정별 기본 배송지 사용</label>
+                    </div>
                     <div className="row">
                         <div className="md-6 col">
-                            <div className="md-12 row">
-                                <div className="col-md-6">
-                                    <label htmlFor="input-buyer-name" className="form-label contents-bill-input-label">받으시는 분</label>
-                                    <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name} style={{'--width' : '450px'}}/>
-                                </div>
-                            </div>
-                            <br/>
-                            <div className="m2-12 row">
-                                <div className="col-md-6">
-                                    <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
-                                    <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()} style={{'--width' : '450px'}}/>
-                                </div>
-                            </div>
-                            <br/>
-                            <div className="md-12 row" style={{marginBottom : 5}}>
-                                <div className="col-mb-6">
-                                    <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">배송 주소</label>
-                                    <label className="form-label contents-bill-input-label" ref={this.ref_postcode} ></label>
-                                    <div className="input-group col-mb-3">
-                                        <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)} style={{'--width' : '450px'}}/>
-                                        <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
+                            <div id={this.el_div_delivery_info}>
+                                <div className="md-12 row">
+                                    <div className="col-md-6">
+                                        <label htmlFor="input-buyer-name" className="form-label contents-bill-input-label">받으시는 분</label>
+                                        <input type="text" className="form-control" placeholder="이름" id="input-buyer-name" ref={this.ref_buyer_name} style={{'--width' : '450px'}}/>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="md-12 row">
-                                <div className="col-mb-6">
-                                    <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2} style={{'--width' : '450px'}}/>
+                                <br/>
+                                <div className="m2-12 row">
+                                    <div className="col-md-6">
+                                        <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
+                                        <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()} style={{'--width' : '450px'}}/>
+                                    </div>
                                 </div>
+                                <br/>
+                                <div className="md-12 row" style={{marginBottom : 5}}>
+                                    <div className="col-mb-6">
+                                        <label htmlFor="input-buyer-addr" className="form-label contents-bill-input-label">배송 주소</label>
+                                        <label className="form-label contents-bill-input-label" ref={this.ref_postcode} ></label>
+                                        <div className="input-group col-mb-3">
+                                            <input id="input-buyer-addr" type="text" className="form-control contents-bill-input-addr" placeholder="주소" aria-label="주소" aria-describedby="addr-serach-btn" ref={this.ref_addr1} onChange={this.onChangeAddr1Value.bind(this)} onKeyUp={this.onKeyUpAddr1.bind(this)} style={{'--width' : '450px'}}/>
+                                            <button className="btn btn-primary" type="button" id="addr-serach-btn" onClick={this.onClickSearchBtn.bind(this)}>검색</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="md-12 row">
+                                    <div className="col-mb-6">
+                                        <input id="input-buyer-addr-detail" type="text" className="form-control" placeholder="나머지 주소" aria-label="나머지 주소" ref={this.ref_addr2} style={{'--width' : '450px'}}/>
+                                    </div>
+                                </div>
+                                <br />
                             </div>
-                            <br />
                             <div className="m2-12 row">
                                 <div className="col-md-6">
                                     <label className="form-label contents-bill-input-label">결제 수단</label>
@@ -390,7 +424,7 @@ class ContentsBilling extends React.Component {
                         </div>
                         <div className="md-6 col">
                             <div className="m2-12 row">
-                                <div className="col-md-6">
+                                <div className="col-md-6" id={this.el_div_addr_search}>
                                     <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
                                     <select className="form-select form-select-down-arrw select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
                                         {this.state.opts_search_result}
