@@ -158,10 +158,12 @@ async function main(browser_context, task_info, product_info, billing_info, sett
 
         // STEP6 : open checkout page
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.IN_TO_CART]);
-        const open_checkout_page_result = await TaskUtils.open_checkout_page(browser_context, product_info);
-        if(open_checkout_page_result == false){
+        const account_default_billing_info = await TaskUtils.open_checkout_page(browser_context, product_info);
+        if(account_default_billing_info === undefined){
             throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
         }
+
+        if(billing_info.use_default_addr) Object.assign(billing_info, account_default_billing_info);
 
         // STEP7 : chekcout singleship (registering buyer address info)
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.PREPARE_ORDER]);
