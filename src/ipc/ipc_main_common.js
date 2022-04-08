@@ -63,6 +63,19 @@ function register(win){
         })();
     });
 
+    ipcMain.on('unset-to-update', (event, data) =>{
+        (async ()=>{
+            try{
+                const app_update_info_path = require('../user_file_path').USER_FILE_PATH.APP_UPDATE_INFO;
+                const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
+                await UserFileManager.write(app_update_info_path, { update : false });
+                
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'unset-to-update-callback', err));
+            }
+        })();
+    });
+
     ipcMain.on('notify-new-product', (event, data) =>{
         
         try{

@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld('electron', {
     openDirectory : _openDirectory,
     getAppPath : _getAppPath,
     restartToUpdate : _restartToUpdate,
+    unsetToUpdate : _unsetToUpdate,
     startWatchingNewReleased : _startWatchingNewReleased,
     stopWatchingNewReleased : _stopWatchingNewReleased,
     notifyNewProduct : _notifyNewProduct,
@@ -445,6 +446,11 @@ function _getAppPath(__callback){
 function _restartToUpdate(){
     let ipc_data = get_ipc_data();
     ipcRenderer.send('restart-to-update', ipc_data);
+}
+
+function _unsetToUpdate(){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('unset-to-update', ipc_data);
 }
 
 function _startWatchingNewReleased(settings_info, __callback){
