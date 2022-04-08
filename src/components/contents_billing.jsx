@@ -32,6 +32,7 @@ class ContentsBilling extends React.Component {
 
         this.el_div_payco_info = 'div-payco-info';
         this.el_div_delivery_info = 'div-delivery-info';
+        this.el_div_addr_search = 'div-addr-search';
         this.el_input_payco_email = 'input-payco-email';
         this.el_input_payco_pwd = 'input-payco-pwd';
         this.el_input_payco_checkout_pwd = 'input-payco-checkout-pwd';
@@ -148,7 +149,7 @@ class ContentsBilling extends React.Component {
 
         try{
 
-            if(billing_info.use_default_addr){
+            if(billing_info.use_default_addr === false){
                 if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
                     return '받으시는 분 이름이 지정되지 않았습니다.';
                 }
@@ -328,6 +329,9 @@ class ContentsBilling extends React.Component {
     setVisibilityDeliveryInfo(setting){
         const el_delivery_info_div = document.getElementById(this.el_div_delivery_info);
         el_delivery_info_div.style.display = setting ? 'block' : 'none';
+
+        const el_addr_search_div = document.getElementById(this.el_div_addr_search);
+        el_addr_search_div.style.display = setting ? 'block' : 'none';
     }
 
     onChangeInputUseDefaultDeliveryAddr(){
@@ -420,7 +424,7 @@ class ContentsBilling extends React.Component {
                         </div>
                         <div className="md-6 col">
                             <div className="m2-12 row">
-                                <div className="col-md-6">
+                                <div className="col-md-6" id={this.el_div_addr_search}>
                                     <label htmlFor="opts-addr-search-result" className="form-label contents-bill-input-label">주소 검색 결과</label>
                                     <select className="form-select form-select-down-arrw select-addr-search-result" size="16" aria-label="size 16 select example" id="opts-addr-search-result" onChange={this.onChangeSearchResultItem.bind(this)}>
                                         {this.state.opts_search_result}
