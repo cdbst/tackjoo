@@ -378,42 +378,27 @@ class ContentsTasks extends React.Component {
                         </div>
                     </div>
                     <div className="table-wrapper">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col" style={{width : this.image_col_width, maxWidth : this.image_col_width}}>이미지</th>
-                                <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>상품명</th>
-                                <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>사이즈</th>
-                                <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정</th>
-                                <th scope="col" style={{width : this.proxy_col_width, maxWidth : this.proxy_col_width}}>프록시</th>
-                                <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>판매일정</th>
-                                <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
-                                <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
-                                <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.task_table_item_list}
-                        </tbody>
-                    </table>
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style={{width : this.image_col_width, maxWidth : this.image_col_width}}>이미지</th>
+                                    <th scope="col" style={{width : this.product_col_width, maxWidth : this.product_col_width}}>상품명</th>
+                                    <th scope="col" style={{width : this.size_col_width, maxWidth : this.size_col_width}}>사이즈</th>
+                                    <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정</th>
+                                    <th scope="col" style={{width : this.proxy_col_width, maxWidth : this.proxy_col_width}}>프록시</th>
+                                    <th scope="col" style={{width : this.open_time_col_width, maxWidth : this.open_time_col_width}}>판매일정</th>
+                                    <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
+                                    <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
+                                    <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.task_table_item_list}
+                            </tbody>
+                        </table>
                     </div>
                     <div className="row footer">
-                        <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
-                                <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
-                            </button>
-                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
-                                <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
-                            </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
-                            </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
-                            </button>
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
-                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
-                            </button>
+                        <div className="col-md-5 bd-highlight d-flex flex-row-reverse align-items-center">
                             <LaodingButton
                                 ref={this.__ref_product_list_reload_btn}
                                 h_on_click={this.onClickBtnProductListReload.bind(this)}
@@ -421,6 +406,25 @@ class ContentsTasks extends React.Component {
                                 btn_class={"btn-primary btn-footer-inside"}
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
+                        </div>
+                        <div className="col-md-3 bd-highlight d-flex align-items-center">
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
+                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
+                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
+                            </button>
+                        </div>
+                        <div className="col-md-4 bd-highlight d-flex align-items-center">
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
+                                <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
+                            </button>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
+                                <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
+                            </button>
                         </div>
                     </div>
                 </div>
