@@ -67,7 +67,7 @@ class Toast extends React.Component {
         return (
             <div aria-live="polite" aria-atomic="true" className="d-flex w-100" >
                 <div className="toast-container position-absolute p-3 bottom-0 start-0">
-                    <div className="div-top-to-bottom" style={{paddingBottom: 44}}>
+                    <div className="div-top-to-bottom" style={{paddingBottom: 46}}>
                         {this.state.toast_items}
                     </div>
                 </div>

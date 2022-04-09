@@ -12,6 +12,7 @@ class ContentsTasks extends React.Component {
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
+        this.onTaskSelectChanged = this.onTaskSelectChanged.bind(this);
         this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
@@ -44,7 +45,8 @@ class ContentsTasks extends React.Component {
         this.open_time_col_width = 190;
         this.scheduled_time_col_width = 190;
         this.status_col_width = 220;
-        this.action_col_width = 145.5;
+        this.action_col_width = 210;
+        this.select_col_width = 60;
 
         let cols_width_without_product_col = this.image_col_width + 
             this.size_col_width + 
@@ -52,7 +54,8 @@ class ContentsTasks extends React.Component {
             this.open_time_col_width + 
             this.scheduled_time_col_width + 
             this.status_col_width +
-            this.action_col_width;
+            this.action_col_width +
+            this.select_col_width;
 
         this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
     }
@@ -204,12 +207,18 @@ class ContentsTasks extends React.Component {
         });
     }
 
+    onTaskSelectChanged(task_id, value){
+        console.log(` ${task_id} : ${value}`);
+    }
+    
+
     __getTaskTableElement(task_info, task_ref){
         return (
             <TaskTableItem
                 key={task_info._id} 
                 id={task_info._id}
                 h_remove={this.onRemoveTask.bind(this)}
+                h_select_changed={this.onTaskSelectChanged.bind(this)}
                 task_info={task_info}
                 ref={task_ref}
                 image_col_width={this.image_col_width}
@@ -221,6 +230,7 @@ class ContentsTasks extends React.Component {
                 scheduled_time_col_width={this.scheduled_time_col_width}
                 status_col_width={this.status_col_width}
                 action_col_width={this.action_col_width}
+                select_col_width={this.select_col_width}
             />
         );
     }
@@ -390,6 +400,7 @@ class ContentsTasks extends React.Component {
                                     <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
                                     <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
                                     <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
+                                    <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}></th>
                                 </tr>
                             </thead>
                             <tbody>

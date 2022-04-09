@@ -4,11 +4,14 @@ class TaskTableItem extends React.Component {
     static PLAY_BTN_SRC = './res/img/play-fill.svg';
     static PAUSE_BTN_SRC = './res/img/pause-fill.svg';
 
+    el_input_select = 'el-input-select';
+
     constructor(props) {
         super(props);
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
+        this.onClickModifyBtn = this.onClickModifyBtn.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
@@ -22,6 +25,8 @@ class TaskTableItem extends React.Component {
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
         this.isIdleState = this.isIdleState.bind(this);
+
+        this.onChangeSelect = this.onChangeSelect.bind(this);
 
         this.ref_status_btn = React.createRef();
 
@@ -128,6 +133,10 @@ class TaskTableItem extends React.Component {
         }else if(new_status == common.TASK_STATUS.PAUSE){
             this.onPauseTask();
         }
+    }
+
+    onClickModifyBtn(){
+        console.log('onClickModifyBtn');
     }
 
     onClickRemoveBtn(){
@@ -245,6 +254,11 @@ class TaskTableItem extends React.Component {
         return idle_status_list.includes(this.state.status);
     }
 
+    onChangeSelect(){
+        const is_selected = document.getElementById(this.el_input_select).checked;
+        this.props.h_select_changed(this.props.task_info._id, is_selected);
+    }
+
     render(){
         
         const product_info = this.props.task_info.product_info;
@@ -307,16 +321,21 @@ class TaskTableItem extends React.Component {
                                 <img src={status_btn} style={{width:24, height:24}} />
                             </button>
                         </div>
-                        {/* <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-danger" >
+                        <div className="float-start button-wrapper-inner-table">
+                            <button type="button" className="btn btn-info" onClick={this.onClickModifyBtn.bind(this)}>
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
                             </button>
-                        </div> */}
+                        </div>
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemoveBtn.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
+                    </div>
+                </td>
+                <td style={{width : this.props.select_col_width, maxWidth : this.props.select_col_width}} >
+                    <div className="form-switch">
+                        <input id={this.el_input_select} type="checkbox" className="form-check-input" onChange={this.onChangeSelect.bind(this)}/>
                     </div>
                 </td>
             </tr>
