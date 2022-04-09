@@ -97,6 +97,9 @@ class ContentsTasks extends React.Component {
     }
 
     onClickSelectedTaskRemove(){
+
+        if(this.__selected_task_id_list.length === 0) return;
+
         Index.g_prompt_modal.popModal('경고', <p>선택한 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
 
@@ -104,13 +107,9 @@ class ContentsTasks extends React.Component {
                 delete this.__table_item_ref_dict[task_id];
             });
 
-            console.log(this.__table_item_ref_dict);
-
             const task_table_item_list = this.state.task_table_item_list.filter((task_table_item) => {
                 return !this.__selected_task_id_list.includes(task_table_item.key);
             });
-
-            console.log(task_table_item_list);
 
             this.__selected_task_id_list = [];
             this.__updateTaskTableItem(task_table_item_list);
