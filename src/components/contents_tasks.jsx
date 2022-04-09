@@ -20,7 +20,7 @@ class ContentsTasks extends React.Component {
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
         this.__createNewTask = this.__createNewTask.bind(this);
-        this.__push_task_table_item = this.__push_task_table_item.bind(this);
+        this.__pushTaskTableItem = this.__pushTaskTableItem.bind(this);
         this.create_quick_task = this.create_quick_task.bind(this);
 
         this.popSelectedTaskList = this.popSelectedTaskList.bind(this);
@@ -30,6 +30,8 @@ class ContentsTasks extends React.Component {
         this.__get_appropreate_to_tasking_proxy_info = this.__get_appropreate_to_tasking_proxy_info.bind(this);
 
         this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
+        this.__updateTaskTableItem = this.__updateTaskTableItem.bind(this);
+        this.updateSelectAllInput = this.updateSelectAllInput.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
@@ -69,6 +71,12 @@ class ContentsTasks extends React.Component {
         this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
     }
 
+    __updateTaskTableItem(task_table_item){
+        this.setState({ task_table_item_list: task_table_item}, () => {
+            this.updateSelectAllInput();
+        });
+    }
+
     onClickBtnProductListReload(){
 
         this.__ref_product_list_reload_btn.current.setLoadingStatus(true);
@@ -82,7 +90,8 @@ class ContentsTasks extends React.Component {
         Index.g_prompt_modal.popModal('경고', <p>모든 작업을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
             this.__table_item_ref_dict = {};
-            this.setState({ task_table_item_list: []});
+            this.__selected_task_id_list = [];
+            this.__updateTaskTableItem([]);
         });
     }
 
@@ -175,20 +184,18 @@ class ContentsTasks extends React.Component {
             return;
         }
 
-        this.__push_task_table_item(task_info_obj);
+        this.__pushTaskTableItem(task_info_obj);
         
     }
 
-    __push_task_table_item(task_info){
+    __pushTaskTableItem(task_info){
         const task_table_item_ref = React.createRef();
         const task_table_item = this.__getTaskTableElement(task_info, task_table_item_ref);
 
         this.state.task_table_item_list.push(task_table_item);
         this.__table_item_ref_dict[task_info._id] = task_table_item_ref;
 
-        this.setState({
-            task_table_item_list: this.state.task_table_item_list
-        });
+        this.__updateTaskTableItem(this.state.task_table_item_list);
     }
 
     __checkTaskDuplicated(task_info_to_check){
@@ -210,10 +217,10 @@ class ContentsTasks extends React.Component {
             return task_table_item.key != task_id;
         });
 
+        this.popSelectedTaskList(task_id);
+
         delete this.__table_item_ref_dict[task_id];
-        this.setState({
-            task_table_item_list: task_table_item_list
-        });
+        this.__updateTaskTableItem(task_table_item_list);
     }
 
     popSelectedTaskList(_task_id){
@@ -224,18 +231,21 @@ class ContentsTasks extends React.Component {
         if(this.__selected_task_id_list.includes(task_id) === false) this.__selected_task_id_list.push(task_id);
     }
 
+    updateSelectAllInput(){
+        const num_of_tasks = this.state.task_table_item_list.length;
+        document.getElementById(this.el_input_select_all).checked = num_of_tasks === this.__selected_task_id_list.length;
+    }
+
     onTaskSelectChanged(task_id, value){
         if(value) this.pushSelectedTaskList(task_id);
         else this.popSelectedTaskList(task_id);
 
         console.log(this.__selected_task_id_list);
 
-        const num_of_tasks = this.state.task_table_item_list.length;
-        document.getElementById(this.el_input_select_all).checked = num_of_tasks === this.__selected_task_id_list.length;
+        this.updateSelectAllInput();
     }
 
     onChangeSelectAll(){
-        console.log('onChangeSelectAll');
 
         const is_selected = document.getElementById(this.el_input_select_all).checked;
 
