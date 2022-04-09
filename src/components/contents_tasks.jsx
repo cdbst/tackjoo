@@ -1,6 +1,8 @@
 
 class ContentsTasks extends React.Component {
 
+    el_input_select_all = 'input-select-tasks-all';
+
     constructor(props) {
         super(props);
 
@@ -21,8 +23,13 @@ class ContentsTasks extends React.Component {
         this.__push_task_table_item = this.__push_task_table_item.bind(this);
         this.create_quick_task = this.create_quick_task.bind(this);
 
+        this.popSelectedTaskList = this.popSelectedTaskList.bind(this);
+        this.pushSelectedTaskList = this.pushSelectedTaskList.bind(this);
+
         this.__get_appropreate_to_tasking_account_email = this.__get_appropreate_to_tasking_account_email.bind(this);
         this.__get_appropreate_to_tasking_proxy_info = this.__get_appropreate_to_tasking_proxy_info.bind(this);
+
+        this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
@@ -33,6 +40,8 @@ class ContentsTasks extends React.Component {
         this.state = {
             task_table_item_list : []
         };
+
+        this.__selected_task_id_list = [];
 
         this.__setupColumnsWidth();
     }
@@ -207,10 +216,33 @@ class ContentsTasks extends React.Component {
         });
     }
 
-    onTaskSelectChanged(task_id, value){
-        console.log(` ${task_id} : ${value}`);
+    popSelectedTaskList(_task_id){
+        this.__selected_task_id_list = this.__selected_task_id_list.filter((task_id) => task_id !== _task_id);
     }
-    
+
+    pushSelectedTaskList(task_id){
+        if(this.__selected_task_id_list.includes(task_id) === false) this.__selected_task_id_list.push(task_id);
+    }
+
+    onTaskSelectChanged(task_id, value){
+        if(value) this.pushSelectedTaskList(task_id);
+        else this.popSelectedTaskList(task_id);
+
+        console.log(this.__selected_task_id_list);
+
+        const num_of_tasks = this.state.task_table_item_list.length;
+        document.getElementById(this.el_input_select_all).checked = num_of_tasks === this.__selected_task_id_list.length;
+    }
+
+    onChangeSelectAll(){
+        console.log('onChangeSelectAll');
+
+        const is_selected = document.getElementById(this.el_input_select_all).checked;
+
+        for(const task_ref of Object.values(this.__table_item_ref_dict)){
+            task_ref.current.setSelectStatus(is_selected)
+        }
+    }
 
     __getTaskTableElement(task_info, task_ref){
         return (
@@ -400,7 +432,17 @@ class ContentsTasks extends React.Component {
                                     <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
                                     <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
                                     <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
-                                    <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}></th>
+                                    <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}>
+                                    <div className="form-switch">
+                                        <input 
+                                            id={this.el_input_select_all} 
+                                            type="checkbox" 
+                                            className="form-check-input" 
+                                            onChange={this.onChangeSelectAll.bind(this)}
+                                            disabled={this.state.task_table_item_list.length === 0}    
+                                        />
+                                    </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -4,7 +4,7 @@ class TaskTableItem extends React.Component {
     static PLAY_BTN_SRC = './res/img/play-fill.svg';
     static PAUSE_BTN_SRC = './res/img/pause-fill.svg';
 
-    el_input_select = 'el-input-select';
+    
 
     constructor(props) {
         super(props);
@@ -27,6 +27,7 @@ class TaskTableItem extends React.Component {
         this.isIdleState = this.isIdleState.bind(this);
 
         this.onChangeSelect = this.onChangeSelect.bind(this);
+        this.setSelectStatus = this.setSelectStatus.bind(this);
 
         this.ref_status_btn = React.createRef();
 
@@ -43,6 +44,8 @@ class TaskTableItem extends React.Component {
             status : initial_status,
             selected : false
         };
+
+        this.el_input_select = 'el-input-select-' + this.props.task_info._id;
 
         this.__mount = false;
     }
@@ -259,6 +262,12 @@ class TaskTableItem extends React.Component {
         const is_selected = document.getElementById(this.el_input_select).checked;
         this.setState({ selected: is_selected});
         this.props.h_select_changed(this.props.task_info._id, is_selected);
+    }
+
+    setSelectStatus(value){
+        document.getElementById(this.el_input_select).checked = value;
+        this.setState({ selected: value});
+        this.props.h_select_changed(this.props.task_info._id, value);
     }
 
     render(){

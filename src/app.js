@@ -39,12 +39,12 @@ app.focusOnWindow = function(){
 function create_window() {
     try{
         const win = new BrowserWindow({
-            width: 1620,
+            width: 1680,
             height: 1040,
-            minWidth : 1620,
+            minWidth : 1680,
             minHeight : 1040,
             webPreferences: {
-                devTools: false,
+                //devTools: false,
                 //sandbox: true,
                 nodeIntegration: true,
                 preload: path.join(__dirname, "preload.js"),
@@ -56,7 +56,7 @@ function create_window() {
         app.main_browser_window = win;
         IpcM.register(win);
     
-        //win.webContents.openDevTools();
+        win.webContents.openDevTools();
         win.setMenuBarVisibility(false);
         win.loadFile(path.join(__dirname, "index.html"));
     }catch(e){
