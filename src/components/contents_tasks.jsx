@@ -34,6 +34,9 @@ class ContentsTasks extends React.Component {
         this.__updateTaskTableItem = this.__updateTaskTableItem.bind(this);
         this.updateSelectAllInput = this.updateSelectAllInput.bind(this);
 
+        this.onClickSelectedTaskModifyLink = this.onClickSelectedTaskModifyLink.bind(this);
+        this.onClickSelectedTaskModify = this.onClickSelectedTaskModify.bind(this);
+
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
 
@@ -114,6 +117,15 @@ class ContentsTasks extends React.Component {
             this.__selected_task_id_list = [];
             this.__updateTaskTableItem(task_table_item_list);
         });
+    }
+
+    onClickSelectedTaskModifyLink(){
+        if(this.__selected_task_id_list.length === 0) return;
+        console.log('onClickSelectedTaskModifyLink');
+    }
+    onClickSelectedTaskModify(){
+        if(this.__selected_task_id_list.length === 0) return;
+        console.log('onClickSelectedTaskModify');
     }
 
     onClickBtnRunAll(){
@@ -491,14 +503,14 @@ class ContentsTasks extends React.Component {
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
                             <div style={{marginLeft: 24}}>
-                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)} >
+                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)}>
                                     <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 선택삭제
                                 </button>
-                                <button type="button" className="btn btn-info btn-footer-inside" >
-                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 선택링크편집
+                                <button type="button" className="btn btn-info btn-footer-inside" onClick={this.onClickSelectedTaskModifyLink.bind(this)}>
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} /> 선택링크편집
                                 </button>
-                                <button type="button" className="btn btn-primary btn-footer-inside" >
-                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 선택작업편집
+                                <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickSelectedTaskModify.bind(this)}>
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} /> 선택작업편집
                                 </button>
                             </div>
                             <div style={{marginLeft: 30}}>
