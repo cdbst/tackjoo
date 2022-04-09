@@ -9,6 +9,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
         this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
+        this.onClickSelectedTaskRemove = this.onClickSelectedTaskRemove.bind(this);
         this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
@@ -87,11 +88,32 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRemoveAll(){
-        Index.g_prompt_modal.popModal('경고', <p>모든 작업을 삭제하시겠습니까?</p>, (is_ok)=>{
+        Index.g_prompt_modal.popModal('경고', <p>모든 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
             this.__table_item_ref_dict = {};
             this.__selected_task_id_list = [];
             this.__updateTaskTableItem([]);
+        });
+    }
+
+    onClickSelectedTaskRemove(){
+        Index.g_prompt_modal.popModal('경고', <p>선택한 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+
+            this.__selected_task_id_list.forEach((task_id) =>{
+                delete this.__table_item_ref_dict[task_id];
+            });
+
+            console.log(this.__table_item_ref_dict);
+
+            const task_table_item_list = this.state.task_table_item_list.filter((task_table_item) => {
+                return !this.__selected_task_id_list.includes(task_table_item.key);
+            });
+
+            console.log(task_table_item_list);
+
+            this.__selected_task_id_list = [];
+            this.__updateTaskTableItem(task_table_item_list);
         });
     }
 
@@ -461,7 +483,7 @@ class ContentsTasks extends React.Component {
                         </table>
                     </div>
                     <div className="row footer">
-                        <div className="col-md-5 bd-highlight d-flex align-items-center">
+                        <div className="col-md-2 bd-highlight d-flex align-items-center">
                             <LaodingButton
                                 ref={this.__ref_product_list_reload_btn}
                                 h_on_click={this.onClickBtnProductListReload.bind(this)}
@@ -469,6 +491,11 @@ class ContentsTasks extends React.Component {
                                 btn_class={"btn-primary btn-footer-inside"}
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
+                        </div>
+                        <div className="col-md-3 bd-highlight d-flex align-items-center">
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)}>
+                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 선택삭제
+                            </button>
                         </div>
                         <div className="col-md-3 bd-highlight d-flex align-items-center">
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
