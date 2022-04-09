@@ -398,7 +398,7 @@ class ContentsTasks extends React.Component {
                         </table>
                     </div>
                     <div className="row footer">
-                        <div className="col-md-5 bd-highlight d-flex flex-row-reverse align-items-center">
+                        <div className="col-md-5 bd-highlight d-flex align-items-center">
                             <LaodingButton
                                 ref={this.__ref_product_list_reload_btn}
                                 h_on_click={this.onClickBtnProductListReload.bind(this)}
