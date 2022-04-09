@@ -482,33 +482,39 @@ class ContentsTasks extends React.Component {
                         </table>
                     </div>
                     <div className="row footer">
-                        <div className="col-md-2 bd-highlight d-flex align-items-center">
+                        <div className="col-md-8 bd-highlight d-flex align-items-center">
                             <LaodingButton
                                 ref={this.__ref_product_list_reload_btn}
                                 h_on_click={this.onClickBtnProductListReload.bind(this)}
-                                btn_label={"상품리스트 갱신"}
+                                btn_label={"상품갱신"}
                                 btn_class={"btn-primary btn-footer-inside"}
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
-                        </div>
-                        <div className="col-md-3 bd-highlight d-flex align-items-center">
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)}>
-                                <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 선택삭제
-                            </button>
-                        </div>
-                        <div className="col-md-3 bd-highlight d-flex align-items-center">
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
-                            </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
-                            </button>
+                            <div style={{marginLeft: 24}}>
+                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)} >
+                                    <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 선택삭제
+                                </button>
+                                <button type="button" className="btn btn-info btn-footer-inside" >
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 선택링크편집
+                                </button>
+                                <button type="button" className="btn btn-primary btn-footer-inside" >
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 선택작업편집
+                                </button>
+                            </div>
+                            <div style={{marginLeft: 30}}>
+                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
+                                    <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
+                                </button>
+                                <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
+                                    <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
+                                </button>
+                            </div>
                         </div>
                         <div className="col-md-4 bd-highlight d-flex align-items-center">
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
-                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
+                            <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
                                 <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
                             </button>
                             <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
