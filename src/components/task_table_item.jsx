@@ -40,7 +40,8 @@ class TaskTableItem extends React.Component {
         }
 
         this.state = {
-            status : initial_status
+            status : initial_status,
+            selected : false
         };
 
         this.__mount = false;
@@ -256,6 +257,7 @@ class TaskTableItem extends React.Component {
 
     onChangeSelect(){
         const is_selected = document.getElementById(this.el_input_select).checked;
+        this.setState({ selected: is_selected});
         this.props.h_select_changed(this.props.task_info._id, is_selected);
     }
 
@@ -278,8 +280,10 @@ class TaskTableItem extends React.Component {
 
         const status_text = this.state.status === common.TASK_STATUS.DONE ? `${this.state.status}(${this.checked_out_size_info.name})` : this.state.status;
 
+        const background_color = this.state.selected ? '#83f195' : 'transparent';
+
         return(
-            <tr>
+            <tr style={{background : background_color}}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 

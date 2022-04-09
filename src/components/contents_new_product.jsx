@@ -132,7 +132,7 @@ class ContentsNewProduct extends React.Component {
             const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
             const includes_blacklist = this.checkProductInfoWithBlackList(product_info);
             if(use_filter) display = (white_list_idx === -1 || includes_blacklist) ? 'none' : '';
-            else background = (white_list_idx === -1 || includes_blacklist) ? 'transparent' : '#ffb3b3';
+            else background = (white_list_idx === -1 || includes_blacklist) ? 'transparent' : '#006600';
             
 
             table_items.push(<NewProductTableItem
