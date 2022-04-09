@@ -451,7 +451,12 @@ class ContentsTasks extends React.Component {
         return (
             <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.TASKS}>
                 <div className="container-fluid">
-                    <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
+                    <TaskEditModal 
+                        id={this.task_edit_modal_id} 
+                        h_create_task={this.onCreateNewTask.bind(this)}
+                        contents_account_ref={this.props.contents_account_ref}
+                        contents_proxies_ref={this.props.contents_proxies_ref}
+                    />
                     <LoadLinkProductModal id={this.load_link_product_modal_id} h_load_product={this.onLoadLinkProduct.bind(this)}/>
                     <br/>
                     <div className="row">

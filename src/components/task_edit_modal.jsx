@@ -72,38 +72,25 @@ class TaskEditModal extends React.Component {
     }
 
     onModalshown(e){
+        
+        this.product_info_list = Index.g_product_mngr.getProductInfoList();
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
-        window.electron.getAccountInfo( (err, __account_info_list) => {
+        const el_modal = document.getElementById(this.props.id);
 
-            this.product_info_list = Index.g_product_mngr.getProductInfoList();
-            let account_info_list = undefined;
+        if(el_modal.product_link_url === undefined){
 
-            if(err){
-                account_info_list = [];
-            }else{
-                account_info_list = __account_info_list.accounts;
-            }
-
-            window.electron.loadProxyInfo((err, proxy_info_list) =>{
-
-                if(err) proxy_info_list = [];
-
-                let el_modal = document.getElementById(this.props.id);
-
-                if(el_modal.product_link_url === undefined){
-
-                    this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
-                        this.onChangeType(
-                            this.ref_options_type.current.getSelectedOptionValue(),
-                            this.ref_options_product.current.getSelectedOptionKey()
-                        );
-                    });
-
-                }else{                    
-                    this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
-                }
+            this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
+                this.onChangeType(
+                    this.ref_options_type.current.getSelectedOptionValue(),
+                    this.ref_options_product.current.getSelectedOptionKey()
+                );
             });
-        });
+
+        }else{                    
+            this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
+        }
     }
 
     setCustomURLProduct(product_link_url, account_info_list, proxy_info_list){
