@@ -12,6 +12,7 @@ class TaskEditModal extends React.Component {
         this.onSubmitTaskInfo = this.onSubmitTaskInfo.bind(this);
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
+        this.hideModal = this.hideModal.bind(this);
 
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
@@ -135,7 +136,16 @@ class TaskEditModal extends React.Component {
         this.ref_product_img.current.style.setProperty('display', on ? 'none' : '', 'important');
     }
 
+    hideModal(){
+        const el_modal = document.getElementById(this.props.id);
+        const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.hide();
+    }
+
     onModalClosed(e){
+        console.log('onModalClosed');
+        const el_modal = document.getElementById(this.props.id);
+        el_modal.product_link_url = undefined;
     }
 
     getKreamProductInfo(){
@@ -284,10 +294,7 @@ class TaskEditModal extends React.Component {
         }
         
         this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
-        
-        let el_modal = document.getElementById(this.props.id);
-        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        bs_obj_modal.hide();
+        this.hideModal();
     }
 
     onClickProductImg(){

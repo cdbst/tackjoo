@@ -6,7 +6,7 @@ class ContentsTasks extends React.Component {
     constructor(props) {
         super(props);
 
-        this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
+        this.popTaskEditModal = this.popTaskEditModal.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
         this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
         this.onClickSelectedTaskRemove = this.onClickSelectedTaskRemove.bind(this);
@@ -91,6 +91,9 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRemoveAll(){
+
+        if(this.state.task_table_item_list.length === 0) return;
+
         Index.g_prompt_modal.popModal('경고', <p>모든 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
             this.__table_item_ref_dict = {};
@@ -129,18 +132,18 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRunAll(){
-        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
+        for(const table_item_ref of Object.values(this.__table_item_ref_dict)){
             table_item_ref.current.onPlayTask();
         }
     }
 
     onClickBtnStopAll(){
-        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
+        for(const table_item_ref of Object.values(this.__table_item_ref_dict)){
             table_item_ref.current.onPauseTask();
         }
     }
 
-    onClickBtnNewTask(product_link_url){
+    popTaskEditModal(product_link_url){
 
         let el_modal = document.getElementById(this.task_edit_modal_id);
         el_modal.product_link_url = product_link_url;
@@ -184,7 +187,7 @@ class ContentsTasks extends React.Component {
     }
 
     onLoadLinkProduct(product_link_url){
-        this.onClickBtnNewTask(product_link_url);
+        this.popTaskEditModal(product_link_url);
     }
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
@@ -534,7 +537,7 @@ class ContentsTasks extends React.Component {
                             <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
                                 <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
                             </button>
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.popTaskEditModal()}}>
                                 <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
                             </button>
                         </div>

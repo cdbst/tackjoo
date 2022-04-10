@@ -50,10 +50,10 @@ class MenuBar extends React.Component {
                         <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">작업</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">응모</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.NEW_PRODUCT} data-bs-toggle="tab" href="#new-product" role="tab" aria-controls="new-product" aria-selected="false">신상품</a>
                     </li>
                     <li className="nav-item" role="presentation">
-                        <a className="nav-link" id={MenuBar.MENU_ID.NEW_PRODUCT} data-bs-toggle="tab" href="#new-product" role="tab" aria-controls="new-product" aria-selected="false">신상품</a>
+                        <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">응모</a>
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">계정관리</a>
@@ -70,7 +70,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 700px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 620px)'}}>
                         <li className="nav-item">
                             <a className="nav-link">{this.state.server_time}</a>
                         </li>
