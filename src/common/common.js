@@ -325,6 +325,10 @@
         return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
     }
 
+    exports.sample = function(items) {
+        return items[Math.floor(Math.random()*items.length)];
+    }
+
     exports.print_time_duration = function(log, message, before_time){
         const cur_time = Date.now();
         log.info(this.get_log_str('task.js', 'PERPORMANCE', message + ': ' + (cur_time - before_time)));

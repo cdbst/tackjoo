@@ -46,6 +46,7 @@ class ContentsTasks extends React.Component {
         this.__ref_product_list_reload_btn = React.createRef();
 
         this.__table_item_ref_dict = {};
+
         this.state = {
             task_table_item_list : []
         };
@@ -183,7 +184,7 @@ class ContentsTasks extends React.Component {
         }
 
         for(var i = 0; i < account_email_list.length; i++){
-            const friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
+            const friendly_size_name = common.sample(friendly_size_name_list);
 
             let cur_proxy_info = undefined;
             if(proxy_info_list.length !== 0){
@@ -195,7 +196,45 @@ class ContentsTasks extends React.Component {
     }
 
     onModifyTask(product_info, friendly_size_name_list, schedule_time, proxy_info_list, watchdog, task_id_list){
-        console.log(arguments);
+
+        const new_task_table_items = _.clone(this.state.task_table_item_list);
+
+        task_id_list.forEach((task_id, idx)=>{
+
+            const table_item_ref = this.__table_item_ref_dict[task_id];
+            const origin_task_info = table_item_ref.current.getTaskInfo();
+
+            if(table_item_ref.current.isPossibleToModify() === false){
+                Index.g_sys_msg_q.enqueue('에러', `진행중인 작업은 수정할 수 없습니다. (${task_info.account_email} : ${task_info.product_info.name})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                return;
+            }
+
+            const new_task_info = _.clone(origin_task_info);
+
+            const friendly_size_name = common.sample(friendly_size_name_list);
+            const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+
+            let proxy_info = undefined;
+            if(proxy_info_list.length !== 0){
+                proxy_info = proxy_info_list[idx % proxy_info_list.length];
+            }
+
+            common.update_task_info_obj(new_task_info, 'product_info', product_info);
+            common.update_task_info_obj(new_task_info, 'size_name', size_name);
+            common.update_task_info_obj(new_task_info, 'friendly_size_name', friendly_size_name);
+            common.update_task_info_obj(new_task_info, 'schedule_time', schedule_time);
+            common.update_task_info_obj(new_task_info, 'proxy_info', proxy_info);
+            common.update_task_info_obj(new_task_info, 'watchdog', watchdog);
+
+            for(var i = 0; i < new_task_table_items.length; i++){
+                if(new_task_table_items[i].key === task_id){
+                    new_task_table_items[i] = this.__getTaskTableElement(new_task_info, table_item_ref);
+                    break;
+                }
+            }
+        });
+
+        this.__updateTaskTableItem(new_task_table_items);
     }
 
     onLoadLinkProduct(product_link_url){
@@ -250,9 +289,11 @@ class ContentsTasks extends React.Component {
         this.__updateTaskTableItem(this.state.task_table_item_list);
     }
 
-    __checkTaskDuplicated(task_info_to_check){
+    __checkTaskDuplicated(task_info_to_check, wildcard_idx_list = []){
         
-        let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
+        const duplicated = this.state.task_table_item_list.filter((task_table_item, idx) =>{
+
+            if(wildcard_idx_list.includes(idx)) return false;
 
             const task_info = task_table_item.props.task_info;
             if(task_info.account_id !== task_info_to_check.account_id) return false;

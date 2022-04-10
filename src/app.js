@@ -39,9 +39,9 @@ app.focusOnWindow = function(){
 function create_window() {
     try{
         const win = new BrowserWindow({
-            width: 1680,
+            width: 1700,
             height: 1040,
-            minWidth : 1680,
+            minWidth : 1700,
             minHeight : 1040,
             webPreferences: {
                 //devTools: false,

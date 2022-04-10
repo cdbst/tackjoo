@@ -4,8 +4,6 @@ class TaskTableItem extends React.Component {
     static PLAY_BTN_SRC = './res/img/play-fill.svg';
     static PAUSE_BTN_SRC = './res/img/pause-fill.svg';
 
-    
-
     constructor(props) {
         super(props);
 
@@ -22,12 +20,15 @@ class TaskTableItem extends React.Component {
         this.getStatusFontColor = this.getStatusFontColor.bind(this);
         this.getProductDescNameFontColor = this.getProductDescNameFontColor.bind(this);
 
+        this.isPossibleToModify = this.isPossibleToModify.bind(this);
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
         this.isIdleState = this.isIdleState.bind(this);
 
         this.onChangeSelect = this.onChangeSelect.bind(this);
         this.setSelectStatus = this.setSelectStatus.bind(this);
+
+        this.getTaskInfo = this.getTaskInfo.bind(this);
 
         this.ref_status_btn = React.createRef();
 
@@ -202,6 +203,20 @@ class TaskTableItem extends React.Component {
         }else{
             return TaskTableItem.PAUSE_BTN_SRC;
         }
+    }
+
+    isPossibleToModify(){
+        if(this.state.status == common.TASK_STATUS.READY){
+            return true;
+        }else if(this.isPossibleToPlay()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    getTaskInfo(){
+        return this.props.task_info;
     }
 
     isPossibleToPlay(){
