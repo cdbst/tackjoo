@@ -205,19 +205,21 @@ class ContentsTasks extends React.Component {
             const origin_task_info = table_item_ref.current.getTaskInfo();
 
             if(table_item_ref.current.isPossibleToModify() === false){
-                Index.g_sys_msg_q.enqueue('에러', `진행중인 작업은 수정할 수 없습니다. (${task_info.account_email} : ${task_info.product_info.name})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                Index.g_sys_msg_q.enqueue('에러', `진행중인 작업은 수정할 수 없습니다. (${origin_task_info.account_email} : ${origin_task_info.product_info.name})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
                 return;
             }
 
+            delete this.__table_item_ref_dict[task_id];
+
+            const new_task_id = common.uuidv4();
+            this.__table_item_ref_dict[new_task_id] = table_item_ref;
+            
+            
             const new_task_info = _.clone(origin_task_info);
 
             const friendly_size_name = common.sample(friendly_size_name_list);
             const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
-
-            let proxy_info = undefined;
-            if(proxy_info_list.length !== 0){
-                proxy_info = proxy_info_list[idx % proxy_info_list.length];
-            }
+            let proxy_info = proxy_info_list.length === 0 ? undefined : proxy_info_list[idx % proxy_info_list.length];
 
             common.update_task_info_obj(new_task_info, 'product_info', product_info);
             common.update_task_info_obj(new_task_info, 'size_name', size_name);
@@ -225,6 +227,7 @@ class ContentsTasks extends React.Component {
             common.update_task_info_obj(new_task_info, 'schedule_time', schedule_time);
             common.update_task_info_obj(new_task_info, 'proxy_info', proxy_info);
             common.update_task_info_obj(new_task_info, 'watchdog', watchdog);
+            common.update_task_info_obj(new_task_info, '_id', new_task_id);
 
             for(var i = 0; i < new_task_table_items.length; i++){
                 if(new_task_table_items[i].key === task_id){
@@ -232,8 +235,11 @@ class ContentsTasks extends React.Component {
                     break;
                 }
             }
+
+            this.__selected_task_id_list = this.__selected_task_id_list.filter((_task_id) => _task_id !== task_id);
         });
 
+        
         this.__updateTaskTableItem(new_task_table_items);
     }
 
