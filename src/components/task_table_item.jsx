@@ -142,10 +142,18 @@ class TaskTableItem extends React.Component {
     }
 
     onClickModifyBtn(){
+        if(this.isPossibleToModify() === false){
+            Index.g_sys_msg_q.enqueue('에러', '진행 중인 작업은 편집할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
         this.props.h_modify();
     }
 
     onClickModifyLinkBtn(){
+        if(this.isPossibleToModify() === false){
+            Index.g_sys_msg_q.enqueue('에러', '진행 중인 작업은 편집할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
         this.props.h_modify_link();
     }
 
