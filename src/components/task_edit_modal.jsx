@@ -80,6 +80,9 @@ class TaskEditModal extends React.Component {
 
         const el_modal = document.getElementById(this.props.id);
 
+        console.log(el_modal.product_link_url);
+        console.log(el_modal.task_id_list_to_modify);
+
         if(el_modal.product_link_url === undefined){
 
             this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
@@ -143,9 +146,9 @@ class TaskEditModal extends React.Component {
     }
 
     onModalClosed(e){
-        console.log('onModalClosed');
         const el_modal = document.getElementById(this.props.id);
         el_modal.product_link_url = undefined;
+        el_modal.task_id_list_to_modify = undefined;
     }
 
     getKreamProductInfo(){

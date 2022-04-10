@@ -14,6 +14,7 @@ class ContentsTasks extends React.Component {
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
         this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
+        this.onModifyLinkProduct = this.onModifyLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
         this.onTaskSelectChanged = this.onTaskSelectChanged.bind(this);
         this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
@@ -34,11 +35,12 @@ class ContentsTasks extends React.Component {
         this.__updateTaskTableItem = this.__updateTaskTableItem.bind(this);
         this.updateSelectAllInput = this.updateSelectAllInput.bind(this);
 
-        this.onClickSelectedTaskModifyLink = this.onClickSelectedTaskModifyLink.bind(this);
         this.onClickSelectedTaskModify = this.onClickSelectedTaskModify.bind(this);
+        this.onClickSelectedTaskModifyLink = this.onClickSelectedTaskModifyLink.bind(this);
 
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
+        this.modify_link_product_modal_id = 'modify-link-product-modal';
 
         this.__ref_product_list_reload_btn = React.createRef();
 
@@ -122,13 +124,17 @@ class ContentsTasks extends React.Component {
         });
     }
 
-    onClickSelectedTaskModifyLink(){
-        if(this.__selected_task_id_list.length === 0) return;
-        console.log('onClickSelectedTaskModifyLink');
-    }
     onClickSelectedTaskModify(){
         if(this.__selected_task_id_list.length === 0) return;
-        console.log('onClickSelectedTaskModify');
+        this.popTaskEditModal(undefined, this.__selected_task_id_list);
+    }
+
+    onClickSelectedTaskModifyLink(){
+        if(this.__selected_task_id_list.length === 0) return;
+        
+        let el_modal = document.getElementById(this.modify_link_product_modal_id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     onClickBtnRunAll(){
@@ -143,10 +149,11 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    popTaskEditModal(product_link_url){
+    popTaskEditModal(product_link_url, task_id_list_to_modify){
 
         let el_modal = document.getElementById(this.task_edit_modal_id);
         el_modal.product_link_url = product_link_url;
+        el_modal.task_id_list_to_modify = task_id_list_to_modify;
 
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
@@ -188,6 +195,10 @@ class ContentsTasks extends React.Component {
 
     onLoadLinkProduct(product_link_url){
         this.popTaskEditModal(product_link_url);
+    }
+
+    onModifyLinkProduct(product_link_url){
+        this.popTaskEditModal(product_link_url, this.__selected_task_id_list);
     }
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
@@ -275,8 +286,6 @@ class ContentsTasks extends React.Component {
     onTaskSelectChanged(task_id, value){
         if(value) this.pushSelectedTaskList(task_id);
         else this.popSelectedTaskList(task_id);
-
-        console.log(this.__selected_task_id_list);
 
         this.updateSelectAllInput();
     }
@@ -460,7 +469,16 @@ class ContentsTasks extends React.Component {
                         contents_account_ref={this.props.contents_account_ref}
                         contents_proxies_ref={this.props.contents_proxies_ref}
                     />
-                    <LoadLinkProductModal id={this.load_link_product_modal_id} h_load_product={this.onLoadLinkProduct.bind(this)}/>
+                    <LoadLinkProductModal 
+                        id={this.load_link_product_modal_id} 
+                        h_load_product={this.onLoadLinkProduct.bind(this)}
+                        title={"링크로 상품 불러오기"}
+                    />
+                    <LoadLinkProductModal 
+                        id={this.modify_link_product_modal_id} 
+                        h_load_product={this.onModifyLinkProduct.bind(this)}
+                        title={"링크로 상품 편집하기"}
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
