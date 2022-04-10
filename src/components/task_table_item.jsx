@@ -304,7 +304,7 @@ class TaskTableItem extends React.Component {
 
         const status_text = this.state.status === common.TASK_STATUS.DONE ? `${this.state.status}(${this.checked_out_size_info.name})` : this.state.status;
 
-        const background_color = this.state.selected ? '#83f195' : 'transparent';
+        const background_color = this.state.selected ? 'rgb(131, 241, 149, 0.36)' : 'transparent';
 
         return(
             <tr style={{background : background_color}}>
