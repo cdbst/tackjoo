@@ -13,6 +13,7 @@ class ContentsTasks extends React.Component {
         this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
+        this.onModifyTask = this.onModifyTask.bind(this);
         this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
         this.onModifyLinkProduct = this.onModifyLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
@@ -191,6 +192,10 @@ class ContentsTasks extends React.Component {
 
             this.__createNewTask(product_info, friendly_size_name, account_email_list[i], schedule_time, cur_proxy_info, watchdog);
         }
+    }
+
+    onModifyTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info_list, watchdog, task_id_list){
+        console.log(arguments);
     }
 
     onLoadLinkProduct(product_link_url){
@@ -466,6 +471,7 @@ class ContentsTasks extends React.Component {
                     <TaskEditModal 
                         id={this.task_edit_modal_id} 
                         h_create_task={this.onCreateNewTask.bind(this)}
+                        h_modify_task={this.onModifyTask.bind(this)}
                         contents_account_ref={this.props.contents_account_ref}
                         contents_proxies_ref={this.props.contents_proxies_ref}
                     />

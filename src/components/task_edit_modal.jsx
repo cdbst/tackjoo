@@ -50,6 +50,7 @@ class TaskEditModal extends React.Component {
         this.ref_product_img = React.createRef();
 
         this.schedule_time_input_instance = undefined;
+        this.modify_mode = false;
     }
 
     componentDidMount(){
@@ -82,6 +83,10 @@ class TaskEditModal extends React.Component {
 
         console.log(el_modal.product_link_url);
         console.log(el_modal.task_id_list_to_modify);
+
+        this.modify_mode = el_modal.task_id_list_to_modify !== undefined;
+
+        //this.ref_options_account.current.setDisable(el_modal.task_id_list_to_modify !== undefined);
 
         if(el_modal.product_link_url === undefined){
 
@@ -275,6 +280,7 @@ class TaskEditModal extends React.Component {
         if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
             selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
         }
+        
 
         let selected_schedule = undefined;
         
@@ -296,7 +302,12 @@ class TaskEditModal extends React.Component {
             selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id );
         }
         
-        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
+        if(this.modify_mode){
+            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog, );
+        }else{
+            this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
+        }
+
         this.hideModal();
     }
 
@@ -398,7 +409,6 @@ class TaskEditModal extends React.Component {
 
             kream_price_str = this.state.kream_product_info.price;
         }
-
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">

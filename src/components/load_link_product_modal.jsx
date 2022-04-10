@@ -1,7 +1,5 @@
 class LoadLinkProductModal extends React.Component {
 
-    
-
     constructor(props) {
         super(props);
 

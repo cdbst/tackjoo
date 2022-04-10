@@ -5,6 +5,7 @@ class LabelMultipleSelect extends React.Component {
         this.onChangeOption = this.onChangeOption.bind(this);
         this.getOptionItems = this.getOptionItems.bind(this);
         this.setDisable = this.setDisable.bind(this);
+        this.setDisplay = this.setDisplay.bind(this);
 
         this.getSelectedOptionValues = this.getSelectedOptionValues.bind(this);
         this.__ref_select = React.createRef();
@@ -44,6 +45,10 @@ class LabelMultipleSelect extends React.Component {
 
     setDisable(option){
         this.__ref_select.current.disabled = option;
+    }
+
+    setDisplay(option){
+        this.__ref_select.current.style.display = option ? '' : 'none';
     }
 
     render(){
