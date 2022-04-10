@@ -1,37 +1,60 @@
 
 class ContentsTasks extends React.Component {
 
+    el_input_select_all = 'input-select-tasks-all';
+
     constructor(props) {
         super(props);
 
-        this.onClickBtnNewTask = this.onClickBtnNewTask.bind(this);
+        this.popTaskEditModal = this.popTaskEditModal.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
         this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
+        this.onClickSelectedTaskRemove = this.onClickSelectedTaskRemove.bind(this);
         this.onClickBtnProductListReload = this.onClickBtnProductListReload.bind(this);
 
         this.onCreateNewTask = this.onCreateNewTask.bind(this);
+        this.onModifyTask = this.onModifyTask.bind(this);
         this.onLoadLinkProduct = this.onLoadLinkProduct.bind(this);
+        this.onModifyLinkProduct = this.onModifyLinkProduct.bind(this);
         this.onRemoveTask = this.onRemoveTask.bind(this);
+        this.onTaskSelectChanged = this.onTaskSelectChanged.bind(this);
         this.__getTaskTableElement = this.__getTaskTableElement.bind(this);
         this.__checkTaskDuplicated = this.__checkTaskDuplicated.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.__adjectScheduleTime = this.__adjectScheduleTime.bind(this);
         this.__createNewTask = this.__createNewTask.bind(this);
-        this.__push_task_table_item = this.__push_task_table_item.bind(this);
+        this.__pushTaskTableItem = this.__pushTaskTableItem.bind(this);
         this.create_quick_task = this.create_quick_task.bind(this);
+
+        this.popSelectedTaskList = this.popSelectedTaskList.bind(this);
+        this.pushSelectedTaskList = this.pushSelectedTaskList.bind(this);
 
         this.__get_appropreate_to_tasking_account_email = this.__get_appropreate_to_tasking_account_email.bind(this);
         this.__get_appropreate_to_tasking_proxy_info = this.__get_appropreate_to_tasking_proxy_info.bind(this);
 
+        this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
+        this.__updateTaskTableItem = this.__updateTaskTableItem.bind(this);
+        this.updateSelectAllInput = this.updateSelectAllInput.bind(this);
+
+        this.onClickSelectedTaskModify = this.onClickSelectedTaskModify.bind(this);
+        this.onClickSelectedTaskModifyLink = this.onClickSelectedTaskModifyLink.bind(this);
+
+        this.onChangeTask = this.onChangeTask.bind(this);
+        this.onChangeTaskLink = this.onChangeTaskLink.bind(this);
+
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
+        this.modify_link_product_modal_id = 'modify-link-product-modal';
 
         this.__ref_product_list_reload_btn = React.createRef();
 
         this.__table_item_ref_dict = {};
+
         this.state = {
             task_table_item_list : []
         };
+
+        this.__selected_task_id_list = [];
 
         this.__setupColumnsWidth();
     }
@@ -44,7 +67,8 @@ class ContentsTasks extends React.Component {
         this.open_time_col_width = 190;
         this.scheduled_time_col_width = 190;
         this.status_col_width = 220;
-        this.action_col_width = 145.5;
+        this.action_col_width = 210;
+        this.select_col_width = 60;
 
         let cols_width_without_product_col = this.image_col_width + 
             this.size_col_width + 
@@ -52,9 +76,16 @@ class ContentsTasks extends React.Component {
             this.open_time_col_width + 
             this.scheduled_time_col_width + 
             this.status_col_width +
-            this.action_col_width;
+            this.action_col_width +
+            this.select_col_width;
 
         this.product_col_width = 'calc( 100% - ' + cols_width_without_product_col + 'px)';
+    }
+
+    __updateTaskTableItem(task_table_item){
+        this.setState({ task_table_item_list: task_table_item}, () => {
+            this.updateSelectAllInput();
+        });
     }
 
     onClickBtnProductListReload(){
@@ -67,29 +98,67 @@ class ContentsTasks extends React.Component {
     }
 
     onClickBtnRemoveAll(){
-        Index.g_prompt_modal.popModal('경고', <p>모든 작업을 삭제하시겠습니까?</p>, (is_ok)=>{
+
+        if(this.state.task_table_item_list.length === 0) return;
+
+        Index.g_prompt_modal.popModal('경고', <p>모든 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
             if(is_ok == false) return;
             this.__table_item_ref_dict = {};
-            this.setState({ task_table_item_list: []});
+            this.__selected_task_id_list = [];
+            this.__updateTaskTableItem([]);
         });
     }
 
+    onClickSelectedTaskRemove(){
+
+        if(this.__selected_task_id_list.length === 0) return;
+
+        Index.g_prompt_modal.popModal('경고', <p>선택한 작업들을 삭제하시겠습니까?</p>, (is_ok)=>{
+            if(is_ok == false) return;
+
+            this.__selected_task_id_list.forEach((task_id) =>{
+                delete this.__table_item_ref_dict[task_id];
+            });
+
+            const task_table_item_list = this.state.task_table_item_list.filter((task_table_item) => {
+                return !this.__selected_task_id_list.includes(task_table_item.key);
+            });
+
+            this.__selected_task_id_list = [];
+            this.__updateTaskTableItem(task_table_item_list);
+        });
+    }
+
+    onClickSelectedTaskModify(){
+        if(this.__selected_task_id_list.length === 0) return;
+        this.popTaskEditModal(undefined, this.__selected_task_id_list);
+    }
+
+    onClickSelectedTaskModifyLink(){
+        if(this.__selected_task_id_list.length === 0) return;
+        
+        let el_modal = document.getElementById(this.modify_link_product_modal_id);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
     onClickBtnRunAll(){
-        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
+        for(const table_item_ref of Object.values(this.__table_item_ref_dict)){
             table_item_ref.current.onPlayTask();
         }
     }
 
     onClickBtnStopAll(){
-        for(const [, table_item_ref] of Object.entries(this.__table_item_ref_dict)){
+        for(const table_item_ref of Object.values(this.__table_item_ref_dict)){
             table_item_ref.current.onPauseTask();
         }
     }
 
-    onClickBtnNewTask(product_link_url){
+    popTaskEditModal(product_link_url, task_id_list_to_modify){
 
         let el_modal = document.getElementById(this.task_edit_modal_id);
         el_modal.product_link_url = product_link_url;
+        el_modal.task_id_list_to_modify = task_id_list_to_modify;
 
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
@@ -118,7 +187,7 @@ class ContentsTasks extends React.Component {
         }
 
         for(var i = 0; i < account_email_list.length; i++){
-            const friendly_size_name = friendly_size_name_list[common.get_random_int(0, friendly_size_name_list.length - 1)];
+            const friendly_size_name = common.sample(friendly_size_name_list);
 
             let cur_proxy_info = undefined;
             if(proxy_info_list.length !== 0){
@@ -129,8 +198,56 @@ class ContentsTasks extends React.Component {
         }
     }
 
+    onModifyTask(product_info, friendly_size_name_list, schedule_time, watchdog, task_id_list){
+
+        const new_task_table_items = _.clone(this.state.task_table_item_list);
+
+        task_id_list.forEach((task_id, idx)=>{
+
+            const table_item_ref = this.__table_item_ref_dict[task_id];
+            const origin_task_info = table_item_ref.current.getTaskInfo();
+
+            if(table_item_ref.current.isPossibleToModify() === false){
+                Index.g_sys_msg_q.enqueue('에러', `진행중인 작업은 수정할 수 없습니다. (${origin_task_info.account_email} : ${origin_task_info.product_info.name})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                return;
+            }
+
+            delete this.__table_item_ref_dict[task_id];
+
+            const new_task_id = common.uuidv4();
+            this.__table_item_ref_dict[new_task_id] = table_item_ref;
+            
+            const new_task_info = _.clone(origin_task_info);
+
+            const friendly_size_name = common.sample(friendly_size_name_list);
+            const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
+
+            common.update_task_info_obj(new_task_info, 'product_info', product_info);
+            common.update_task_info_obj(new_task_info, 'size_name', size_name);
+            common.update_task_info_obj(new_task_info, 'friendly_size_name', friendly_size_name);
+            common.update_task_info_obj(new_task_info, 'schedule_time', schedule_time);
+            common.update_task_info_obj(new_task_info, 'watchdog', watchdog);
+            common.update_task_info_obj(new_task_info, '_id', new_task_id);
+
+            for(var i = 0; i < new_task_table_items.length; i++){
+                if(new_task_table_items[i].key === task_id){
+                    new_task_table_items[i] = this.__getTaskTableElement(new_task_info, table_item_ref);
+                    break;
+                }
+            }
+
+            this.__selected_task_id_list = this.__selected_task_id_list.filter((_task_id) => _task_id !== task_id);
+        });
+
+        this.__updateTaskTableItem(new_task_table_items);
+    }
+
     onLoadLinkProduct(product_link_url){
-        this.onClickBtnNewTask(product_link_url);
+        this.popTaskEditModal(product_link_url);
+    }
+
+    onModifyLinkProduct(product_link_url, task_id){
+        this.popTaskEditModal(product_link_url, task_id === undefined ? this.__selected_task_id_list : [task_id]);
     }
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
@@ -163,25 +280,25 @@ class ContentsTasks extends React.Component {
             return;
         }
 
-        this.__push_task_table_item(task_info_obj);
+        this.__pushTaskTableItem(task_info_obj);
         
     }
 
-    __push_task_table_item(task_info){
+    __pushTaskTableItem(task_info){
         const task_table_item_ref = React.createRef();
         const task_table_item = this.__getTaskTableElement(task_info, task_table_item_ref);
 
         this.state.task_table_item_list.push(task_table_item);
         this.__table_item_ref_dict[task_info._id] = task_table_item_ref;
 
-        this.setState({
-            task_table_item_list: this.state.task_table_item_list
-        });
+        this.__updateTaskTableItem(this.state.task_table_item_list);
     }
 
-    __checkTaskDuplicated(task_info_to_check){
+    __checkTaskDuplicated(task_info_to_check, wildcard_idx_list = []){
         
-        let duplicated = this.state.task_table_item_list.filter((task_table_item) =>{
+        const duplicated = this.state.task_table_item_list.filter((task_table_item, idx) =>{
+
+            if(wildcard_idx_list.includes(idx)) return false;
 
             const task_info = task_table_item.props.task_info;
             if(task_info.account_id !== task_info_to_check.account_id) return false;
@@ -198,10 +315,50 @@ class ContentsTasks extends React.Component {
             return task_table_item.key != task_id;
         });
 
+        this.popSelectedTaskList(task_id);
+
         delete this.__table_item_ref_dict[task_id];
-        this.setState({
-            task_table_item_list: task_table_item_list
-        });
+        this.__updateTaskTableItem(task_table_item_list);
+    }
+
+    popSelectedTaskList(_task_id){
+        this.__selected_task_id_list = this.__selected_task_id_list.filter((task_id) => task_id !== _task_id);
+    }
+
+    pushSelectedTaskList(task_id){
+        if(this.__selected_task_id_list.includes(task_id) === false) this.__selected_task_id_list.push(task_id);
+    }
+
+    updateSelectAllInput(){
+        const num_of_tasks = this.state.task_table_item_list.length;
+        document.getElementById(this.el_input_select_all).checked = num_of_tasks === this.__selected_task_id_list.length;
+    }
+
+    onTaskSelectChanged(task_id, value){
+        if(value) this.pushSelectedTaskList(task_id);
+        else this.popSelectedTaskList(task_id);
+
+        this.updateSelectAllInput();
+    }
+
+    onChangeSelectAll(){
+
+        const is_selected = document.getElementById(this.el_input_select_all).checked;
+
+        for(const task_ref of Object.values(this.__table_item_ref_dict)){
+            task_ref.current.setSelectStatus(is_selected)
+        }
+    }
+
+    onChangeTask(task_id){
+        this.popTaskEditModal(undefined, [task_id]);
+    }
+
+    onChangeTaskLink(task_id){
+        let el_modal = document.getElementById(this.modify_link_product_modal_id);
+        el_modal.task_id = task_id;
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     __getTaskTableElement(task_info, task_ref){
@@ -210,6 +367,9 @@ class ContentsTasks extends React.Component {
                 key={task_info._id} 
                 id={task_info._id}
                 h_remove={this.onRemoveTask.bind(this)}
+                h_select_changed={this.onTaskSelectChanged.bind(this)}
+                h_modify={this.onChangeTask.bind(this, task_info._id)}
+                h_modify_link={this.onChangeTaskLink.bind(this, task_info._id)}
                 task_info={task_info}
                 ref={task_ref}
                 image_col_width={this.image_col_width}
@@ -221,6 +381,7 @@ class ContentsTasks extends React.Component {
                 scheduled_time_col_width={this.scheduled_time_col_width}
                 status_col_width={this.status_col_width}
                 action_col_width={this.action_col_width}
+                select_col_width={this.select_col_width}
             />
         );
     }
@@ -351,7 +512,7 @@ class ContentsTasks extends React.Component {
         const opt_quick_task_config = Index.g_settings_info.getSetting('new_product_quick_task_judge_size');
 
         const friendly_size_name = opt_quick_task_config === 0 ? common.SPECIAL_SIZE_OPTS.MIDDLE : common.SPECIAL_SIZE_OPTS.RANDOM;
-        const schedule_time = Index.g_server_clock.getServerTime();
+        const schedule_time = new Date(Index.g_server_clock.getServerTime());
 
         let proxy_info = undefined;
         if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
@@ -366,8 +527,23 @@ class ContentsTasks extends React.Component {
         return (
             <div className="tab-pane fade show active" id="tasks" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.TASKS}>
                 <div className="container-fluid">
-                    <TaskEditModal id={this.task_edit_modal_id} h_create_task={this.onCreateNewTask.bind(this)}/>
-                    <LoadLinkProductModal id={this.load_link_product_modal_id} h_load_product={this.onLoadLinkProduct.bind(this)}/>
+                    <TaskEditModal 
+                        id={this.task_edit_modal_id} 
+                        h_create_task={this.onCreateNewTask.bind(this)}
+                        h_modify_task={this.onModifyTask.bind(this)}
+                        contents_account_ref={this.props.contents_account_ref}
+                        contents_proxies_ref={this.props.contents_proxies_ref}
+                    />
+                    <LoadLinkProductModal 
+                        id={this.load_link_product_modal_id} 
+                        h_load_product={this.onLoadLinkProduct.bind(this)}
+                        title={"링크로 상품 불러오기"}
+                    />
+                    <LoadLinkProductModal 
+                        id={this.modify_link_product_modal_id} 
+                        h_load_product={this.onModifyLinkProduct.bind(this)}
+                        title={"링크로 상품 편집하기"}
+                    />
                     <br/>
                     <div className="row">
                         <div className="col">
@@ -390,6 +566,17 @@ class ContentsTasks extends React.Component {
                                     <th scope="col" style={{width : this.scheduled_time_col_width, maxWidth : this.scheduled_time_col_width}}>예약시간</th>
                                     <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
                                     <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
+                                    <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}>
+                                    <div className="form-switch">
+                                        <input 
+                                            id={this.el_input_select_all} 
+                                            type="checkbox" 
+                                            className="form-check-input" 
+                                            onChange={this.onChangeSelectAll.bind(this)}
+                                            disabled={this.state.task_table_item_list.length === 0}    
+                                        />
+                                    </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -398,31 +585,42 @@ class ContentsTasks extends React.Component {
                         </table>
                     </div>
                     <div className="row footer">
-                        <div className="col-md-5 bd-highlight d-flex flex-row-reverse align-items-center">
+                        <div className="col-md-8 bd-highlight d-flex align-items-center">
                             <LaodingButton
                                 ref={this.__ref_product_list_reload_btn}
                                 h_on_click={this.onClickBtnProductListReload.bind(this)}
-                                btn_label={"상품리스트 갱신"}
+                                btn_label={"상품갱신"}
                                 btn_class={"btn-primary btn-footer-inside"}
                                 img_src={"./res/img/cloud-arrow-down-fill.svg"}
                             />
-                        </div>
-                        <div className="col-md-3 bd-highlight d-flex align-items-center">
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
-                                <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
-                            </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
-                                <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
-                            </button>
+                            <div style={{marginLeft: 24}}>
+                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickSelectedTaskRemove.bind(this)}>
+                                    <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 선택삭제
+                                </button>
+                                <button type="button" className="btn btn-info btn-footer-inside" onClick={this.onClickSelectedTaskModifyLink.bind(this)}>
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} /> 선택링크편집
+                                </button>
+                                <button type="button" className="btn btn-primary btn-footer-inside" onClick={this.onClickSelectedTaskModify.bind(this)}>
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} /> 선택작업편집
+                                </button>
+                            </div>
+                            <div style={{marginLeft: 30}}>
+                                <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnStopAll.bind(this)}>
+                                    <img src="./res/img/pause-circle-fill.svg" style={{width:24, height:24}}/> 모두정지
+                                </button>
+                                <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickBtnRunAll.bind(this)}>
+                                    <img src="./res/img/play-circle-fill.svg" style={{width:24, height:24}} /> 모두시작
+                                </button>
+                            </div>
                         </div>
                         <div className="col-md-4 bd-highlight d-flex align-items-center">
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickBtnRemoveAll.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
-                            <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
+                            <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.load_link_product_modal_id}>
                                 <img src="./res/img/link.svg" style={{width:24, height:24}}/> 링크로 생성
                             </button>
-                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.onClickBtnNewTask()}}>
+                            <button type="button" className="btn btn-primary btn-footer-inside" onClick={()=>{this.popTaskEditModal()}}>
                                 <img src="./res/img/file-earmark-plus-fill.svg" style={{width:24, height:24}} /> 생성하기
                             </button>
                         </div>

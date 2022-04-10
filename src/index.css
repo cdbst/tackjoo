@@ -92,6 +92,14 @@ input::-webkit-inner-spin-button {
     background-color: rgba(83, 235, 134, 0.6) !important;
 }
 
+.btn-info:hover {
+    background-color: rgba(37, 207, 242, 0.6) !important;
+}
+
+.btn-warning:hover {
+    background-color: rgba(255, 193, 7, 0.6) !important;
+}
+
 .btn-footer-inside{
     width : 160px !important;
     height : 40px !important;

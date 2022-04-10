@@ -530,7 +530,7 @@ function parse_draw_size_info_list_from_product_page($){
     try{
 
         let el_option_list_draw_product = $('*[data-theDrawProductXref]');
-        if(el_option_list_draw_product.length == 0) return undefined;
+        if(el_option_list_draw_product.length == 0) return [];
 
         el_option_list_draw_product.each((idx, el_option) =>{
 

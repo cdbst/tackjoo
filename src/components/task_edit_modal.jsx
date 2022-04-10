@@ -12,6 +12,7 @@ class TaskEditModal extends React.Component {
         this.onSubmitTaskInfo = this.onSubmitTaskInfo.bind(this);
         this.onModalClosed = this.onModalClosed.bind(this);
         this.onModalshown = this.onModalshown.bind(this);
+        this.hideModal = this.hideModal.bind(this);
 
         this.onChangeType = this.onChangeType.bind(this);
         this.onChangeProduct = this.onChangeProduct.bind(this);
@@ -49,6 +50,7 @@ class TaskEditModal extends React.Component {
         this.ref_product_img = React.createRef();
 
         this.schedule_time_input_instance = undefined;
+        this.modify_mode = false;
     }
 
     componentDidMount(){
@@ -72,38 +74,32 @@ class TaskEditModal extends React.Component {
     }
 
     onModalshown(e){
+        
+        this.product_info_list = Index.g_product_mngr.getProductInfoList();
+        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
-        window.electron.getAccountInfo( (err, __account_info_list) => {
+        const el_modal = document.getElementById(this.props.id);
+        this.modify_mode = el_modal.task_id_list_to_modify !== undefined;
 
-            this.product_info_list = Index.g_product_mngr.getProductInfoList();
-            let account_info_list = undefined;
+        this.ref_options_account.current.setDisable(this.modify_mode);
+        if(this.modify_mode) this.ref_options_account.current.unsetSelect();
+        
+        this.ref_options_proxy.current.setDisable(this.modify_mode);
+        if(this.modify_mode) this.ref_options_proxy.current.unsetSelect();
 
-            if(err){
-                account_info_list = [];
-            }else{
-                account_info_list = __account_info_list.accounts;
-            }
+        if(el_modal.product_link_url === undefined){
 
-            window.electron.loadProxyInfo((err, proxy_info_list) =>{
-
-                if(err) proxy_info_list = [];
-
-                let el_modal = document.getElementById(this.props.id);
-
-                if(el_modal.product_link_url === undefined){
-
-                    this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
-                        this.onChangeType(
-                            this.ref_options_type.current.getSelectedOptionValue(),
-                            this.ref_options_product.current.getSelectedOptionKey()
-                        );
-                    });
-
-                }else{                    
-                    this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
-                }
+            this.setState({filtered_product_info_list : this.product_info_list, account_info_list : account_info_list, proxy_info_list : proxy_info_list}, () => {
+                this.onChangeType(
+                    this.ref_options_type.current.getSelectedOptionValue(),
+                    this.ref_options_product.current.getSelectedOptionKey()
+                );
             });
-        });
+
+        }else{                    
+            this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
+        }
     }
 
     setCustomURLProduct(product_link_url, account_info_list, proxy_info_list){
@@ -148,7 +144,17 @@ class TaskEditModal extends React.Component {
         this.ref_product_img.current.style.setProperty('display', on ? 'none' : '', 'important');
     }
 
+    hideModal(){
+        const el_modal = document.getElementById(this.props.id);
+        const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.hide();
+    }
+
     onModalClosed(e){
+        const el_modal = document.getElementById(this.props.id);
+        el_modal.product_link_url = undefined;
+        el_modal.task_id_list_to_modify = undefined;
+        this.modify_mode = undefined;
     }
 
     getKreamProductInfo(){
@@ -263,19 +269,25 @@ class TaskEditModal extends React.Component {
 
         const watchdog = this.ref_options_size.current.getToggleValue();
         if(watchdog){
-            Index.g_sys_msg_q.enqueue('경고', "품절된 사이즈를 등록했습니다. 구매 가능한 사이즈가 확인되면 지정한 사이즈와 가장 유사한 사이즈를 자동 구매합니다.", ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
+            Index.g_sys_msg_q.enqueue('경고', "품절된 사이즈를 지정했습니다. 구매 가능한 사이즈가 확인되면 지정한 사이즈와 가장 유사한 사이즈를 자동으로 구매합니다.", ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
         }
 
-        let selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
-        if(selected_account_email_list.length == 0){
-            Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
+        let selected_account_email_list = undefined;
 
-        if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
-            selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
-        }
+        if(this.modify_mode === false){
 
+            selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
+            if(selected_account_email_list.length == 0){
+                Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+    
+            if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
+                selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+            }
+        }
+        
+        
         let selected_schedule = undefined;
         
         if(this.state.use_reservation){
@@ -287,20 +299,25 @@ class TaskEditModal extends React.Component {
             selected_schedule = selected_schedule[0];
         }
 
-        const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
         let selected_proxy_info_list = [];
 
-        if(selected_proxy_id === '분할할당'){
-            selected_proxy_info_list = this.state.proxy_info_list; // 분할 할당을 선택하면 모든 프록시를 지정한다.( 모든 프록시를 각각의 계정에 분할해서 할당하기 위함이다.)
-        }else if(selected_proxy_id != ''){
-            selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id );
+        if(this.modify_mode === false){
+            const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
+            if(selected_proxy_id === '분할할당'){
+                selected_proxy_info_list = this.state.proxy_info_list; // 분할 할당을 선택하면 모든 프록시를 지정한다.( 모든 프록시를 각각의 계정에 분할해서 할당하기 위함이다.)
+            }else if(selected_proxy_id != ''){
+                selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id);
+            }
         }
         
-        this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
-        
-        let el_modal = document.getElementById(this.props.id);
-        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        bs_obj_modal.hide();
+        if(this.modify_mode){
+            const el_modal = document.getElementById(this.props.id);
+            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_schedule, watchdog, el_modal.task_id_list_to_modify);
+        }else{
+            this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
+        }
+
+        this.hideModal();
     }
 
     onClickProductImg(){
@@ -401,7 +418,6 @@ class TaskEditModal extends React.Component {
 
             kream_price_str = this.state.kream_product_info.price;
         }
-
         
         return (
             <div className="modal" id={this.props.id} tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
@@ -522,7 +538,7 @@ class TaskEditModal extends React.Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
-                            <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>생성</button>
+                            <button type="button" ref={this.ref_ok_btn} className="btn btn-primary btn-inner-modal" onClick={this.onSubmitTaskInfo.bind(this)}>확인</button>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,8 @@ class TaskTableItem extends React.Component {
 
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
+        this.onClickModifyBtn = this.onClickModifyBtn.bind(this);
+        this.onClickModifyLinkBtn = this.onClickModifyLinkBtn.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
@@ -19,9 +21,15 @@ class TaskTableItem extends React.Component {
         this.getStatusFontColor = this.getStatusFontColor.bind(this);
         this.getProductDescNameFontColor = this.getProductDescNameFontColor.bind(this);
 
+        this.isPossibleToModify = this.isPossibleToModify.bind(this);
         this.isPossibleToPlay = this.isPossibleToPlay.bind(this);
         this.isPossibleToPause = this.isPossibleToPause.bind(this);
         this.isIdleState = this.isIdleState.bind(this);
+
+        this.onChangeSelect = this.onChangeSelect.bind(this);
+        this.setSelectStatus = this.setSelectStatus.bind(this);
+
+        this.getTaskInfo = this.getTaskInfo.bind(this);
 
         this.ref_status_btn = React.createRef();
 
@@ -35,8 +43,11 @@ class TaskTableItem extends React.Component {
         }
 
         this.state = {
-            status : initial_status
+            status : initial_status,
+            selected : false
         };
+
+        this.el_input_select = 'el-input-select-' + this.props.task_info._id;
 
         this.__mount = false;
     }
@@ -130,6 +141,22 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    onClickModifyBtn(){
+        if(this.isPossibleToModify() === false){
+            Index.g_sys_msg_q.enqueue('에러', '진행 중인 작업은 편집할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
+        this.props.h_modify();
+    }
+
+    onClickModifyLinkBtn(){
+        if(this.isPossibleToModify() === false){
+            Index.g_sys_msg_q.enqueue('에러', '진행 중인 작업은 편집할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+            return;
+        }
+        this.props.h_modify_link();
+    }
+
     onClickRemoveBtn(){
 
         if(this.isPossibleToPause()){
@@ -191,6 +218,20 @@ class TaskTableItem extends React.Component {
         }
     }
 
+    isPossibleToModify(){
+        if(this.state.status == common.TASK_STATUS.READY){
+            return true;
+        }else if(this.isPossibleToPlay()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    getTaskInfo(){
+        return this.props.task_info;
+    }
+
     isPossibleToPlay(){
         switch(this.state.status){
             case common.TASK_STATUS.READY : 
@@ -245,6 +286,18 @@ class TaskTableItem extends React.Component {
         return idle_status_list.includes(this.state.status);
     }
 
+    onChangeSelect(){
+        const is_selected = document.getElementById(this.el_input_select).checked;
+        this.setState({ selected: is_selected});
+        this.props.h_select_changed(this.props.task_info._id, is_selected);
+    }
+
+    setSelectStatus(value){
+        document.getElementById(this.el_input_select).checked = value;
+        this.setState({ selected: value});
+        this.props.h_select_changed(this.props.task_info._id, value);
+    }
+
     render(){
         
         const product_info = this.props.task_info.product_info;
@@ -264,8 +317,12 @@ class TaskTableItem extends React.Component {
 
         const status_text = this.state.status === common.TASK_STATUS.DONE ? `${this.state.status}(${this.checked_out_size_info.name})` : this.state.status;
 
+        const background_color = this.state.selected ? 'rgb(131, 241, 149, 0.36)' : 'transparent';
+
+        const status_btn_title = status_btn === TaskTableItem.PLAY_BTN_SRC ? '시작하기' : '정지하기';
+
         return(
-            <tr>
+            <tr style={{background : background_color}}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 
@@ -302,21 +359,26 @@ class TaskTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title={status_btn_title}>
                             <button ref={this.ref_status_btn} type="button" className="btn btn-warning" onClick={this.onClickStatusBtn.bind(this, status_btn == TaskTableItem.PLAY_BTN_SRC)}>
                                 <img src={status_btn} style={{width:24, height:24}} />
                             </button>
                         </div>
-                        {/* <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-danger" >
+                        <div className="float-start button-wrapper-inner-table" title="[좌클릭 : 편집하기], [우클릭: 링크로 편집하기]">
+                            <button type="button" className="btn btn-info" onClick={this.onClickModifyBtn.bind(this)} onContextMenu={this.onClickModifyLinkBtn.bind(this)}>
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
                             </button>
-                        </div> */}
-                        <div className="float-start button-wrapper-inner-table">
+                        </div>
+                        <div className="float-start button-wrapper-inner-table" title="제거하기">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemoveBtn.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
+                    </div>
+                </td>
+                <td style={{width : this.props.select_col_width, maxWidth : this.props.select_col_width}} >
+                    <div className="form-switch">
+                        <input id={this.el_input_select} type="checkbox" className="form-check-input" onChange={this.onChangeSelect.bind(this)}/>
                     </div>
                 </td>
             </tr>
