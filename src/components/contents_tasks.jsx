@@ -39,6 +39,9 @@ class ContentsTasks extends React.Component {
         this.onClickSelectedTaskModify = this.onClickSelectedTaskModify.bind(this);
         this.onClickSelectedTaskModifyLink = this.onClickSelectedTaskModifyLink.bind(this);
 
+        this.onChangeTask = this.onChangeTask.bind(this);
+        this.onChangeTaskLink = this.onChangeTaskLink.bind(this);
+
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
         this.modify_link_product_modal_id = 'modify-link-product-modal';
@@ -239,7 +242,6 @@ class ContentsTasks extends React.Component {
             this.__selected_task_id_list = this.__selected_task_id_list.filter((_task_id) => _task_id !== task_id);
         });
 
-        
         this.__updateTaskTableItem(new_task_table_items);
     }
 
@@ -247,8 +249,8 @@ class ContentsTasks extends React.Component {
         this.popTaskEditModal(product_link_url);
     }
 
-    onModifyLinkProduct(product_link_url){
-        this.popTaskEditModal(product_link_url, this.__selected_task_id_list);
+    onModifyLinkProduct(product_link_url, task_id){
+        this.popTaskEditModal(product_link_url, task_id === undefined ? this.__selected_task_id_list : [task_id]);
     }
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
@@ -351,6 +353,17 @@ class ContentsTasks extends React.Component {
         }
     }
 
+    onChangeTask(task_id){
+        this.popTaskEditModal(undefined, [task_id]);
+    }
+
+    onChangeTaskLink(task_id){
+        let el_modal = document.getElementById(this.modify_link_product_modal_id);
+        el_modal.task_id = task_id;
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
     __getTaskTableElement(task_info, task_ref){
         return (
             <TaskTableItem
@@ -358,6 +371,8 @@ class ContentsTasks extends React.Component {
                 id={task_info._id}
                 h_remove={this.onRemoveTask.bind(this)}
                 h_select_changed={this.onTaskSelectChanged.bind(this)}
+                h_modify={this.onChangeTask.bind(this, task_info._id)}
+                h_modify_link={this.onChangeTaskLink.bind(this, task_info._id)}
                 task_info={task_info}
                 ref={task_ref}
                 image_col_width={this.image_col_width}

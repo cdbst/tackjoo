@@ -12,7 +12,7 @@ class LoadLinkProductModal extends React.Component {
     }
 
     componentDidMount(){
-        let el_modal = document.getElementById(this.props.id);
+        const el_modal = document.getElementById(this.props.id);
         el_modal.removeEventListener('hidden.bs.modal', this.onModalClosed);
         el_modal.addEventListener('hidden.bs.modal', this.onModalClosed);
 
@@ -21,13 +21,15 @@ class LoadLinkProductModal extends React.Component {
     }
 
     onModalshown(e){
-        let el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
+        const el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
         el_product_link_input.focus();
     }
 
-    onModalClosed(e){        
-        let el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
-
+    onModalClosed(e){       
+        const el_modal = document.getElementById(this.props.id);
+        el_modal.task_id = undefined;
+        
+        const el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
         el_product_link_input.value = '';
     }
 
@@ -35,8 +37,8 @@ class LoadLinkProductModal extends React.Component {
 
         e.preventDefault();
         
-        let el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
-        let value = el_product_link_input.value;
+        const el_product_link_input = document.getElementById(this.EL_ID_MODAL_INPUT_PRODUCT_LINK);
+        const value = el_product_link_input.value;
 
         if(value === ''){
             Index.g_sys_msg_q.enqueue('에러', '제품 URL을 입력하지 않았습니다', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -46,11 +48,10 @@ class LoadLinkProductModal extends React.Component {
             return;
         }
 
-        this.props.h_load_product(value);
+        const el_modal = document.getElementById(this.props.id);
+        const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
 
-        let el_modal = document.getElementById(this.props.id);
-        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        
+        this.props.h_load_product(value, el_modal.task_id);
         bs_obj_modal.hide();
     }
 

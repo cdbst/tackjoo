@@ -142,11 +142,11 @@ class TaskTableItem extends React.Component {
     }
 
     onClickModifyBtn(){
-        console.log('onClickModifyBtn');
+        this.props.h_modify();
     }
 
     onClickModifyLinkBtn(){
-        console.log('onClickModifyLinkBtn');
+        this.props.h_modify_link();
     }
 
     onClickRemoveBtn(){
