@@ -515,7 +515,7 @@ class ContentsTasks extends React.Component {
         const opt_quick_task_config = Index.g_settings_info.getSetting('new_product_quick_task_judge_size');
 
         const friendly_size_name = opt_quick_task_config === 0 ? common.SPECIAL_SIZE_OPTS.MIDDLE : common.SPECIAL_SIZE_OPTS.RANDOM;
-        const schedule_time = Index.g_server_clock.getServerTime();
+        const schedule_time = new Date(Index.g_server_clock.getServerTime());
 
         let proxy_info = undefined;
         if(Index.g_settings_info.settings_info.new_product_create_task_use_proxy === 1){
