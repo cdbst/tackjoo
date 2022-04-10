@@ -80,13 +80,9 @@ class TaskEditModal extends React.Component {
         const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
         const el_modal = document.getElementById(this.props.id);
-
-        console.log(el_modal.product_link_url);
-        console.log(el_modal.task_id_list_to_modify);
-
         this.modify_mode = el_modal.task_id_list_to_modify !== undefined;
 
-        //this.ref_options_account.current.setDisable(el_modal.task_id_list_to_modify !== undefined);
+        this.ref_options_account.current.setDisable(this.modify_mode);
 
         if(el_modal.product_link_url === undefined){
 
@@ -154,6 +150,7 @@ class TaskEditModal extends React.Component {
         const el_modal = document.getElementById(this.props.id);
         el_modal.product_link_url = undefined;
         el_modal.task_id_list_to_modify = undefined;
+        this.modify_mode = undefined;
     }
 
     getKreamProductInfo(){
@@ -268,20 +265,25 @@ class TaskEditModal extends React.Component {
 
         const watchdog = this.ref_options_size.current.getToggleValue();
         if(watchdog){
-            Index.g_sys_msg_q.enqueue('경고', "품절된 사이즈를 등록했습니다. 구매 가능한 사이즈가 확인되면 지정한 사이즈와 가장 유사한 사이즈를 자동 구매합니다.", ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
+            Index.g_sys_msg_q.enqueue('경고', "품절된 사이즈를 지정했습니다. 구매 가능한 사이즈가 확인되면 지정한 사이즈와 가장 유사한 사이즈를 자동으로 구매합니다.", ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
         }
 
-        let selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
-        if(selected_account_email_list.length == 0){
-            Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
+        let selected_account_email_list = undefined;
 
-        if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
-            selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+        if(this.modify_mode === false){
+
+            selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
+            if(selected_account_email_list.length == 0){
+                Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+    
+            if(selected_account_email_list.includes(TaskEditModal.ACCOUNT_OPTION_NAME_ALL)){
+                selected_account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+            }
         }
         
-
+        
         let selected_schedule = undefined;
         
         if(this.state.use_reservation){
@@ -303,7 +305,8 @@ class TaskEditModal extends React.Component {
         }
         
         if(this.modify_mode){
-            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog, );
+            const el_modal = document.getElementById(this.props.id);
+            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_schedule, selected_proxy_info_list, watchdog, el_modal.task_id_list_to_modify);
         }else{
             this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
         }

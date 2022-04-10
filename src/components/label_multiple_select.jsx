@@ -45,6 +45,7 @@ class LabelMultipleSelect extends React.Component {
 
     setDisable(option){
         this.__ref_select.current.disabled = option;
+        this.__ref_select.current.selectedIndex = option ? -1 : 0;
     }
 
     setDisplay(option){

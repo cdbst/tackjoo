@@ -194,7 +194,7 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    onModifyTask(product_info, friendly_size_name_list, account_email_list, schedule_time, proxy_info_list, watchdog, task_id_list){
+    onModifyTask(product_info, friendly_size_name_list, schedule_time, proxy_info_list, watchdog, task_id_list){
         console.log(arguments);
     }
 
