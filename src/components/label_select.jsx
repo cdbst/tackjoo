@@ -5,6 +5,7 @@ class LabelSelect extends React.Component {
         this.onChangeOption = this.onChangeOption.bind(this);
         this.getOptionItems = this.getOptionItems.bind(this);
         this.setDisable = this.setDisable.bind(this);
+        this.unsetSelect = this.unsetSelect.bind(this);
         this.setValue = this.setValue.bind(this);
 
         this.getSelectedOptionValue = this.getSelectedOptionValue.bind(this);
@@ -61,6 +62,10 @@ class LabelSelect extends React.Component {
 
     setDisable(option){
         this.ref_options.current.disabled = option;
+    }
+
+    unsetSelect(){
+        this.ref_options.current.selectedIndex = -1;
     }
 
     render(){

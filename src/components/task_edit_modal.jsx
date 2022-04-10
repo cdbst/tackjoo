@@ -83,6 +83,10 @@ class TaskEditModal extends React.Component {
         this.modify_mode = el_modal.task_id_list_to_modify !== undefined;
 
         this.ref_options_account.current.setDisable(this.modify_mode);
+        if(this.modify_mode) this.ref_options_account.current.unsetSelect();
+        
+        this.ref_options_proxy.current.setDisable(this.modify_mode);
+        if(this.modify_mode) this.ref_options_proxy.current.unsetSelect();
 
         if(el_modal.product_link_url === undefined){
 
@@ -295,18 +299,20 @@ class TaskEditModal extends React.Component {
             selected_schedule = selected_schedule[0];
         }
 
-        const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
         let selected_proxy_info_list = [];
 
-        if(selected_proxy_id === '분할할당'){
-            selected_proxy_info_list = this.state.proxy_info_list; // 분할 할당을 선택하면 모든 프록시를 지정한다.( 모든 프록시를 각각의 계정에 분할해서 할당하기 위함이다.)
-        }else if(selected_proxy_id != ''){
-            selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id );
+        if(this.modify_mode === false){
+            const selected_proxy_id = this.ref_options_proxy.current.getSelectedOptionKey();
+            if(selected_proxy_id === '분할할당'){
+                selected_proxy_info_list = this.state.proxy_info_list; // 분할 할당을 선택하면 모든 프록시를 지정한다.( 모든 프록시를 각각의 계정에 분할해서 할당하기 위함이다.)
+            }else if(selected_proxy_id != ''){
+                selected_proxy_info_list = this.state.proxy_info_list.filter((proxy_info) => proxy_info._id == selected_proxy_id);
+            }
         }
         
         if(this.modify_mode){
             const el_modal = document.getElementById(this.props.id);
-            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_schedule, selected_proxy_info_list, watchdog, el_modal.task_id_list_to_modify);
+            this.props.h_modify_task(this.state.selected_product, selected_size_list, selected_schedule, watchdog, el_modal.task_id_list_to_modify);
         }else{
             this.props.h_create_task(this.state.selected_product, selected_size_list, selected_account_email_list, selected_schedule, selected_proxy_info_list, watchdog);
         }

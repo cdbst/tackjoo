@@ -198,7 +198,7 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    onModifyTask(product_info, friendly_size_name_list, schedule_time, proxy_info_list, watchdog, task_id_list){
+    onModifyTask(product_info, friendly_size_name_list, schedule_time, watchdog, task_id_list){
 
         const new_task_table_items = _.clone(this.state.task_table_item_list);
 
@@ -217,18 +217,15 @@ class ContentsTasks extends React.Component {
             const new_task_id = common.uuidv4();
             this.__table_item_ref_dict[new_task_id] = table_item_ref;
             
-            
             const new_task_info = _.clone(origin_task_info);
 
             const friendly_size_name = common.sample(friendly_size_name_list);
             const size_name = ProductManager.get_size_name_by_friendly_size_name(product_info, friendly_size_name);
-            let proxy_info = proxy_info_list.length === 0 ? undefined : proxy_info_list[idx % proxy_info_list.length];
 
             common.update_task_info_obj(new_task_info, 'product_info', product_info);
             common.update_task_info_obj(new_task_info, 'size_name', size_name);
             common.update_task_info_obj(new_task_info, 'friendly_size_name', friendly_size_name);
             common.update_task_info_obj(new_task_info, 'schedule_time', schedule_time);
-            common.update_task_info_obj(new_task_info, 'proxy_info', proxy_info);
             common.update_task_info_obj(new_task_info, 'watchdog', watchdog);
             common.update_task_info_obj(new_task_info, '_id', new_task_id);
 
