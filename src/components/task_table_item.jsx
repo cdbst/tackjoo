@@ -10,6 +10,7 @@ class TaskTableItem extends React.Component {
         this.onClickRemoveBtn = this.onClickRemoveBtn.bind(this);
         this.onClickStatusBtn = this.onClickStatusBtn.bind(this);
         this.onClickModifyBtn = this.onClickModifyBtn.bind(this);
+        this.onClickModifyLinkBtn = this.onClickModifyLinkBtn.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onAlamScheduledTime = this.onAlamScheduledTime.bind(this);
 
@@ -142,6 +143,10 @@ class TaskTableItem extends React.Component {
 
     onClickModifyBtn(){
         console.log('onClickModifyBtn');
+    }
+
+    onClickModifyLinkBtn(){
+        console.log('onClickModifyLinkBtn');
     }
 
     onClickRemoveBtn(){
@@ -306,6 +311,8 @@ class TaskTableItem extends React.Component {
 
         const background_color = this.state.selected ? 'rgb(131, 241, 149, 0.36)' : 'transparent';
 
+        const status_btn_title = status_btn === TaskTableItem.PLAY_BTN_SRC ? '시작하기' : '정지하기';
+
         return(
             <tr style={{background : background_color}}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
@@ -344,17 +351,17 @@ class TaskTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.action_col_width, maxWidth : this.props.action_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title={status_btn_title}>
                             <button ref={this.ref_status_btn} type="button" className="btn btn-warning" onClick={this.onClickStatusBtn.bind(this, status_btn == TaskTableItem.PLAY_BTN_SRC)}>
                                 <img src={status_btn} style={{width:24, height:24}} />
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-info" onClick={this.onClickModifyBtn.bind(this)}>
+                        <div className="float-start button-wrapper-inner-table" title="[좌클릭 : 편집하기], [우클릭: 링크로 편집하기]">
+                            <button type="button" className="btn btn-info" onClick={this.onClickModifyBtn.bind(this)} onContextMenu={this.onClickModifyLinkBtn.bind(this)}>
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="제거하기">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemoveBtn.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
