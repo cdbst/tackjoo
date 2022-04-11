@@ -63,6 +63,7 @@ class BrowserContext {
         this.open_cancel_order_page = this.open_cancel_order_page.bind(this);
         this.partial_cancel_calculator = this.partial_cancel_calculator.bind(this);
         this.cancel_order = this.cancel_order.bind(this);
+        this.cleanup_cart = this.cleanup_cart.bind(this);
         this.is_session_expired = this.is_session_expired.bind(this);
         
         this.clear_cookies = this.clear_cookies.bind(this);
@@ -1428,6 +1429,48 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'cancel_order', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
+    }
+
+    async cleanup_cart(retry_cnt = undefined){
+
+        const headers = {
+            'authority': BrowserContext.NIKE_DOMAIN_NAME,
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/cart',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': 'Windows',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        }
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/cart/removeAll', headers);
+
+                if(res.status != 200){
+                    throw new Error('cleanup_cart : response ' + res.status);
+                }
+    
+                return true;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'cleanup_cart', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

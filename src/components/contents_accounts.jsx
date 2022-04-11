@@ -320,7 +320,7 @@ class ContentsAccounts extends React.Component {
                 return;
             }
 
-            if(modal) Index.g_sys_msg_q.enqueue('안내', account_obj.email + '카트 비우기에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(modal) Index.g_sys_msg_q.enqueue('안내', account_obj.email + ' 카트 비우기에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 

@@ -183,7 +183,12 @@ function register(){
                     }
                 }
 
-                //cleanup cart
+                const result = await browser_context.cleanup_cart(3);
+                if(result === false){
+                    throw new Error('fail with cleanup cart');
+                }
+
+                event.reply('cleanup-cart-reply' + data.id, undefined);
 
             }catch(err){
                 log.error(common.get_log_str('ipc_main_account.js', 'cleanup-cart-callback', err));
@@ -198,12 +203,12 @@ function register(){
 
 async function login(browser_context){
 
-    let result = await browser_context.open_main_page();
+    let result = await browser_context.open_main_page(3);
     if(result === false){
         return 'fail with open main page';
     }
 
-    result = await browser_context.login(5);
+    result = await browser_context.login(3);
     if(result === false){
         return 'fail with login';
     }
