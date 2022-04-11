@@ -47,7 +47,8 @@ contextBridge.exposeInMainWorld('electron', {
     saveNewProductWhiteListInfo : _saveNewProductWhiteListInfo,
     loadNewProductWhiteListInfo : _loadNewProductWhiteListInfo,
     saveNewProductBlackListInfo : _saveNewProductBlackListInfo,
-    loadNewProductBlackListInfo : _loadNewProductBlackListInfo
+    loadNewProductBlackListInfo : _loadNewProductBlackListInfo,
+    cleanupCart : _cleanupCart
 });
 
 /**
@@ -554,5 +555,21 @@ function _loadNewProductBlackListInfo(__callback){
 
     ipcRenderer.once('load-new-released-product-blacklist-info-reply' + ipc_data.id, (_event, blacklist_info) => {
         __callback(blacklist_info.err, blacklist_info.data);
+    });
+}
+
+function _cleanupCart(_id, __callback){
+
+    if(_id == '' || _id == undefined){
+        __callback('login fail : account unique id information is invalid');
+        return;
+    }
+
+    let ipc_data = get_ipc_data({id : _id});
+
+    ipcRenderer.send('cleanup-cart', ipc_data);
+
+    ipcRenderer.once('cleanup-cart-reply' + ipc_data.id, (event, err) => {
+        __callback(err);
     });
 }
