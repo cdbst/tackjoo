@@ -110,8 +110,8 @@ class TaskTableItem extends React.Component {
                 if(__callback) __callback();
             }else{
                 
-                this.setTaskStatus(common.TASK_STATUS.PAUSE, ()=>{
-                    this.ref_status_btn.current.disabled = false;
+                this.setTaskStatus(common.TASK_STATUS.PAUSE_PENDING, ()=>{
+                    //this.ref_status_btn.current.disabled = false;
                     if(__callback) __callback();
                 });
             }
@@ -244,6 +244,8 @@ class TaskTableItem extends React.Component {
                 }
             case common.TASK_STATUS.PAUSE : 
                 return true;
+            case common.TASK_STATUS.PAUSE_PENDING : 
+                return false;
             case common.TASK_STATUS.PLAY : 
                 return false;
             case common.TASK_STATUS.FAIL : 

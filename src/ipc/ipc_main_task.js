@@ -55,14 +55,14 @@ function register(){
         
         let task_info = data.payload.task_info;
         let task_runner = TaskRunnerManager.get(task_info._id);
-        if(task_runner != undefined){
+        if(task_runner !== undefined){
             task_runner.stop();
         }else{
             TaskRunnerManager.set_stop_pending(task_info._id);
         }
 
         //랜더러 단에 즉시 stop 이벤트를 발생시키지 않도록 처리 : stop pending 상태로 갔다가 정상 stop 되는 동작으로 유도하기 위해서.
-        //event.reply('pause-task-reply' + task_info._id, {err : undefined});
+        event.reply('pause-task-reply' + task_info._id, {err : undefined});
     });
 }
 

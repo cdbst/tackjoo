@@ -247,10 +247,10 @@ function _pauseTask(_task_info, __callback){
 
     ipcRenderer.once('pause-task-reply' + _task_info._id, (_event, data) => {
 
-        if(_task_info._id in task_ipc_handler_map){
-            ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
-            delete task_ipc_handler_map[_task_info._id];
-        }
+        // if(_task_info._id in task_ipc_handler_map){
+        //     ipcRenderer.removeListener('play-task-reply' + _task_info._id, task_ipc_handler_map[_task_info._id]);
+        //     delete task_ipc_handler_map[_task_info._id];
+        // }
 
         __callback(data.err);
     });

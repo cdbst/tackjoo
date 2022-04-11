@@ -353,6 +353,7 @@
     exports.TASK_STATUS = {
         READY : '준비중', //아직 open time이 전이라 play 할 수 없는 상태임.
         PAUSE : '중지됨',
+        PAUSE_PENDING : '작업 정지 대기 중',
         PLAY : '시작됨',
         WAITING_FOR_OTHER_TASK : '다른 작업 기다리는 중',
         FAIL : '실패',
