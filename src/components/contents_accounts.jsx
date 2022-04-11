@@ -15,6 +15,7 @@ class ContentsAccounts extends React.Component {
         this.getTableItems = this.getTableItems.bind(this);
         this.genAccountObj = this.genAccountObj.bind(this);
         this.loginAccount = this.loginAccount.bind(this);
+        this.cleanupCart = this.cleanupCart.bind(this);
         this.getAccountInfoList = this.getAccountInfoList.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
@@ -22,6 +23,8 @@ class ContentsAccounts extends React.Component {
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
         this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
+        this.onClickCleanupCartAll = this.onClickCleanupCartAll.bind(this);
+        
 
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
@@ -252,18 +255,17 @@ class ContentsAccounts extends React.Component {
         });
     }
 
+    onClickCleanupCartAll(){
+        this.state.account_info.forEach((account)=>{
+            this.cleanupCart(account.id, false);
+        });
+    }
+
     loginAccount(_id, modal = true){
         
-        let account_to_login = undefined;
+        const account_to_login = this.state.account_info.find((account) => account.id === _id);
 
-        for(var i = 0; i < this.state.account_info.length; i++){
-            let account = this.state.account_info[i];
-            if(account.id != _id) continue;
-            account_to_login = account;
-            break;
-        }
-
-        if(account_to_login == undefined){
+        if(account_to_login === undefined){
             Index.g_sys_msg_q.enqueue('에러', '로그인할 계정정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
@@ -298,9 +300,31 @@ class ContentsAccounts extends React.Component {
         });
     }
 
+    cleanupCart(_id, modal = true){
+
+        const account_obj = this.state.account_info.find((account) => account.id === _id);
+
+        if(account_obj === undefined){
+            Index.g_sys_msg_q.enqueue('에러', '계정정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return;
+        }
+
+        this.table_item_ref_list[account_obj.id].current.setCleanupCartStatus(true);
+
+        window.electron.cleanupCart(_id, (err) =>{
+            
+            this.table_item_ref_list[account_obj.id].current.setCleanupCartStatus(false);
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '카트 비우기에 실패했습니다. (' + account_obj.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(modal) Index.g_sys_msg_q.enqueue('안내', account_obj.email + '카트 비우기에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
+    }
+
     getTableItems(account_info){
-        let remove_handler = this.removeAccount;
-        let login_handler = this.loginAccount;
 
         let account_table_list = [];
         this.table_item_ref_list = {};
@@ -313,8 +337,9 @@ class ContentsAccounts extends React.Component {
                     ref={this.table_item_ref_list[account.id]}
                     key={account.email} 
                     data={account} 
-                    h_remove={remove_handler} 
-                    h_login={login_handler}
+                    h_remove={this.removeAccount.bind(this)} 
+                    h_login={this.loginAccount.bind(this)}
+                    h_cleanup_cart={this.cleanupCart.bind(this)}
                     e_mail_col_width={this.email_col_width}
                     status_col_width={this.status_col_width}
                     actions_col_width={this.actions_col_width}
@@ -369,8 +394,11 @@ class ContentsAccounts extends React.Component {
                             <button type="button" className="btn btn-primary btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.account_bulk_edit_modal_el_id}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/> 여러개 추가
                             </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
+                            <button type="button" className="btn btn-info btn-footer-inside" onClick={this.onClickLoginAll.bind(this)}>
                                 <img src="./res/img/door-open-fill.svg" style={{width:24, height:24}}/> 전체로그인
+                            </button>
+                            <button type="button" className="btn btn-warning btn-footer-inside" onClick={this.onClickCleanupCartAll.bind(this)}>
+                                <img src="./res/img/cart-x-fill.svg" style={{width:24, height:24}}/> 전체카트비우기
                             </button>
                         </div>
                     </div>

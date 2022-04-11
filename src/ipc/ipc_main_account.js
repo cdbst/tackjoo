@@ -25,13 +25,13 @@ function register(){
     ipcMain.on('add-account', (event, data) => {
 
         const account_info = data.payload;
-        const borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
         const save_to_file = data.payload.save_to_file;
 
         (async() =>{
             try{
 
-                BrowserContextManager.add(borwser_context);
+                BrowserContextManager.add(browser_context);
 
                 if(save_to_file){
                     const file_data = BrowserContextManager.get_file_data();
@@ -54,8 +54,8 @@ function register(){
 
         for(var i = 0; i < account_info_list.length; i++){
             const account_info = account_info_list[i];
-            const borwser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
-            BrowserContextManager.add(borwser_context);
+            const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+            BrowserContextManager.add(browser_context);
         }
 
         (async() =>{
@@ -127,17 +127,17 @@ function register(){
     ipcMain.on('login', (event, data) => {
         
         let _id = data.payload.id;
-        let borwser_context = BrowserContextManager.get(_id);
+        let browser_context = BrowserContextManager.get(_id);
 
-        if(borwser_context == undefined){
+        if(browser_context == undefined){
             log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'cannot found browser context'));
             event.reply('login-reply' + data.id, 'cannot found browser context');
             return;
         }
 
-        if(borwser_context.login_date !== undefined){
-            borwser_context.clear_cookies();
-            borwser_context.clear_csrfToken();
+        if(browser_context.login_date !== undefined){
+            browser_context.clear_cookies();
+            browser_context.clear_csrfToken();
         }
 
         (async () =>{
@@ -145,20 +145,12 @@ function register(){
             try{
                 await IPRequestLock.accquire(undefined, undefined);
 
-                let result = await borwser_context.open_main_page();
-                if(result == false){
-                    log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'fail with openning main page'));
-                    event.reply('login-reply' + data.id, 'fail with openning main page');
-                    return;
+                const err = await login(browser_context);
+                if(err !== undefined){
+                    throw new Error(err);                    
                 }
-    
-                result = await borwser_context.login(5);
-                if(result){
-                    event.reply('login-reply' + data.id, undefined);
-                }else{
-                    log.error(common.get_log_str('ipc_main_account.js', 'login-callback', 'login fail'));
-                    event.reply('login-reply' + data.id, 'login fail');
-                }
+
+                event.reply('login-reply' + data.id, undefined);
 
             }catch(err){
                 log.error(common.get_log_str('ipc_main_account.js', 'login-callback', err));
@@ -166,9 +158,57 @@ function register(){
             }finally{
                 IPRequestLock.release(undefined, undefined);
             }
-
         })();
     });
+
+    ipcMain.on('cleanup-cart', (event, data) => {
+        
+        const browser_context = BrowserContextManager.get(data.payload.id);
+
+        if(browser_context === undefined){
+            log.error(common.get_log_str('ipc_main_account.js', 'cleanup-cart-callback', 'cannot found browser context'));
+            event.reply('cleanup-cart-reply' + data.id, 'cannot found browser context');
+            return;
+        }
+
+        (async () =>{
+            
+            try{
+                await IPRequestLock.accquire(undefined, undefined);
+
+                if(browser_context.is_session_expired(30)){
+                    const err = await login(browser_context);
+                    if(err !== undefined){
+                        throw new Error(err);                    
+                    }
+                }
+
+                //cleanup cart
+
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'cleanup-cart-callback', err));
+                event.reply('cleanup-cart-reply' + data.id, err.message);
+            }finally{
+                IPRequestLock.release(undefined, undefined);
+            }
+        })();
+
+    });
+}
+
+async function login(browser_context){
+
+    let result = await browser_context.open_main_page();
+    if(result === false){
+        return 'fail with open main page';
+    }
+
+    result = await browser_context.login(5);
+    if(result === false){
+        return 'fail with login';
+    }
+
+    return undefined;
 }
 
 module.exports.register = register;

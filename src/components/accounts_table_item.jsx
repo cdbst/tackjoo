@@ -10,10 +10,13 @@ class AccountsTableItem extends React.Component {
         super(props);
 
         this.onClickLogin = this.onClickLogin.bind(this);
+        this.onClickCleanupCart = this.onClickCleanupCart.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
         this.setLoginStatus = this.setLoginStatus.bind(this);
+        this.setCleanupCartStatus = this.setCleanupCartStatus.bind(this);
 
         this.ref_login_btn = React.createRef();
+        this.ref_cleanup_cart_btn = React.createRef();
         this.state = {
             login_btn_src : AccountsTableItem.LOGIN_BTN_SRC
         };
@@ -33,12 +36,20 @@ class AccountsTableItem extends React.Component {
         this.props.h_login(this.props.data.id);
     }
 
+    onClickCleanupCart(){
+        this.props.h_cleanup_cart(this.props.data.id);
+    }
+
     onClickRemove(){
         this.props.h_remove(this.props.data.id);
     }
 
     setLoginStatus(status){
         this.ref_login_btn.current.setLoadingStatus(status);
+    }
+
+    setCleanupCartStatus(status){
+        this.ref_cleanup_cart_btn.current.setLoadingStatus(status);
     }
 
     render(){
@@ -57,8 +68,16 @@ class AccountsTableItem extends React.Component {
                             <LaodingButton
                                 ref={this.ref_login_btn}
                                 h_on_click={this.onClickLogin.bind(this)}
-                                btn_class={"btn-warning"}
+                                btn_class={"btn-info"}
                                 img_src={"./res/img/door-open-fill.svg"}
+                            />
+                        </div>
+                        <div className="float-start button-wrapper-inner-table">
+                            <LaodingButton
+                                ref={this.ref_cleanup_cart_btn}
+                                h_on_click={this.onClickCleanupCart.bind(this)}
+                                btn_class={"btn-warning"}
+                                img_src={"./res/img/cart-x-fill.svg"}
                             />
                         </div>
                         <div className="float-start button-wrapper-inner-table">
