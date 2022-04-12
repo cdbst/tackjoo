@@ -7,8 +7,6 @@ class ContentsAccounts extends React.Component {
         this.addAccount = this.addAccount.bind(this);
         this.addBulkAccount = this.addBulkAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
-        this.updateLockStatus = this.updateLockStatus.bind(this);
-        this.genAccountInfoObj = this.genAccountInfoObj.bind(this);
         this.getAccountInfoList = this.getAccountInfoList.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
@@ -49,24 +47,15 @@ class ContentsAccounts extends React.Component {
                 Index.g_sys_msg_q.enqueue('경고', '계정정보가 아직 없거나 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
 
-                data.accounts.forEach((account_info) =>{
-                    this.addAccount(account_info.email, account_info.pwd, account_info.id, false);
+                data.accounts.forEach((account_info) =>{                    
+                    this.pushAccountTableItem(account_info, false);
                 });
             }
         });
     }
 
     getAccountInfoList(){
-        return this.state.account_table_list.map((table_item) => table_item.props.account_info );
-    }
-
-    genAccountInfoObj(_email, _pwd, _id = undefined){
-
-        return {
-            email : _email,
-            pwd : _pwd,
-            id : _id == undefined ? common.uuidv4() : _id
-        };
+        return this.state.account_table_list.map((table_item) => table_item.props.account_info);
     }
 
     addBulkAccount(_account_info_list){
@@ -113,7 +102,12 @@ class ContentsAccounts extends React.Component {
                 continue;
             }
 
-            const account_info_obj = this.genAccountInfoObj(email, pwd);
+            const account_info_obj = common.get_account_info_obj_scheme();
+            common.update_account_info_obj(account_info_obj, 'email', email);
+            common.update_account_info_obj(account_info_obj, 'pwd', pwd);
+            common.update_account_info_obj(account_info_obj, 'id', common.uuidv4());
+            common.update_account_info_obj(account_info_obj, 'locked', false);
+
             account_info_obj_list.push(account_info_obj);            
         }
         
@@ -139,29 +133,24 @@ class ContentsAccounts extends React.Component {
         });
     }
 
-    addAccount(_email, _pwd, _id, save_to_file = true){
+    addAccount(account_info){
 
-        if(_pwd == ''){
+        if(account_info.pwd == ''){
             Index.g_sys_msg_q.enqueue('에러', '유효한 비밀번호를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        if(common.is_valid_email(_email) == null){
+        if(common.is_valid_email(account_info.email) == null){
             Index.g_sys_msg_q.enqueue('에러', '유효한 이메일 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        if(this.checkDuplicatedItem(_email)){
-            Index.g_sys_msg_q.enqueue('에러', _email + ' 해당 계정이 이미 등록된 상태입니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+        if(this.checkDuplicatedItem(account_info.email)){
+            Index.g_sys_msg_q.enqueue('에러', account_info.email + ' 해당 계정이 이미 등록된 상태입니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
         
-        const account_info = this.genAccountInfoObj(_email, _pwd, _id);
-        this.pushAccountTableItem(account_info, save_to_file);
-    }
-
-    updateLockStatus(account_id){
-
+        this.pushAccountTableItem(account_info, true);
     }
 
     removeAccount(account_id){
@@ -221,7 +210,6 @@ class ContentsAccounts extends React.Component {
                 key={account_info.id} 
                 account_info={account_info}
                 h_remove={this.removeAccount.bind(this, account_info.id)}
-                h_set_lock_status={this.updateLockStatus.bind(this, account_info.id)}
                 e_mail_col_width={this.email_col_width}
                 status_col_width={this.status_col_width}
                 actions_col_width={this.actions_col_width}
@@ -258,7 +246,7 @@ class ContentsAccounts extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">{`계정관리 ${this.state.account_table_list.length})`}</h4>
+                            <h4 className="contents-title">{`계정관리 (${this.state.account_table_list.length})`}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}

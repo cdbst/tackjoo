@@ -152,6 +152,23 @@
     }
 
 
+    exports.get_account_info_obj_scheme = function (){
+        return {
+            email : undefined,
+            pwd : undefined,
+            locked : undefined,
+            id : undefined
+        };
+    }
+
+    exports.update_account_info_obj = function(account_info, key, value){
+        if(key in this.get_account_info_obj_scheme() === false){
+            throw 'order info object is not includes property : ' + key;
+        }
+
+        account_info[key] = value;
+        return account_info;
+    }
 
     exports.get_task_info_obj_scheme = function (){
         return {

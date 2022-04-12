@@ -24,8 +24,8 @@ function register(){
 
     ipcMain.on('add-account', (event, data) => {
 
-        const account_info = data.payload;
-        const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        const account_info = data.payload.account_info;
+        const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id, account_info.locked);
         const save_to_file = data.payload.save_to_file;
 
         (async() =>{
@@ -54,7 +54,7 @@ function register(){
 
         for(var i = 0; i < account_info_list.length; i++){
             const account_info = account_info_list[i];
-            const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+            const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id, account_info.locked);
             BrowserContextManager.add(browser_context);
         }
 

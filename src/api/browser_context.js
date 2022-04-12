@@ -71,7 +71,7 @@ class BrowserContext {
 
         this.update_settings = this.update_settings.bind(this);
         
-        if(args.length == 3 || args.length == 0){
+        if(args.length === 4 || args.length == 0){
             this.__init.apply(null, args); // email, pwd, id
         }else if(args.length == 1){
             this.__init_by_json(args[0]); //json string.
@@ -80,11 +80,12 @@ class BrowserContext {
         }
     }
 
-    __init(_email, _pwd, _id){
+    __init(_email, _pwd, _id, _locked){
 
         this.email = _email;
         this.pwd = _pwd;
         this.id = _id;
+        this.locked = _locked === undefined ? false : _locked;
 
         this.in_progress_login = false;
         this.login_date = undefined;

@@ -41,8 +41,13 @@ class AccountEditModal extends React.Component {
         let el_pwd_inpt = document.getElementById(this.EL_ID_MODAL_INPUT_PWD);
         let el_email_input = document.getElementById(this.EL_ID_MODAL_INPUT_EMAIL);
 
-        //Idd Item Needed;
-        this.props.h_add_new_account(el_email_input.value, el_pwd_inpt.value);
+        const account_info_obj = common.get_account_info_obj_scheme();
+        common.update_account_info_obj(account_info_obj, 'email', el_email_input.value);
+        common.update_account_info_obj(account_info_obj, 'pwd', el_pwd_inpt.value);
+        common.update_account_info_obj(account_info_obj, 'id', common.uuidv4());
+        common.update_account_info_obj(account_info_obj, 'locked', false);
+
+        this.props.h_add_new_account(account_info_obj);
 
         let el_modal = document.getElementById(this.props.id);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);

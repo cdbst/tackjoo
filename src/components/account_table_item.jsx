@@ -26,17 +26,19 @@ class AccountsTableItem extends React.Component {
         const is_locked = this.props.account_info.locked === undefined ? false : this.props.account_info.locked;
 
         this.state = {
-            status : is_locked ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGIN
+            status : is_locked ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGOUT
         }
+    }
+
+    isLocked(){
+        return this.state.status === AccountsTableItem.STATUS.LOCKED;
     }
 
     componentDidMount(){
 
         const account_info = this.props.account_info;
 
-        console.log('componentDidMount ' + account_info.email);
-
-        window.electron.addAccount(account_info.email, account_info.pwd, account_info.id, this.props.save_to_file, (err) =>{
+        window.electron.addAccount(account_info, this.props.save_to_file, (err) =>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('에러', '새로운 계정을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
@@ -50,8 +52,6 @@ class AccountsTableItem extends React.Component {
     componentWillUnmount(){
 
         const account_info = this.props.account_info;
-
-        console.log('componentWillUnmount ' + account_info.email);
 
         window.electron.removeAccount(account_info.id, (err)=>{
 
@@ -102,7 +102,8 @@ class AccountsTableItem extends React.Component {
     }
 
     onClickLockCfg(status){
-        this.props.h_set_lock_status(status);
+        //update lock
+
     }
 
     onClickRemove(){
