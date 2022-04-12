@@ -33,12 +33,16 @@ class ToggleButton extends React.Component {
     render(){
 
         const btn_img_src = this.state.set ? this.props.set_img_src : this.props.unset_img_src;
-        const btn_label = this.state.set ? this.props.set_btn_label : this.props.unset_btn_label;
+        let btn_label = undefined;
+
+        if(this.props.set_btn_label === undefined || this.props.unset_btn_label){
+            btn_label = this.state.set ? this.props.set_btn_label : this.props.unset_btn_label;
+        }
 
         return(
             <button ref={this.__ref_btn} type="button" className={"btn " + this.props.btn_class} onClick={this.__onClick.bind(this)}>
                 <img src={btn_img_src} style={{width:24, height:24}}/>
-                {btn_label}
+                { btn_label !== undefined && btn_label }
             </button>
         );
     }

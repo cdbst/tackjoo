@@ -14,6 +14,7 @@ class AccountsTableItem extends React.Component {
         this.onClickRemove = this.onClickRemove.bind(this);
         this.setLoginStatus = this.setLoginStatus.bind(this);
         this.setCleanupCartStatus = this.setCleanupCartStatus.bind(this);
+        this.onClickLockCfg = this.onClickLockCfg.bind(this);
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
@@ -40,6 +41,10 @@ class AccountsTableItem extends React.Component {
         this.props.h_cleanup_cart(this.props.data.id);
     }
 
+    onClickLockCfg(status){
+        console.log(status);
+    }
+
     onClickRemove(){
         this.props.h_remove(this.props.data.id);
     }
@@ -64,7 +69,7 @@ class AccountsTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="로그인">
                             <LaodingButton
                                 ref={this.ref_login_btn}
                                 h_on_click={this.onClickLogin.bind(this)}
@@ -72,7 +77,7 @@ class AccountsTableItem extends React.Component {
                                 img_src={"./res/img/door-open-fill.svg"}
                             />
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="카트 비우기">
                             <LaodingButton
                                 ref={this.ref_cleanup_cart_btn}
                                 h_on_click={this.onClickCleanupCart.bind(this)}
@@ -81,6 +86,15 @@ class AccountsTableItem extends React.Component {
                             />
                         </div>
                         <div className="float-start button-wrapper-inner-table">
+                            <ToggleButton
+                                h_on_click={this.onClickLockCfg.bind(this)}
+                                init_state={false}
+                                set_img_src={"./res/img/lock-fill.svg"}
+                                unset_img_src={"./res/img/unlock-fill.svg"}
+                                btn_class={"btn-light"}
+                            />
+                        </div>
+                        <div className="float-start button-wrapper-inner-table" title="제거하기">
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemove.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>

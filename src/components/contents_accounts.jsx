@@ -42,7 +42,7 @@ class ContentsAccounts extends React.Component {
     }
 
     __setupColumnsWidth(){
-        this.actions_col_width = 240;
+        this.actions_col_width = 280;
         this.status_col_width = 120;
         this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width) + 'px)';
     }
