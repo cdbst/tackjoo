@@ -3,14 +3,18 @@
 
 class AccountsTableItem extends React.Component {
 
-    static LOGIN_BTN_SRC = './res/img/door-open-fill.svg';
+    static STATUS = {
+        LOGIN : '로그인',
+        LOGOUT : '로그아웃',
+        LOCKED : '잠금상태'
+    };
 
     constructor(props) {
         
         super(props);
 
-        this.onClickLogin = this.onClickLogin.bind(this);
-        this.onClickCleanupCart = this.onClickCleanupCart.bind(this);
+        this.doLogin = this.doLogin.bind(this);
+        this.cleanupCart = this.cleanupCart.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
         this.setLoginStatus = this.setLoginStatus.bind(this);
         this.setCleanupCartStatus = this.setCleanupCartStatus.bind(this);
@@ -18,35 +22,91 @@ class AccountsTableItem extends React.Component {
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
-        this.state = {
-            login_btn_src : AccountsTableItem.LOGIN_BTN_SRC
-        };
 
-        this.__mount = false;
+        const is_locked = this.props.account_info.locked === undefined ? false : this.props.account_info.locked;
+
+        this.state = {
+            status : is_locked ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGIN
+        }
     }
 
     componentDidMount(){
-        this.__mount = true;
+
+        const account_info = this.props.account_info;
+
+        console.log('componentDidMount ' + account_info.email);
+
+        window.electron.addAccount(account_info.email, account_info.pwd, account_info.id, this.props.save_to_file, (err) =>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '새로운 계정을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            //Index.g_sys_msg_q.enqueue('안내', _email + ' 새로운 계정을 등록했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        });
     }
 
     componentWillUnmount(){
-        this.__mount = false;
+
+        const account_info = this.props.account_info;
+
+        console.log('componentWillUnmount ' + account_info.email);
+
+        window.electron.removeAccount(account_info.id, (err)=>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '계정 정보를 제거하는데 알 수 없는 에러가 발생했습니다. ' + account_info.email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            }
+
+            Index.g_sys_msg_q.enqueue('안내', account_info.email  + ' 계정 정보를 제거하였습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
-    onClickLogin(){
-        this.props.h_login(this.props.data.id);
+    doLogin(modal = true){
+
+        this.setLoginStatus(true);
+
+        window.electron.login(this.props.account_info.id, (err) =>{
+            
+            this.setLoginStatus(false);
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', `로그인에 실패했습니다. (${this.props.account_info.email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                return;
+            }
+            
+            this.setState({ status : AccountsTableItem.STATUS.LOGIN });
+
+            if(modal) Index.g_sys_msg_q.enqueue('안내', this.props.account_info.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        });
     }
 
-    onClickCleanupCart(){
-        this.props.h_cleanup_cart(this.props.data.id);
+    cleanupCart(modal = true){
+
+        const account_info = this.props.account_info;
+
+        this.setCleanupCartStatus(true);
+
+        window.electron.cleanupCart(account_info.id, (err) =>{
+            
+            this.setCleanupCartStatus(false);
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '카트 비우기에 실패했습니다. (' + account_info.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            if(modal) Index.g_sys_msg_q.enqueue('안내', account_info.email + ' 카트 비우기에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        });
     }
 
     onClickLockCfg(status){
-        console.log(status);
+        this.props.h_set_lock_status(status);
     }
 
     onClickRemove(){
-        this.props.h_remove(this.props.data.id);
+        this.props.h_remove(this.props.account_info.id);
     }
 
     setLoginStatus(status){
@@ -58,21 +118,23 @@ class AccountsTableItem extends React.Component {
     }
 
     render(){
-        let status_text_class = this.props.data.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
+
+        let status_text_class = this.state.status == AccountsTableItem.STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
+
         return(
             <tr>
                 <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
-                    <span>{this.props.data.email}</span>
+                    <span>{this.props.account_info.email}</span>
                 </td>
                 <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
-                    <span className={status_text_class}>{this.props.data.status}</span>
+                    <span className={status_text_class}>{this.state.status}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
                         <div className="float-start button-wrapper-inner-table" title="로그인">
                             <LaodingButton
                                 ref={this.ref_login_btn}
-                                h_on_click={this.onClickLogin.bind(this)}
+                                h_on_click={this.doLogin.bind(this)}
                                 btn_class={"btn-info"}
                                 img_src={"./res/img/door-open-fill.svg"}
                             />
@@ -80,7 +142,7 @@ class AccountsTableItem extends React.Component {
                         <div className="float-start button-wrapper-inner-table" title="카트 비우기">
                             <LaodingButton
                                 ref={this.ref_cleanup_cart_btn}
-                                h_on_click={this.onClickCleanupCart.bind(this)}
+                                h_on_click={this.cleanupCart.bind(this)}
                                 btn_class={"btn-warning"}
                                 img_src={"./res/img/cart-x-fill.svg"}
                             />

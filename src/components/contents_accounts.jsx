@@ -1,41 +1,31 @@
 
 class ContentsAccounts extends React.Component {
 
-    static ACCOUNT_STATUS = {
-        LOGIN : '로그인',
-        LOGOUT : '로그아웃'
-    }
-
     constructor(props) {
         super(props);
 
         this.addAccount = this.addAccount.bind(this);
         this.addBulkAccount = this.addBulkAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
-        this.getTableItems = this.getTableItems.bind(this);
-        this.genAccountObj = this.genAccountObj.bind(this);
-        this.loginAccount = this.loginAccount.bind(this);
-        this.cleanupCart = this.cleanupCart.bind(this);
+        this.updateLockStatus = this.updateLockStatus.bind(this);
+        this.genAccountInfoObj = this.genAccountInfoObj.bind(this);
         this.getAccountInfoList = this.getAccountInfoList.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
-        this.__updateAccountInfo = this.__updateAccountInfo.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickCleanupCartAll = this.onClickCleanupCartAll.bind(this);
+        this.pushAccountTableItem = this.pushAccountTableItem.bind(this);
+        this.checkDuplicatedItem = this.checkDuplicatedItem.bind(this);
         
-
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
 
-        let account_info = [];
-        let table_items = this.getTableItems(account_info);
         this.table_item_ref_list = {};
 
         this.state = {
-            account_info : account_info,
-            account_table_list : table_items
+            account_table_list : []
         }
         
         this.__setupColumnsWidth();
@@ -53,47 +43,34 @@ class ContentsAccounts extends React.Component {
 
     __loadAccountInfoFile(){
 
-        //Index.g_sys_msg_q.enqueue('로딩', '계정 정보를 읽는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-
-        window.electron.getAccountInfo( (err, _account_info_list) => {
+        window.electron.getAccountInfo( (err, data) => {
 
             if(err) {
                 Index.g_sys_msg_q.enqueue('경고', '계정정보가 아직 없거나 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             }else{
-                for(var i = 0; i < _account_info_list.accounts.length; i++){
-                    let account = _account_info_list.accounts[i];
-                    this.addAccount(account.email, account.pwd, account.id, false, false); // modal disable.
-                }
+
+                data.accounts.forEach((account_info) =>{
+                    this.addAccount(account_info.email, account_info.pwd, account_info.id, false);
+                });
             }
         });
     }
 
     getAccountInfoList(){
-        return this.state.account_info;
+        return this.state.account_table_list.map((table_item) => table_item.props.account_info );
     }
 
-    __updateAccountInfo(_account_info){
-
-        let _account_table_list = this.getTableItems(_account_info);
-            
-        this.setState(prevState => ({
-            account_table_list : _account_table_list,
-            account_info : _account_info
-        }));
-    }
-
-    genAccountObj(_email, _pwd, _status, _id = undefined){
+    genAccountInfoObj(_email, _pwd, _id = undefined){
 
         return {
             email : _email,
             pwd : _pwd,
-            status : _status,
             id : _id == undefined ? common.uuidv4() : _id
         };
     }
 
-    //_account_info_list 는 멀티라인 텍스트이다.
     addBulkAccount(_account_info_list){
+        //_account_info_list 는 멀티라인 텍스트이다.
 
         const account_info_list = _account_info_list.split('\n');
         const error_messages = [];
@@ -130,14 +107,13 @@ class ContentsAccounts extends React.Component {
                 continue;
             }
 
-            // 중복 점검 - 기존 리스트.
-            duplicated_account_info = this.state.account_info.find((account_info_obj) => account_info_obj.email === email);
-            if(duplicated_account_info !== undefined){
+            // 중복 점검 - 기존 리스트.        
+            if(this.checkDuplicatedItem(email)){
                 error_messages.push(`[${i + 1}]번째 줄의 계정 정보는 이미 등록된 계정입니다. (${account_info})`);
                 continue;
             }
 
-            const account_info_obj = this.genAccountObj(email, pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT);
+            const account_info_obj = this.genAccountInfoObj(email, pwd);
             account_info_obj_list.push(account_info_obj);            
         }
         
@@ -155,18 +131,18 @@ class ContentsAccounts extends React.Component {
                 return;
             }
 
-            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
-            _account_info = [..._account_info, ...account_info_obj_list];
-            this.__updateAccountInfo(_account_info);
+            account_info_obj_list.forEach((account_info) =>{
+                this.pushAccountTableItem(account_info, false);
+            });
             
             Index.g_sys_msg_q.enqueue('알림', `총 ${account_info_obj_list.length} 개의 계정을 등록했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
 
-    addAccount(_email, _pwd, _id, save_to_file = true, modal = true){
+    addAccount(_email, _pwd, _id, save_to_file = true){
 
-        if(_email == '' || _pwd == ''){
-            Index.g_sys_msg_q.enqueue('에러', '올바른 계정 정보를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+        if(_pwd == ''){
+            Index.g_sys_msg_q.enqueue('에러', '유효한 비밀번호를 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -175,57 +151,30 @@ class ContentsAccounts extends React.Component {
             return;
         }
 
-        let _dup_account_info = this.state.account_info.filter((account)=>{
-            return account.email == _email;
-        })
-
-        if(_dup_account_info.length > 0){
+        if(this.checkDuplicatedItem(_email)){
             Index.g_sys_msg_q.enqueue('에러', _email + ' 해당 계정이 이미 등록된 상태입니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
         
-        let account = this.genAccountObj(_email, _pwd, ContentsAccounts.ACCOUNT_STATUS.LOGOUT, _id);
-
-        window.electron.addAccount(account.email, account.pwd, account.id, save_to_file, (err) =>{
-
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '새로운 계정을 등록하는데 실패했습니다. ' + _email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
-            _account_info.push(account);
-
-            this.__updateAccountInfo(_account_info);
-
-            if(modal) Index.g_sys_msg_q.enqueue('안내', _email + ' 새로운 계정을 등록했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
-        });
+        const account_info = this.genAccountInfoObj(_email, _pwd, _id);
+        this.pushAccountTableItem(account_info, save_to_file);
     }
 
-    removeAccount(_id){
+    updateLockStatus(account_id){
+
+    }
+
+    removeAccount(account_id){
         
-        let account_to_remove = undefined;
+        const new_account_table_list = this.state.account_table_list.filter((table_item) => table_item.props.account_info.id !== account_id);
 
-        let _updated_account_info = this.state.account_info.filter((account)=>{
-            if(account.id != _id) return true;
-            account_to_remove = account;
-            return false;
-        });
-
-        if(account_to_remove == undefined){
+        if(new_account_table_list.length === this.state.account_table_list.length){
             Index.g_sys_msg_q.enqueue('에러', '제거할 계정 정보를 찾을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
-        window.electron.removeAccount(_id, (err)=>{
-
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '계정 정보를 제거하는데 알 수 없는 에러가 발생했습니다. ' + account_to_remove.email, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            }
-
-            this.__updateAccountInfo(_updated_account_info);
-
-            Index.g_sys_msg_q.enqueue('안내', account_to_remove.email  + ' 계정 정보를 제거하였습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        this.setState({
+            account_table_list : new_account_table_list
         });
     }
 
@@ -250,109 +199,52 @@ class ContentsAccounts extends React.Component {
     }
 
     onClickLoginAll(e){
-        this.state.account_info.forEach((account)=>{
-            this.loginAccount(account.id, false);
-        });
+        for(const table_item_ref of Object.values(this.table_item_ref_list)){
+            table_item_ref.current.doLogin(false);
+        }
     }
 
     onClickCleanupCartAll(){
-        this.state.account_info.forEach((account)=>{
-            this.cleanupCart(account.id, false);
-        });
+        for(const table_item_ref of Object.values(this.table_item_ref_list)){
+            table_item_ref.current.cleanupCart(false);
+        }
     }
 
-    loginAccount(_id, modal = true){
+    pushAccountTableItem(account_info, save_to_file){
+
+        const account_table_list = this.state.account_table_list;
+        this.table_item_ref_list[account_info.id] = React.createRef();
         
-        const account_to_login = this.state.account_info.find((account) => account.id === _id);
+        account_table_list.push(
+            <AccountsTableItem 
+                ref={this.table_item_ref_list[account_info.id]}
+                key={account_info.id} 
+                account_info={account_info}
+                h_remove={this.removeAccount.bind(this, account_info.id)}
+                h_set_lock_status={this.updateLockStatus.bind(this, account_info.id)}
+                e_mail_col_width={this.email_col_width}
+                status_col_width={this.status_col_width}
+                actions_col_width={this.actions_col_width}
+                save_to_file={save_to_file}
+            />
+        );
 
-        if(account_to_login === undefined){
-            Index.g_sys_msg_q.enqueue('에러', '로그인할 계정정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        this.table_item_ref_list[account_to_login.id].current.setLoginStatus(true);
-
-        window.electron.login(_id, (err) =>{
-            
-            this.table_item_ref_list[account_to_login.id].current.setLoginStatus(false);
-
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '로그인에 실패했습니다. (' + account_to_login.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            let _account_info = JSON.parse(JSON.stringify(this.state.account_info));
-
-            for(var i = 0; i < _account_info.length; i++){
-                if(_account_info[i].id != _id) continue;
-                _account_info[i].status = ContentsAccounts.ACCOUNT_STATUS.LOGIN;
-                break;
-            }
-
-            let _account_table_list = this.getTableItems(_account_info);
-            
-            this.setState(_ => ({
-                account_table_list : _account_table_list,
-                account_info : _account_info
-            }));
-
-            if(modal) Index.g_sys_msg_q.enqueue('안내', account_to_login.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        this.setState({
+            account_table_list : account_table_list
         });
     }
 
-    cleanupCart(_id, modal = true){
+    checkDuplicatedItem(email){
 
-        const account_obj = this.state.account_info.find((account) => account.id === _id);
-
-        if(account_obj === undefined){
-            Index.g_sys_msg_q.enqueue('에러', '계정정보를 찾을수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-            return;
-        }
-
-        this.table_item_ref_list[account_obj.id].current.setCleanupCartStatus(true);
-
-        window.electron.cleanupCart(_id, (err) =>{
-            
-            this.table_item_ref_list[account_obj.id].current.setCleanupCartStatus(false);
-
-            if(err){
-                Index.g_sys_msg_q.enqueue('에러', '카트 비우기에 실패했습니다. (' + account_obj.email  + ')', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
-                return;
-            }
-
-            if(modal) Index.g_sys_msg_q.enqueue('안내', account_obj.email + ' 카트 비우기에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-        });
-    }
-
-    getTableItems(account_info){
-
-        let account_table_list = [];
-        this.table_item_ref_list = {};
-
-        account_info.forEach((account) =>{
-            this.table_item_ref_list[account.id] = React.createRef();
-
-            account_table_list.push(
-                <AccountsTableItem 
-                    ref={this.table_item_ref_list[account.id]}
-                    key={account.email} 
-                    data={account} 
-                    h_remove={this.removeAccount.bind(this)} 
-                    h_login={this.loginAccount.bind(this)}
-                    h_cleanup_cart={this.cleanupCart.bind(this)}
-                    e_mail_col_width={this.email_col_width}
-                    status_col_width={this.status_col_width}
-                    actions_col_width={this.actions_col_width}
-                />
-            );
+        const duplicated_table_item = this.state.account_table_list.filter((table_item)=>{
+            if(table_item.props.account_info.email === email) return true;
+            else return false;
         });
 
-        return account_table_list;
+        return duplicated_table_item > 0;
     }
 
     render() {
-        let num_of_accounts = this.state.account_info.length;
-        let num_of_login_accounts = this.state.account_info.filter((account) => account.status == ContentsAccounts.ACCOUNT_STATUS.LOGIN).length;
         return (
             <div className="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ACCOUNTS}>
                 <div className="container-fluid">
@@ -366,7 +258,7 @@ class ContentsAccounts extends React.Component {
                     <br/>
                     <div className="row">
                         <div className="col">
-                            <h4 className="contents-title">{"계정관리 (" + num_of_login_accounts + "/" + num_of_accounts + ")"}</h4>
+                            <h4 className="contents-title">{`계정관리 ${this.state.account_table_list.length})`}</h4>
                         </div>
                         <div className="col">
                             {/* <a>TEST : search item interface</a> */}
