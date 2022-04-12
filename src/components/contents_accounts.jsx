@@ -20,8 +20,6 @@ class ContentsAccounts extends React.Component {
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
 
-        this.table_item_ref_list = {};
-
         this.state = {
             account_table_list : []
         }
@@ -188,25 +186,26 @@ class ContentsAccounts extends React.Component {
     }
 
     onClickLoginAll(e){
-        for(const table_item_ref of Object.values(this.table_item_ref_list)){
-            table_item_ref.current.doLogin(false);
-        }
+
+        this.state.account_table_list.forEach((table_item) =>{
+            table_item.ref.current.doLogin(false);
+        });
     }
 
     onClickCleanupCartAll(){
-        for(const table_item_ref of Object.values(this.table_item_ref_list)){
-            table_item_ref.current.cleanupCart(false);
-        }
+
+        this.state.account_table_list.forEach((table_item) =>{
+            table_item.ref.current.cleanupCart(false);
+        });
     }
 
     pushAccountTableItem(account_info, save_to_file){
 
         const account_table_list = this.state.account_table_list;
-        this.table_item_ref_list[account_info.id] = React.createRef();
         
         account_table_list.push(
             <AccountsTableItem 
-                ref={this.table_item_ref_list[account_info.id]}
+                ref={React.createRef()}
                 key={account_info.id} 
                 account_info={account_info}
                 h_remove={this.removeAccount.bind(this, account_info.id)}
@@ -229,7 +228,7 @@ class ContentsAccounts extends React.Component {
             else return false;
         });
 
-        return duplicated_table_item > 0;
+        return duplicated_table_item.length > 0;
     }
 
     render() {

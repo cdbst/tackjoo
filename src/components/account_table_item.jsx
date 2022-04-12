@@ -19,6 +19,7 @@ class AccountsTableItem extends React.Component {
         this.setLoginStatus = this.setLoginStatus.bind(this);
         this.setCleanupCartStatus = this.setCleanupCartStatus.bind(this);
         this.onClickLockCfg = this.onClickLockCfg.bind(this);
+        this.isLocked = this.isLocked.bind(this);
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
@@ -65,6 +66,8 @@ class AccountsTableItem extends React.Component {
 
     doLogin(modal = true){
 
+        if(this.isLocked()) return;
+
         this.setLoginStatus(true);
 
         window.electron.login(this.props.account_info.id, (err) =>{
@@ -104,6 +107,9 @@ class AccountsTableItem extends React.Component {
     onClickLockCfg(status){
         //update lock
 
+        this.setState({
+            status : status ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGOUT
+        })
     }
 
     onClickRemove(){
@@ -120,7 +126,8 @@ class AccountsTableItem extends React.Component {
 
     render(){
 
-        let status_text_class = this.state.status == AccountsTableItem.STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
+        const status_text_class = this.state.status === AccountsTableItem.STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
+        const lock_btn_title = this.isLocked() ? '잠금 해제' : '잠금 설정';
 
         return(
             <tr>
@@ -138,6 +145,7 @@ class AccountsTableItem extends React.Component {
                                 h_on_click={this.doLogin.bind(this)}
                                 btn_class={"btn-info"}
                                 img_src={"./res/img/door-open-fill.svg"}
+                                disabled={this.isLocked()}
                             />
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="카트 비우기">
@@ -146,9 +154,10 @@ class AccountsTableItem extends React.Component {
                                 h_on_click={this.cleanupCart.bind(this)}
                                 btn_class={"btn-warning"}
                                 img_src={"./res/img/cart-x-fill.svg"}
+                                disabled={this.isLocked()}
                             />
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title={lock_btn_title}>
                             <ToggleButton
                                 h_on_click={this.onClickLockCfg.bind(this)}
                                 init_state={false}
