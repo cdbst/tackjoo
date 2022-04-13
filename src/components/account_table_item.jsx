@@ -91,6 +91,8 @@ class AccountsTableItem extends React.Component {
 
     cleanupCart(modal = true){
 
+        if(this.isLocked()) return;
+
         const account_info = this.state.account_info;
 
         this.setCleanupCartStatus(true);
@@ -112,7 +114,8 @@ class AccountsTableItem extends React.Component {
         //update lock
 
         const new_account_info = _.clone(this.state.account_info);
-        new_account_info.locked = status;
+        common.update_account_info_obj(new_account_info, 'locked', status);
+        common.update_account_info_obj(new_account_info, 'state', status ? common.ACCOUNT_STATE.LOCKED : common.ACCOUNT_STATE.LOGOUT);
 
         this.updateAccount(new_account_info);
     }
