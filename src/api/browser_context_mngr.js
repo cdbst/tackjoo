@@ -61,7 +61,8 @@ class BrowserContextManager{
             accounts_info.push({
                 email : browser_context.email,
                 pwd : browser_context.pwd,
-                id : id
+                id : id,
+                locked : browser_context.locked
             });
         }
 

@@ -521,7 +521,7 @@ class ContentsNewProduct extends React.Component {
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)} >
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
-                            <button type="button" className="btn btn-warning btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.WHITELIST_EDIT_MODAL_ID} >
+                            <button type="button" className="btn btn-light btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.WHITELIST_EDIT_MODAL_ID} >
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 화이트리스트
                             </button>
                             <button type="button" className="btn btn-danger btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.BLACKLIST_EDIT_MODAL_ID} >

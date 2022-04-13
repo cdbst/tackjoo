@@ -152,6 +152,30 @@
     }
 
 
+    exports.get_account_info_obj_scheme = function (){
+        return {
+            email : undefined,
+            pwd : undefined,
+            locked : undefined,
+            id : undefined,
+            state : undefined,
+        };
+    }
+
+    exports.update_account_info_obj = function(account_info, key, value){
+        if(key in this.get_account_info_obj_scheme() === false){
+            throw 'order info object is not includes property : ' + key;
+        }
+
+        account_info[key] = value;
+        return account_info;
+    }
+
+    exports.ACCOUNT_STATE = {
+        LOGIN : '로그인',
+        LOGOUT : '로그아웃',
+        LOCKED : '잠금상태'
+    }
 
     exports.get_task_info_obj_scheme = function (){
         return {

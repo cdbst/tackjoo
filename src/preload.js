@@ -48,7 +48,8 @@ contextBridge.exposeInMainWorld('electron', {
     loadNewProductWhiteListInfo : _loadNewProductWhiteListInfo,
     saveNewProductBlackListInfo : _saveNewProductBlackListInfo,
     loadNewProductBlackListInfo : _loadNewProductBlackListInfo,
-    cleanupCart : _cleanupCart
+    cleanupCart : _cleanupCart,
+    updateAccountInfo : _updateAccountInfo
 });
 
 /**
@@ -97,24 +98,9 @@ function _sendSensorData(_sensor_data){
     ipcRenderer.send('send_sensor_data', data);
 }
 
-function _addAccount(_email, _pwd, _id, _save_to_file, __callback){
+function _addAccount(account_info, _save_to_file, __callback){
 
-    if(_email == '' || _email == undefined){
-        __callback('add account fail : email information is invalid');
-        return;
-    }
-
-    if(_pwd == '' || _pwd == undefined){
-        __callback('add account fail : password information is invalid');
-        return;
-    }
-
-    if(_id == '' || _id == undefined){
-        __callback('add account fail : account unique id information is invalid');
-        return;
-    }
-
-    let ipc_payload = {email : _email, pwd : _pwd, id : _id, save_to_file : _save_to_file}
+    let ipc_payload = {account_info : account_info, save_to_file : _save_to_file}
     let ipc_data = get_ipc_data(ipc_payload);
 
     ipcRenderer.send('add-account', ipc_data);
@@ -570,6 +556,18 @@ function _cleanupCart(_id, __callback){
     ipcRenderer.send('cleanup-cart', ipc_data);
 
     ipcRenderer.once('cleanup-cart-reply' + ipc_data.id, (event, err) => {
+        __callback(err);
+    });
+}
+
+function _updateAccountInfo(account_id, account_info, __callback){
+    const ipc_data = get_ipc_data({
+        account_id : account_id,
+        account_info : account_info
+    });
+    ipcRenderer.send('update-account-info', ipc_data);
+
+    ipcRenderer.once('update-account-info-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 }

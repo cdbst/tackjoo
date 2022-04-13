@@ -24,8 +24,8 @@ function register(){
 
     ipcMain.on('add-account', (event, data) => {
 
-        const account_info = data.payload;
-        const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+        const account_info = data.payload.account_info;
+        const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id, account_info.locked);
         const save_to_file = data.payload.save_to_file;
 
         (async() =>{
@@ -47,6 +47,28 @@ function register(){
         })();
     });
 
+    ipcMain.on('update-account-info', (event, data) => {
+
+        const account_info = data.payload.account_info;
+        const account_id = data.payload.account_id;
+        
+        (async() =>{
+            try{
+                const browser_context = BrowserContextManager.get(account_id);
+                browser_context.update_account_info(account_info);
+
+                const file_data = BrowserContextManager.get_file_data();
+                await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
+                
+                event.reply('update-account-info-reply' + data.id, undefined);
+
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'update-account-info-callback', err));
+                event.reply('update-account-info-reply' + data.id, 'invalid exception has been occurred while registering account information');
+            }
+        })();
+    });
+
     ipcMain.on('add-account-list', (event, data) => {
 
         const account_info_list = data.payload;
@@ -54,7 +76,7 @@ function register(){
 
         for(var i = 0; i < account_info_list.length; i++){
             const account_info = account_info_list[i];
-            const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id);
+            const browser_context = new BrowserContext(account_info.email, account_info.pwd, account_info.id, account_info.locked);
             BrowserContextManager.add(browser_context);
         }
 

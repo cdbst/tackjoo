@@ -76,7 +76,7 @@ class TaskEditModal extends React.Component {
     onModalshown(e){
         
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
-        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const account_info_list = this.props.contents_account_ref.current.getUnlockedAccountInfoList();
         const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
         const el_modal = document.getElementById(this.props.id);
