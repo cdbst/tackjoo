@@ -34,6 +34,10 @@ class AccountsTableItem extends React.Component {
         return this.state.account_info.locked === undefined ? false : this.state.account_info.locked;
     }
 
+    getAccountInfo(){
+        return this.state.account_info;
+    }
+
     componentDidMount(){
 
         const account_info = _.clone(this.state.account_info);

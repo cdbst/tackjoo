@@ -252,7 +252,7 @@ class ContentsTasks extends React.Component {
 
     __createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, watchdog){
 
-        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const account_info_list = this.props.contents_account_ref.current.getUnlockedAccountInfoList();
         const account_info = account_info_list.find((account_info) => account_info.email === account_email);
 
         if(account_info === undefined){
@@ -388,7 +388,7 @@ class ContentsTasks extends React.Component {
 
     __get_appropreate_to_tasking_account_email(){
 
-        const account_info_list = this.props.contents_account_ref.current.getAccountInfoList();
+        const account_info_list = this.props.contents_account_ref.current.getUnlockedAccountInfoList();
 
         if(account_info_list.length === 0){
             return undefined;

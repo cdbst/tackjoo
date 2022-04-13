@@ -8,6 +8,7 @@ class ContentsAccounts extends React.Component {
         this.addBulkAccount = this.addBulkAccount.bind(this);
         this.removeAccount = this.removeAccount.bind(this);
         this.getAccountInfoList = this.getAccountInfoList.bind(this);
+        this.getUnlockedAccountInfoList = this.getUnlockedAccountInfoList.bind(this);
         this.onClickLoginAll = this.onClickLoginAll.bind(this);
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
@@ -53,7 +54,11 @@ class ContentsAccounts extends React.Component {
     }
 
     getAccountInfoList(){
-        return this.state.account_table_list.map((table_item) => table_item.props.account_info);
+        return this.state.account_table_list.map((table_item) => table_item.ref.current.getAccountInfo());
+    }
+
+    getUnlockedAccountInfoList(){
+        return this.state.account_table_list.map((table_item) => table_item.ref.current.getAccountInfo()).filter((account_info) => !account_info.locked);
     }
 
     addBulkAccount(_account_info_list){
