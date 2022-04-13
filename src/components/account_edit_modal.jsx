@@ -46,6 +46,7 @@ class AccountEditModal extends React.Component {
         common.update_account_info_obj(account_info_obj, 'pwd', el_pwd_inpt.value);
         common.update_account_info_obj(account_info_obj, 'id', common.uuidv4());
         common.update_account_info_obj(account_info_obj, 'locked', false);
+        common.update_account_info_obj(account_info_obj, 'state', common.ACCOUNT_STATE.LOGOUT);
 
         this.props.h_add_new_account(account_info_obj);
 
