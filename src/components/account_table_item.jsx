@@ -3,12 +3,6 @@
 
 class AccountsTableItem extends React.Component {
 
-    static STATUS = {
-        LOGIN : '로그인',
-        LOGOUT : '로그아웃',
-        LOCKED : '잠금상태'
-    };
-
     constructor(props) {
         
         super(props);
@@ -20,24 +14,29 @@ class AccountsTableItem extends React.Component {
         this.setCleanupCartStatus = this.setCleanupCartStatus.bind(this);
         this.onClickLockCfg = this.onClickLockCfg.bind(this);
         this.isLocked = this.isLocked.bind(this);
+        this.updateAccount = this.updateAccount.bind(this);
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
 
-        const is_locked = this.props.account_info.locked === undefined ? false : this.props.account_info.locked;
+        const account_info = _.clone(this.props.account_info) // initial state
+        const is_locked = account_info.locked === undefined ? false :  account_info.locked;
+        const state = is_locked ? common.ACCOUNT_STATE.LOCKED : common.ACCOUNT_STATE.LOGOUT;
+
+        common.update_account_info_obj(account_info, 'state', state);
 
         this.state = {
-            status : is_locked ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGOUT
-        }
+            account_info : account_info
+        };
     }
 
     isLocked(){
-        return this.state.status === AccountsTableItem.STATUS.LOCKED;
+        return this.state.account_info.locked === undefined ? false : this.state.account_info.locked;
     }
 
     componentDidMount(){
 
-        const account_info = this.props.account_info;
+        const account_info = _.clone(this.state.account_info);
 
         window.electron.addAccount(account_info, this.props.save_to_file, (err) =>{
 
@@ -52,7 +51,7 @@ class AccountsTableItem extends React.Component {
 
     componentWillUnmount(){
 
-        const account_info = this.props.account_info;
+        const account_info = this.state.account_info;
 
         window.electron.removeAccount(account_info.id, (err)=>{
 
@@ -70,24 +69,25 @@ class AccountsTableItem extends React.Component {
 
         this.setLoginStatus(true);
 
-        window.electron.login(this.props.account_info.id, (err) =>{
+        window.electron.login(this.state.account_info.id, (err) =>{
             
             this.setLoginStatus(false);
 
             if(err){
-                Index.g_sys_msg_q.enqueue('에러', `로그인에 실패했습니다. (${this.props.account_info.email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                Index.g_sys_msg_q.enqueue('에러', `로그인에 실패했습니다. (${this.state.account_info.email})`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
                 return;
             }
             
-            this.setState({ status : AccountsTableItem.STATUS.LOGIN });
+            common.update_account_info_obj(this.state.account_info, 'state', common.ACCOUNT_STATE.LOGIN);
+            this.setState({ account_info : this.state.account_info });
 
-            if(modal) Index.g_sys_msg_q.enqueue('안내', this.props.account_info.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+            if(modal) Index.g_sys_msg_q.enqueue('안내', this.state.account_info.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
         });
     }
 
     cleanupCart(modal = true){
 
-        const account_info = this.props.account_info;
+        const account_info = this.state.account_info;
 
         this.setCleanupCartStatus(true);
 
@@ -107,13 +107,14 @@ class AccountsTableItem extends React.Component {
     onClickLockCfg(status){
         //update lock
 
-        this.setState({
-            status : status ? AccountsTableItem.STATUS.LOCKED : AccountsTableItem.STATUS.LOGOUT
-        })
+        const new_account_info = _.clone(this.state.account_info);
+        new_account_info.locked = status;
+
+        this.updateAccount(new_account_info);
     }
 
     onClickRemove(){
-        this.props.h_remove(this.props.account_info.id);
+        this.props.h_remove(this.state.account_info.id);
     }
 
     setLoginStatus(status){
@@ -124,18 +125,39 @@ class AccountsTableItem extends React.Component {
         this.ref_cleanup_cart_btn.current.setLoadingStatus(status);
     }
 
+    updateAccount(new_account_info){
+
+        window.electron.updateAccountInfo(this.state.account_info.id, new_account_info, (err)=>{
+
+            if(err){
+                
+                Index.g_sys_msg_q.enqueue('에러', `${this.state.account_info.email} 계정 정보 업데이트에 실패했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            this.setState({
+                account_info : new_account_info
+            });
+        });
+    }
+
     render(){
 
-        const status_text_class = this.state.status === AccountsTableItem.STATUS.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
-        const lock_btn_title = this.isLocked() ? '잠금 해제' : '잠금 설정';
+        const is_locked = this.isLocked();
+
+        //TODO 수정 필요.
+        const status_text_class = this.state.account_info.state === common.ACCOUNT_STATE.LOGIN ? 'span-text-color-blue' : 'span-text-color-red';
+        const lock_btn_title = is_locked ? '잠금 해제' : '잠금 설정';
+        
+        const background_color = is_locked ? 'rgb(241, 36, 36, 0.36)' : 'transparent';
 
         return(
-            <tr>
+            <tr style={{background : background_color}}>
                 <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
-                    <span>{this.props.account_info.email}</span>
+                    <span>{this.state.account_info.email}</span>
                 </td>
                 <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
-                    <span className={status_text_class}>{this.state.status}</span>
+                    <span className={status_text_class}>{this.state.account_info.state}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
@@ -145,7 +167,7 @@ class AccountsTableItem extends React.Component {
                                 h_on_click={this.doLogin.bind(this)}
                                 btn_class={"btn-info"}
                                 img_src={"./res/img/door-open-fill.svg"}
-                                disabled={this.isLocked()}
+                                disabled={is_locked}
                             />
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="카트 비우기">
@@ -154,13 +176,13 @@ class AccountsTableItem extends React.Component {
                                 h_on_click={this.cleanupCart.bind(this)}
                                 btn_class={"btn-warning"}
                                 img_src={"./res/img/cart-x-fill.svg"}
-                                disabled={this.isLocked()}
+                                disabled={is_locked}
                             />
                         </div>
                         <div className="float-start button-wrapper-inner-table" title={lock_btn_title}>
                             <ToggleButton
                                 h_on_click={this.onClickLockCfg.bind(this)}
-                                init_state={false}
+                                init_state={is_locked}
                                 set_img_src={"./res/img/lock-fill.svg"}
                                 unset_img_src={"./res/img/unlock-fill.svg"}
                                 btn_class={"btn-light"}

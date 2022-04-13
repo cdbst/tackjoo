@@ -70,9 +70,10 @@ class BrowserContext {
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
 
         this.update_settings = this.update_settings.bind(this);
+        this.update_account_info = this.update_account_info.bind(this);
         
         if(args.length === 4 || args.length == 0){
-            this.__init.apply(null, args); // email, pwd, id
+            this.__init.apply(null, args); // email, pwd, id, locked
         }else if(args.length == 1){
             this.__init_by_json(args[0]); //json string.
         }else{
@@ -113,6 +114,13 @@ class BrowserContext {
         this.__cookie_storage = new CookieManager(json.__cookie_storage);
         this.__iamport_cookie_storage = new CookieManager(json.__iamport_cookie_storage);
         this.login_date = json.login_date !== undefined ? new Date(json.login_date) : undefined;
+    }
+
+    update_account_info(account_info){
+        this.email = account_info.email;
+        this.pwd = account_info.pwd;
+        this.id = account_info.id;
+        this.locked = account_info.locked === undefined ? false : account_info.locked;
     }
 
     update_settings(settings_info){

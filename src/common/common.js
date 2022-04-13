@@ -157,7 +157,8 @@
             email : undefined,
             pwd : undefined,
             locked : undefined,
-            id : undefined
+            id : undefined,
+            state : undefined,
         };
     }
 
@@ -168,6 +169,12 @@
 
         account_info[key] = value;
         return account_info;
+    }
+
+    exports.ACCOUNT_STATE = {
+        LOGIN : '로그인',
+        LOGOUT : '로그아웃',
+        LOCKED : '잠금상태'
     }
 
     exports.get_task_info_obj_scheme = function (){

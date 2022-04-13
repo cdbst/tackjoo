@@ -165,6 +165,8 @@ class ContentsAccounts extends React.Component {
         });
     }
 
+    
+
     showAccountEditModal(_email, _pwd){
 
         let el_pwd_inpt = document.getElementById(this.EL_ID_MODAL_INPUT_PWD);
