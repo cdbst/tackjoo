@@ -62,7 +62,7 @@ class ContentsAccounts extends React.Component {
         }, ()=> {
             window.electron.saveAccountInfoList(this.getAccountInfoList() ,(err) =>{
                 if(err) {
-                    Index.g_sys_msg_q.enqueue('경고', '계정정보를 업데이트 할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    Index.g_sys_msg_q.enqueue('에러', '계정정보를 업데이트 할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 }
             });
         });
