@@ -42,9 +42,13 @@ class ContentsTasks extends React.Component {
         this.onChangeTask = this.onChangeTask.bind(this);
         this.onChangeTaskLink = this.onChangeTaskLink.bind(this);
 
+        this.__setSortable = this.__setSortable.bind(this);
+        this.__changeTableItemIdx = this.__changeTableItemIdx.bind(this);
+
         this.task_edit_modal_id = 'edit-task-modal';
         this.load_link_product_modal_id = 'load-link-product-modal';
         this.modify_link_product_modal_id = 'modify-link-product-modal';
+        this.task_table_body_id = 'task-table-body';
 
         this.__ref_product_list_reload_btn = React.createRef();
 
@@ -57,6 +61,31 @@ class ContentsTasks extends React.Component {
         this.__selected_task_id_list = [];
 
         this.__setupColumnsWidth();
+    }
+
+    componentDidMount(){
+        this.__setSortable();
+    }
+
+    __setSortable(){
+        const el_task_table_body = document.getElementById(this.task_table_body_id);
+        Sortable.create(el_task_table_body, {
+            sort: true,
+            ghostClass : 'draggable-ghost',
+            chosenClass : 'draggable-chosen',
+            dragClass : 'draggable-drag',
+            onEnd : (evt) =>{
+                this.__changeTableItemIdx(evt.oldIndex, evt.newIndex);
+            }
+        });
+    }
+
+    __changeTableItemIdx(from_idx, to_idx){
+        
+        common.move_element(this.state.task_table_item_list, from_idx, to_idx);
+        this.setState({
+            task_table_item_list : this.state.task_table_item_list
+        });
     }
 
     __setupColumnsWidth(){
@@ -579,7 +608,7 @@ class ContentsTasks extends React.Component {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id={this.task_table_body_id}>
                                 {this.state.task_table_item_list}
                             </tbody>
                         </table>
