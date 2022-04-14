@@ -49,7 +49,8 @@ contextBridge.exposeInMainWorld('electron', {
     saveNewProductBlackListInfo : _saveNewProductBlackListInfo,
     loadNewProductBlackListInfo : _loadNewProductBlackListInfo,
     cleanupCart : _cleanupCart,
-    updateAccountInfo : _updateAccountInfo
+    updateAccountInfo : _updateAccountInfo,
+    saveAccountInfoList : _saveAccountInfoList
 });
 
 /**
@@ -568,6 +569,19 @@ function _updateAccountInfo(account_id, account_info, __callback){
     ipcRenderer.send('update-account-info', ipc_data);
 
     ipcRenderer.once('update-account-info-reply' + ipc_data.id, (event, err) => {
+        __callback(err);
+    });
+}
+
+function _saveAccountInfoList(account_info_list, __callback){
+
+    const ipc_data = get_ipc_data({
+        account_info_list : account_info_list
+    });
+
+    ipcRenderer.send('save-account-info-list', ipc_data);
+
+    ipcRenderer.once('save-account-info-list-reply' + ipc_data.id, (event, err) => {
         __callback(err);
     });
 }

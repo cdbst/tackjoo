@@ -13,6 +13,7 @@ class ContentsAccounts extends React.Component {
         this.showAccountEditModal = this.showAccountEditModal.bind(this);
         this.showAccountBulkEditModal = this.showAccountBulkEditModal.bind(this);
         this.__loadAccountInfoFile = this.__loadAccountInfoFile.bind(this);
+        this.__setSortable = this.__setSortable.bind(this);
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickCleanupCartAll = this.onClickCleanupCartAll.bind(this);
         this.pushAccountTableItem = this.pushAccountTableItem.bind(this);
@@ -20,6 +21,7 @@ class ContentsAccounts extends React.Component {
         
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
+        this.account_table_body = 'account-table-body';
 
         this.state = {
             account_table_list : []
@@ -36,6 +38,34 @@ class ContentsAccounts extends React.Component {
 
     componentDidMount(){
         this.__loadAccountInfoFile();
+        this.__setSortable();
+    }
+
+    __setSortable(){
+        const el_account_table_body = document.getElementById(this.account_table_body);
+        Sortable.create(el_account_table_body, {
+            sort: true,
+            ghostClass : 'draggable-ghost',
+            chosenClass : 'draggable-chosen',
+            dragClass : 'draggable-drag',
+            onEnd : (evt) =>{
+                this.__changeAccountTableItemIdx(evt.oldIndex, evt.newIndex);
+            }
+        });
+    }
+
+    __changeAccountTableItemIdx(from_idx, to_idx){
+        
+        common.move_element(this.state.account_table_list, from_idx, to_idx);
+        this.setState({
+            account_table_list : this.state.account_table_list
+        }, ()=> {
+            window.electron.saveAccountInfoList(this.getAccountInfoList() ,(err) =>{
+                if(err) {
+                    Index.g_sys_msg_q.enqueue('경고', '계정정보를 업데이트 할 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                }
+            });
+        });
     }
 
     __loadAccountInfoFile(){
@@ -267,7 +297,7 @@ class ContentsAccounts extends React.Component {
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id={this.account_table_body}>
                             {this.state.account_table_list}
                         </tbody>
                     </table>

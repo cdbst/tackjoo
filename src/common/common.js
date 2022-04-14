@@ -69,6 +69,12 @@
         });
     }
 
+    exports.move_element = function (arr, from_idx, to_idx) {
+        var element = arr[from_idx];
+        arr.splice(from_idx, 1);
+        arr.splice(to_idx, 0, element)
+    }
+
     exports.merge_object = function (target, source) {
 
         Object.entries(source).forEach(([key, value]) =>{
