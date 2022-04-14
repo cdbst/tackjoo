@@ -103,7 +103,7 @@ window.doCheckout = function(key_map_text, password){
                     const el_btn_key = iframe.contentWindow.document.getElementById(key_el_id);
                     setTimeout((el_btn_key)=>{
                         el_btn_key.click();
-                    }, 20, el_btn_key);
+                    }, 60, el_btn_key);
                 }
             });
         }); 
