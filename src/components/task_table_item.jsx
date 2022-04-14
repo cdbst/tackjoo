@@ -324,7 +324,7 @@ class TaskTableItem extends React.Component {
         const status_btn_title = status_btn === TaskTableItem.PLAY_BTN_SRC ? '시작하기' : '정지하기';
 
         return(
-            <tr style={{background : background_color}}>
+            <tr style={{background : background_color}} className="draggable">
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 

@@ -18,10 +18,11 @@ class ContentsAccounts extends React.Component {
         this.onClickCleanupCartAll = this.onClickCleanupCartAll.bind(this);
         this.pushAccountTableItem = this.pushAccountTableItem.bind(this);
         this.checkDuplicatedItem = this.checkDuplicatedItem.bind(this);
+        this.__changeTableItemIdx = this.__changeTableItemIdx.bind(this);
         
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
-        this.account_table_body = 'account-table-body';
+        this.account_table_body_id = 'account-table-body';
 
         this.state = {
             account_table_list : []
@@ -42,19 +43,19 @@ class ContentsAccounts extends React.Component {
     }
 
     __setSortable(){
-        const el_account_table_body = document.getElementById(this.account_table_body);
+        const el_account_table_body = document.getElementById(this.account_table_body_id);
         Sortable.create(el_account_table_body, {
             sort: true,
             ghostClass : 'draggable-ghost',
             chosenClass : 'draggable-chosen',
             dragClass : 'draggable-drag',
             onEnd : (evt) =>{
-                this.__changeAccountTableItemIdx(evt.oldIndex, evt.newIndex);
+                this.__changeTableItemIdx(evt.oldIndex, evt.newIndex);
             }
         });
     }
 
-    __changeAccountTableItemIdx(from_idx, to_idx){
+    __changeTableItemIdx(from_idx, to_idx){
         
         common.move_element(this.state.account_table_list, from_idx, to_idx);
         this.setState({
@@ -297,7 +298,7 @@ class ContentsAccounts extends React.Component {
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
-                        <tbody id={this.account_table_body}>
+                        <tbody id={this.account_table_body_id}>
                             {this.state.account_table_list}
                         </tbody>
                     </table>

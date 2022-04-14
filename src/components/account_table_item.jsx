@@ -159,11 +159,7 @@ class AccountsTableItem extends React.Component {
         const background_color = is_locked ? 'rgb(241, 36, 36, 0.36)' : 'transparent';
 
         return(
-            <tr
-                style={{background : background_color}} 
-                id={this.state.account_info.id}
-                className="draggable"
-            >
+            <tr style={{background : background_color}} className="draggable">
                 <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
                     <span>{this.state.account_info.email}</span>
                 </td>
