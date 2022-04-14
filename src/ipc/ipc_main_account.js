@@ -47,6 +47,25 @@ function register(){
         })();
     });
 
+    ipcMain.on('save-account-info-list', (event, data) => {
+
+        (async() =>{
+            try{
+                data.payload.account_info_list.forEach((account_info)=> delete account_info['state']);
+                const account_info_list = data.payload.account_info_list;
+                
+                const file_data = { accounts : account_info_list };
+                await UserFileManager.write(USER_FILE_PATH.USER_INFO, file_data);
+                
+                event.reply('save-account-info-list-reply' + data.id, undefined);
+
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_account.js', 'save-account-info-list-callback', err));
+                event.reply('save-account-info-list-reply' + data.id, 'invalid exception has been occurred while saving account information list');
+            }
+        })();
+    });
+
     ipcMain.on('update-account-info', (event, data) => {
 
         const account_info = data.payload.account_info;
@@ -64,7 +83,7 @@ function register(){
 
             }catch(err){
                 log.error(common.get_log_str('ipc_main_account.js', 'update-account-info-callback', err));
-                event.reply('update-account-info-reply' + data.id, 'invalid exception has been occurred while registering account information');
+                event.reply('update-account-info-reply' + data.id, 'invalid exception has been occurred while updating account information');
             }
         })();
     });

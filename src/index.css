@@ -125,6 +125,7 @@ input::-webkit-inner-spin-button {
 .table-wrapper{
   height: calc(100vh - 150px);;  
   overflow: auto;
+  overflow-x: hidden;
 }
 
 thead tr:nth-child(1) th{
@@ -369,3 +370,26 @@ tbody tr:hover td {
 }
 
 /* End to contents settings */
+
+.draggable, .draggable::after, .draggable::before {
+	-webkit-user-drag: element !important
+}
+
+.draggable.dragging {
+    opacity: 1;
+}
+
+.draggable-ghost {
+    opacity: 0.8;
+    border: 3px dashed;
+    background-color: rgb(131, 241, 149, 0.36) !important;
+}
+
+.draggable-chosen {
+    opacity: 1;
+    background-color: black !important;
+}
+
+.draggable-drag {
+    background-color: black !important;
+}
