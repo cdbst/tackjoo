@@ -425,7 +425,7 @@ class ContentsTasks extends React.Component {
 
         // 첫번째로 아예 task로 등록되지 않은 계정부터 찾는다.
         const account_status_dict = {};
-        account_info_list.forEach((account_info)=>{
+        account_info_list.forEach((account_info) =>{
             account_status_dict[account_info.email] = {
                 status : 0,
                 count : 0
@@ -435,6 +435,7 @@ class ContentsTasks extends React.Component {
         for(const task_ref of Object.values(this.__table_item_ref_dict)){
 
             const task_account_email = task_ref.current.props.task_info.account_email;
+            if(task_account_email in account_status_dict === false) continue; // 기 생성된 작업에 사용 중인 계정이 이 시점에는 잠금 상태 인 경우, 혹은 삭제된 상태인 경우 예외처리임.
             account_status_dict[task_account_email].count++;
             account_status_dict[task_account_email].status = Math.max(account_status_dict[task_account_email].status, task_ref.current.isIdleState() ? 1 : 2);
         }
@@ -494,8 +495,12 @@ class ContentsTasks extends React.Component {
 
             const proxy_info = task_ref.current.props.task_info.proxy_info;
             if(proxy_info === undefined) continue;
-            proxy_status_dict[proxy_info._id].count++;
-            proxy_status_dict[proxy_info._id].status = Math.max(proxy_status_dict[proxy_info._id].status, task_ref.current.isIdleState() ? 1 : 2);
+
+            const proxy_info_id = proxy_info._id;
+
+            if(proxy_info_id in proxy_status_dict === false) continue; // 기 생성된 작업에서 사용중인 프록시가 현재 시점에선 삭제된 상태인 경우임.
+            proxy_status_dict[proxy_info_id].count++;
+            proxy_status_dict[proxy_info_id].status = Math.max(proxy_status_dict[proxy_info_id].status, task_ref.current.isIdleState() ? 1 : 2);
         }
 
         const unregistred_proxy_infos = [];
