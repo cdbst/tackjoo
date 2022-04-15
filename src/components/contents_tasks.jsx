@@ -463,11 +463,11 @@ class ContentsTasks extends React.Component {
         busy_account_emails.sort(sort);
 
         if(unregistred_account_emails.length > 0){
-            return unregistred_account_emails.shift();
+            return unregistred_account_emails.pop();
         }else if(idle_account_emails.length > 0){
-            return idle_account_emails.shift();
+            return idle_account_emails.pop();
         }else if(busy_account_emails.length > 0){
-            return busy_account_emails.shift();
+            return busy_account_emails.pop();
         }else{
             return undefined;
         }
