@@ -257,7 +257,7 @@ class ContentsNewProduct extends React.Component {
 
     __onRightClickWatchBtn(){
 
-        Index.g_time_select_modal.popModal('감시 예약됨', (is_ok, time)=>{
+        Index.g_time_select_modal.popModal('감시 예약 시간 설정', (is_ok, time)=>{
 
             if(is_ok === true){
                 this.__reserveWatchdog(time);
@@ -492,7 +492,7 @@ class ContentsNewProduct extends React.Component {
     render() {
 
         let reserved_start_watchdog_date_str = this.state.reserved_start_watchdog_date !== undefined ? common.get_formatted_date_str(this.state.reserved_start_watchdog_date, true) : '';
-        reserved_start_watchdog_date_str = reserved_start_watchdog_date_str !== '' ? `${reserved_start_watchdog_date_str} 감시 시작 예약됨` : '';
+        reserved_start_watchdog_date_str = reserved_start_watchdog_date_str !== '' ? `${reserved_start_watchdog_date_str} 감시 예약` : '';
 
         return (
             <div className="tab-pane fade" id="new-product" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.NEW_PRODUCT}>
