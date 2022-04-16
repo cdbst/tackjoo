@@ -312,7 +312,7 @@ tbody tr:hover td {
     color: #ffffff !important;
 }
 
-#schedule-time-input{
+.time-input-select{
     background:url('./res/img/caret-down-fill.svg') no-repeat right 12px center !important;
     width: 310px !important;
     color: var(--color) !important;

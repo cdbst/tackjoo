@@ -18,7 +18,7 @@ class TimeSelectModal extends React.Component {
             modal_title : '',
             modal_content_style : {
                 width: 360, 
-                height: 550
+                height: 210
             }
         };
 
@@ -99,8 +99,8 @@ class TimeSelectModal extends React.Component {
                         <div className="modal-body">
                             <input 
                                 id={TimeSelectModal.TIME_INPUT_ID} 
-                                className="modal-select form-control" 
-                                style={{'--width' : '308px'}}
+                                className="modal-select form-control time-input-select" 
+                                style={{'--width' : '308px', 'text-align-last' : 'center'}}
                             />
                         </div>
                         <div className="modal-footer">
