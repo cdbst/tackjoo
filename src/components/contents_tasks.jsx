@@ -379,8 +379,8 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    onChangeTask(task_id){
-        this.popTaskEditModal(undefined, [task_id]);
+    onChangeTask(product_url, task_id){
+        this.popTaskEditModal(product_url, [task_id]);
     }
 
     onChangeTaskLink(task_id){
@@ -397,7 +397,7 @@ class ContentsTasks extends React.Component {
                 id={task_info._id}
                 h_remove={this.onRemoveTask.bind(this)}
                 h_select_changed={this.onTaskSelectChanged.bind(this)}
-                h_modify={this.onChangeTask.bind(this, task_info._id)}
+                h_modify={this.onChangeTask.bind(this)}
                 h_modify_link={this.onChangeTaskLink.bind(this, task_info._id)}
                 task_info={task_info}
                 ref={task_ref}
