@@ -11,6 +11,7 @@ class ContentsNewProduct extends React.Component {
         this.__getTableItems = this.__getTableItems.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
+        this.__onRightClickWatchBtn = this.__onRightClickWatchBtn.bind(this);
         this.onRemoveProduct = this.onRemoveProduct.bind(this);
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
         this.__onSubmitWhitelistInfo = this.__onSubmitWhitelistInfo.bind(this);
@@ -245,6 +246,18 @@ class ContentsNewProduct extends React.Component {
                 this.props.contents_task_ref.current.create_quick_task(product_info);
             }
         }, 100);
+    }
+
+    __onRightClickWatchBtn(){
+        console.log('__onRightClickWatchBtn');
+
+        Index.g_time_select_modal.popModal('감시 시작 시간 예약', (is_ok, selected_itme)=>{
+
+            if(is_ok == false) return;
+
+            console.log(selected_itme);
+        });
+        
     }
 
     __onClickWatchBtn(status){
@@ -510,6 +523,7 @@ class ContentsNewProduct extends React.Component {
                             <ToggleButton
                                 ref={this.__watchBtnRefCb.bind(this)}
                                 h_on_click={this.__onClickWatchBtn.bind(this)}
+                                h_on_right_click={this.__onRightClickWatchBtn.bind(this)}
                                 init_state={false}
                                 set_btn_label={"감시 취소"}
                                 unset_btn_label={"감시 시작"}

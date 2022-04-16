@@ -4,6 +4,7 @@ class ToggleButton extends React.Component {
         super(props);
 
         this.__onClick = this.__onClick.bind(this);
+        this.__onRightClick = this.__onRightClick.bind(this);
         this.__ref_btn = React.createRef();
 
         this.state = {
@@ -18,6 +19,10 @@ class ToggleButton extends React.Component {
         }), ()=>{
             this.props.h_on_click(this.state.set);
         });
+    }
+
+    __onRightClick(){
+        this.props.h_on_right_click();
     }
 
     setDisabled(status){
@@ -40,7 +45,11 @@ class ToggleButton extends React.Component {
         }
 
         return(
-            <button ref={this.__ref_btn} type="button" className={"btn " + this.props.btn_class} onClick={this.__onClick.bind(this)}>
+            <button ref={this.__ref_btn} 
+                type="button" 
+                className={"btn " + this.props.btn_class} 
+                onClick={this.__onClick.bind(this)} 
+                onContextMenu={this.__onRightClick.bind(this)}>
                 <img src={btn_img_src} style={{width:24, height:24}}/>
                 { btn_label !== undefined && btn_label }
             </button>
