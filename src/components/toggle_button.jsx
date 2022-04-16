@@ -57,9 +57,12 @@ class ToggleButton extends React.Component {
                 type="button" 
                 className={"btn " + this.props.btn_class} 
                 onClick={this.__onClick.bind(this)} 
-                onContextMenu={this.__onRightClick.bind(this)}>
+                onContextMenu={this.__onRightClick.bind(this)}
+                title={this.props.title !== undefined ? this.props.title : ''}
+            >
                 <img src={btn_img_src} style={{width:24, height:24}}/>
                 { btn_label !== undefined && btn_label }
+                
             </button>
         );
     }

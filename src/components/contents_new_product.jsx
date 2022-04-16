@@ -567,11 +567,12 @@ class ContentsNewProduct extends React.Component {
                                     unset_btn_label={"감시 시작"}
                                     set_img_src={"./res/img/tail-spin.svg"}
                                     unset_img_src={"./res/img/search.svg"}
-                                    btn_class={"btn-primary btn-footer-inside"}    
+                                    btn_class={"btn-primary btn-footer-inside"}
+                                    title="[좌클릭 : 감시 제어], [우클릭: 감시 예약]"
                                 />
                             </div>
                             
-                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)} >
+                            <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제
                             </button>
                             <button type="button" className="btn btn-light btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.WHITELIST_EDIT_MODAL_ID} >
