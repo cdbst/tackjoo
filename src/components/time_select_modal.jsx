@@ -11,6 +11,7 @@ class TimeSelectModal extends React.Component {
         this.onClickOkBtn = this.onClickOkBtn.bind(this);
         this.onClickCancelBtn = this.onClickCancelBtn.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.showModal = this.showModal.bind(this);
         
         this.__mount = false;
         this.__h_modal_close = undefined;
@@ -60,9 +61,7 @@ class TimeSelectModal extends React.Component {
         this.setState({ modal_title : _modal_title }, () => {
             this.time_input_instance.setDate(common.get_formatted_date_str(new Date(), true), false);
             this.__h_modal_close = h_modal_close;
-            let el_modal = document.getElementById(TimeSelectModal.ID);
-            let bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-            bs_obj_modal.show();
+            this.showModal();
         });
     }
 
@@ -91,9 +90,15 @@ class TimeSelectModal extends React.Component {
     }
 
     closeModal(){
-        let el_modal = document.getElementById(TimeSelectModal.ID);
-        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        const el_modal = document.getElementById(TimeSelectModal.ID);
+        const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.hide();
+    }
+
+    showModal(){
+        const el_modal = document.getElementById(TimeSelectModal.ID);
+        const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     render(){
