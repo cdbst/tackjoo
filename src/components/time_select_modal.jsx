@@ -70,7 +70,7 @@ class TimeSelectModal extends React.Component {
 
         selected_schedule = this.time_input_instance.selectedDates;
         if(selected_schedule.length === 0){
-            Index.g_sys_msg_q.enqueue('에러', "작업 예약(시작) 시간을 설정하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            this.__h_modal_close(false);
             return;
         }
         selected_schedule = selected_schedule[0];
