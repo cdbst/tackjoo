@@ -480,7 +480,7 @@ class TaskEditModal extends React.Component {
                                 <div className="col-md-8">
                                     <input 
                                         id={this.EL_ID_MODAL_INPUT_SCHDULE_TIME} 
-                                        className="modal-select form-control" 
+                                        className="modal-select form-control time-input-select" 
                                         disabled={!this.state.use_reservation}
                                         style={{'--width' : '450px', '--color' : this.state.use_reservation ? 'white' : 'transparent'}}
                                     />

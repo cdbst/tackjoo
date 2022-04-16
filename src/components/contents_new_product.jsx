@@ -11,6 +11,7 @@ class ContentsNewProduct extends React.Component {
         this.__getTableItems = this.__getTableItems.bind(this);
         this.__updateTableItems = this.__updateTableItems.bind(this);
         this.__onClickWatchBtn = this.__onClickWatchBtn.bind(this);
+        this.__onRightClickWatchBtn = this.__onRightClickWatchBtn.bind(this);
         this.onRemoveProduct = this.onRemoveProduct.bind(this);
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
         this.__onSubmitWhitelistInfo = this.__onSubmitWhitelistInfo.bind(this);
@@ -30,18 +31,25 @@ class ContentsNewProduct extends React.Component {
         this.genQuickTaskAutomatically = this.genQuickTaskAutomatically.bind(this);
         this.onFilterChanged = this.onFilterChanged.bind(this);
 
+        this.__reserveWatchdog = this.__reserveWatchdog.bind(this);
+        this.__unreserveWatchdog = this.__unreserveWatchdog.bind(this);
+        this.__onAlamWatchdogStartTime = this.__onAlamWatchdogStartTime.bind(this);
+
         this.whitelist_info_list = [];
         this.blacklist_info_list = [];
         this.__product_info_list = [];
 
         this.state = {
-            product_table_list : []
+            product_table_list : [],
+            reserved_start_watchdog_date : undefined
         };
 
         this.__ref_watch_btn = undefined;
         this.__ref_whitelist_edit_modal = React.createRef();
         this.__ref_blacklist_edit_modal = React.createRef();
         this.__ref_sel_whitelist_filter = React.createRef();
+
+        this.watchdog_alam_subscriber_id = common.uuidv4();
 
         this.__mount = false;
         this.__setupColumnsWidth();
@@ -247,6 +255,42 @@ class ContentsNewProduct extends React.Component {
         }, 100);
     }
 
+    __onRightClickWatchBtn(){
+
+        Index.g_time_select_modal.popModal('감시 예약 시간 설정', (is_ok, time)=>{
+
+            if(is_ok === true){
+                this.__reserveWatchdog(time);
+            }else if(is_ok === false){
+                this.__unreserveWatchdog();
+            }
+        });
+    }
+
+    __reserveWatchdog(reserve_itme){
+        this.setState({
+            reserved_start_watchdog_date : reserve_itme
+        }, ()=>{
+            Index.g_server_clock.subscribeAlam(reserve_itme, this.__onAlamWatchdogStartTime, this.watchdog_alam_subscriber_id);
+        });
+    }
+
+    __unreserveWatchdog(){
+        this.setState({
+            reserved_start_watchdog_date : undefined
+        }, ()=>{
+            Index.g_server_clock.unsubscribeAlam(this.watchdog_alam_subscriber_id);
+        });
+    }
+
+    __onAlamWatchdogStartTime(){
+        this.setState({
+            reserved_start_watchdog_date : undefined
+        }, ()=>{
+            if(this.__ref_watch_btn.getState() === false) this.__ref_watch_btn.__onClick(); // 감시 상태 아닐때만 감시 시작.
+        });
+    }
+
     __onClickWatchBtn(status){
 
         this.__ref_watch_btn.setDisabled(true);
@@ -447,6 +491,9 @@ class ContentsNewProduct extends React.Component {
 
     render() {
 
+        let reserved_start_watchdog_date_str = this.state.reserved_start_watchdog_date !== undefined ? common.get_formatted_date_str(this.state.reserved_start_watchdog_date, true) : '';
+        reserved_start_watchdog_date_str = reserved_start_watchdog_date_str !== '' ? `${reserved_start_watchdog_date_str} 감시 예약` : '';
+
         return (
             <div className="tab-pane fade" id="new-product" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.NEW_PRODUCT}>
                 <div className="container-fluid">
@@ -507,16 +554,22 @@ class ContentsNewProduct extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <ToggleButton
-                                ref={this.__watchBtnRefCb.bind(this)}
-                                h_on_click={this.__onClickWatchBtn.bind(this)}
-                                init_state={false}
-                                set_btn_label={"감시 취소"}
-                                unset_btn_label={"감시 시작"}
-                                set_img_src={"./res/img/tail-spin.svg"}
-                                unset_img_src={"./res/img/search.svg"}
-                                btn_class={"btn-primary btn-footer-inside"}
-                            />
+                            <div>
+                                <h6 style={{position : 'absolute', right : 10, bottom: 44}}>
+                                    <span className="badge bg-info" >{reserved_start_watchdog_date_str}</span>
+                                </h6>
+                                <ToggleButton
+                                    ref={this.__watchBtnRefCb.bind(this)}
+                                    h_on_click={this.__onClickWatchBtn.bind(this)}
+                                    h_on_right_click={this.__onRightClickWatchBtn.bind(this)}
+                                    init_state={false}
+                                    set_btn_label={"감시 취소"}
+                                    unset_btn_label={"감시 시작"}
+                                    set_img_src={"./res/img/tail-spin.svg"}
+                                    unset_img_src={"./res/img/search.svg"}
+                                    btn_class={"btn-primary btn-footer-inside"}    
+                                />
+                            </div>
                             
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.__onClickRemoveAll.bind(this)} >
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 모두삭제

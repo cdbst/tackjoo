@@ -10,6 +10,7 @@ class Index extends React.Component {
     static g_product_mngr = new ProductManager();
     static g_server_clock = new ServerClock();
     static g_prompt_modal = new PromptModalHandler();
+    static g_time_select_modal = new TimeSelectModalHandler();
     static g_billing_info = undefined;
     static g_settings_info = new AppSettings();
 
@@ -20,6 +21,9 @@ class Index extends React.Component {
         
         this.prompt_modal_ref = React.createRef();
         Index.g_prompt_modal.setModalRef(this.prompt_modal_ref);
+
+        this.time_select_modal = React.createRef();
+        Index.g_time_select_modal.setModalRef(this.time_select_modal);
 
         this.state = {
             sys_msg_q : Index.g_sys_msg_q,
@@ -58,6 +62,7 @@ class Index extends React.Component {
         return (
             <div>
                 <PromptModal ref={this.prompt_modal_ref}/>
+                <TimeSelectModal ref={this.time_select_modal}/>
                 <Toast sys_msg_q={this.state.sys_msg_q}/>
                 {this.state.signed_in ? (
                     <div>
