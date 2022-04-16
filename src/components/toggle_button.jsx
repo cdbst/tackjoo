@@ -5,6 +5,10 @@ class ToggleButton extends React.Component {
 
         this.__onClick = this.__onClick.bind(this);
         this.__onRightClick = this.__onRightClick.bind(this);
+        this.setDisabled = this.setDisabled.bind(this);
+        this.setBtnState = this.setBtnState.bind(this);
+        this.getState = this.getState.bind(this);
+
         this.__ref_btn = React.createRef();
 
         this.state = {
@@ -33,6 +37,10 @@ class ToggleButton extends React.Component {
         this.setState(_ => ({
             set : status
         }));
+    }
+
+    getState(){
+        return this.state.set;
     }
 
     render(){

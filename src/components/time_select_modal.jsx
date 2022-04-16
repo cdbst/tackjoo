@@ -9,10 +9,12 @@ class TimeSelectModal extends React.Component {
         this.onPopModal = this.onPopModal.bind(this);
         this.onModalClosed =this.onModalClosed.bind(this);
         this.onClickOkBtn = this.onClickOkBtn.bind(this);
-
+        this.onClickCancelBtn = this.onClickCancelBtn.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        
         this.__mount = false;
         this.__h_modal_close = undefined;
-        this.__click_ok = false;
+        this.__click_ok = undefined;
 
         this.state = {
             modal_title : '',
@@ -49,7 +51,6 @@ class TimeSelectModal extends React.Component {
         });
     }
 
-
     componentWillUnmount(){
         this.__mount = false;
     }
@@ -76,12 +77,20 @@ class TimeSelectModal extends React.Component {
 
         this.__h_modal_close(this.__click_ok, selected_schedule);
         this.__h_modal_close = undefined;
-        this.__click_ok = false;
+        this.__click_ok = undefined;
     }
 
     onClickOkBtn(){
         this.__click_ok = true;
+        this.closeModal();
+    }
 
+    onClickCancelBtn(){
+        this.__click_ok = false;
+        this.closeModal();
+    }
+
+    closeModal(){
         let el_modal = document.getElementById(TimeSelectModal.ID);
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.hide();
@@ -104,7 +113,7 @@ class TimeSelectModal extends React.Component {
                             />
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" onClick={this.onClickCancelBtn.bind(this)}>취소</button>
                             <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onClickOkBtn.bind(this)}>확인</button>
                         </div>
                     </div>
