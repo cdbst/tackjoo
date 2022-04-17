@@ -83,13 +83,17 @@ async function req_kream_product_info(kream_product_id){
         common.update_kream_product_info_obj(kream_product_info, 'product_id', kream_product_id);
         common.update_kream_product_info_obj(kream_product_info, 'url', `${KREAM_URL}/products/${kream_product_id}`);
 
-        const interest = res.data.counter.wish_count;
+        let interest = res.data.counter.wish_count;
+        interest = interest === null ? 0 : interest;
         common.update_kream_product_info_obj(kream_product_info, 'interest', interest);
 
-        const price = res.data.market.market_price;
-        let fixed_price = (price).toLocaleString('ko-KR', {style: 'currency', currency: 'KRW'});
-        fixed_price = fixed_price.replace('₩', '') + ' 원';
-        common.update_kream_product_info_obj(kream_product_info, 'price', fixed_price);
+        let price = res.data.market.market_price;
+        if(price !== null){
+            price = (price).toLocaleString('ko-KR', {style: 'currency', currency: 'KRW'});
+            price = price.replace('₩', '') + ' 원';
+        }
+
+        common.update_kream_product_info_obj(kream_product_info, 'price', price);
 
         const options = res.data.options;
         common.update_kream_product_info_obj(kream_product_info, 'options', options);

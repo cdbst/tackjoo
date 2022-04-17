@@ -409,14 +409,22 @@ class TaskEditModal extends React.Component {
         let kream_price_str = '정보 없음';
 
         if(this.state.selected_product !== undefined && this.state.kream_product_info !== undefined){
-            const price_gap = common.getPriceGap(this.state.kream_product_info.price, this.state.selected_product.price);
-            if(price_gap > 0){
-                kream_price_label_class_name = 'task-edit-modal-option-label-info';
-            }else if(price_gap < 0){
-                kream_price_label_class_name = 'task-edit-modal-option-label-danger';
-            }
 
-            kream_price_str = this.state.kream_product_info.price;
+            if(this.state.kream_product_info.price !== null){
+
+                const price_gap = common.getPriceGap(this.state.kream_product_info.price, this.state.selected_product.price);
+
+                if(price_gap > 0){
+                    kream_price_label_class_name = 'task-edit-modal-option-label-info';
+                }else if(price_gap < 0){
+                    kream_price_label_class_name = 'task-edit-modal-option-label-danger';
+                }
+
+                kream_price_str = this.state.kream_product_info.price;
+
+            }else{
+                kream_price_str = '거래 없음';
+            }
         }
         
         return (

@@ -86,22 +86,29 @@ class NewProductTableItem extends React.Component {
 
     render(){
 
-        const kream_price_str = this.state.kream_product_info === undefined ? '정보없음' : this.state.kream_product_info.price;
+        
         const kream_interest_str = this.state.kream_product_info === undefined ? '' : this.state.kream_product_info.interest;
 
         let price_gap_str = '';
         let price_gap = 0;
 
+        let kream_price_str = '정보없음';
         let product_name_font_clolr = '#ffffff';
         
         if(this.state.kream_product_info){
-            price_gap = common.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
-            price_gap_str = new Intl.NumberFormat('ko-KR').format(price_gap);
-            let yield_ratio =  (price_gap / common.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
-            yield_ratio = yield_ratio.toFixed(1);
-            price_gap_str = `${price_gap_str}(${yield_ratio}%)`;
 
-            product_name_font_clolr = this.getProductNameColor(yield_ratio);
+            if(this.state.kream_product_info.price !== null){
+                price_gap = common.getPriceGap(this.state.kream_product_info.price, this.props.product_info.price);
+                price_gap_str = new Intl.NumberFormat('ko-KR').format(price_gap);
+                let yield_ratio =  (price_gap / common.getNumberByCurrencyStr(this.props.product_info.price)) * 100;
+                yield_ratio = yield_ratio.toFixed(1);
+                price_gap_str = `${price_gap_str}(${yield_ratio}%)`;
+    
+                product_name_font_clolr = this.getProductNameColor(yield_ratio);
+                kream_price_str = this.state.kream_product_info.price;
+            }else{
+                kream_price_str = '거래없음'
+            }
         }
 
         const price_gap_str_font_color = price_gap > 0 ? '#0dcaf0' : '#dc3545';
