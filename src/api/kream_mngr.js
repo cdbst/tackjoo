@@ -88,10 +88,7 @@ async function req_kream_product_info(kream_product_id){
         common.update_kream_product_info_obj(kream_product_info, 'interest', interest);
 
         let price = res.data.market.market_price;
-        if(price !== null){
-            price = (price).toLocaleString('ko-KR', {style: 'currency', currency: 'KRW'});
-            price = price.replace('₩', '') + ' 원';
-        }
+        if(price !== null) price = Intl.NumberFormat('ko-KR').format(price) + ' 원';
 
         common.update_kream_product_info_obj(kream_product_info, 'price', price);
 
