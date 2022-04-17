@@ -83,13 +83,17 @@ class ContentsSignIn extends React.Component {
     }
 
     onClickViewTerm(){
-        window.electron.readTermFileData((err, data) =>{
+        window.electron.readTermFileData((err, term_data) =>{
             if(err){
                 Index.g_sys_msg_q.enqueue('에러', '이용약관을 불러올수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
 
-            console.log(data);
+            const converter = new showdown.Converter();
+            const term_data_html = converter.makeHtml(term_data);
+            Index.g_prompt_modal.popModal('이용 약관', (<div className="Container" dangerouslySetInnerHTML={{__html: term_data_html}}></div>), (is_ok)=>{
+                console.log(is_ok);
+            });
         });
     }
 
