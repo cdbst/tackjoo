@@ -52,6 +52,9 @@ contextBridge.exposeInMainWorld('electron', {
     updateAccountInfo : _updateAccountInfo,
     saveAccountInfoList : _saveAccountInfoList,
     readTermFileData : _readTermFileData,
+    updateViewTermSetting : _updateViewTermSetting,
+    getViewTermSetting : _getViewTermSetting,
+    exitProgram : _exitProgram
 });
 
 /**
@@ -595,4 +598,33 @@ function _readTermFileData(__callback){
     ipcRenderer.once('read-term-file-reply' + ipc_data.id, (_event, term_data_info) => {
         __callback(term_data_info.err, term_data_info.data);
     });
+}
+
+function _updateViewTermSetting(setting, __callback){
+
+    const ipc_data = get_ipc_data({
+        setting : setting
+    });
+    
+    ipcRenderer.send('update-view-term-setting', ipc_data);
+
+    ipcRenderer.once('update-view-term-setting-reply' + ipc_data.id, (_event, err) => {
+        if(__callback)__callback(err);
+    });
+}
+
+function _getViewTermSetting(__callback){
+
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('read-view-term-setting', ipc_data);
+    ipcRenderer.once('read-view-term-setting-reply' + ipc_data.id, (_event, data) => {
+        __callback(data.err, data.data);
+    });
+}
+
+function _exitProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('exit-program', ipc_data);
 }
