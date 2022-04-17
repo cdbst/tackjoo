@@ -4,12 +4,27 @@ const common = require('../common/common');
 const util = require("./ipc_util.js");
 const path = require('path');
 const { notify_new_product, notify_new_product_list } = require('../api/notification_mngr');
+const fs = require('fs');
+
+const TERM_FILE_PATH = path.resolve(path.join(app.getAppPath(), 'res', 'term', 'term.txt'));
 
 let g_win = undefined;
 
 function register(win){
 
     g_win = win;
+
+    ipcMain.on('read-term-file', (event, data) => {
+
+        fs.readFile(TERM_FILE_PATH, 'utf8', (err, term_data) =>{
+            if(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'read-term-file-callback', err));
+                event.reply('read-term-file-reply' + data.id, {err : err, data : undefined});
+                return;
+            }
+            event.reply('read-term-file-reply' + data.id, {err : undefined, data : term_data});
+        });
+    });
 
     ipcMain.on('open-external-webpage', (event, data) => {
         try{
