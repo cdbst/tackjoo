@@ -99,7 +99,7 @@ async function req_kream_product_info(kream_product_id){
         return kream_product_info;
 
     }catch(err){
-        log.error(get_log_str('kream_mngr.js', 'req_kream_product_id', err));
+        log.error(get_log_str('kream_mngr.js', 'req_kream_product_info', err));
         return undefined;
     }
 }
