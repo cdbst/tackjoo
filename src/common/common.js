@@ -91,6 +91,7 @@
             url : undefined,
             price: undefined,
             interest : undefined,
+            options: undefined,
             _id : undefined
         };
     }

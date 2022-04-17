@@ -32,6 +32,15 @@ async function get_kream_product_info(model_id){
 
     if(model_id === undefined) return undefined;
 
+    const kream_product_id = await req_kream_product_id(model_id);
+    if(kream_product_id === undefined) return undefined;
+
+    const kream_product_info = await req_kream_product_info(kream_product_id);
+    return kream_product_info;
+}
+
+async function req_kream_product_id(model_id){
+
     const axios_req_cfg = {
         method: 'GET',
         url: KREAM_API_URL + '/p/products/suggest',
@@ -48,19 +57,50 @@ async function get_kream_product_info(model_id){
         if(res.data === undefined || res.data.items === undefined || res.data.items.length === 0) return undefined;
 
         const product_meta_info = res.data.items[0];
-
-        let retry = 6;
-
-        while(retry--){
-            const kream_product_info = await parse_kream_product_page(product_meta_info.id);
-            if(kream_product_info === undefined) return undefined;
-            else if(is_valid_currency_format(kream_product_info.price.replace(' 원', ''))) return kream_product_info;
-        }
-
-        return undefined;
+        return product_meta_info.id;
 
     }catch(err){
-        log.error(get_log_str('kream_mngr.js', 'parse_kream_product_page', err));
+        log.error(get_log_str('kream_mngr.js', 'req_kream_product_id', err));
+        return undefined;
+    }
+}
+
+async function req_kream_product_info(kream_product_id){
+
+    const axios_req_cfg = {
+        method: 'GET',
+        url: `${KREAM_API_URL}/p/products/${kream_product_id}`,
+        headers : get_req_headers(),
+        params : {
+            request_key : uuidv4()
+        }
+    };
+
+    try{
+        const res = await axios(axios_req_cfg);
+
+        const kream_product_info = common.get_kream_product_info_obj_scheme();
+        common.update_kream_product_info_obj(kream_product_info, 'product_id', kream_product_id);
+        common.update_kream_product_info_obj(kream_product_info, 'url', `${KREAM_URL}/products/${kream_product_id}`);
+
+        let interest = res.data.counter.wish_count;
+        interest = interest === null ? 0 : interest;
+        common.update_kream_product_info_obj(kream_product_info, 'interest', interest);
+
+        let price = res.data.market.market_price;
+        if(price !== null) price = Intl.NumberFormat('ko-KR').format(price) + ' 원';
+
+        common.update_kream_product_info_obj(kream_product_info, 'price', price);
+
+        const options = res.data.options;
+        common.update_kream_product_info_obj(kream_product_info, 'options', options);
+
+        common.update_kream_product_info_obj(kream_product_info, '_id', common.uuidv4());
+
+        return kream_product_info;
+
+    }catch(err){
+        log.error(get_log_str('kream_mngr.js', 'req_kream_product_info', err));
         return undefined;
     }
 }
