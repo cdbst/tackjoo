@@ -1,9 +1,9 @@
 {
   "name": "tackjoo",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "TACKJOO Business app",
   "appid": "com.cdbst.tackjoo",
-  "copyright": "Copyright on cdbst all right reserved.",
+  "copyright": "Copyright on ShoeSTech all right reserved.",
   "main": "app.js",
   "scripts": {
     "prebuild": "npx babel ./*.jsx ./components/*.jsx --out-dir ./ --presets react-app/prod",
@@ -24,7 +24,7 @@
     "js",
     "react"
   ],
-  "author": "cdbst",
+  "author": "ShoeSTech",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/cdbst/tackjoo/issues"
