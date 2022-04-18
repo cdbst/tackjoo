@@ -34,7 +34,7 @@ async function build(){
             build_cfg.config.publish = {
                 provider : 'github',
                 repo : RELEASE_REPO_NAME,
-                owner : package_json.author,
+                owner : package_json.developer,
                 vPrefixedTagName : true,
                 protocol : 'https'
             }
@@ -44,7 +44,7 @@ async function build(){
             build_cfg.config.publish = {
                 provider : 'github',
                 repo : TEST_RELEASE_REPO_NAME,
-                owner : package_json.author,
+                owner : package_json.developer,
                 vPrefixedTagName : true,
                 protocol : 'https'
             }

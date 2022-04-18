@@ -24,6 +24,7 @@
     "js",
     "react"
   ],
+  "developer": "cdbst",
   "author": "ShoeSTech",
   "license": "ISC",
   "bugs": {
