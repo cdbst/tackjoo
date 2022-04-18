@@ -152,9 +152,15 @@ class ContentsSignIn extends React.Component {
                     </div>
                     <div className="mt-5 text-muted">Discord 문의👉 Takc#8171</div>
                     <div className="text-muted">{`version v${this.app_version}`}</div>
-                    <div className="text-muted">&copy; cdbst 2021-2022</div>
+                    <div className="text-muted">&copy; ShoeSTech 2021-2022</div>
+                </div>
+                <div className="row signin-footer">
+                    <div className="col-md-12 bd-highlight align-items-center text-center">
+                        <p className="text-center">&copy; 슈스텍(ShoeSTech) (사업자등록번호 : 160-13-01747)</p>
+                    </div>
                 </div>
             </div>
+            
         );
     }
 }

@@ -119,6 +119,14 @@ input::-webkit-inner-spin-button {
     height: 60px;   /* Height of the footer */
     background: #202225;
 }
+
+.signin-footer {
+    position: fixed !important;
+    bottom: 0;
+    width: 100%;
+    height: 30px;   /* Height of the footer */
+    background: #202225;
+}
 /* END to Footer Div */
 
 /* Start To contents tables */
