@@ -57,7 +57,7 @@ class PromptModal extends React.Component {
 
     render(){
         return(
-            <div id={PromptModal.id} className="modal" tabIndex="-1">
+            <div id={PromptModal.id} className="modal" tabIndex="-1" data-bs-backdrop="static">
                 <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div className="modal-content">
                     <div className="modal-header">

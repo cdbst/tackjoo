@@ -11,6 +11,7 @@ class ContentsSignIn extends React.Component {
         this.onSubmitUserInfo = this.onSubmitUserInfo.bind(this);
         this.onKeyDownInputPwd = this.onKeyDownInputPwd.bind(this);
         this.loadLoginInfo = this.loadLoginInfo.bind(this);
+        this.loadViewTerm = this.loadViewTerm.bind(this);
         this.onChangeInputRemember = this.onChangeInputRemember.bind(this);
 
         this.app_version = window.electron.getAppVersion();
@@ -20,6 +21,7 @@ class ContentsSignIn extends React.Component {
     componentDidMount(){
         this.__mount = true;
         this.loadLoginInfo();
+        this.loadViewTerm();
     }
 
     componentWillUnmount(){
@@ -33,6 +35,14 @@ class ContentsSignIn extends React.Component {
             document.getElementById(this.INPUT_EMAIL_ID).value = login_info.email;
             document.getElementById(this.INPUT_PWD_ID).value = login_info.password;
             document.getElementById(this.INPUT_REMEMBER_INFO_ID).checked = login_info.remember;
+        });
+    }
+
+    loadViewTerm(){
+        window.electron.getViewTermSetting((err, setting) =>{
+            if(err !== undefined || setting === false){
+                this.viewTerm();
+            }
         });
     }
 
@@ -82,6 +92,27 @@ class ContentsSignIn extends React.Component {
         window.electron.openExternalWebPage('http://18.179.4.170/password');
     }
 
+    viewTerm(){
+        window.electron.readTermFileData((err, term_data) =>{
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', '이용약관을 불러올수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
+            const converter = new showdown.Converter();
+            const term_data_html = converter.makeHtml(term_data);
+            Index.g_prompt_modal.popModal('이용 약관', (<div className="Container" dangerouslySetInnerHTML={{__html: term_data_html}}></div>), (is_ok)=>{
+                if(is_ok){
+                    window.electron.updateViewTermSetting(true);
+                }else{
+                    window.electron.updateViewTermSetting(false, (_err) =>{
+                        window.electron.exitProgram();
+                    });
+                }
+            });
+        });
+    }
+
     onKeyDownInputPwd(e){
         if(e.keyCode == 13){
             this.onSubmitUserInfo(e);
@@ -113,8 +144,11 @@ class ContentsSignIn extends React.Component {
                         <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
                     </div>
                     <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
-                    <div className="mt-3" onClick={this.onClickFindPassword.bind(this)}>
-                        <a href="#" className="text-info">비밀번호 찾기</a>
+                    <div className="mt-3">
+                        <a href="#" className="text-info" onClick={this.onClickFindPassword.bind(this)}>비밀번호 변경/찾기</a>
+                    </div>
+                    <div className="mt-3">
+                        <a href="#" className="text-info" onClick={this.viewTerm.bind(this)}>이용약관 보기</a>
                     </div>
                     <div className="mt-5 text-muted">Discord 문의👉 Takc#8171</div>
                     <div className="text-muted">{`version v${this.app_version}`}</div>

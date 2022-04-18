@@ -4,12 +4,27 @@ const common = require('../common/common');
 const util = require("./ipc_util.js");
 const path = require('path');
 const { notify_new_product, notify_new_product_list } = require('../api/notification_mngr');
+const fs = require('fs');
+
+const TERM_FILE_PATH = path.resolve(path.join(app.getAppPath(), 'res', 'term', 'term.txt'));
 
 let g_win = undefined;
 
 function register(win){
 
     g_win = win;
+
+    ipcMain.on('read-term-file', (event, data) => {
+
+        fs.readFile(TERM_FILE_PATH, 'utf8', (err, term_data) =>{
+            if(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'read-term-file-callback', err));
+                event.reply('read-term-file-reply' + data.id, {err : err, data : undefined});
+                return;
+            }
+            event.reply('read-term-file-reply' + data.id, {err : undefined, data : term_data});
+        });
+    });
 
     ipcMain.on('open-external-webpage', (event, data) => {
         try{
@@ -54,6 +69,9 @@ function register(win){
                 const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
                 await UserFileManager.write(app_update_info_path, { update : true });
 
+                const view_term_info_path = require('../user_file_path').USER_FILE_PATH.VIEW_TERM_INFO;
+                await UserFileManager.write(view_term_info_path, { view : false });
+
                 app.relaunch();
                 app.exit();
                 
@@ -72,6 +90,41 @@ function register(win){
                 
             }catch(err){
                 log.error(common.get_log_str('ipc_main_common.js', 'unset-to-update-callback', err));
+            }
+        })();
+    });
+
+    ipcMain.on('update-view-term-setting', (event, data) =>{
+        (async ()=>{
+            try{
+
+                const setting = data.payload.setting;
+
+                const view_term_info_path = require('../user_file_path').USER_FILE_PATH.VIEW_TERM_INFO;
+                const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
+                await UserFileManager.write(view_term_info_path, { view : setting });
+
+                event.reply('update-view-term-setting-reply' + data.id, err);
+                
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'update-view-term-setting-callback', err));
+                event.reply('update-view-term-setting-reply' + data.id, undefined);
+            }
+        })();
+    });
+
+    ipcMain.on('read-view-term-setting', (event, data) =>{
+        (async ()=>{
+            try{
+                const view_term_info_path = require('../user_file_path').USER_FILE_PATH.VIEW_TERM_INFO;
+                const UserFileManager = require("../api/user_file_mngr.js").UserFileManager;
+                const setting_data = await UserFileManager.read(view_term_info_path);
+
+                event.reply('read-view-term-setting-reply' + data.id, {err : undefined, data : setting_data.view});
+                
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_common.js', 'read-view-term-setting-callback', err));
+                event.reply('read-view-term-setting-reply' + data.id, {err : err});
             }
         })();
     });
@@ -107,6 +160,10 @@ function register(win){
         }catch(err){
             log.error(common.get_log_str('ipc_main_common.js', 'notify-new-product-list-callback', err));
         }
+    });
+
+    ipcMain.on('exit-program', (event, data) =>{
+        app.exit();
     });
 }
 

@@ -11,6 +11,7 @@ const USER_FILE_PATH = {
     SETTINGS_INFO : path.join(APP_DATA_PATH, 'userdata', 'settings.dat'),
     APP_AUTH_INFO : path.join(APP_DATA_PATH, 'userdata', 'aai.dat'),
     APP_UPDATE_INFO : path.join(APP_DATA_PATH, 'userdata', 'au.dat'),
+    VIEW_TERM_INFO : path.join(APP_DATA_PATH, 'userdata', 'vt.dat'),
     NEW_RELEASED_PRODUCT_WHITELIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_wl.dat'),
     NEW_RELEASED_PRODUCT_BLACKLIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_bl.dat')
 };
