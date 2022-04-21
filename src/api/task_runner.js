@@ -235,15 +235,19 @@ class TaskRunner{
     }
 
     start(){
-        if(this.canceled) throw new TaskCanceledError(this, 'Task is canceled.');
+        
         if(AuthEngine.is_authorized() === false) throw new TaskCanceledError(this, 'Unauthorized user.');
         this.running = true;
-
 
         return new Promise(async (resolve, reject)=>{
 
             this.resolve = resolve;
             this.reject = reject;
+
+            if(this.canceled){
+                reject(this, 'Task is canceled.');
+                return;
+            } 
 
             let sku_inventory_info = undefined;
 
@@ -306,7 +310,7 @@ class TaskRunner{
         if(this.task_info.watchdog !== true) return;
         
         ProductRestockWatchdog.off_watch(this.product_info);
-        this.reject('stop watch restock');
+        if(this.reject !== undefined) this.reject('stop watch restock');
     }
 
     stop(){
@@ -322,7 +326,7 @@ class TaskRunner{
         this.close_pay_window();
         await this.browser_context.open_main_page(1);
         if(error){
-            this.reject(error);
+            if(this.reject !== undefined) this.reject(error);
         }else{
             this.resolve(this.task_info);
         }
