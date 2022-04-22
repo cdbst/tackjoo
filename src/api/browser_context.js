@@ -43,6 +43,7 @@ class BrowserContext {
         this.__post_process_req_fail = this.__post_process_req_fail.bind(this);
         
         this.__http_request = this.__http_request.bind(this);
+        this.__process_to_redir = this.__process_to_redir.bind(this);
         this.__get_proxy_cfg = this.__get_proxy_cfg.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
         this.__set_cookie = this.__set_cookie.bind(this);
@@ -237,19 +238,23 @@ class BrowserContext {
 
         if(headers == undefined) headers = {};
 
-        let cookie_storage = this.__judge_cookie_storage(url);
+        const cookie_storage = this.__judge_cookie_storage(url);
         if(cookie_storage.num_of_cookies > 0){
             headers['cookie'] = cookie_storage.get_serialized_cookie_data();
         }
 
-        let axios_req_cfg = {
+        const axios_req_cfg = {
             method: method,
             url: url,
             timeout: this.__req_timout,
-            headers : headers
+            headers : headers,
+            maxRedirects : 0,
+            validateStatus: function (status) {
+                return status >= 200 && status <= 310; // 기본값
+            }
         };
 
-        let proxy_cfg = this.__get_proxy_cfg();
+        const proxy_cfg = this.__get_proxy_cfg();
         if(proxy_cfg != undefined){
             axios_req_cfg.proxy = proxy_cfg;
         }
@@ -264,13 +269,31 @@ class BrowserContext {
 
         return new Promise((resolve, reject)=>{
             axios(axios_req_cfg)
-            .then(res => {
-                resolve(res);
+            .then(async (res) => {
+                if(res.status >= 300 && res.status <= 310){
+                    const redir_res = await this.__process_to_redir(res);
+                    resolve(redir_res);
+                }else{
+                    resolve(res);
+                }
             })
             .catch(error => {
                 reject(error);
             });
         });
+    }
+
+    async __process_to_redir(res){
+
+        if(res.headers.location.includes('no-access')){
+            log.info(common.get_log_str('browser_context.js', '__http_request', 'skip redirect to no-access page.'));
+            throw new Error('skip redirect to no-access page');
+        }else{
+            const redir_res = await this.__http_request(BrowserContext.REQ_METHOD.GET, res.headers.location, undefined, undefined, false);
+            const redir_cookie_storage = this.__judge_cookie_storage(res.headers.location);
+            this.__set_cookie(redir_cookie_storage, redir_res);
+            return redir_res;
+        }
     }
 
     __remove_aws_cookies(){
@@ -318,7 +341,7 @@ class BrowserContext {
                 }
 
                 const $ = cheerio.load(res.data);
-                this.__post_process_open_page(res.headers, $);
+                this.__post_process_open_page(res, $);
     
                 return res;
 
@@ -576,13 +599,9 @@ class BrowserContext {
         }
     }
 
-    __post_process_open_page(res_headers, $){
+    __post_process_open_page(res, $){
 
-        if('set-cookie' in res_headers){
-            res_headers['set-cookie'].forEach(cookie_data =>{
-                this.__cookie_storage.add_cookie_data(cookie_data);
-            });
-        }
+        this.__set_cookie(this.__cookie_storage, res);
 
         this.csrfToken = this.__get_csrfToken($);
         if(this.csrfToken == undefined){
@@ -613,6 +632,11 @@ class BrowserContext {
             return false;
         }
 
+        (async()=>{
+            const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, this.sensor_data_server_url, undefined, undefined,  false);
+            this.__set_cookie(this.__cookie_storage, res);
+        })();
+        
         return true;
     }
 
@@ -640,7 +664,7 @@ class BrowserContext {
     
                 const $ = cheerio.load(res.data);
     
-                let result = this.__post_process_open_page(res.headers, $);
+                let result = this.__post_process_open_page(res, $);
                 if(result == false){
                     throw new Error('open_main_page : cannot store page informations');
                 }
@@ -658,11 +682,11 @@ class BrowserContext {
 
     async open_feed_page(){
 
-        let headers = this.__get_open_page_header();
+        const headers = this.__get_open_page_header();
 
         for(var i = 0; i < this.__req_retry_cnt; i++){
             try{
-                let res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/', headers);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/launch/', headers);
 
                 if(res.status != 200){
                     throw new Error('open_feed_page : response ' + res.status);
@@ -670,7 +694,7 @@ class BrowserContext {
     
                 const $ = cheerio.load(res.data);
     
-                const result = this.__post_process_open_page(res.headers, $);
+                const result = this.__post_process_open_page(res, $);
                 if(!result){
                     throw new Error('open_feed_page : cannot store informations');
                 }
@@ -712,7 +736,7 @@ class BrowserContext {
 
                 const $ = cheerio.load(res.data);
 
-                let result = this.__post_process_open_page(res.headers, $);
+                let result = this.__post_process_open_page(res, $);
                 if(result == false){
                     throw new Error('open_product_page : cannot store informations');
                 }
@@ -977,7 +1001,7 @@ class BrowserContext {
     
                 const $ = cheerio.load(res.data);
     
-                let result = this.__post_process_open_page(res.headers, $);
+                let result = this.__post_process_open_page(res, $);
                 if(result == false){
                     throw new Error('open_checkout_page : cannot store page informations');                    
                 }
@@ -1041,6 +1065,10 @@ class BrowserContext {
                     if(('_global' in res.data === true) && res.data['_global'].includes('재고가 없습니다')){
                         return undefined; // 재고가 없는 상태에서 계속 재시도 하는 것은 무의미 하므로 바로 종료 시킨다.
                     }
+                }
+
+                if(res.data.isError === true && res.data._global !== undefined){
+                    throw new Error(res.data._global);
                 }
 
                 if('total_amount' in res.data == false){
