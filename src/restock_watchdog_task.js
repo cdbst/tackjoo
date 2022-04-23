@@ -29,6 +29,7 @@ async function main(product_info, settings_info, proxy_info){
     const browser_context = new BrowserContext();
     browser_context.proxy_info = proxy_info;
     browser_context.update_settings(settings_info);
+    browser_context.open_main_page(1);
 
     let sku_inventory_info = undefined;
 
