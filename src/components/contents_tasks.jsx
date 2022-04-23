@@ -463,7 +463,7 @@ class ContentsTasks extends React.Component {
         busy_account_emails.sort(sort);
 
         if(unregistred_account_emails.length > 0){
-            return unregistred_account_emails.pop();
+            return unregistred_account_emails.shift();
         }else if(idle_account_emails.length > 0){
             return idle_account_emails.pop();
         }else if(busy_account_emails.length > 0){
@@ -525,7 +525,7 @@ class ContentsTasks extends React.Component {
         busy_proxy_infos.sort(sort);
 
         if(unregistred_proxy_infos.length > 0){
-            return unregistred_proxy_infos.pop();
+            return unregistred_proxy_infos.shift();
         }else if(idle_proxy_infos.length > 0){
             return idle_proxy_infos.pop();
         }else if(busy_proxy_infos.length > 0){
