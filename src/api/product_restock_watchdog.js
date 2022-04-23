@@ -3,6 +3,8 @@ const log = require('electron-log');
 const path = require('path');
 const { app } = require('electron');
 const { Worker } = require('worker_threads');
+const { gen_sensor_data }= require("../ipc/ipc_main_sensor.js");
+const TaskCommon = require('./task_common.js');
 
 class ProductRestockWatchdog{
 
@@ -12,6 +14,9 @@ class ProductRestockWatchdog{
         this.gen_watchdog_worker = this.gen_watchdog_worker.bind(this);
         this.on_watch = this.on_watch.bind(this);
         this.off_watch = this.off_watch.bind(this);
+        this.on_recv_api_call = this.on_recv_api_call.bind(this);
+        this.gen_sensor_data = this.gen_sensor_data.bind(this);
+        this.broadcast_message = this.broadcast_message.bind(this);
 
         this.watchdog_list = {};
     }
@@ -54,6 +59,8 @@ class ProductRestockWatchdog{
                     if(data.sku_inventory_info !== undefined){
                         resolve(data.sku_inventory_info);
                         delete this.watchdog_list[product_info.product_id];
+                    }else if(data.type == TaskCommon.TASK_MSG_TYPE.API_CALL){
+                        this.on_recv_api_call(data);
                     }
                 });
 
@@ -86,6 +93,44 @@ class ProductRestockWatchdog{
 
         if(this.watchdog_list[product_info.product_id].watcher_cnt <= 0){
             this.watchdog_list[product_info.product_id].worker_obj.terminate();
+        }
+    }
+
+    async gen_sensor_data(){
+        const sensor_data = await gen_sensor_data();
+        return sensor_data;
+    }
+
+    broadcast_message(data){
+        for(const worker_data of Object.values(this.watchdog_list)){
+            worker_data.worker_obj.postMessage(data);
+        }
+    }
+
+    on_recv_api_call(data){
+
+        if(data.func in this == false || typeof this[data.func] !== 'function'){
+            this.broadcast_message(TaskCommon.gen_api_call_res_payload(data.id, 'Cannot found API Function', undefined));
+            return;
+        }
+        
+        if(this[data.func].constructor.name === 'AsyncFunction'){
+            (async () =>{
+                try{
+                    const result = await this[data.func].apply(null, data.params);
+                    this.broadcast_message(TaskCommon.gen_api_call_res_payload(data.id, undefined, result));
+                    
+                }catch(e){
+                    this.broadcast_message(TaskCommon.gen_api_call_res_payload(data.id, e, undefined));
+                }
+            })();
+        }else{
+            try{
+                const result = this[data.func].apply(null, data.params);
+                this.broadcast_message(TaskCommon.gen_api_call_res_payload(data.id, undefined, result));
+            }catch(e){
+                this.broadcast_message(TaskCommon.gen_api_call_res_payload(data.id, e, undefined));
+            }
         }
     }
 }

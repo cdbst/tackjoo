@@ -1,6 +1,7 @@
 const {parentPort, workerData} = require('worker_threads');
 const common = require("./common/common.js");
 const BrowserContext = require('./api/browser_context.js').BrowserContext;
+const { MainThreadApiCaller } = require('./api/task_utils.js');
 
 const log = require('electron-log');
 const app_cfg = require('./app_config');
@@ -10,6 +11,7 @@ const product_info = workerData.product_info;
 const settings_info = workerData.settings_info;
 const proxy_info = workerData.proxy_info;
 
+global.MainThreadApiCaller = new MainThreadApiCaller(parentPort);
 
 process.on('unhandledRejection', (err) => {
 
@@ -26,6 +28,7 @@ main(product_info, settings_info, proxy_info);
 async function main(product_info, settings_info, proxy_info){
     const browser_context = new BrowserContext();
     browser_context.proxy_info = proxy_info;
+    browser_context.update_settings(settings_info);
 
     let sku_inventory_info = undefined;
 
