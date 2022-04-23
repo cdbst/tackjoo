@@ -518,7 +518,7 @@ class ContentsTasks extends React.Component {
         }
 
         const sort = (a, b) => {
-            return proxy_status_dict[b._id].count - proxy_status_dict[a._id].count;
+            return proxy_status_dict[a._id].count - proxy_status_dict[b._id].count;
         };
 
         idle_proxy_infos.sort(sort);
@@ -527,9 +527,9 @@ class ContentsTasks extends React.Component {
         if(unregistred_proxy_infos.length > 0){
             return unregistred_proxy_infos.shift();
         }else if(idle_proxy_infos.length > 0){
-            return idle_proxy_infos.pop();
+            return idle_proxy_infos.shift();
         }else if(busy_proxy_infos.length > 0){
-            return busy_proxy_infos.pop();
+            return busy_proxy_infos.shift();
         }else {
             return undefined;
         }
