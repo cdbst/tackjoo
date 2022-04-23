@@ -13,6 +13,7 @@ class AppSettings{
             http_req_ret_cnt : 30,
             http_req_ret_interval : 1.5,
             http_req_timeout : 0,
+            http_req_ignore_redriect_to_no_access : 0,
             http_max_req_within_same_ip : 3,
             task_ret_cnt : 0,
             task_ret_interval : 1,
