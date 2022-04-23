@@ -101,7 +101,7 @@ class BrowserContext {
         this.__req_retry_interval = 1500; // app 설정으로 부터 지정되어야 할 값임.
         this.__req_retry_cnt = 30;
         this.__req_timout = 0;
-        
+        this.__disable_redirect = false;
         
         this.__cookie_storage = new CookieManager();
         this.__cookie_storage.add_cookie_data('social_type=comlogin');
@@ -131,6 +131,7 @@ class BrowserContext {
         this.__req_retry_interval = this.settings_info.http_req_ret_interval * 1000;
         this.__req_retry_cnt = this.settings_info.http_req_ret_cnt + 1;
         this.__req_timout = this.settings_info.http_req_timeout * 1000;
+        this.__disable_redirect = this.settings_info.http_req_ignore_redriect_to_no_access === 1 ? true : false;
     }
 
     is_session_expired(session_timeout){
@@ -247,12 +248,15 @@ class BrowserContext {
             method: method,
             url: url,
             timeout: this.__req_timout,
-            headers : headers,
-            maxRedirects : 0,
-            validateStatus: function (status) {
-                return status >= 200 && status <= 310; // 기본값
-            }
+            headers : headers
         };
+
+        if(this.__disable_redirect === true){
+            axios_req_cfg.maxRedirects = 0;
+            axios_req_cfg.validateStatus = (status) => {
+                return status >= 200 && status <= 310; 
+            }
+        }
 
         const proxy_cfg = this.__get_proxy_cfg();
         if(proxy_cfg != undefined){
