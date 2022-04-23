@@ -22,7 +22,7 @@ class ContentsSettings extends React.Component {
         HTTP_REQ_RET_INTERVAL : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1.5)',
         HTTP_REQ_RET_CNT : 'HTTP 요청에 대한 서버의 알 수 없는 응답시, 몇 회 재시도 할지 설정합니다. (기본 값 : 30)',
         HTTP_REQ_TIMEOUT : 'HTTP 요청에 대한 서버의 응답을 최대 몇 초 기다릴지 설정합니다. (기본 값 : 0, 계속 기다리려면 0 입력)',
-        HTTP_MAX_REQ_WITHIN_SAME_IP : 'HTTP 요청시 하나의 IP에서 동시에 몇개의 요청까지 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
+        HTTP_MAX_REQ_WITHIN_SAME_IP : '한 개의 IP에서 동시에 몇개의 작업을 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
         TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)',
         NIKE_LOGIN_SESSION_TIMEOUT : '공식홈페이지 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
@@ -260,9 +260,9 @@ class ContentsSettings extends React.Component {
                                 <SettingsSubTitle sub_title="<HTTP 요청 설정>" /> <br />
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_CNT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_CNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr/>
-                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr />
-                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_REQ_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.HTTP_REQ_TIMEOUT} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="초"/> <hr /> <br />
                                 <SettingsSubTitle sub_title="<Task 설정>" /> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
