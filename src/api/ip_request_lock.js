@@ -12,7 +12,7 @@ class IPRequestLock{
     }
 
     __get_proxy_addr(proxy_ip, proxy_port){
-        if(proxy_ip == undefined || proxy_port == undefined) return '*'
+        if(proxy_ip == undefined || proxy_port == undefined) return '*';
         else return `${proxy_ip}:${proxy_port}`;
     }
 
