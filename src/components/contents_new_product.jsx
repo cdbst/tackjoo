@@ -313,9 +313,7 @@ class ContentsNewProduct extends React.Component {
 
                 this.genQuickTaskAutomatically(new_product_info_list);
 
-                new_product_info_list.forEach((product_info)=>{
-                    this.__product_info_list.push(product_info);
-                });
+                this.__product_info_list = [...new_product_info_list, ...this.__product_info_list];
 
                 //Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 window.electron.notifyNewProductList(new_product_info_list);
