@@ -456,7 +456,7 @@ class ContentsTasks extends React.Component {
         }
 
         const sort = (a, b) => {
-            return account_status_dict[b].count - account_status_dict[a].count;
+            return account_status_dict[a].count - account_status_dict[b].count;
         };
 
         idle_account_emails.sort(sort);
@@ -465,9 +465,9 @@ class ContentsTasks extends React.Component {
         if(unregistred_account_emails.length > 0){
             return unregistred_account_emails.shift();
         }else if(idle_account_emails.length > 0){
-            return idle_account_emails.pop();
+            return idle_account_emails.shift();
         }else if(busy_account_emails.length > 0){
-            return busy_account_emails.pop();
+            return busy_account_emails.shift();
         }else{
             return undefined;
         }
