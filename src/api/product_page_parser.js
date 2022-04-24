@@ -785,6 +785,7 @@ function parse_product_list_from_new_released_page($, replace_url){
             common.update_product_info_obj(product_info, 'price', price);
             
             const el_soldout_bedge_div = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-soldout-badge'], []);
+            if(el_soldout_bedge_div.length === 0) return;
             const soldout = el_soldout_bedge_div[0].attribs.class.includes('isActive');
             common.update_product_info_obj(product_info, 'soldout', soldout);
     
