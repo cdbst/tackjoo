@@ -308,11 +308,17 @@ function parse_closed_product_page($, _product_info){
 }
 
 function parse_normal_product_page($, _product_info){
-    let item_attr = parse_item_attr_from_product_page($);
+    const item_attr = parse_item_attr_from_product_page($);
     common.update_product_info_obj(_product_info, 'item_attr', item_attr);
 
-    let product_options = parse_product_options_from_product_page($);
+    const product_options = parse_product_options_from_product_page($);
     common.update_product_info_obj(_product_info, 'product_options', product_options);
+
+    // snkrs normal type 상품이면서 품절된 상품의 경우 `parse_item_attr_from_product_page` 함수에서 파싱이 불가능한 상황이 있을수 있음
+    if(item_attr === undefined && product_options !== undefined && product_options.length > 0){ 
+        const opt_item_attr = product_options[0].attributeName;
+        common.update_product_info_obj(_product_info, 'item_attr', `itemAttributes[${opt_item_attr}]`);
+    } 
 }
 
 function parse_item_attr_from_product_page($){

@@ -178,7 +178,7 @@ function get_billing_info_from_checkout_page($){
         return billing_info;
 
     }catch(err){
-        log.error(common.get_log_str('checkout_page_parser.js', 'get_billing_info_from_checkout_page', e));
+        log.error(common.get_log_str('checkout_page_parser.js', 'get_billing_info_from_checkout_page', err));
         return undefined;
     } 
 }

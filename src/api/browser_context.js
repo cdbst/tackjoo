@@ -290,9 +290,10 @@ class BrowserContext {
     async __process_to_redir(res){
 
         if(res.headers.location.includes('no-access')){
-            log.info(common.get_log_str('browser_context.js', '__http_request', 'skip redirect to no-access page.'));
+            log.info(common.get_log_str('browser_context.js', '__process_to_redir', 'skip redirect to no-access page.'));
             throw new Error('skip redirect to no-access page');
         }else{
+            log.info(common.get_log_str('browser_context.js', '__process_to_redir', `redirect to : ${res.headers.location}`));
             const redir_res = await this.__http_request(BrowserContext.REQ_METHOD.GET, res.headers.location, undefined, undefined, false);
             const redir_cookie_storage = this.__judge_cookie_storage(res.headers.location);
             this.__set_cookie(redir_cookie_storage, redir_res);
