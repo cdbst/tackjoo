@@ -31,7 +31,7 @@ process.on('unhandledRejection', (err) => {
     log.warn(common.get_log_str('task.js', 'unhandledRejection-callback', err.message));
 
     if(remain_ret_cnt-- > 0){
-        g_sku_inventory_info = false // 최초 알고 있던 재고 정보가 오래된 정보일 수 있으므로 task 재시도시 초기화 시킨다.
+        g_sku_inventory_info = undefined; // 최초 알고 있던 재고 정보가 오래된 정보일 수 있으므로 task 재시도시 초기화 시킨다.
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_RETRY]);
         common.async_sleep(task_ret_interval).then(()=>{
             browser_context.open_main_page();
