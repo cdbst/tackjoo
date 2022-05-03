@@ -86,7 +86,7 @@ class NewReleasedProductWatchdog{
 
                     if(accumulated_fail_cnt === 10){
                         notify_text('신상품 감시기능 중지', '신상품 페이지로부터 더 이상 상품 정보를 얻을수 없는 상태입니다.');
-                        this.watchdog_rejecter('cannot receive product information form new release zpage.');
+                        this.watchdog_rejecter('cannot receive product information form new release page.');
                         return;
                     }
     
