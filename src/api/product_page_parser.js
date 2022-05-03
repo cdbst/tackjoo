@@ -738,85 +738,148 @@ function parse_product_img_url_from_new_released_product_page($){
  * 
  * @param {object} $ parsed new release web page object
  * @param {boolean} replace_url 상품 url을 '/kr/ko_kr/'에서 '/kr/launch/'로 대체시킬지 여부
- * @returns {object} new release page에서 파싱된 product info 리스트
+ * @returns {Promise} new release page에서 파싱된 product info 리스트
  */
 function parse_product_list_from_new_released_page($, replace_url){
-    const product_list_divs = $('.a-product');
 
-    if(product_list_divs.length === 0) return [];
+    return new Promise((resolve, reject)=>{
+        const product_list_divs = $('.a-product');
 
-    const product_info_list = [];
-
-    product_list_divs.each((idx, product_info_div)=>{
-        //get product
-        try{
-            const product_info = common.get_product_info_obj_scheme();
-            common.update_product_info_obj(product_info, 'category', 'new_released');
-            common.update_product_info_obj(product_info, '_id', common.uuidv4());
-    
-            // TODO : [주의] 현재는 확인 불가하지만 Notify Me로 등장하는 것들이 있음. Notify me의 경우 normal type이 될 수 없음.
-            common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
-    
-            const el_name_inputs = parser_common.get_specific_tag_nodes(product_info_div, ['input'], [], ['name']);
-            el_name_inputs.forEach((el_name_input)=>{
-                if(el_name_input.attribs.name === 'productId'){
-                    common.update_product_info_obj(product_info, 'product_id', el_name_input.attribs.value);
-                }else if(el_name_input.attribs.name === 'producturl'){
-                    let product_url = el_name_input.attribs.value;
-                    if(replace_url) product_url = product_url.replace('/kr/ko_kr/', '/kr/launch/');
-                    common.update_product_info_obj(product_info, 'url', common.NIKE_URL + product_url);
-                }else if(el_name_input.attribs.name === 'productmodel'){
-                    common.update_product_info_obj(product_info, 'model_id', el_name_input.attribs.value);
-                }
-            });
-    
-            const el_title_span = parser_common.get_specific_tag_nodes(product_info_div, [], ['item-title']);
-            let product_name = parser_common.get_specific_child_text_nodes(el_title_span[0])[0].data.trim();
-            product_name = parser_common.strip_useless_string(product_name)
-            common.update_product_info_obj(product_info, 'name', product_name);
-    
-            const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, [], ['a-product-image-link']);
-            const item_attr_name = el_category_a[0].attribs.productcategory;
-            const item_attr = `itemAttributes[${item_attr_name}_SIZE]`;
-            common.update_product_info_obj(product_info, 'item_attr', item_attr);
-    
-            const el_price_p = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-display-price'], []);
-            const price = parser_common.get_specific_child_text_nodes(el_price_p[0])[0].data.trim();
-            common.update_product_info_obj(product_info, 'price', price);
-            
-            const el_soldout_bedge_div = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-soldout-badge'], []);
-            if(el_soldout_bedge_div.length === 0) return;
-            const soldout = el_soldout_bedge_div[0].attribs.class.includes('isActive');
-            common.update_product_info_obj(product_info, 'soldout', soldout);
-    
-            const el_proudct_img = parser_common.get_specific_tag_nodes(product_info_div, ['img'], [], []);
-            const proudct_img_url = el_proudct_img[1].attribs.src;
-            common.update_product_info_obj(product_info, 'img_url', proudct_img_url);
-    
-            common.update_product_info_obj(product_info, 'released_date', new Date());
-
-            //parse cnadidate color products
-            const el_sub_color_list = parser_common.get_specific_tag_nodes(product_info_div, ['li']);
-
-            // sub color들에대한 상품 정보들을 파싱한다.
-            const sub_product_info_list = parse_sub_color_product_info_list(el_sub_color_list, product_info, replace_url);
-            if(sub_product_info_list.length > 0){
-
-                sub_product_info_list.forEach((sub_product_info) =>{
-                    product_info_list.push(sub_product_info);
-                });
-
-            }else{
-                product_info_list.push(product_info);
-            }
-
-        }catch(err){
-            log.error(common.get_log_str('product_page_parser.js', 'parse_product_list_from_new_released_page', err));
+        if(product_list_divs.length === 0){
+            resolve([]);
+            return;
         }
-        
-    });
 
-    return product_info_list;
+
+        // //page 수를 구하는 코드 (테스트 코드)
+        // let page_size = 4;
+
+        // const total_count_span = $('span[data-info-total-count]');
+        // if(total_count_span.length > 0){
+
+        //     let el_total_count_text = parser_common.get_specific_child_text_nodes(total_count_span[0]);
+
+        //     if(el_total_count_text.length > 0){
+        //         let total_count = el_total_count_text[0].data.trim();
+        //         total_count = parseInt(total_count);
+        //         page_size = (total_count / 40);
+        //         page_size = (total_count % 40) > 0 ? page_size + 1 : page_size;
+        //     }
+        // }
+    
+        const product_info_list = [];
+    
+        product_list_divs.each((idx, product_info_div)=>{
+            //get product
+            try{
+                const product_info = common.get_product_info_obj_scheme();
+                common.update_product_info_obj(product_info, 'category', 'new_released');
+                common.update_product_info_obj(product_info, '_id', common.uuidv4());
+        
+                // TODO : [주의] 현재는 확인 불가하지만 Notify Me로 등장하는 것들이 있음. Notify me의 경우 normal type이 될 수 없음.
+                common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
+        
+                const el_name_inputs = parser_common.get_specific_tag_nodes(product_info_div, ['input'], [], ['name']);
+                el_name_inputs.forEach((el_name_input)=>{
+                    if(el_name_input.attribs.name === 'productId'){
+                        common.update_product_info_obj(product_info, 'product_id', el_name_input.attribs.value);
+                    }else if(el_name_input.attribs.name === 'producturl'){
+                        let product_url = el_name_input.attribs.value;
+                        if(replace_url) product_url = product_url.replace('/kr/ko_kr/', '/kr/launch/');
+                        common.update_product_info_obj(product_info, 'url', common.NIKE_URL + product_url);
+                    }else if(el_name_input.attribs.name === 'productmodel'){
+                        common.update_product_info_obj(product_info, 'model_id', el_name_input.attribs.value);
+                    }
+                });
+        
+                const el_title_span = parser_common.get_specific_tag_nodes(product_info_div, [], ['item-title']);
+                let product_name = parser_common.get_specific_child_text_nodes(el_title_span[0])[0].data.trim();
+                product_name = parser_common.strip_useless_string(product_name)
+                common.update_product_info_obj(product_info, 'name', product_name);
+        
+                const el_category_a = parser_common.get_specific_tag_nodes(product_info_div, [], ['a-product-image-link']);
+                const item_attr_name = el_category_a[0].attribs.productcategory;
+                const item_attr = `itemAttributes[${item_attr_name}_SIZE]`;
+                common.update_product_info_obj(product_info, 'item_attr', item_attr);
+        
+                const el_price_p = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-display-price'], []);
+                const price = parser_common.get_specific_child_text_nodes(el_price_p[0])[0].data.trim();
+                common.update_product_info_obj(product_info, 'price', price);
+                
+                const el_soldout_bedge_div = parser_common.get_specific_tag_nodes(product_info_div, [], ['product-soldout-badge'], []);
+                if(el_soldout_bedge_div.length === 0) return;
+                const soldout = el_soldout_bedge_div[0].attribs.class.includes('isActive');
+                common.update_product_info_obj(product_info, 'soldout', soldout);
+        
+                const el_proudct_img = parser_common.get_specific_tag_nodes(product_info_div, ['img'], [], []);
+                const proudct_img_url = el_proudct_img[1].attribs.src;
+                common.update_product_info_obj(product_info, 'img_url', proudct_img_url);
+        
+                common.update_product_info_obj(product_info, 'released_date', new Date());
+    
+                //parse cnadidate color products
+                const el_sub_color_list = parser_common.get_specific_tag_nodes(product_info_div, ['li']);
+    
+                // sub color들에대한 상품 정보들을 파싱한다.
+                const sub_product_info_list = parse_sub_color_product_info_list(el_sub_color_list, product_info, replace_url);
+                if(sub_product_info_list.length > 0){
+    
+                    sub_product_info_list.forEach((sub_product_info) =>{
+                        product_info_list.push(sub_product_info);
+                    });
+    
+                }else{
+                    product_info_list.push(product_info);
+                }
+    
+            }catch(err){
+                log.error(common.get_log_str('product_page_parser.js', 'parse_product_list_from_new_released_page', err));
+            }
+        });
+    
+        resolve(product_info_list);
+    });
+}
+
+/**
+ * new relesed page에서 특정 항목이 다른 상품 리스트 page list 페이지의 url 정보를 닮고 있을 경우
+ * url 정보를 취득합니다.
+ * 
+ * @param {object} $ parsed new release web page object
+ * @returns {Promise} 상품 리스트 페이지의 url들을 반환함
+ */
+function parse_other_product_list_page_urls($){
+
+    return new Promise((resolve, reject) =>{
+
+        const banner_images = $('.bannerImag');
+
+        if(banner_images.length === 0){
+            resolve([]);
+            return;
+        }
+
+        const other_product_list_page_urls = [];
+        const page_size = 4;
+
+        banner_images.each((idx, banner_image)=>{
+
+            try{
+                if('href' in banner_image.attribs === false) return;
+                const url = common.NIKE_URL + banner_image.attribs.href;
+
+                for(var i = 0; i < page_size; i++){
+                    const date = (new Date()).getTime();
+                    other_product_list_page_urls.push(`${url}?page=${i+1}&pageSize=40&lineSize=5&_=${date}`);
+                }
+
+            }catch(err){
+                log.error(common.get_log_str('product_page_parser.js', 'parse_other_product_list_page_urls', err));
+            }
+        });
+
+        resolve(other_product_list_page_urls);
+    });
 }
 
 /**
@@ -866,3 +929,4 @@ module.exports.get_product_list_info_from_feed_page = get_product_list_info_from
 module.exports.get_product_info_from_product_page = get_product_info_from_product_page;
 module.exports.update_product_info_as_sku_inventory_info = update_product_info_as_sku_inventory_info;
 module.exports.parse_product_list_from_new_released_page = parse_product_list_from_new_released_page;
+module.exports.parse_other_product_list_page_urls = parse_other_product_list_page_urls;

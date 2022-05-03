@@ -1,6 +1,9 @@
 const common = require('../common/common');
 const { BrowserContext } = require('./browser_context');
-const { parse_product_list_from_new_released_page } = require('../api/product_page_parser');
+const { 
+    parse_product_list_from_new_released_page,
+    parse_other_product_list_page_urls
+} = require('../api/product_page_parser');
 const { notify_text } = require('./notification_mngr');
 const cheerio = require('cheerio');
 const log = require('electron-log');
@@ -18,6 +21,7 @@ class NewReleasedProductWatchdog{
         this.stop_watch = this.stop_watch.bind(this);
         this.get_new_released_product_info_list = this.get_new_released_product_info_list.bind(this);
         this.open_new_released_page_test = this.open_new_released_page_test.bind(this);
+        this.get_product_list_from_url = this.get_product_list_from_url.bind(this);
 
         this.browser_context = new BrowserContext();
         this.watch_interval = settings_info.new_product_watch_interval;
@@ -82,7 +86,7 @@ class NewReleasedProductWatchdog{
 
                     if(accumulated_fail_cnt === 10){
                         notify_text('신상품 감시기능 중지', '신상품 페이지로부터 더 이상 상품 정보를 얻을수 없는 상태입니다.');
-                        this.watchdog_rejecter('cannot receive product information form new release page.');
+                        this.watchdog_rejecter('cannot receive product information form new release zpage.');
                         return;
                     }
     
@@ -90,21 +94,29 @@ class NewReleasedProductWatchdog{
                         this.watchdog_rejecter('watchdog is stopped by user.');
                         return;
                     }
-    
-                    const res = await this.browser_context.open_page(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases', 1);
-                    
-                    if(res === undefined || res.data === undefined){
-                        accumulated_fail_cnt++;
-                        continue;
-                    } 
-    
-                    const $ = cheerio.load(res.data);
-                    const new_product_info_list = parse_product_list_from_new_released_page($, this.use_snkrs_url);
+
+                    let [new_product_info_list, other_product_list_page_urls] = await this.get_product_list_from_url(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
+
                     if(new_product_info_list.length === 0){
                         accumulated_fail_cnt++;
                         continue;
                     }
-    
+
+                    const list_of_p_other_product_list_page = [];
+
+                    for(var i = 0; i < other_product_list_page_urls.length; i++){
+                        const other_product_list_url = other_product_list_page_urls[i];
+                        const p_product_list = this.get_product_list_from_url(other_product_list_url);
+                        list_of_p_other_product_list_page.push(p_product_list);
+                        //await common.async_sleep((this.watch_interval * 1000));
+                    }
+
+                    const list_of_other_product_list = await Promise.all(list_of_p_other_product_list_page);
+
+                    list_of_other_product_list.forEach(([other_product_list, _])=>{
+                        new_product_info_list = [...new_product_info_list, ...other_product_list];
+                    });
+
                     const new_released_product_list = this.get_new_released_product_info_list(prev_product_info_list, new_product_info_list);
                     if(new_released_product_list.length > 0){
                         __callback(new_released_product_list);
@@ -123,6 +135,21 @@ class NewReleasedProductWatchdog{
             notify_text('신상품 감시기능 중지', `신상품을 감시하는 기능이 정지되었습니다. (${this.watch_max_ret}회 감시 완료)`);
             this.watchdog_resolver();
         });
+    }
+
+    async get_product_list_from_url(url){
+
+        const res = await this.browser_context.open_page(url, 1);
+                    
+        if(res === undefined || res.data === undefined){
+            return [];
+        } 
+
+        const $ = cheerio.load(res.data);
+        const p_new_product_info_list = parse_product_list_from_new_released_page($, this.use_snkrs_url);
+        const p_other_product_list_page_urls = parse_other_product_list_page_urls($);
+
+        return Promise.all([p_new_product_info_list, p_other_product_list_page_urls]);
     }
 
     stop_watch(){
