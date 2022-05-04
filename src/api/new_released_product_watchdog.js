@@ -71,6 +71,8 @@ class NewReleasedProductWatchdog{
 
         this.stopped = false;
 
+        const default_request_url = common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases';
+
         return new Promise(async (resolve, reject)=>{
             this.watchdog_resolver = resolve;
             this.watchdog_rejecter = reject;
@@ -78,6 +80,8 @@ class NewReleasedProductWatchdog{
             let prev_product_info_list = [];
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
             let accumulated_fail_cnt = 0;
+            const default_req_urls = [ default_request_url ];
+            let other_product_req_urls = [];
 
             while(ret_remain--){
 
@@ -95,27 +99,33 @@ class NewReleasedProductWatchdog{
                         return;
                     }
 
-                    let [new_product_info_list, other_product_list_page_urls] = await this.get_product_list_from_url(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
+                    let new_product_info_list = [];
+                    let new_other_product_req_urls = [];
+
+                    const p_req_list = [...default_req_urls, ...other_product_req_urls].map((url)=>this.get_product_list_from_url(url));
+
+                    const list_of_other_product_list = await Promise.all(p_req_list);
+                    list_of_other_product_list.forEach(([product_info_list, other_product_list_page_urls])=>{
+                        new_product_info_list = [...new_product_info_list, ...product_info_list];
+                        new_other_product_req_urls = [...new_other_product_req_urls, ...other_product_list_page_urls];
+                    });
 
                     if(new_product_info_list.length === 0){
-                        accumulated_fail_cnt++;
-                        continue;
+                        throw new Error('new release watchdog recv empty product list');
                     }
 
-                    const list_of_p_other_product_list_page = [];
-
-                    for(var i = 0; i < other_product_list_page_urls.length; i++){
-                        const other_product_list_url = other_product_list_page_urls[i];
-                        const p_product_list = this.get_product_list_from_url(other_product_list_url);
-                        list_of_p_other_product_list_page.push(p_product_list);
-                        //await common.async_sleep((this.watch_interval * 1000));
+                    if(new_other_product_req_urls.length > 0){
+                        if(_.xor(other_product_req_urls.map((url)=> url.replace(/&_=\d+/g, '')), 
+                            new_other_product_req_urls.map((url)=>url.replace(/&_=\d+/g, ''))).length > 0){
+                            const required_interval_times = 0.5 * new_other_product_req_urls.length + 0.5; //추가링크 0.5초 * n개 + 기본 링크 0.5초
+                            const cur_required_interval_times = this.watch_interval - required_interval_times;
+                            if(cur_required_interval_times < 0){
+                                notify_text('감시기능 경고 - 추가 외부 상품 링크 감지', `신상품 페이지에 추가적인 외부 상품 링크가 있습니다. 장시간 감지하려면, 감시 주기를 추가로 약 ${-cur_required_interval_times} 초 정도 더 필요합니다.`);
+                            }
+                        }
                     }
 
-                    const list_of_other_product_list = await Promise.all(list_of_p_other_product_list_page);
-
-                    list_of_other_product_list.forEach(([other_product_list, _])=>{
-                        new_product_info_list = [...new_product_info_list, ...other_product_list];
-                    });
+                    other_product_req_urls = new_other_product_req_urls;
 
                     const new_released_product_list = this.get_new_released_product_info_list(prev_product_info_list, new_product_info_list);
                     if(new_released_product_list.length > 0){
