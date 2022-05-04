@@ -32,6 +32,16 @@ function get_iframe_child_element(iframe, id, __callback){
     }, 100, id);
 }
 
+function get_iframe_child_class_elements(iframe, class_name, __callback){
+    const interval = setInterval((class_name)=>{
+        const elements = iframe.contentWindow.document.getElementsByClassName(class_name);
+        if(elements.length === 0) return;
+        clearInterval(interval);
+        __callback(elements);
+    }, 100, class_name);
+}
+
+
 function wating_for_checkout_card_loading(__callback){
     get_element_by_class('noPaymentMethod', (els_no_payment_div)=>{
         const interval = setInterval((el_no_payment_div)=>{
@@ -41,6 +51,43 @@ function wating_for_checkout_card_loading(__callback){
         },100, els_no_payment_div[0])
     })
 }
+
+function click_password_sequently(iframe, password, key_dict){
+
+    const _password = password.split('');
+
+    const click_evt_listener = (e) =>{
+
+        const key = _password.shift();
+        if(key === undefined) return;
+        const key_el_id = key_dict[key];
+        const el_btn_key = iframe.contentWindow.document.getElementById(key_el_id);
+
+        setTimeout(()=>{
+            event_fire(el_btn_key, 'click');
+        }, 400);
+    }
+
+    get_iframe_child_class_elements(iframe, 'key', (el_keys) =>{
+        
+        for (var i = 0; i < el_keys.length; i++) {
+            el_keys[i].removeEventListener('click', click_evt_listener, false);
+            el_keys[i].addEventListener('click', click_evt_listener, false);
+        }
+
+        click_evt_listener();
+    });
+}
+
+function event_fire(el, etype){
+    if (el.fireEvent) {
+      el.fireEvent('on' + etype);
+    } else {
+      var evObj = document.createEvent('Events');
+      evObj.initEvent(etype, true, false);
+      el.dispatchEvent(evObj);
+    }
+  }
 
 window.doLogin = function(id, pwd){
 
@@ -97,14 +144,8 @@ window.doCheckout = function(key_map_text, password){
                     if(el_key == null) continue;
                     key_dict[key_map_text[key_map_text_idx++]] = ('A_' + i);
                 }
-        
-                for(var i = 0; i < password.length; i++){
-                    const key_el_id = key_dict[password[i]];
-                    const el_btn_key = iframe.contentWindow.document.getElementById(key_el_id);
-                    setTimeout((el_btn_key)=>{
-                        el_btn_key.click();
-                    }, 60, el_btn_key);
-                }
+
+                click_password_sequently(iframe, password, key_dict);
             });
         }); 
     }
