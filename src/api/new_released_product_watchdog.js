@@ -114,6 +114,17 @@ class NewReleasedProductWatchdog{
                         throw new Error('new release watchdog recv empty product list');
                     }
 
+                    if(new_other_product_req_urls.length > 0){
+                        if(_.xor(other_product_req_urls.map((url)=> url.replace(/&_=\d+/g, '')), 
+                            new_other_product_req_urls.map((url)=>url.replace(/&_=\d+/g, ''))).length > 0){
+                            const required_interval_times = 0.5 * new_other_product_req_urls.length + 0.5; //추가링크 0.5초 * n개 + 기본 링크 0.5초
+                            const cur_required_interval_times = this.watch_interval - required_interval_times;
+                            if(cur_required_interval_times < 0){
+                                notify_text('감시기능 경고 - 추가 외부 상품 링크 감지', `신상품 페이지에 추가적인 외부 상품 링크가 있습니다. 장시간 감지하려면, 감시 주기를 추가로 약 ${-cur_required_interval_times} 초 정도 더 필요합니다.`);
+                            }
+                        }
+                    }
+
                     other_product_req_urls = new_other_product_req_urls;
 
                     const new_released_product_list = this.get_new_released_product_info_list(prev_product_info_list, new_product_info_list);
