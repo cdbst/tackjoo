@@ -71,6 +71,8 @@ class NewReleasedProductWatchdog{
 
         this.stopped = false;
 
+        const default_request_url = common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases';
+
         return new Promise(async (resolve, reject)=>{
             this.watchdog_resolver = resolve;
             this.watchdog_rejecter = reject;
@@ -78,6 +80,8 @@ class NewReleasedProductWatchdog{
             let prev_product_info_list = [];
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
             let accumulated_fail_cnt = 0;
+            const default_req_urls = [ default_request_url ];
+            let other_product_req_urls = [];
 
             while(ret_remain--){
 
@@ -95,27 +99,22 @@ class NewReleasedProductWatchdog{
                         return;
                     }
 
-                    let [new_product_info_list, other_product_list_page_urls] = await this.get_product_list_from_url(common.NIKE_URL + '/kr/ko_kr/w/xg/xb/xc/new-releases');
+                    let new_product_info_list = [];
+                    let new_other_product_req_urls = [];
+
+                    const p_req_list = [...default_req_urls, ...other_product_req_urls].map((url)=>this.get_product_list_from_url(url));
+
+                    const list_of_other_product_list = await Promise.all(p_req_list);
+                    list_of_other_product_list.forEach(([product_info_list, other_product_list_page_urls])=>{
+                        new_product_info_list = [...new_product_info_list, ...product_info_list];
+                        new_other_product_req_urls = [...new_other_product_req_urls, ...other_product_list_page_urls];
+                    });
 
                     if(new_product_info_list.length === 0){
-                        accumulated_fail_cnt++;
-                        continue;
+                        throw new Error('new release watchdog recv empty product list');
                     }
 
-                    const list_of_p_other_product_list_page = [];
-
-                    for(var i = 0; i < other_product_list_page_urls.length; i++){
-                        const other_product_list_url = other_product_list_page_urls[i];
-                        const p_product_list = this.get_product_list_from_url(other_product_list_url);
-                        list_of_p_other_product_list_page.push(p_product_list);
-                        //await common.async_sleep((this.watch_interval * 1000));
-                    }
-
-                    const list_of_other_product_list = await Promise.all(list_of_p_other_product_list_page);
-
-                    list_of_other_product_list.forEach(([other_product_list, _])=>{
-                        new_product_info_list = [...new_product_info_list, ...other_product_list];
-                    });
+                    other_product_req_urls = new_other_product_req_urls;
 
                     const new_released_product_list = this.get_new_released_product_info_list(prev_product_info_list, new_product_info_list);
                     if(new_released_product_list.length > 0){
