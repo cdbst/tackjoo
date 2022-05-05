@@ -182,13 +182,27 @@ class ContentsNewProduct extends React.Component {
         this.whitelist_info_list.every((whitelist_info, idx)=>{
             const task_cnt = parseInt(whitelist_info.task_cnt);
             if(ignore_task_cnt === false && task_cnt === 0) return true;
-            if(product_info.name.includes(whitelist_info.keyword) || product_info.model_id.includes(whitelist_info.keyword)){
+
+            let absolute_match = false;
+            let keyword = whitelist_info.keyword;
+
+            if(keyword.startsWith('@@')){
+                keyword = keyword.replace(/^@@/, '');
+                absolute_match = true;
+            }
+
+            if(absolute_match && (product_info.name === keyword || product_info.model_id === keyword)){
+                create_task_cnt = task_cnt;
+                white_list_idx = idx;
+                return false;
+            }else if(absolute_match === false && (product_info.name.includes(keyword) || product_info.model_id.includes(keyword))){
                 create_task_cnt = task_cnt;
                 white_list_idx = idx;
                 return false;
             }else{
                 return true;
             }
+
         });
 
         return [create_task_cnt, white_list_idx];
@@ -199,7 +213,18 @@ class ContentsNewProduct extends React.Component {
         let exists_in_blacklist = false;
         
         this.blacklist_info_list.filter((blacklist_info) => blacklist_info !== '').every((blacklist_info)=>{
-            if(product_info.name.includes(blacklist_info) || product_info.model_id.includes(blacklist_info) || product_info.url.includes(blacklist_info)){
+
+            let absolute_match = false;
+
+            if(blacklist_info.startsWith('@@')){
+                blacklist_info = blacklist_info.replace(/^@@/, '');
+                absolute_match = true;
+            }
+
+            if(absolute_match && (product_info.name === blacklist_info || product_info.model_id === blacklist_info || product_info.url === blacklist_info)){
+                exists_in_blacklist = true;
+                return false;
+            }else if(absolute_match === false && (product_info.name.includes(blacklist_info) || product_info.model_id.includes(blacklist_info) || product_info.url.includes(blacklist_info))){
                 exists_in_blacklist = true;
                 return false;
             }else{
