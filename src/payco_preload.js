@@ -124,31 +124,37 @@ window.doCheckout = function(key_map_text, password){
 
     //숫자가 아닌 것들을 모두 제거
     key_map_text = key_map_text.replace(/[^0-9]/g, '');
+    const unique_key_map_text = [...new Set(key_map_text)].join('');
 
-    if(key_map_text.length !== 10){ //이미지 인식 결과가 이상하다면 재시도.
+    if(key_map_text.length !== 10 || key_map_text.length !== unique_key_map_text.length){ //이미지 인식 결과가 이상하다면 재시도.
+
+        console.log(key_map_text);
+
         get_element_by_class('ly_close', (close_btns)=>{
             close_btns[0].click();
             window.clickCheckoutBtn();
         });
-    }else{
-        get_element('lazyModalDialogIframe', (iframe)=>{
-
-            get_iframe_child_element(iframe, 'ico_password1', ()=>{
-
-                get_iframe_child_class_elements(iframe, 'key', 13, (el_keys) =>{
-        
-                    const key_dict = {};
-                    let key_map_text_idx = 0;
-        
-                    for(var i = 0; i < 11; i++){
-                        const el_key = iframe.contentWindow.document.getElementById('A_' + i);
-                        if(el_key == null) continue;
-                        key_dict[key_map_text[key_map_text_idx++]] = ('A_' + i);
-                    }
-    
-                    click_password_sequently(iframe, el_keys, password, key_dict);
-                });
-            });
-        }); 
+        return;
     }
+
+    get_element('lazyModalDialogIframe', (iframe)=>{
+
+        get_iframe_child_element(iframe, 'ico_password1', ()=>{
+
+            get_iframe_child_class_elements(iframe, 'key', 13, (el_keys) =>{
+    
+                const key_dict = {};
+                let key_map_text_idx = 0;
+    
+                for(var i = 0; i < 11; i++){
+                    const el_key = iframe.contentWindow.document.getElementById('A_' + i);
+                    if(el_key == null) continue;
+                    key_dict[key_map_text[key_map_text_idx++]] = ('A_' + i);
+                }
+
+                click_password_sequently(iframe, el_keys, password, key_dict);
+            });
+        });
+    }); 
+    
 }
