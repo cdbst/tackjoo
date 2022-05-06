@@ -399,7 +399,8 @@
         TRY_TO_DRAW : 'THE DRAW 준비 중',
         GET_PRODUCT_INFO : '상품 정보 확인 중',
         TRY_TO_PAY : '주문결제 요청 중',
-        READY_TO_PAY : '주문결제 대기 중'
+        READY_TO_PAY : '주문결제 대기 중',
+        CHECK_IS_WIN : 'DRAW 결과 확인 중',
     };
 
 })(typeof exports === 'undefined'? this['common']={}: exports);

@@ -180,17 +180,26 @@ module.exports.apply_draw = async(browser_context, product_info, size_info) =>{
 
 module.exports.add_to_cart = async(browser_context, product_info, size_info) =>{
 
-    let size_info_has_quantity = this.get_size_info_list_has_quantity(product_info);
-
-    while(true){
-
+    if(size_info.winFlag !== undefined){
         const res_data = await browser_context.add_to_cart(product_info, size_info);
-        if(res_data === undefined) return undefined;
-        if('sku_id' in res_data === false) return size_info;
+        if(res_data === undefined || res_data.quantityAdded === undefined){
+            return undefined;
+        }else{
+            return size_info;
+        }
+    }else{
+        let size_info_has_quantity = this.get_size_info_list_has_quantity(product_info);
 
-        size_info_has_quantity = size_info_has_quantity.filter(si => si.sku_id !== res_data.sku_id);
-        const rand_idx = common.get_random_int(0, size_info_has_quantity.length - 1);
-        size_info = size_info_has_quantity[rand_idx];
+        while(true){
+    
+            const res_data = await browser_context.add_to_cart(product_info, size_info);
+            if(res_data === undefined) return undefined;
+            if('sku_id' in res_data === false) return size_info;
+    
+            size_info_has_quantity = size_info_has_quantity.filter(si => si.sku_id !== res_data.sku_id);
+            const rand_idx = common.get_random_int(0, size_info_has_quantity.length - 1);
+            size_info = size_info_has_quantity[rand_idx];
+        }
     }
 }
 
@@ -212,6 +221,11 @@ module.exports.prepare_pay = async(browser_context, prepare_pay_payload, billing
 module.exports.open_checkout_page = async(browser_context, product_info) =>{
     const billing_info = await browser_context.open_checkout_page(product_info);
     return billing_info;
+}
+
+module.exports.check_draw_result = async(browser_context, product_info) =>{
+    const check_result = await browser_context.check_draw_result(product_info);
+    return check_result;
 }
 
 

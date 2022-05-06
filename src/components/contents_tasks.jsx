@@ -535,9 +535,11 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    create_quick_task(product_info){
+    create_quick_task(product_info, account_email){
 
-        const account_email = this.__get_appropreate_to_tasking_account_email();
+        if(account_email === undefined){
+            account_email = this.__get_appropreate_to_tasking_account_email();
+        }
 
         if(account_email === undefined){
             Index.g_sys_msg_q.enqueue('에러', '작업을 하기위한 계정이 하나도 존재하지 않습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);

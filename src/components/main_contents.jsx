@@ -16,7 +16,7 @@ class MainContents extends React.Component {
                 <ContentsBilling />
                 <ContentsProxies ref={this.__ref_contents_proxies}/>
                 <ContentsSettings />
-                <ContentsTheDraw />
+                <ContentsTheDraw contents_task_ref={this.__ref_contents_tasks}/>
                 <ContentsNewProduct contents_task_ref={this.__ref_contents_tasks}/>
                 <ContentsOrderList />
             </div>
