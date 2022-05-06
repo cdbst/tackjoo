@@ -25,6 +25,10 @@ function get_element_by_class(class_name, __callback){
 
 function get_iframe_child_element(iframe, id, __callback){
     const interval = setInterval((id)=>{
+        if(iframe.contentWindow == undefined || iframe.contentWindow.document == undefined){
+            clearInterval(interval);
+            return
+        }
         const element = iframe.contentWindow.document.getElementById(id);
         if(element === null) return;
         clearInterval(interval);
@@ -32,10 +36,14 @@ function get_iframe_child_element(iframe, id, __callback){
     }, 100, id);
 }
 
-function get_iframe_child_class_elements(iframe, class_name, __callback){
+function get_iframe_child_class_elements(iframe, class_name, required_count, __callback){
     const interval = setInterval((class_name)=>{
+        if(iframe.contentWindow == undefined || iframe.contentWindow.document == undefined){
+            clearInterval(interval);
+            return
+        }
         const elements = iframe.contentWindow.document.getElementsByClassName(class_name);
-        if(elements.length === 0) return;
+        if(elements.length !== required_count) return;
         clearInterval(interval);
         __callback(elements);
     }, 100, class_name);
@@ -52,9 +60,10 @@ function wating_for_checkout_card_loading(__callback){
     })
 }
 
-function click_password_sequently(iframe, password, key_dict){
+function click_password_sequently(iframe, el_keys, password, key_dict){
 
     const _password = password.split('');
+    let click_count = 0;
 
     const click_evt_listener = (e) =>{
 
@@ -63,20 +72,18 @@ function click_password_sequently(iframe, password, key_dict){
         const key_el_id = key_dict[key];
         const el_btn_key = iframe.contentWindow.document.getElementById(key_el_id);
 
-        setTimeout(()=>{
+        get_iframe_child_class_elements(iframe, 'ico on', click_count, (_el_pw_on_ico) =>{
+            click_count++;
             event_fire(el_btn_key, 'click');
-        }, 400);
+        });
+    }
+        
+    for (var i = 0; i < el_keys.length; i++) {
+        el_keys[i].removeEventListener('click', click_evt_listener, false);
+        el_keys[i].addEventListener('click', click_evt_listener, false);
     }
 
-    get_iframe_child_class_elements(iframe, 'key', (el_keys) =>{
-        
-        for (var i = 0; i < el_keys.length; i++) {
-            el_keys[i].removeEventListener('click', click_evt_listener, false);
-            el_keys[i].addEventListener('click', click_evt_listener, false);
-        }
-
-        click_evt_listener();
-    });
+    click_evt_listener();
 }
 
 function event_fire(el, etype){
@@ -125,16 +132,22 @@ window.doCheckout = function(key_map_text, password){
 
     //숫자가 아닌 것들을 모두 제거
     key_map_text = key_map_text.replace(/[^0-9]/g, '');
+    const unique_key_map_text = [...new Set(key_map_text)].join('');
 
-    if(key_map_text.length !== 10){ //이미지 인식 결과가 이상하다면 재시도.
+    if(key_map_text.length !== 10 || key_map_text.length !== unique_key_map_text.length){ //이미지 인식 결과가 이상하다면 재시도.
+
         get_element_by_class('ly_close', (close_btns)=>{
             close_btns[0].click();
             window.clickCheckoutBtn();
         });
-    }else{
-        get_element('lazyModalDialogIframe', (iframe)=>{
+        return;
+    }
 
-            get_iframe_child_element(iframe, 'ico_password1', ()=>{
+    get_element('lazyModalDialogIframe', (iframe)=>{
+
+        get_iframe_child_element(iframe, 'ico_password1', ()=>{
+
+            get_iframe_child_class_elements(iframe, 'key', 13, (el_keys) =>{
     
                 const key_dict = {};
                 let key_map_text_idx = 0;
@@ -145,8 +158,9 @@ window.doCheckout = function(key_map_text, password){
                     key_dict[key_map_text[key_map_text_idx++]] = ('A_' + i);
                 }
 
-                click_password_sequently(iframe, password, key_dict);
+                click_password_sequently(iframe, el_keys, password, key_dict);
             });
-        }); 
-    }
+        });
+    }); 
+    
 }
