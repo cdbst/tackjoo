@@ -25,6 +25,10 @@ function get_element_by_class(class_name, __callback){
 
 function get_iframe_child_element(iframe, id, __callback){
     const interval = setInterval((id)=>{
+        if(iframe.contentWindow == undefined || iframe.contentWindow.document == undefined){
+            clearInterval(interval);
+            return
+        }
         const element = iframe.contentWindow.document.getElementById(id);
         if(element === null) return;
         clearInterval(interval);
@@ -34,6 +38,10 @@ function get_iframe_child_element(iframe, id, __callback){
 
 function get_iframe_child_class_elements(iframe, class_name, required_count, __callback){
     const interval = setInterval((class_name)=>{
+        if(iframe.contentWindow == undefined || iframe.contentWindow.document == undefined){
+            clearInterval(interval);
+            return
+        }
         const elements = iframe.contentWindow.document.getElementsByClassName(class_name);
         if(elements.length !== required_count) return;
         clearInterval(interval);
@@ -127,8 +135,6 @@ window.doCheckout = function(key_map_text, password){
     const unique_key_map_text = [...new Set(key_map_text)].join('');
 
     if(key_map_text.length !== 10 || key_map_text.length !== unique_key_map_text.length){ //이미지 인식 결과가 이상하다면 재시도.
-
-        console.log(key_map_text);
 
         get_element_by_class('ly_close', (close_btns)=>{
             close_btns[0].click();
