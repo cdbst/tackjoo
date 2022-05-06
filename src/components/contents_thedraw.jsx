@@ -188,6 +188,12 @@ class ContentsTheDraw extends React.Component {
                 Index.g_sys_msg_q.enqueue('안내', '상품 정보를 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
+
+            if(product_info.draw_id === undefined){
+                Index.g_sys_msg_q.enqueue('안내', '진행 중인 DRAW 상품이 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+
             common.update_product_info_obj(product_info, 'url', product_url);
             //상품 구매 타입을 Buy로 변환시켜준다. (더이상 The draw 타입이 아님.)
             common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
