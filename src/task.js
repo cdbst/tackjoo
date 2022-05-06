@@ -93,11 +93,11 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.CHECK_IS_WIN]);
         const the_draw_check_result = await TaskUtils.check_draw_result(browser_context, product_info);
         if(the_draw_check_result === undefined){
-            throw new CheckDrawResultError("Invalid draw result");
+            throw new CheckDrawResultError(product_info, "Invalid draw result");
         }
 
         if(the_draw_check_result.winFlag !== 'win'){
-            throw new CheckDrawResultError("Invalid draw result - 당첨되지 않은 THE DRAW 상품 구매 시도.");
+            throw new CheckDrawResultError(product_info, "Invalid draw result - 당첨되지 않은 THE DRAW 상품 구매 시도.");
         }
 
         await task_order(browser_context, product_info, billing_info, the_draw_check_result);
