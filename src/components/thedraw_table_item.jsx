@@ -113,17 +113,17 @@ class TheDrawTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="당첨 상품 바로가기">
                             <button type="button" className="btn btn-warning" onClick={this.onClickGoLinkBtn.bind(this)}>
                                 <img src="./res/img/link.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
-                            <button type="button" className="btn btn-info" onClick={this.onPopAccountInfo.bind(this)}>
+                        <div className="float-start button-wrapper-inner-table" title="당첨 계정 정보 확인">
+                            <button type="button" className="btn btn-light" onClick={this.onPopAccountInfo.bind(this)}>
                                 <img src="./res/img/info-circle-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="당첨 상품 구매하기">
                             <button type="button" className="btn btn-info" onClick={this.onCreateQuickTask.bind(this)} disabled={this.props.draw_item.draw_result === '미당첨'}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
                             </button>
