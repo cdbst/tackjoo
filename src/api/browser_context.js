@@ -907,15 +907,33 @@ class BrowserContext {
 
     async add_to_cart(product_info, size_info){
 
-        let payload_obj = {
-            'SIZE' : size_info['id'],
-            'quantity' : 1,
-            'csrfToken' : this.csrfToken,
-            'productId' : product_info['product_id']
-        };
+        let payload_obj = undefined;
+        
+        if(size_info.winFlag !== undefined){
 
-        payload_obj[product_info.item_attr] = size_info['name'];
+            payload_obj = {
+                productId : product_info.product_id,
+                SIZE : size_info.SIZE,
+                quantity : 1,
+                csrfToken : this.csrfToken,
+                attributename : size_info.attributename,
+            };
 
+            payload_obj[`itemAttributes[${size_info.attributename}]`] = size_info.itemAttributes;
+            payload_obj['userDefinedFields[THE_DRAW_ENTRY_ID]'] = size_info.theDrawEntryId;
+
+        }else{
+
+            payload_obj = {
+                SIZE : size_info['id'],
+                quantity : 1,
+                csrfToken : this.csrfToken,
+                productId : product_info.product_id
+            };
+    
+            payload_obj[product_info.item_attr] = size_info['name'];
+        }
+        
         let payload = new URLSearchParams(payload_obj).toString()
 
         let headers = {
@@ -957,9 +975,17 @@ class BrowserContext {
                 this.__set_cookie(this.__cookie_storage, res);
 
                 if(('error' in res.data) && (typeof res.data.error) === 'string' && 
-                    (res.data.error.includes('재고가 없습니다') || res.data.error.includes('유효하지 않습니다'))){
+                    (res.data.error.includes('재고가 없습니다') || res.data.error.includes('유효하지 않습니다'))
+                ){
                     log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data.error));
                     return size_info; // 상품 재고가 없는 상황에서 retry 하는 것은 의미가 없다. 이와 같은 경우 구매를 시도한 size_info object를 반환한다.
+                }
+
+                if(('error' in res.data) && (typeof res.data.error) === 'string' && 
+                    (res.data.error.includes('구매 제한 수량을 초과'))
+                ){
+                    log.error(common.get_log_str('browser_context.js', 'add_to_cart', res.data.error));
+                    return undefined; // 더 이상 구매 하지 못하는 상황에서의 재시도 작업은 의미가 없으므로 즉시 리턴한다.
                 }
 
                 if('error' in res.data){
@@ -1518,6 +1544,73 @@ class BrowserContext {
         }
 
         return false;
+    }
+
+    async check_draw_result(product_info, retry_cnt){
+
+        const payload_obj = {
+            prodId: product_info.product_id,
+            theDrawId: product_info.draw_id,
+            skuId: 111,
+            redirectUrl: product_info.url,
+            csrfToken: this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            "authority": BrowserContext.NIKE_DOMAIN_NAME,
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cache-control": "no-cache",
+            "content-length": payload.length,
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "origin": BrowserContext.NIKE_URL,
+            "pragma": "no-cache",
+            "referer": product_info.url,
+            "sec-ch-ua": BrowserContext.SEC_CA_UA,
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "user-agent": BrowserContext.USER_AGENT,
+            "x-requested-with": "XMLHttpRequest"
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        this.__cookie_storage.add_cookie_data('_gali=btn-drawiswin');
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/launch/theDraw/entry/isWin', headers, payload);
+
+                if(res.status !== 200){
+                    throw new Error('check_draw_result : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                if((res.data instanceof Object) == false){
+                    throw new Error('check_draw_result : unexpected data : data is not object type');
+                }
+    
+                if(('winFlag' in res.data) === false){
+                    throw new Error('check_draw_result : unexpected data : \'winFlag\' information is not exist.');
+                }
+
+                return res.data;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'check_draw_result', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
     }
 }
 

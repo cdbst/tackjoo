@@ -5,7 +5,9 @@ const product_page_parser = require('./api/product_page_parser.js');
 const BrowserContext = require('./api/browser_context.js').BrowserContext;
 const {TaskInfoError, ProductInfoError, OpenProductPageError, SizeInfoError, 
     ApplyDrawError, AddToCartError, CheckOutSingleShipError, CheckOutRequestError, 
-    PrepareKakaoPayError, OpenCheckOutPageError, OpenPayWindowError, LoginError, GetSkuInventoryError} = require('./api/task_errors.js');
+    PrepareKakaoPayError, OpenCheckOutPageError, OpenPayWindowError, LoginError, GetSkuInventoryError,
+    CheckDrawResultError
+} = require('./api/task_errors.js');
 
 const log = require('electron-log');
 const app_cfg = require('./app_config');
@@ -81,6 +83,26 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         if(product_info == undefined){
             throw new OpenProductPageError("Cannot open product page info");
         }
+    }else if(product_info.sell_type === common.SELL_TYPE.normal && product_info.draw_id !== undefined){ // draw 상품을 구매하는 상황임.
+
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ON_PAGE]);
+        await TaskUtils.open_product_page(browser_context, product_info);
+        common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal); // product type을 강제로 변환 (draw -> noraml), 왜냐하면 구매작업이기 때문.
+
+        //STEP2 - 1 : THE DRAW 결과 확인하기
+        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.CHECK_IS_WIN]);
+        const the_draw_check_result = await TaskUtils.check_draw_result(browser_context, product_info);
+        if(the_draw_check_result === undefined){
+            throw new CheckDrawResultError("Invalid draw result");
+        }
+
+        if(the_draw_check_result.winFlag !== 'win'){
+            throw new CheckDrawResultError("Invalid draw result - 당첨되지 않은 THE DRAW 상품 구매 시도.");
+        }
+
+        await task_order(browser_context, product_info, billing_info, the_draw_check_result);
+        process.exit(0);
+
     }else if(product_info.sell_type === common.SELL_TYPE.custom){
         // STEP2 : Open Product Page
         global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.WAITING_FOR_RELEASE]);
@@ -138,63 +160,66 @@ async function main(browser_context, task_info, product_info, billing_info, sett
         process.exit(0);
 
     }else{
-
-        // STEP5 : Add product to cart.
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ADD_TO_CART]);
-        const size_info_in_cart = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
-        if(size_info_in_cart == undefined){
-            throw new AddToCartError(product_info, size_info, "Fail with add to cart");
-        }
-
-        global.MainThreadApiCaller.call('set_checked_out_size_info', [size_info_in_cart]);
-
-        // STEP6 : open checkout page
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.IN_TO_CART]);
-        const account_default_billing_info = await TaskUtils.open_checkout_page(browser_context, product_info);
-        if(account_default_billing_info === undefined){
-            throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
-        }
-
-        if(billing_info.use_default_addr) Object.assign(billing_info, account_default_billing_info);
-
-        // STEP7 : chekcout singleship (registering buyer address info)
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.PREPARE_ORDER]);
-        const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info, product_info);
-        if(pay_prepare_payload == undefined){
-            throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
-        }
-
-        // STEP8 : prepare kakaopay
-        const pay_url = await TaskUtils.prepare_pay(browser_context, pay_prepare_payload, billing_info);
-        if(pay_url == undefined){
-            throw new PrepareKakaoPayError(pay_prepare_payload, "Fail with prepare kakaopay")
-        }
-
-        // STEP9 : open kakaopay checkout window
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
-        try{
-            let open_pay_window_api = undefined;
-            if(billing_info.pay_method === 'payco'){
-                open_pay_window_api = 'open_payco_window';
-            }else if(billing_info.pay_method === 'kakaopay'){
-                open_pay_window_api = 'open_kakaopay_window';
-            }
-            await global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
-        }catch(e){
-            let _err = new OpenPayWindowError(kakao_data, "Open pay window fail");
-            _err.stack = e.stack;
-            _err.message = e.message;
-            throw _err;
-        }
-
-        // STEP10 : Click checkout button (결제 버튼 클릭)
-        global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
-        await common.async_sleep(2000);
-        const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info, product_info);
-        if(checkout_result == undefined){
-            throw new CheckOutRequestError("Fail with checkout request");
-        }
-
+        await task_order(browser_context, product_info, billing_info, size_info);
         process.exit(0);
+    }
+}
+
+async function task_order(browser_context, product_info, billing_info, size_info){
+
+    // STEP5 : Add product to cart.
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.ADD_TO_CART]);
+    const size_info_in_cart = await TaskUtils.add_to_cart(browser_context, product_info, size_info);
+    if(size_info_in_cart === undefined){
+        throw new AddToCartError(product_info, size_info, "Fail with add to cart");
+    }
+
+    global.MainThreadApiCaller.call('set_checked_out_size_info', [size_info_in_cart]);
+
+    // STEP6 : open checkout page
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.IN_TO_CART]);
+    const account_default_billing_info = await TaskUtils.open_checkout_page(browser_context, product_info);
+    if(account_default_billing_info === undefined){
+        throw new OpenCheckOutPageError(product_info, "Fail with openning checkout page");
+    }
+
+    if(billing_info.use_default_addr) Object.assign(billing_info, account_default_billing_info);
+
+    // STEP7 : chekcout singleship (registering buyer address info)
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.PREPARE_ORDER]);
+    const pay_prepare_payload = await TaskUtils.checkout_singleship(browser_context, billing_info, product_info);
+    if(pay_prepare_payload == undefined){
+        throw new CheckOutSingleShipError(billing_info, "Fail with checkout singleship");
+    }
+
+    // STEP8 : prepare kakaopay
+    const pay_url = await TaskUtils.prepare_pay(browser_context, pay_prepare_payload, billing_info);
+    if(pay_url == undefined){
+        throw new PrepareKakaoPayError(pay_prepare_payload, "Fail with prepare kakaopay")
+    }
+
+    // STEP9 : open kakaopay checkout window
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.READY_TO_PAY]);
+    try{
+        let open_pay_window_api = undefined;
+        if(billing_info.pay_method === 'payco'){
+            open_pay_window_api = 'open_payco_window';
+        }else if(billing_info.pay_method === 'kakaopay'){
+            open_pay_window_api = 'open_kakaopay_window';
+        }
+        await global.MainThreadApiCaller.call(open_pay_window_api, [pay_url]);
+    }catch(e){
+        let _err = new OpenPayWindowError(kakao_data, "Open pay window fail");
+        _err.stack = e.stack;
+        _err.message = e.message;
+        throw _err;
+    }
+
+    // STEP10 : Click checkout button (결제 버튼 클릭)
+    global.MainThreadApiCaller.call('send_message', [common.TASK_STATUS.TRY_TO_PAY]);
+    await common.async_sleep(2000);
+    const checkout_result = await TaskUtils.checkout_request(browser_context, billing_info, product_info);
+    if(checkout_result == undefined){
+        throw new CheckOutRequestError("Fail with checkout request");
     }
 }

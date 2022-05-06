@@ -8,6 +8,7 @@ class TheDrawTableItem extends React.Component {
         this.getDrawResultFontColor = this.getDrawResultFontColor.bind(this);
         this.getAccountInfoTag = this.getAccountInfoTag.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
+        this.onCreateQuickTask = this.onCreateQuickTask.bind(this);
 
         this.__mount = false;
     }
@@ -52,6 +53,10 @@ class TheDrawTableItem extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    onCreateQuickTask(){
+        this.props.h_on_create_task(this.props.draw_item.product_link, this.props.draw_item.account_email);
     }
 
     onPopAccountInfo(){
@@ -116,6 +121,11 @@ class TheDrawTableItem extends React.Component {
                         <div className="float-start button-wrapper-inner-table">
                             <button type="button" className="btn btn-info" onClick={this.onPopAccountInfo.bind(this)}>
                                 <img src="./res/img/info-circle-fill.svg" style={{width:24, height:24}}/>
+                            </button>
+                        </div>
+                        <div className="float-start button-wrapper-inner-table">
+                            <button type="button" className="btn btn-info" onClick={this.onCreateQuickTask.bind(this)} disabled={this.props.draw_item.draw_result === '미당첨'}>
+                                <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
                     </div>

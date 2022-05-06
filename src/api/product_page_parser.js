@@ -15,6 +15,8 @@ function get_sell_type(sell_type_string){
         sell_type = common.SELL_TYPE.ftfs;
     }else if(text.includes(common.SELL_TYPE.draw.toLowerCase())){
         sell_type = common.SELL_TYPE.draw;
+    }else if(text === '당첨 결과 확인'){
+        sell_type = common.SELL_TYPE.draw;
     }else if(text.includes(common.SELL_TYPE.notify.toLowerCase())){
         sell_type = common.SELL_TYPE.notify;
     }else if(text.includes(common.SELL_TYPE.notify.toLowerCase())){

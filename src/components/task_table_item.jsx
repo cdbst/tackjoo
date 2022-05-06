@@ -274,6 +274,8 @@ class TaskTableItem extends React.Component {
                 return false;
             case common.TASK_STATUS.WAITING_FOR_RELEASE:
                 return false;
+            case common.TASK_STATUS.CHECK_IS_WIN:
+                return false;
         }
     }
 
@@ -317,7 +319,14 @@ class TaskTableItem extends React.Component {
         const proxy_alias = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.alias;
         const proxy_ip = this.props.task_info.proxy_info == undefined ? '' : this.props.task_info.proxy_info.ip;
 
-        const status_text = this.state.status === common.TASK_STATUS.DONE ? `${this.state.status}(${this.checked_out_size_info.name})` : this.state.status;
+        let status_text = undefined;
+
+        if(this.state.status === common.TASK_STATUS.DONE){
+            const size_name = this.checked_out_size_info.winFlag === undefined ? this.checked_out_size_info.name : this.checked_out_size_info.itemAttributes;
+            status_text = `${this.state.status}(${size_name})`;
+        }else{
+            status_text = this.state.status;
+        }
 
         const background_color = this.state.selected ? 'rgb(131, 241, 149, 0.36)' : 'transparent';
 

@@ -201,6 +201,20 @@ class OpenPayWindowError extends Error {
     }
 }
 
+class CheckDrawResultError extends Error {
+    constructor(product_info, ...params) {
+      
+        super(...params);
+  
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, CheckDrawResultError);
+        }
+        
+        this.name = 'CheckDrawResultError';
+        this.product_info = product_info;
+    }
+}
+
 module.exports.TaskInfoError = TaskInfoError;
 module.exports.ProductInfoError = ProductInfoError;
 module.exports.OpenProductPageError = OpenProductPageError;
@@ -215,3 +229,4 @@ module.exports.OpenPayWindowError = OpenPayWindowError;
 module.exports.TaskCanceledError = TaskCanceledError;
 module.exports.LoginError = LoginError;
 module.exports.GetSkuInventoryError = GetSkuInventoryError;
+module.exports.CheckDrawResultError = CheckDrawResultError;

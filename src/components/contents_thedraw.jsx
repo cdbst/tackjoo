@@ -10,6 +10,7 @@ class ContentsTheDraw extends React.Component {
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
+        this.onCreateTask = this.onCreateTask.bind(this);
 
         this.thedraw_item_list = [];
 
@@ -173,10 +174,25 @@ class ContentsTheDraw extends React.Component {
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
                 image_col_width = {this.image_col_width}
+                h_on_create_task={this.onCreateTask.bind(this)}
                 draw_item = {draw_item}
                 key={draw_item._id}
             />
         );
+    }
+
+    onCreateTask(product_url, account_email){
+        window.electron.getProductInfo(product_url, (error, product_info) =>{
+            
+            if(error !== undefined || product_info === undefined){
+                Index.g_sys_msg_q.enqueue('안내', '상품 정보를 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+            common.update_product_info_obj(product_info, 'url', product_url);
+            //상품 구매 타입을 Buy로 변환시켜준다. (더이상 The draw 타입이 아님.)
+            common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
+            this.props.contents_task_ref.current.create_quick_task(product_info, account_email);
+        });
     }
 
     render() {
