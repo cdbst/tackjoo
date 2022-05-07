@@ -124,7 +124,7 @@ class TheDrawTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="당첨 상품 구매하기">
-                            <button type="button" className="btn btn-info" onClick={this.onCreateQuickTask.bind(this)} disabled={this.props.draw_item.draw_result === '미당첨'}>
+                            <button type="button" className="btn btn-info" onClick={this.onCreateQuickTask.bind(this)} disabled={this.props.draw_item.draw_result !== '당첨'}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
