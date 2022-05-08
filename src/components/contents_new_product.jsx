@@ -137,7 +137,7 @@ class ContentsNewProduct extends React.Component {
 
             let display = '';
             let background = 'transparent';
-            const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info, true);
+            const [_, white_list_idx] = this.checkProductInfoWithWhiteList(product_info);
             const includes_blacklist = this.checkProductInfoWithBlackList(product_info);
             if(use_filter) display = (white_list_idx === -1 || includes_blacklist) ? 'none' : '';
             else background = (white_list_idx === -1 || includes_blacklist) ? 'transparent' : 'rgb(131, 241, 149, 0.36)';
@@ -174,14 +174,12 @@ class ContentsNewProduct extends React.Component {
         this.__updateTableItems();
     }
 
-    checkProductInfoWithWhiteList(product_info, ignore_task_cnt = false){
+    checkProductInfoWithWhiteList(product_info){
 
         let create_task_cnt = 0;
         let white_list_idx = -1;
         
         this.whitelist_info_list.every((whitelist_info, idx)=>{
-            const task_cnt = parseInt(whitelist_info.task_cnt);
-            if(ignore_task_cnt === false && task_cnt === 0) return true;
 
             let absolute_match = false;
             let keyword = whitelist_info.keyword;
@@ -191,18 +189,21 @@ class ContentsNewProduct extends React.Component {
                 absolute_match = true;
             }
 
+            let found = false;
+
             if(absolute_match && (product_info.name === keyword || product_info.model_id === keyword)){
-                create_task_cnt = task_cnt;
-                white_list_idx = idx;
-                return false;
+                found =  true;
             }else if(absolute_match === false && (product_info.name.includes(keyword) || product_info.model_id.includes(keyword))){
-                create_task_cnt = task_cnt;
+                found =  true;
+            }
+
+            if(found){
+                create_task_cnt = parseInt(whitelist_info.task_cnt);
                 white_list_idx = idx;
                 return false;
             }else{
                 return true;
             }
-
         });
 
         return [create_task_cnt, white_list_idx];
