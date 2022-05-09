@@ -81,7 +81,7 @@ class NewReleasedProductWatchdog{
             let ret_remain = this.watch_max_ret === 0 ? 1 : this.watch_max_ret;
             let accumulated_fail_cnt = 0;
             const default_req_urls = [ default_request_url ];
-            let other_product_req_urls = [];
+            //let other_product_req_urls = [];
 
             while(ret_remain--){
 
@@ -100,32 +100,33 @@ class NewReleasedProductWatchdog{
                     }
 
                     let new_product_info_list = [];
-                    let new_other_product_req_urls = [];
+                    //let new_other_product_req_urls = [];
 
-                    const p_req_list = [...default_req_urls, ...other_product_req_urls].map((url)=>this.get_product_list_from_url(url));
+                    //const p_req_list = [...default_req_urls, ...other_product_req_urls].map((url)=>this.get_product_list_from_url(url));
+                    const p_req_list = default_req_urls.map((url)=>this.get_product_list_from_url(url));
 
                     const list_of_other_product_list = await Promise.all(p_req_list);
                     list_of_other_product_list.forEach(([product_info_list, other_product_list_page_urls])=>{
                         new_product_info_list = [...new_product_info_list, ...product_info_list];
-                        new_other_product_req_urls = [...new_other_product_req_urls, ...other_product_list_page_urls];
+                        //new_other_product_req_urls = [...new_other_product_req_urls, ...other_product_list_page_urls];
                     });
 
                     if(new_product_info_list.length === 0){
                         throw new Error('new release watchdog recv empty product list');
                     }
 
-                    if(new_other_product_req_urls.length > 0){
-                        if(_.xor(other_product_req_urls.map((url)=> url.replace(/&_=\d+/g, '')), 
-                            new_other_product_req_urls.map((url)=>url.replace(/&_=\d+/g, ''))).length > 0){
-                            const required_interval_times = 0.7 * new_other_product_req_urls.length + 0.7; //추가링크 0.5초 * n개 + 기본 링크 0.5초
-                            const cur_required_interval_times = this.watch_interval - required_interval_times;
-                            if(cur_required_interval_times < 0){
-                                notify_text('감시기능 경고 - 추가 외부 상품 링크 감지', `신상품 페이지에 추가적인 외부 상품 링크가 있습니다. 장시간 감지하려면, 감시 주기를 추가로 약 ${-cur_required_interval_times} 초 정도 더 필요합니다.`);
-                            }
-                        }
-                    }
+                    // if(new_other_product_req_urls.length > 0){
+                    //     if(_.xor(other_product_req_urls.map((url)=> url.replace(/&_=\d+/g, '')), 
+                    //         new_other_product_req_urls.map((url)=>url.replace(/&_=\d+/g, ''))).length > 0){
+                    //         const required_interval_times = 0.7 * new_other_product_req_urls.length + 0.7; //추가링크 0.5초 * n개 + 기본 링크 0.5초
+                    //         const cur_required_interval_times = this.watch_interval - required_interval_times;
+                    //         if(cur_required_interval_times < 0){
+                    //             notify_text('감시기능 경고 - 추가 외부 상품 링크 감지', `신상품 페이지에 추가적인 외부 상품 링크가 있습니다. 장시간 감지하려면, 감시 주기를 추가로 약 ${-cur_required_interval_times} 초 정도 더 필요합니다.`);
+                    //         }
+                    //     }
+                    // }
 
-                    other_product_req_urls = new_other_product_req_urls;
+                    // other_product_req_urls = new_other_product_req_urls;
 
                     const new_released_product_list = this.get_new_released_product_info_list(prev_product_info_list, new_product_info_list);
                     if(new_released_product_list.length > 0){
