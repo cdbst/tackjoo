@@ -1,11 +1,35 @@
-const {ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
+const { reject } = require('lodash');
 ipcRenderer.on('message', on_message);
 
 function on_message(event, message) {
     window[message.api].apply(window, message.args);
 }
 
+function get_element_v2(id){
+
+    return new Promise((resolve, reject) =>{
+
+        let h_interval = undefined;
+
+        try{
+            h_interval = setInterval(()=>{
+                const element = document.getElementById(id);
+                if(element === null) return;
+                clearInterval(h_interval); // is async or sync???
+                h_interval = undefined;
+                resolve(element);
+            }, 100);
+
+        }catch(err){
+            if(h_interval)clearInterval(h_interval);
+            reject(err);
+        }
+    });
+}
+
 function get_element(id, __callback){
+
     const interval = setInterval((id)=>{
         const element = document.getElementById(id);
         if(element === null) return;
@@ -98,30 +122,34 @@ function event_fire(el, etype){
 
 window.doLogin = function(id, pwd){
 
-    get_element('id', (el_input_id)=>{
+    get_element_v2('id').then((el_input_id)=>{
         el_input_id.value = id;
-
-        get_element('pw', (el_input_pwd) =>{
-            el_input_pwd.value = pwd;
-
-            get_element('loginBtn', (el_btn_login) =>{
-                el_btn_login.click();
-            });
-        });
+        return get_element_v2('pw');
+    }).then((el_input_pwd)=>{
+        el_input_pwd.value = pwd;
+        return get_element_v2('loginBtn');
+    }).then((el_btn_login)=>{
+        return el_btn_login.click();
+    }).catch((err)=>{
+        console.error(err);
     });
 }
 
 window.doConfirmBirthdayIfno = function(birthday){
-    get_element('birthday', (el_birthday_input)=>{
+
+    get_element_v2('birthday').then((el_birthday_input)=>{
         el_birthday_input.value = birthday;
-        get_element('confirmBtn', (el_btn_confirm) =>{
-            el_btn_confirm.click();
-        });
+        return get_element_v2('confirmBtn');
+    }).then((el_btn_confirm)=>{
+        el_btn_confirm.click();
+    }).catch((err)=>{
+        console.error(err);
     });
 }
 
 window.clickCheckoutBtn = function(){
-    get_element('btnPayment', (payment_btn)=>{
+
+    get_element_v2('btnPayment').then((payment_btn)=>{
         wating_for_checkout_card_loading(()=>{
             payment_btn.click();
         });
@@ -143,7 +171,7 @@ window.doCheckout = function(key_map_text, password){
         return;
     }
 
-    get_element('lazyModalDialogIframe', (iframe)=>{
+    get_element_v2('lazyModalDialogIframe').then((iframe)=>{
 
         get_iframe_child_element(iframe, 'ico_password1', ()=>{
 
@@ -161,6 +189,7 @@ window.doCheckout = function(key_map_text, password){
                 click_password_sequently(iframe, el_keys, password, key_dict);
             });
         });
-    }); 
-    
+    }).catch(err =>{
+
+    });
 }

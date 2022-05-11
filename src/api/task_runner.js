@@ -214,7 +214,7 @@ class TaskRunner{
                 const image_buffer = Buffer.from(res.body, "base64");
                 const text = await OCREngine.get_text(image_buffer);
                 await this.checkout_wait.wait();
-                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.payco_info.checkout_pwd]);
+                this.pay_window.call_renderer_api('doCheckout', [text, this.billing_info.payco_info.checkout_pwd.substring(0, 5)]);
             }
         };
 
