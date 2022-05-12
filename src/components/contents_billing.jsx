@@ -151,19 +151,23 @@ class ContentsBilling extends React.Component {
 
             if(billing_info.use_default_addr === false){
                 if(billing_info.buyer_name == undefined || billing_info.buyer_name == ''){
-                    return '받으시는 분 이름이 지정되지 않았습니다.';
+                    return '받으시는 분 이름이 입력되지 않았습니다.';
                 }
         
                 if(billing_info.phone_num == undefined || billing_info.phone_num == ''){
-                    return '받으시는 분 전화번호가 지정되지 않았습니다.';
+                    return '연락처가 입력되지 않았습니다.';
+                }
+
+                if(new RegExp('^[0-9]+$').test(billing_info.phone_num) === false){
+                    return '연락처가 올바르게 입력되지 않았습니다. 전화번호를 숫자로만 입력해야 합니다.';
                 }
         
                 if(billing_info.buyer_addr1 == undefined || billing_info.buyer_addr1 == ''){
-                    return '받으시는 분 주소가 지정되지 않았습니다.';
+                    return '배송 주소가 지정되지 않았습니다.';
                 }
         
                 if(billing_info.buyer_addr2 == undefined || billing_info.buyer_addr2 == ''){
-                    return '받으시는 분 세부 주소가 지정되지 않았습니다.';
+                    return '세부 배송 주소가 지정되지 않았습니다.';
                 }
         
                 if(billing_info.postal_code == undefined || billing_info.postal_code == ''){
@@ -368,7 +372,7 @@ class ContentsBilling extends React.Component {
                                 <div className="m2-12 row">
                                     <div className="col-md-6">
                                         <label htmlFor="input-buyer-phone-num" className="form-label contents-bill-input-label">연락처</label>
-                                        <input type="number" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} onWheel={(e) => e.target.blur()} style={{'--width' : '450px'}}/>
+                                        <input type="text" className="form-control" placeholder="-없이 입력" id="input-buyer-phone-num" ref={this.ref_phone_num} style={{'--width' : '450px'}}/>
                                     </div>
                                 </div>
                                 <br/>
