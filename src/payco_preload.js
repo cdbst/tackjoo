@@ -38,6 +38,7 @@ function get_element_by_class(class_name){
                 const elements = document.getElementsByClassName(class_name);
                 if(elements.length === 0) return;
                 clearInterval(h_interval);
+                h_interval = undefined;
                 resolve(elements)
             }, 100);
         }catch(err){
@@ -59,6 +60,7 @@ function get_iframe_child_element(iframe, id){
                 const element = iframe.contentWindow.document.getElementById(id);
                 if(element === null) return;
                 clearInterval(h_interval);
+                h_interval = undefined;
                 resolve(element)
             }, 100);
         }catch(err){
@@ -82,6 +84,7 @@ function get_iframe_child_class_elements(iframe, class_name, required_count){
                 const elements = iframe.contentWindow.document.getElementsByClassName(class_name);
                 if(elements.length !== required_count) return;
                 clearInterval(h_interval);
+                h_interval = undefined;
                 resolve(elements);
             }, 100);
         }catch(err){
@@ -105,14 +108,15 @@ function wating_for_checkout_card_loading(){
                 h_interval = setInterval(()=>{
                     if(el_no_payment_div.style.display !== 'none') return;
                     clearInterval(h_interval);
+                    h_interval = undefined;
                     resolve();
                 }, 100);
             }catch(err){
+                if(h_interval) clearInterval(h_interval);
                 reject(err);
             }
 
         }).catch((err)=>{
-            if(h_interval) clearInterval(h_interval);
             reject(err);
         });
     });
