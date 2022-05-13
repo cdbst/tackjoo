@@ -15,7 +15,7 @@ function get_element(id){
             h_interval = setInterval(()=>{
                 const element = document.getElementById(id);
                 if(element === null) return;
-                clearInterval(h_interval); // is async or sync???
+                if(h_interval) clearInterval(h_interval); // is async or sync???
                 h_interval = undefined;
                 resolve(element);
             }, 100);
@@ -37,7 +37,7 @@ function get_element_by_class(class_name){
             h_interval = setInterval(()=>{
                 const elements = document.getElementsByClassName(class_name);
                 if(elements.length === 0) return;
-                clearInterval(h_interval);
+                if(h_interval) clearInterval(h_interval);
                 h_interval = undefined;
                 resolve(elements)
             }, 100);
@@ -59,7 +59,7 @@ function get_iframe_child_element(iframe, id){
                 }
                 const element = iframe.contentWindow.document.getElementById(id);
                 if(element === null) return;
-                clearInterval(h_interval);
+                if(h_interval) clearInterval(h_interval);
                 h_interval = undefined;
                 resolve(element)
             }, 100);
@@ -83,7 +83,7 @@ function get_iframe_child_class_elements(iframe, class_name, required_count){
                 }
                 const elements = iframe.contentWindow.document.getElementsByClassName(class_name);
                 if(elements.length !== required_count) return;
-                clearInterval(h_interval);
+                if(h_interval) clearInterval(h_interval);
                 h_interval = undefined;
                 resolve(elements);
             }, 100);
@@ -107,7 +107,7 @@ function wating_for_checkout_card_loading(){
             try{
                 h_interval = setInterval(()=>{
                     if(el_no_payment_div.style.display !== 'none') return;
-                    clearInterval(h_interval);
+                    if(h_interval) clearInterval(h_interval);
                     h_interval = undefined;
                     resolve();
                 }, 100);
@@ -134,7 +134,7 @@ function click_password_sequently(iframe, el_keys, password, key_dict){
         const key = _password.shift();
         if(key === undefined) return;
         const key_el_id = key_dict[key];
-        const el_btn_key = iframe.contentWindow.document.getElementById(key_el_id);
+        const el_btn_key = el_keys[key_el_id];
 
         get_iframe_child_class_elements(iframe, 'ico on', click_count).then((_el_pw_on_ico)=>{
             click_count++;
@@ -152,15 +152,15 @@ function click_password_sequently(iframe, el_keys, password, key_dict){
     click_evt_listener();
 }
 
-function event_fire(el, etype){
+function event_fire(el, etype) {
     if (el.fireEvent) {
-      el.fireEvent('on' + etype);
+        el.fireEvent("on" + etype);
     } else {
-      var evObj = document.createEvent('Events');
-      evObj.initEvent(etype, true, false);
-      el.dispatchEvent(evObj);
+        var evObj = document.createEvent("Events");
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
     }
-  }
+}
 
 window.doLogin = function(id, pwd){
 
