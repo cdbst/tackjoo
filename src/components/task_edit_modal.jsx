@@ -525,9 +525,8 @@ class TaskEditModal extends React.Component {
                                 </label>
                                 <label className="col-md-3 col-form-label font-weight-bold task-edit-modal-option-label">크림가격</label>
                                 <label 
-                                    className={`col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`} 
+                                    className={`curser-pointer col-md-3 col-form-label font-weight-bold ${kream_price_label_class_name}`} 
                                     onClick={this.onClickKreamPrice.bind(this)}
-                                    style={{cursor: 'pointer'}}
                                 > {kream_price_str}
                                 </label>
                             </div>
@@ -537,7 +536,7 @@ class TaskEditModal extends React.Component {
                                     <label className="task-edit-modal-option-label">모델</label>
                                 </div>
                                 <div className="col-md-4">
-                                    <label onClick={this.onClickProductModelID.bind(this)} style={{cursor: 'pointer'}}>{model_id}</label>
+                                    <label className="curser-pointer" onClick={this.onClickProductModelID.bind(this)}>{model_id}</label>
                                 </div>
                                 <div className="col-md-6">
                                     <LabelSelect ref={this.ref_options_proxy} label="프록시" label_col_class="col-md-4" select_col_class="col-md-8" options={porxy_alias_list} option_keys={porxy__id_list}/>
