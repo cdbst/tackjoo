@@ -6,6 +6,7 @@ class OrderTableItem extends React.Component {
         this.onClickGoLinkBtn = this.onClickGoLinkBtn.bind(this);
         this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
         this.onClickCancelOrder = this.onClickCancelOrder.bind(this);
+        this.saveTableItemText = this.saveTableItemText.bind(this);
 
         this.__ref_cancel_order_btn = React.createRef();
 
@@ -66,38 +67,55 @@ class OrderTableItem extends React.Component {
         });
     }
 
+    saveTableItemText(text){
+        Index.g_sys_msg_q.enqueue('알림', `클립보드에 저장되었습니다. (${text})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        window.electron.writeTextToClipboard(text);
+    }
+
     render(){
 
         const cancel_order_tooltip = this.props.order_info.is_cancelable ? '주문 취소하기' : '결제 완료단계에서만 주문 취소가 가능합니다';
+        const formated_order_date = common.get_formatted_date_str(this.props.order_info.date);
 
         return(
             <tr>
                 <td style={{width : this.props.product_img_col_width, maxWidth : this.props.product_img_col_width}}>
                     <img 
-                        className="rounded product-table-item-img" 
+                        className="rounded product-table-item-img curser-pointer" 
                         src={this.props.order_info.img_url} 
                         alt={this.props.order_info.name}
                         onClick={this.onClickGoLinkBtn.bind(this)}
-                        style={{cursor: 'pointer'}}
                     />
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
-                    <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.order_info.account_email}>{this.props.order_info.account_email}</div>
+                    <div 
+                        className="cut-text curser-pointer" 
+                        style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} 
+                        title={this.props.order_info.account_email}
+                        onClick={this.saveTableItemText.bind(this, this.props.order_info.account_email)}>
+                        {this.props.order_info.account_email}
+                    </div>
                 </td>
                 <td style={{width : this.props.product_name_col_width, maxWidth : this.props.product_name_col_width}}>
-                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.order_info.name}>{this.props.order_info.name}</div>
+                    <div 
+                        className="cut-text curser-pointer" 
+                        style={{width : '21vw', maxWidth : '21vw'}} 
+                        title={this.props.order_info.name}
+                        onClick={this.saveTableItemText.bind(this, this.props.order_info.name)}>
+                        {this.props.order_info.name}
+                    </div>
                 </td>
                 <td style={{width : this.props.product_model_id_col_width, maxWidth : this.props.product_model_id_col_width}}>
-                    <div >{this.props.order_info.model_id}</div>
+                    <div className="curser-pointer" onClick={this.saveTableItemText.bind(this, this.props.order_info.model_id)}>{this.props.order_info.model_id}</div>
                 </td>
                 <td style={{width : this.props.product_size_col_width, maxWidth : this.props.product_size_col_width}}>
-                    <span>{this.props.order_info.size}</span>
+                    <span className="curser-pointer" onClick={this.saveTableItemText.bind(this, this.props.order_info.size)}>{this.props.order_info.size}</span>
                 </td>
                 <td style={{width : this.props.product_price_col_width, maxWidth : this.props.product_price_col_width}}>
-                    <span>{this.props.order_info.price}</span>
+                    <span className="curser-pointer" onClick={this.saveTableItemText.bind(this, this.props.order_info.price)}>{this.props.order_info.price}</span>
                 </td>
                 <td style={{width : this.props.order_date_col_width, maxWidth : this.props.order_date_col_width}}>
-                    <span>{common.get_formatted_date_str(this.props.order_info.date)}</span>
+                    <span className="curser-pointer" onClick={this.saveTableItemText.bind(this, formated_order_date)}>{formated_order_date}</span>
                 </td>
                 <td style={{width : this.props.order_status_col_width, maxWidth : this.props.order_status_col_width}}>
                     <span >{this.props.order_info.status}</span>

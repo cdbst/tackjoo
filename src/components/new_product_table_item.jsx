@@ -117,12 +117,11 @@ class NewProductTableItem extends React.Component {
             <tr onDoubleClick={this.onDBClickTableItem.bind(this)} style={{display : this.props.display, background : this.props.background}}>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
-                        className="rounded product-table-item-img" 
+                        className="rounded product-table-item-img curser-pointer" 
                         src={this.props.product_info.img_url} 
                         alt={this.props.product_info.name}
                         title={this.props.product_info.url}
                         onClick={this.onClickProductImg.bind(this)}
-                        style={{cursor: 'pointer'}}
                     />
                 </td>
                 <td style={{width : this.props.name_col_width, maxWidth : this.props.name_col_width}}>

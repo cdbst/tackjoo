@@ -38,6 +38,10 @@ body {
     color : #83f195 !important;
 }
 
+.curser-pointer{
+    cursor : pointer !important;
+}
+
 /* Disable input type number arrow buttons */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

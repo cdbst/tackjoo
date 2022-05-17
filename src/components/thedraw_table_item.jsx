@@ -86,11 +86,10 @@ class TheDrawTableItem extends React.Component {
             <tr>
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
-                        className="rounded product-table-item-img" 
+                        className="rounded product-table-item-img curser-pointer" 
                         src={this.props.draw_item.product_img_url} 
                         alt={this.props.draw_item.product_name}
                         onClick={this.onClickProductImg.bind(this)}
-                        style={{cursor: 'pointer'}}
                     />
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>

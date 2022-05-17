@@ -336,10 +336,9 @@ class TaskTableItem extends React.Component {
             <tr style={{background : background_color}} className="draggable">
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
-                        className="rounded product-table-item-img" 
+                        className="rounded product-table-item-img curser-pointer" 
                         src={product_info.img_url} 
                         alt={product_info.name}
-                        style={{cursor: 'pointer'}}
                         onClick={this.onClickProductImg.bind(this)}
                     />
                 </td>
