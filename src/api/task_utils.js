@@ -95,8 +95,13 @@ module.exports.judge_appropreate_size_info = (product_info, task_info) =>{
     }else if(product_info.size_info_list.length === 1){ // free size일 경우 처리.
         const maybe_free_size_info = product_info.size_info_list[0];
         if(maybe_free_size_info.name === 'FREE' || maybe_free_size_info.friendly_name === 'FREE'){
-            if(maybe_free_size_info.quantity > 0) return maybe_free_size_info;
-            else return undefined;
+        
+            if(product_info.sell_type === common.SELL_TYPE.draw){
+                return maybe_free_size_info;
+            }else{
+                if(maybe_free_size_info.quantity > 0) return maybe_free_size_info;
+                else return undefined;
+            }
         }
     }
 
