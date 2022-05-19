@@ -544,11 +544,11 @@ function parse_draw_size_info_list_from_product_page($){
 
             if(('data-externalid' in el_option.attribs) == false) return;
 
-            let data_external_id_array = el_option.attribs['data-externalid'].split('  ');
+            let data_external_id_array = el_option.attribs['data-externalid'].split(/\s+/);
             
             if(data_external_id_array.length != 2) return;
 
-            let external_id = data_external_id_array[0];
+            let external_id = data_external_id_array[0].trim();
 
             let sku_id = el_option.attribs['data-skuid'];
             if(sku_id == undefined) return;
@@ -572,6 +572,7 @@ function parse_draw_size_info_list_from_product_page($){
             common.update_size_info_obj(size_info_obj, 'external_id', external_id);
             common.update_size_info_obj(size_info_obj, 'draw_product_xref', the_draw_product_xref);
             common.update_size_info_obj(size_info_obj, 'draw_sku_xref', the_draw_sku_xref);
+            //common.update_size_info_obj(size_info_obj, 'quantity', 1); //드로우는 한번만 사지므로 임의로 1로 설정해준다.
 
             size_info_list.push(size_info_obj);
         });
