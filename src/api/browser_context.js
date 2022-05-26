@@ -1274,7 +1274,7 @@ class BrowserContext {
 
         for(var i = 0; i < __retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/theDrawList', headers);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/theDrawList?pageSize=30', headers);
 
                 if(res.status != 200){
                     throw new Error('open_draw_list_page : response ' + res.status);
@@ -1303,7 +1303,7 @@ class BrowserContext {
 
         for(var i = 0; i < __retry_cnt; i++){
             try{
-                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders', headers);
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders?pageSize=60', headers);
 
                 if(res.status != 200){
                     throw new Error('open_order_list_page : response ' + res.status);
