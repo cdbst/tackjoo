@@ -340,7 +340,7 @@ class TaskEditModal extends React.Component {
     render(){
 
         let sell_type_list = ProductManager.getValueList(this.product_info_list, 'sell_type', false);
-        let product_name_list = ProductManager.getProductDescNameList(this.state.filtered_product_info_list);
+        let product_name_list = ProductManager.getProductDescNameList(this.state.filtered_product_info_list, true);
         let product_id_list = ProductManager.getValueList(this.state.filtered_product_info_list, '_id');
 
         let product_img_url = this.state.selected_product == undefined ? './res/img/exclamation-diamond.svg' : this.state.selected_product.img_url;

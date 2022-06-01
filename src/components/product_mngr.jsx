@@ -130,16 +130,24 @@ class ProductManager{
         return size_names;
     }
 
-    static getProductDescName(product_info){
+    static getProductDescName(product_info, with_sell_date = false){
+
+        let open_date_str = undefined;
+
+        if(with_sell_date){
+            open_date_str = product_info.open_time === undefined ? undefined : common.get_formatted_date_str(product_info.open_time, false);
+        }
+        
         if(product_info.alt_name === undefined || product_info.alt_name === ''){
-            return product_info.name;
+            return open_date_str === undefined ? product_info.name : `[${open_date_str}] ${product_info.name}`;
         }else{
-            return product_info.name + ' (' + product_info.alt_name + ')';
+            const product_name =  product_info.name + ' (' + product_info.alt_name + ')';
+            return open_date_str === undefined ? product_name : `[${open_date_str}] ${product_name}`;
         }
     }
 
-    static getProductDescNameList(product_info_list){
-        return product_info_list.map((product_info) => ProductManager.getProductDescName(product_info) );
+    static getProductDescNameList(product_info_list, with_sell_date = false){
+        return product_info_list.map((product_info) => ProductManager.getProductDescName(product_info, with_sell_date) );
     }
 
     static isValidProductInfoToTasking(product_info){

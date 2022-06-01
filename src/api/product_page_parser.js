@@ -82,6 +82,9 @@ let get_product_list_info_from_feed_page = ($) => {
         let sell_type = get_sell_type(sell_type_text);
         if(sell_type == undefined) return;
 
+        let open_time = el.attribs['data-active-date'];
+        open_time = open_time === undefined ? undefined : new Date(open_time);
+
         let product_info = common.get_product_info_obj_scheme();
 
         common.update_product_info_obj(product_info, 'name', product_name);
@@ -90,6 +93,7 @@ let get_product_list_info_from_feed_page = ($) => {
         common.update_product_info_obj(product_info, 'url', product_url);
         common.update_product_info_obj(product_info, 'img_url', product_img_url);
         common.update_product_info_obj(product_info, 'product_id', product_id);
+        common.update_product_info_obj(product_info, 'open_time', open_time);
 
         product_list.push(product_info);
     });
