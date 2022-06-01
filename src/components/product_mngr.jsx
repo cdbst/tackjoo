@@ -122,7 +122,7 @@ class ProductManager{
     static getDefaultSizeNameList(){
         const size_num = 55;
         const base_size = 50;
-        let size_names = [];
+        const size_names = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
         for(var i = 0; i < size_num; i++){
             size_names.push((base_size + i * 5).toString());
