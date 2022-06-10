@@ -124,42 +124,30 @@ function wating_for_checkout_card_loading(){
     
 }
 
-function click_password_sequently(iframe, el_keys, password, key_dict){
+let inprogress_click = false;
+function click_password_sequently(password, key_dict, key_press_func){
 
-    const _password = password.split('');
-    let click_count = 0;
+    if(inprogress_click) return;
+    inprogress_click = true;
 
-    const click_evt_listener = (e) =>{
+    try{
+        const _password = password.split('');
 
-        const key = _password.shift();
-        if(key === undefined) return;
-        const key_el_id = key_dict[key];
-        const el_btn_key = el_keys[key_el_id];
-
-        get_iframe_child_class_elements(iframe, 'ico on', click_count).then((_el_pw_on_ico)=>{
-            click_count++;
-            event_fire(el_btn_key, 'click');
-        }).catch((err)=>{
-            console.error(err);
-        });
+        for(var i = 0; i < _password.length; i++){
+            const pw_key = _password[i];
+            key_press_func(key_dict[pw_key]);
+        }
+    }finally{
+        inprogress_click = false;
     }
-        
-    for (var i = 0; i < el_keys.length; i++) {
-        el_keys[i].removeEventListener('click', click_evt_listener, false);
-        el_keys[i].addEventListener('click', click_evt_listener, false);
-    }
-
-    click_evt_listener();
 }
 
-function event_fire(el, etype) {
-    if (el.fireEvent) {
-        el.fireEvent("on" + etype);
-    } else {
-        var evObj = document.createEvent("Events");
-        evObj.initEvent(etype, true, false);
-        el.dispatchEvent(evObj);
+function get_context_by_name(name){
+    for(var i = 0; i < globalThis.length; i++){
+        console.log(globalThis[i].name);
+        if(globalThis[i].name === name) return globalThis[i];
     }
+    return undefined;
 }
 
 window.doLogin = function(id, pwd){
@@ -217,6 +205,8 @@ window.doCheckout = function(key_map_text, password){
         }).catch((err)=>{
             console.error(err);
         });
+
+        return;
     }
 
     let _el_iframe = undefined;
@@ -234,11 +224,12 @@ window.doCheckout = function(key_map_text, password){
         for(var i = 0; i < 11; i++){
             const el_key = _el_iframe.contentWindow.document.getElementById('A_' + i);
             if(el_key == null) continue;
-            key_dict[key_map_text[key_map_text_idx++]] = ('A_' + i);
+            key_dict[key_map_text[key_map_text_idx++]] = i;
         }
 
-        click_password_sequently(_el_iframe, el_keys, password, key_dict);
-
+        const iframe_context = globalThis[4];        
+        click_password_sequently(password, key_dict, iframe_context.pc.payment.password.enc._keyPressPassword);
+        
     }).catch((err) =>{
         console.error(err);
     });

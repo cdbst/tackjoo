@@ -180,8 +180,8 @@ class TaskRunner{
             webPreferences: {
                 //sandbox : false,
                 webSecurity : false,
-                nodeIntegration: true,
-                //contextIsolation: false,
+                allowRunningInsecureContent: true,
+                contextIsolation: false,
                 //enableRemoteModule: true,
                 preload: path.resolve(path.join(app.getAppPath(), 'payco_preload.js')),
                 backgroundThrottling: false
