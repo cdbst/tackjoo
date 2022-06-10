@@ -10,6 +10,7 @@ class ServerClock{
         this.subscribeAlam = this.subscribeAlam.bind(this);
         this.unsubscribeAlam = this.unsubscribeAlam.bind(this);
         this.getServerTime = this.getServerTime.bind(this);
+        this.refreeshClock = this.refreeshClock.bind(this);
         
         this.alam_subscribers = [];
         this.__server_timer_update_interval = 100; // millesec
@@ -91,6 +92,12 @@ class ServerClock{
 
         before_req_timestamp = new Date();
         xhr.send(null); 
+    }
+
+    refreeshClock(){
+        this.__getServerDateTime((date)=>{
+            this.server_time = date;
+        });
     }
 
     /**
