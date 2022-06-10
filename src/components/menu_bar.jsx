@@ -41,6 +41,11 @@ class MenuBar extends React.Component {
         }));
     }
 
+    onClickTimeRefreeshBtn(){
+        Index.g_server_clock.refreeshClock();
+        Index.g_sys_msg_q.enqueue('알림', `서버 시간을 갱신했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 1000);
+    }
+
     render() {
         return (
             <div>
@@ -71,6 +76,9 @@ class MenuBar extends React.Component {
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
                     <ul className="nav justify-content-end" style={{width:'calc(100% - 620px)'}}>
+                        <li className="nav-item">
+                            <img src="./res/img/arrow-clockwise.svg" style={{width:24, height:24, marginTop:10, cursor:"pointer"}} onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
+                        </li>
                         <li className="nav-item">
                             <a className="nav-link">{this.state.server_time}</a>
                         </li>
