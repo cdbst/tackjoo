@@ -165,7 +165,6 @@ function confirm_password(password, key_dict, pwd_enc_obj){
         pwd_enc_obj.gPassword.push(key_dict[key]);
     });
     
-    console.log(pwd_enc_obj.gPassword);
     pwd_enc_obj.moveNext();
 }
 
