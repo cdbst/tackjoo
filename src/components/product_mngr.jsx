@@ -7,6 +7,7 @@ class ProductManager{
         this.getProductInfoList = this.getProductInfoList.bind(this);
         this.getProductInfo = this.getProductInfo.bind(this);
         this.__updateProductInfo = this.__updateProductInfo.bind(this);
+        this.__sortProductInfoList = this.__sortProductInfoList.bind(this);
 
         this.__product_info_list = [];
         this.__product_info_req_gate = new RequestGate();
@@ -35,9 +36,17 @@ class ProductManager{
                 this.__product_info_list.push(product_info);
             });
 
+            this.__sortProductInfoList();
+
             if(__callback != undefined) __callback(undefined, this.__product_info_list);
 
             Index.g_sys_msg_q.enqueue('안내', '상품 정보를 성공적으로 읽었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        });
+    }
+
+    __sortProductInfoList(){
+        this.__product_info_list.sort((a, b)=>{
+            return a.open_time.getTime() - b.open_time.getTime();
         });
     }
 
