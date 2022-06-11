@@ -159,12 +159,14 @@ function get_key_dict_from_virtual_keyborad_iframe(key_map_text, vkeyboard_ifram
 
 function confirm_password(password, key_dict, pwd_enc_obj){
 
+    pwd_enc_obj.gPassword.empty();
+
     password.split('').forEach((key)=> {
         pwd_enc_obj.gPassword.push(key_dict[key]);
     });
     
     console.log(pwd_enc_obj.gPassword);
-    //pwd_enc_obj.moveNext();
+    pwd_enc_obj.moveNext();
 }
 
 window.doLogin = function(id, pwd){
