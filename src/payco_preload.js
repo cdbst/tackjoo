@@ -27,6 +27,27 @@ function get_element(id){
     });
 }
 
+function wait_for_element_destroy(id){
+
+    return new Promise((resolve, reject) =>{
+
+        let h_interval = undefined;
+
+        try{
+            h_interval = setInterval(()=>{
+                const element = document.getElementById(id);
+                if(element !== null) return;
+                if(h_interval) clearInterval(h_interval); // is async or sync???
+                h_interval = undefined;
+                resolve();
+            }, 100);
+        }catch(err){
+            if(h_interval) clearInterval(h_interval);
+            reject(err);
+        }
+    });
+}
+
 function get_element_by_class(class_name){
 
     return new Promise((resolve, reject) =>{
@@ -141,7 +162,9 @@ function confirm_password(password, key_dict, pwd_enc_obj){
     password.split('').forEach((key)=> {
         pwd_enc_obj.gPassword.push(key_dict[key]);
     });
-    pwd_enc_obj.moveNext();
+    
+    console.log(pwd_enc_obj.gPassword);
+    //pwd_enc_obj.moveNext();
 }
 
 window.doLogin = function(id, pwd){
@@ -175,7 +198,9 @@ window.clickCheckoutBtn = function(){
 
     let _el_payment_btn = undefined;
 
-    get_element('btnPayment').then((el_payment_btn)=>{
+    wait_for_element_destroy('lazyModalDialogIframe').then(()=>{
+        return get_element('btnPayment');
+    }).then((el_payment_btn)=>{
         _el_payment_btn = el_payment_btn;
         return wating_for_checkout_card_loading();
     }).then(()=>{
@@ -195,6 +220,8 @@ window.doCheckout = function(key_map_text, password){
 
         get_element_by_class('ly_close').then((close_btns)=>{
             close_btns[0].click();
+            return wait_for_element_destroy('lazyModalDialogIframe');
+        }).then(()=>{
             window.clickCheckoutBtn();
         }).catch((err)=>{
             console.error(err);
