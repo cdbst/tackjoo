@@ -120,34 +120,28 @@ function wating_for_checkout_card_loading(){
             reject(err);
         });
     });
-
-    
 }
 
-let inprogress_click = false;
-function click_password_sequently(password, key_dict, key_press_func){
+function get_key_dict_from_virtual_keyborad_iframe(key_map_text, vkeyboard_iframe){
 
-    if(inprogress_click) return;
-    inprogress_click = true;
+    const key_dict = {};
+    let key_map_text_idx = 0;
 
-    try{
-        const _password = password.split('');
-
-        for(var i = 0; i < _password.length; i++){
-            const pw_key = _password[i];
-            key_press_func(key_dict[pw_key]);
-        }
-    }finally{
-        inprogress_click = false;
+    for(var i = 0; i < 11; i++){
+        const el_key = vkeyboard_iframe.contentWindow.document.getElementById('A_' + i);
+        if(el_key == null) continue;
+        key_dict[key_map_text[key_map_text_idx++]] = i;
     }
+
+    return key_dict;
 }
 
-function get_context_by_name(name){
-    for(var i = 0; i < globalThis.length; i++){
-        console.log(globalThis[i].name);
-        if(globalThis[i].name === name) return globalThis[i];
-    }
-    return undefined;
+function confirm_password(password, key_dict, pwd_enc_obj){
+
+    password.split('').forEach((key)=> {
+        pwd_enc_obj.gPassword.push(key_dict[key]);
+    });
+    pwd_enc_obj.moveNext();
 }
 
 window.doLogin = function(id, pwd){
@@ -216,19 +210,11 @@ window.doCheckout = function(key_map_text, password){
         return get_iframe_child_element(_el_iframe, 'ico_password1');
     }).then((_el_ico_pwd1)=>{
         return get_iframe_child_class_elements(_el_iframe, 'key', 13);
-    }).then((el_keys)=>{
+    }).then((_el_keys)=>{
 
-        const key_dict = {};
-        let key_map_text_idx = 0;
-
-        for(var i = 0; i < 11; i++){
-            const el_key = _el_iframe.contentWindow.document.getElementById('A_' + i);
-            if(el_key == null) continue;
-            key_dict[key_map_text[key_map_text_idx++]] = i;
-        }
-
+        const key_dict = get_key_dict_from_virtual_keyborad_iframe(key_map_text, _el_iframe);
         const iframe_context = globalThis[4];        
-        click_password_sequently(password, key_dict, iframe_context.pc.payment.password.enc._keyPressPassword);
+        confirm_password(password, key_dict, iframe_context.pc.payment.password.enc);
         
     }).catch((err) =>{
         console.error(err);
