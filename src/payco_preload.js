@@ -27,6 +27,27 @@ function get_element(id){
     });
 }
 
+function wait_for_element_destroy(id){
+
+    return new Promise((resolve, reject) =>{
+
+        let h_interval = undefined;
+
+        try{
+            h_interval = setInterval(()=>{
+                const element = document.getElementById(id);
+                if(element !== null) return;
+                if(h_interval) clearInterval(h_interval); // is async or sync???
+                h_interval = undefined;
+                resolve();
+            }, 100);
+        }catch(err){
+            if(h_interval) clearInterval(h_interval);
+            reject(err);
+        }
+    });
+}
+
 function get_element_by_class(class_name){
 
     return new Promise((resolve, reject) =>{
@@ -120,34 +141,31 @@ function wating_for_checkout_card_loading(){
             reject(err);
         });
     });
+}
 
+function get_key_dict_from_virtual_keyborad_iframe(key_map_text, vkeyboard_iframe){
+
+    const key_dict = {};
+    let key_map_text_idx = 0;
+
+    for(var i = 0; i < 11; i++){
+        const el_key = vkeyboard_iframe.contentWindow.document.getElementById('A_' + i);
+        if(el_key == null) continue;
+        key_dict[key_map_text[key_map_text_idx++]] = i;
+    }
+
+    return key_dict;
+}
+
+function confirm_password(password, key_dict, pwd_enc_obj){
+
+    pwd_enc_obj.gPassword.empty();
+
+    password.split('').forEach((key)=> {
+        pwd_enc_obj.gPassword.push(key_dict[key]);
+    });
     
-}
-
-let inprogress_click = false;
-function click_password_sequently(password, key_dict, key_press_func){
-
-    if(inprogress_click) return;
-    inprogress_click = true;
-
-    try{
-        const _password = password.split('');
-
-        for(var i = 0; i < _password.length; i++){
-            const pw_key = _password[i];
-            key_press_func(key_dict[pw_key]);
-        }
-    }finally{
-        inprogress_click = false;
-    }
-}
-
-function get_context_by_name(name){
-    for(var i = 0; i < globalThis.length; i++){
-        console.log(globalThis[i].name);
-        if(globalThis[i].name === name) return globalThis[i];
-    }
-    return undefined;
+    pwd_enc_obj.moveNext();
 }
 
 window.doLogin = function(id, pwd){
@@ -181,7 +199,9 @@ window.clickCheckoutBtn = function(){
 
     let _el_payment_btn = undefined;
 
-    get_element('btnPayment').then((el_payment_btn)=>{
+    wait_for_element_destroy('lazyModalDialogIframe').then(()=>{
+        return get_element('btnPayment');
+    }).then((el_payment_btn)=>{
         _el_payment_btn = el_payment_btn;
         return wating_for_checkout_card_loading();
     }).then(()=>{
@@ -201,6 +221,8 @@ window.doCheckout = function(key_map_text, password){
 
         get_element_by_class('ly_close').then((close_btns)=>{
             close_btns[0].click();
+            return wait_for_element_destroy('lazyModalDialogIframe');
+        }).then(()=>{
             window.clickCheckoutBtn();
         }).catch((err)=>{
             console.error(err);
@@ -216,19 +238,11 @@ window.doCheckout = function(key_map_text, password){
         return get_iframe_child_element(_el_iframe, 'ico_password1');
     }).then((_el_ico_pwd1)=>{
         return get_iframe_child_class_elements(_el_iframe, 'key', 13);
-    }).then((el_keys)=>{
+    }).then((_el_keys)=>{
 
-        const key_dict = {};
-        let key_map_text_idx = 0;
-
-        for(var i = 0; i < 11; i++){
-            const el_key = _el_iframe.contentWindow.document.getElementById('A_' + i);
-            if(el_key == null) continue;
-            key_dict[key_map_text[key_map_text_idx++]] = i;
-        }
-
+        const key_dict = get_key_dict_from_virtual_keyborad_iframe(key_map_text, _el_iframe);
         const iframe_context = globalThis[4];        
-        click_password_sequently(password, key_dict, iframe_context.pc.payment.password.enc._keyPressPassword);
+        confirm_password(password, key_dict, iframe_context.pc.payment.password.enc);
         
     }).catch((err) =>{
         console.error(err);
