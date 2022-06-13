@@ -114,8 +114,8 @@ class ContentsAccounts extends React.Component {
             const pwd = email_pwd_info_array.join(':');
 
             //유효성 검사 : email이 올바른 포멧인지 확인 필요.
-            if(common.is_valid_email(email) == null){
-                error_messages.push(`[${i + 1}]번째 줄의 이메일 값이 올바르지 않습니다. (${account_info})`);
+            if(email === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 계정이 올바르지 않습니다. (${account_info})`);
                 continue;
             }
             if(pwd === ''){
@@ -174,8 +174,8 @@ class ContentsAccounts extends React.Component {
             return;
         }
 
-        if(common.is_valid_email(account_info.email) == null){
-            Index.g_sys_msg_q.enqueue('에러', '유효한 이메일 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+        if(account_info.email == ''){
+            Index.g_sys_msg_q.enqueue('에러', '유효한 계정을 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
@@ -293,7 +293,7 @@ class ContentsAccounts extends React.Component {
                     <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>이메일</th>
+                                <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>계정(이메일 또는 아이디)</th>
                                 <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>상태</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
