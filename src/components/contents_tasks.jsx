@@ -557,8 +557,8 @@ class ContentsTasks extends React.Component {
 
         this.__createNewTask(product_info, friendly_size_name, account_email, schedule_time, proxy_info, false);
 
-        const use_auto_task = Index.g_settings_info.getSetting('new_product_quick_task_use_notify_messae');
-        if(use_auto_task === 1) {
+        const use_notify_message = Index.g_settings_info.getSetting('new_product_quick_task_use_notify_messae');
+        if(use_notify_message === 1) {
             Index.g_sys_msg_q.enqueue('빠른 작업 생성 안내', `${account_email} 계정으로 '${product_info.name}' 상품 1개를 즉시 구매합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 1500);
         }
     }
