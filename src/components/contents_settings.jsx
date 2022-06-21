@@ -21,6 +21,7 @@ class ContentsSettings extends React.Component {
         NEW_PRODUCT_QUICK_TASK_JUDGE_SIZE : 'new-product-quick-task-judge-size-input',
         NEW_PRODUCT_QUICK_TASK_USE_SNKRS_URL : 'new-product-quick-task-use-snkrs-url-input',
         NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK : 'new-product-quick-task-use-auto-task-input',
+        NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE : 'new-product-quick-task-use-notify-message-input'
     }
 
     static OPTION_TEXT = {
@@ -44,6 +45,7 @@ class ContentsSettings extends React.Component {
         NEW_PRODUCT_QUICK_TASK_JUDGE_SIZE : '신상품을 구매할 때, 제품의 구매 옵션을 무작위로 할지, 중간 옵션을 우선으로 할지 지정합니다. (기본 값: 0, [0: 중간] [1: 무작위])',
         NEW_PRODUCT_QUICK_TASK_USE_SNKRS_URL : '신상품을 구매할 때 launch url을 기반으로 작업을 생성할지 지정합니다. (기본 값: 0, [0: 미사용] [1: 사용])',
         NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK : '신상품 감지시 화이트리스트에 포함된 상품이라면 즉시 구매하는 기능을 사용할지 설정합니다. (기본 값: 0, [0: 미사용] [1: 사용])',
+        NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE : '신상품 감지시 화이트리스트에 포함된 상품 구매 안내 메시지를 사용할지 설정합니다. (기본 값: 1, [0: 미사용] [1: 사용])'
     }
 
     constructor(props) {
@@ -159,6 +161,9 @@ class ContentsSettings extends React.Component {
 
         let new_product_quick_task_use_auto_task = settings_info.new_product_quick_task_use_auto_task == undefined ? '' : settings_info.new_product_quick_task_use_auto_task;
         this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK, new_product_quick_task_use_auto_task);
+
+        let new_product_quick_task_use_notify_messae = settings_info.new_product_quick_task_use_notify_messae == undefined ? '' : settings_info.new_product_quick_task_use_notify_messae;
+        this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE, new_product_quick_task_use_notify_messae);
     }
 
     getCurrentSettingsInfo(){
@@ -208,6 +213,9 @@ class ContentsSettings extends React.Component {
         let new_product_quick_task_use_auto_task = this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK);
         new_product_quick_task_use_auto_task = new_product_quick_task_use_auto_task  == '' ? undefined : parseFloat(new_product_quick_task_use_auto_task);
 
+        let new_product_quick_task_use_notify_messae = this.inputValue(ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE);
+        new_product_quick_task_use_notify_messae = new_product_quick_task_use_notify_messae  == '' ? undefined : parseFloat(new_product_quick_task_use_notify_messae);
+
         return {
             http_req_ret_cnt : http_req_ret_cnt,
             http_req_ret_interval : http_req_ret_interval,
@@ -223,7 +231,8 @@ class ContentsSettings extends React.Component {
             new_product_create_task_use_proxy : new_product_create_task_use_proxy,
             new_product_quick_task_judge_size : new_product_quick_task_judge_size,
             new_product_quick_task_use_snkrs_url : new_product_quick_task_use_snkrs_url,
-            new_product_quick_task_use_auto_task : new_product_quick_task_use_auto_task
+            new_product_quick_task_use_auto_task : new_product_quick_task_use_auto_task,
+            new_product_quick_task_use_notify_messae : new_product_quick_task_use_notify_messae
         }
     }
 
@@ -293,6 +302,7 @@ class ContentsSettings extends React.Component {
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_JUDGE_SIZE} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_QUICK_TASK_JUDGE_SIZE} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_SNKRS_URL} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_QUICK_TASK_USE_SNKRS_URL} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_QUICK_TASK_USE_AUTO_TASK} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_QUICK_TASK_USE_NOTIFY_MESSAE} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/>
                             </div>
                             <div className="col-md-2">
                             </div>
