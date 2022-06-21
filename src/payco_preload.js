@@ -157,15 +157,45 @@ function get_key_dict_from_virtual_keyborad_iframe(key_map_text, vkeyboard_ifram
     return key_dict;
 }
 
+function wait_for_pwd_enc_ajax_ldle(pwd_enc_obj){
+
+    return new Promise((resolve, reject) =>{
+
+        let h_interval = undefined;
+
+        try{
+            h_interval = setInterval(()=>{
+                if(pwd_enc_obj.gIsAjaxLoading == true){
+                    return;
+                }
+
+                if(h_interval) clearInterval(h_interval);
+                h_interval = undefined;
+                resolve();
+
+            }, 100);
+        }catch(err){
+            if(h_interval) clearInterval(h_interval);
+            reject(err);
+        }
+    });
+}
+
 function confirm_password(password, key_dict, pwd_enc_obj){
 
-    pwd_enc_obj.gPassword.empty();
+    wait_for_pwd_enc_ajax_ldle(pwd_enc_obj).then(()=>{
 
-    password.split('').forEach((key)=> {
-        pwd_enc_obj.gPassword.push(key_dict[key]);
+        pwd_enc_obj.gPassword.empty();
+
+        password.split('').forEach((key)=> {
+            pwd_enc_obj.gPassword.push(key_dict[key]);
+        });
+
+        pwd_enc_obj.moveNext();
+
+    }).catch((err)=>{
+        console.error(err);
     });
-    
-    pwd_enc_obj.moveNext();
 }
 
 window.doLogin = function(id, pwd){
