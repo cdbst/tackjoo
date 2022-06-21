@@ -4992,7 +4992,7 @@
                       Lg(fP5[J5.AZ(BG, k4)], EA) && nD && nD();
                     });
                   var sP5 = J5.II(qP5, Xb)[J5.RZ(IX, RX)](Bp, J5.RI(MP5, X4));
-                  __callback(sP5);
+                  if(__callback)__callback(sP5);
                   //fP5[J5.xP(BU5, FU5)](sP5), (rh5 = tK);
                 }
                 function kS(__callback) {
