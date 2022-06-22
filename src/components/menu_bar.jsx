@@ -17,9 +17,12 @@ class MenuBar extends React.Component {
         super(props);
 
         this.serverTimeAlamListener = this.serverTimeAlamListener.bind(this);
+        this.runNewVersionWatchdog = this.runNewVersionWatchdog.bind(this);
+        this.onClickUpdateChecker = this.onClickUpdateChecker.bind(this);
 
         this.state = {
-            server_time : common.get_formatted_date_str(new Date(), true)
+            server_time : common.get_formatted_date_str(new Date(), true),
+            show_update_notify : false
         }
 
         this.__mount = false;
@@ -28,6 +31,7 @@ class MenuBar extends React.Component {
 
     componentDidMount(){
         this.__mount = true;
+        this.runNewVersionWatchdog();
     }
 
     componentWillUnmount(){
@@ -39,6 +43,29 @@ class MenuBar extends React.Component {
         this.setState(_ => ({
             server_time : common.get_formatted_date_str(date, true)
         }));
+    }
+
+    runNewVersionWatchdog(){
+
+        const WATCHDOG_INTERVAL = 1000 * 60 * 1; // 1 min;
+        const cur_app_version = window.electron.getAppVersion();
+
+        const update_checker = setInterval(()=>{
+
+            CommonUtils.checkUpdate(cur_app_version, (err, result) =>{
+                if(err) return;
+                if(result !== true) return;
+                this.setState({ show_update_notify : true });
+                clearInterval(update_checker);
+            });
+
+        }, WATCHDOG_INTERVAL);
+    }
+
+    onClickUpdateChecker(){
+        Index.g_prompt_modal.popModal('경고', <p>새로운 버전이 확인되었습니다. 확인 버튼을 누르면 재시작과 동시에 프로그램이 업데이트 됩니다.</p>, (is_ok)=>{
+            if(is_ok) window.electron.restartToUpdate();
+        });
     }
 
     onClickTimeRefreeshBtn(){
@@ -75,12 +102,15 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 620px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 625px)'}}>
                         <li className="nav-item">
-                            <img src="./res/img/arrow-clockwise.svg" style={{width:24, height:24, marginTop:10, cursor:"pointer"}} onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
+                            <img className="nav-bar-icon" src="./res/img/arrow-clockwise.svg" onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link">{this.state.server_time}</a>
+                        </li>
+                        <li className="nav-item" style={{display : this.state.show_update_notify ? 'block' : 'none'}} onClick={this.onClickUpdateChecker}>
+                            <img className="nav-bar-icon" src="./res/img/info-circle-fill-yellow.svg" title="새로운 업데이트가 있습니다. 앱을 재시작하면 업데이트가 진행됩니다." />
                         </li>
                     </ul>
                 </ul>

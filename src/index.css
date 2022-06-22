@@ -178,6 +178,14 @@ tbody tr:hover td {
     background-color: inherit !important;
     color: #83f195 !important;
 }
+
+.nav-bar-icon{
+    width: 24px;
+    height: 24px; 
+    margin-top: 10px;
+    cursor: pointer;
+}
+
 /* End To Menu Bar */
 
 /* Start to Scroll style */
