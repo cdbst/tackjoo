@@ -26,6 +26,7 @@ class AppSettings{
             new_product_quick_task_use_snkrs_url : 0,
             new_product_quick_task_use_auto_task : 0,
             new_product_quick_task_use_notify_messae : 1,
+            new_product_notify_only_on_white_list_item : 0
         }
     }
 
