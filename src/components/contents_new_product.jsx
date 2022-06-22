@@ -342,7 +342,31 @@ class ContentsNewProduct extends React.Component {
                 this.__product_info_list = [...new_product_info_list, ...this.__product_info_list];
 
                 //Index.g_sys_msg_q.enqueue('알림', `신상품 ${new_product_info_list.length}개의 등록이 확인되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-                window.electron.notifyNewProductList(new_product_info_list);
+
+                const notifiy_only_on_white_list = Index.g_settings_info.getSetting('new_product_notify_only_on_white_list_item');
+                if(notifiy_only_on_white_list === 1){
+
+                    let included_in_white_list = false;
+
+                    new_product_info_list.every((new_product_info)=>{
+
+                        if(this.checkProductInfoWithBlackList(new_product_info)) return true;
+
+                        const [_task_cnt, white_list_idx] = this.checkProductInfoWithWhiteList(new_product_info);
+
+                        if(white_list_idx > 0){
+                            included_in_white_list = true;
+                            return false;
+                        }else{
+                            return true;
+                        }
+                    });
+
+                    if(included_in_white_list) window.electron.notifyNewProductList(new_product_info_list);
+
+                }else{
+                    window.electron.notifyNewProductList(new_product_info_list);
+                }
 
                 this.__updateTableItems();
             });
