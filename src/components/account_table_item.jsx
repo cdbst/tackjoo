@@ -16,6 +16,8 @@ class AccountsTableItem extends React.Component {
         this.isLocked = this.isLocked.bind(this);
         this.updateAccount = this.updateAccount.bind(this);
         this.setSessionTimer = this.setSessionTimer.bind(this);
+        this.unsetSessionTimer = this.unsetSessionTimer.bind(this);
+        this.updateAccountStatusToLogout = this.updateAccountStatusToLogout.bind(this);
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
@@ -86,14 +88,30 @@ class AccountsTableItem extends React.Component {
             this.setState({
                 session_expired_time_str : common.format_seconds(--expired_sec)
             }, () => {
-                if(expired_sec <= 0){
-                    clearInterval(this.session_timer);
-                    this.session_timer = undefined;
-                    common.update_account_info_obj(this.state.account_info, 'state', common.ACCOUNT_STATE.LOGOUT);
-                    this.setState({ account_info : this.state.account_info });
-                }
+                if(expired_sec > 0) return;
+                //clear timer
+                this.unsetSessionTimer();
+                //update account status to logout cond.
+                this.updateAccountStatusToLogout();
             });
         }, 1000);
+    }
+
+    unsetSessionTimer(){
+        if(this.session_timer !== undefined) clearInterval(this.session_timer);
+        this.session_timer = undefined;
+    }
+
+    updateAccountStatusToLogout(){
+        common.update_account_info_obj(this.state.account_info, 'state', common.ACCOUNT_STATE.LOGOUT);
+        this.setState({ account_info : this.state.account_info }, ()=>{
+
+            //if use session keep alive mode do login again.
+            const use_session_keep_alive = Index.g_settings_info.getSetting('nike_login_session_keep_alive');
+            if(use_session_keep_alive !== 1) return;
+
+            this.doLogin(false);
+        });
     }
 
     doLogin(modal = true){
