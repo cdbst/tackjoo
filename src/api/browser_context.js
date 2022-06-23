@@ -66,6 +66,7 @@ class BrowserContext {
         this.cancel_order = this.cancel_order.bind(this);
         this.cleanup_cart = this.cleanup_cart.bind(this);
         this.is_session_expired = this.is_session_expired.bind(this);
+        this.wait_for_idle_cond = this.wait_for_idle_cond.bind(this);
         
         this.clear_cookies = this.clear_cookies.bind(this);
         this.clear_csrfToken = this.clear_csrfToken.bind(this);
@@ -91,6 +92,7 @@ class BrowserContext {
 
         this.in_progress_login = false;
         this.login_date = undefined;
+        this.in_progress_task = false;
 
         this.csrfToken = undefined;
         this.sensor_data_server_url = undefined;
@@ -132,6 +134,19 @@ class BrowserContext {
         this.__req_retry_cnt = this.settings_info.http_req_ret_cnt + 1;
         this.__req_timout = this.settings_info.http_req_timeout * 1000;
         this.__disable_redirect = this.settings_info.http_req_ignore_redriect_to_no_access === 1 ? true : false;
+    }
+
+    wait_for_idle_cond(){
+
+        const INTERVAL = 500;
+
+        return new Promise((resolve) =>{
+            const h_watcher = setInterval(()=>{
+                if(this.in_progress_task) return;
+                resolve();
+                clearInterval(h_watcher);
+            }, INTERVAL);
+        });
     }
 
     is_session_expired(session_timeout){

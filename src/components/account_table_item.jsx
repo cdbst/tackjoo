@@ -15,6 +15,9 @@ class AccountsTableItem extends React.Component {
         this.onClickLockCfg = this.onClickLockCfg.bind(this);
         this.isLocked = this.isLocked.bind(this);
         this.updateAccount = this.updateAccount.bind(this);
+        this.setSessionTimer = this.setSessionTimer.bind(this);
+        this.unsetSessionTimer = this.unsetSessionTimer.bind(this);
+        this.updateAccountStatusToLogout = this.updateAccountStatusToLogout.bind(this);
 
         this.ref_login_btn = React.createRef();
         this.ref_cleanup_cart_btn = React.createRef();
@@ -26,8 +29,11 @@ class AccountsTableItem extends React.Component {
         common.update_account_info_obj(account_info, 'state', state);
 
         this.state = {
-            account_info : account_info
+            account_info : account_info,
+            session_expired_time_str : '',
         };
+
+        this.session_timer = undefined;
     }
 
     isLocked(){
@@ -67,6 +73,47 @@ class AccountsTableItem extends React.Component {
         });
     }
 
+    setSessionTimer(expired_sec){
+
+        if(this.session_timer !== undefined) clearInterval(this.session_timer);
+
+        if(expired_sec <= 0){
+            this.setState({
+                session_expired_time_str : ''
+            });
+            return;
+        }
+
+        this.session_timer = setInterval(()=> {
+            this.setState({
+                session_expired_time_str : common.format_seconds(--expired_sec)
+            }, () => {
+                if(expired_sec > 0) return;
+                //clear timer
+                this.unsetSessionTimer();
+                //update account status to logout cond.
+                this.updateAccountStatusToLogout();
+            });
+        }, 1000);
+    }
+
+    unsetSessionTimer(){
+        if(this.session_timer !== undefined) clearInterval(this.session_timer);
+        this.session_timer = undefined;
+    }
+
+    updateAccountStatusToLogout(){
+        common.update_account_info_obj(this.state.account_info, 'state', common.ACCOUNT_STATE.LOGOUT);
+        this.setState({ account_info : this.state.account_info }, ()=>{
+
+            //if use session keep alive mode do login again.
+            const use_session_keep_alive = Index.g_settings_info.getSetting('nike_login_session_keep_alive');
+            if(use_session_keep_alive !== 1) return;
+
+            this.doLogin(false);
+        });
+    }
+
     doLogin(modal = true){
 
         if(this.isLocked()) return;
@@ -84,6 +131,9 @@ class AccountsTableItem extends React.Component {
             
             common.update_account_info_obj(this.state.account_info, 'state', common.ACCOUNT_STATE.LOGIN);
             this.setState({ account_info : this.state.account_info });
+
+            const session_expired_min = Index.g_settings_info.getSetting('nike_login_session_timeout');
+            this.setSessionTimer(parseInt(session_expired_min) * 60);
 
             if(modal) Index.g_sys_msg_q.enqueue('안내', this.state.account_info.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
         });
@@ -116,6 +166,10 @@ class AccountsTableItem extends React.Component {
         const new_account_info = _.clone(this.state.account_info);
         common.update_account_info_obj(new_account_info, 'locked', status);
         common.update_account_info_obj(new_account_info, 'state', status ? common.ACCOUNT_STATE.LOCKED : common.ACCOUNT_STATE.LOGOUT);
+
+        if(status){
+            this.unsetSessionTimer();
+        }
 
         this.updateAccount(new_account_info);
     }
@@ -165,6 +219,9 @@ class AccountsTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
                     <span className={status_text_class}>{this.state.account_info.state}</span>
+                </td>
+                <td style={{width : this.props.session_expired_timer_col_width, maxWidth : this.props.session_expired_timer_col_width}}>
+                    <span >{this.state.session_expired_time_str}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

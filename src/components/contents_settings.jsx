@@ -11,8 +11,11 @@ class ContentsSettings extends React.Component {
         HTTP_MAX_REQ_WITHIN_SAME_IP : 'http-max-req-within-same-ip-input',
         TASK_RET_COUNT : 'task-ret-cnt-input',
         TASK_RET_INTERVAL : 'task-ret-interval-input',
-        NIKE_LOGIN_SESSION_TIMEOUT : 'login-session-timeout-input',
         RESTOCK_WATCHDOG_INTERVAL : 'task-watchdog-ret-interval-input',
+
+        /** 세션 관련 설정 */
+        NIKE_LOGIN_SESSION_TIMEOUT : 'login-session-timeout-input',
+        NIKE_LOGIN_SESSION_KEEP_ALIVE : 'login-session-keep-alive-input',
 
         /** 신상품 관련 설정 */
         NEW_PRODUCT_WATCH_INTERVAL : 'new-product-watch-interval-input',
@@ -36,8 +39,11 @@ class ContentsSettings extends React.Component {
         HTTP_MAX_REQ_WITHIN_SAME_IP : '한 개의 IP에서 동시에 몇개의 작업을 허용할지 설정합니다. (기본 값: 3, 재시작 필요)',
         TASK_RET_COUNT : '실패한 Task에 대해 몇 회 재시도 할지 설정 합니다. (기본 값: 0)',
         TASK_RET_INTERVAL : 'Task 실패시 몇 초 후 재시도 할지 설정합니다. (기본 값 : 1)',
-        NIKE_LOGIN_SESSION_TIMEOUT : '공식홈페이지 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
         RESTOCK_WATCHDOG_INTERVAL : '상품 입고 확인을 몇 초 간격으로 진행할지 설정합니다. (기본 값 : 3)',
+
+        /** 세션 관련 설정 */
+        NIKE_LOGIN_SESSION_TIMEOUT : '공식홈페이지 로그인 세션 유지 시간을 몇 분으로 할지 설정합니다. (기본 값 : 60, 무기한 유지하려면 0 입력)',
+        NIKE_LOGIN_SESSION_KEEP_ALIVE : '로그인 세션 만료시 자동으로 새로 로그인합니다. (기본 값: 1, [0: 미사용] [1: 사용])',
 
         /** 신상품 관련 설정 */
         NEW_PRODUCT_WATCH_INTERVAL : '신상품을 감시하는 주기를 몇초 간격으로 할지 지정합니다. (기본 값: 1)',
@@ -143,6 +149,9 @@ class ContentsSettings extends React.Component {
         let nike_login_session_timeout = settings_info.nike_login_session_timeout == undefined ? '' : settings_info.nike_login_session_timeout;
         this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT, nike_login_session_timeout);
 
+        let nike_login_session_keep_alive = settings_info.nike_login_session_keep_alive == undefined ? '' : settings_info.nike_login_session_keep_alive;
+        this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_KEEP_ALIVE, nike_login_session_keep_alive);
+
         let restock_watchdog_interval = settings_info.restock_watchdog_interval == undefined ? '' : settings_info.restock_watchdog_interval;
         this.inputValue(ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL, restock_watchdog_interval);
 
@@ -197,6 +206,9 @@ class ContentsSettings extends React.Component {
         let nike_login_session_timeout = this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT);
         nike_login_session_timeout = nike_login_session_timeout  == '' ? undefined : parseFloat(nike_login_session_timeout);
 
+        let nike_login_session_keep_alive = this.inputValue(ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_KEEP_ALIVE);
+        nike_login_session_keep_alive = nike_login_session_keep_alive  == '' ? undefined : parseFloat(nike_login_session_keep_alive);
+
         let restock_watchdog_interval = this.inputValue(ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL);
         restock_watchdog_interval = restock_watchdog_interval  == '' ? undefined : parseFloat(restock_watchdog_interval);
 
@@ -233,6 +245,7 @@ class ContentsSettings extends React.Component {
             task_ret_cnt : task_ret_cnt,
             task_ret_interval : task_ret_interval,
             nike_login_session_timeout : nike_login_session_timeout,
+            nike_login_session_keep_alive : nike_login_session_keep_alive,
             restock_watchdog_interval : restock_watchdog_interval,
             new_product_watch_interval : new_product_watch_interval,
             new_product_watch_max_ret : new_product_watch_max_ret,
@@ -302,8 +315,12 @@ class ContentsSettings extends React.Component {
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.HTTP_MAX_REQ_WITHIN_SAME_IP} desc={ContentsSettings.OPTION_TEXT.HTTP_MAX_REQ_WITHIN_SAME_IP} pattern={/^[0-9]\d*$/} placeholder="몇 개"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_COUNT} desc={ContentsSettings.OPTION_TEXT.TASK_RET_COUNT} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.TASK_RET_INTERVAL} desc={ContentsSettings.OPTION_TEXT.TASK_RET_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
-                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.RESTOCK_WATCHDOG_INTERVAL} desc={ContentsSettings.OPTION_TEXT.RESTOCK_WATCHDOG_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/> <br />
+
+                                <SettingsSubTitle sub_title="<로그인 세션 설정>" /> <br />
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_TIMEOUT} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_TIMEOUT} pattern={/^[0-9]\d*$/} placeholder="몇 분"/> <hr/>
+                                <SettingsOptionItem id={ContentsSettings.INPUT_ID.NIKE_LOGIN_SESSION_KEEP_ALIVE} desc={ContentsSettings.OPTION_TEXT.NIKE_LOGIN_SESSION_KEEP_ALIVE} pattern={/^[0-1]$/} placeholder="0 또는 1"/> <hr/> <br />
+
                                 <SettingsSubTitle sub_title="<신상품 관련 설정>" /> <br />
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_INTERVAL} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_INTERVAL} pattern={/^(?!0\d)\d*(\.)?(\d+)?$/} placeholder="몇 초"/> <hr/>
                                 <SettingsOptionItem id={ContentsSettings.INPUT_ID.NEW_PRODUCT_WATCH_MAX_RET} desc={ContentsSettings.OPTION_TEXT.NEW_PRODUCT_WATCH_MAX_RET} pattern={/^[0-9]\d*$/} placeholder="몇 회"/> <hr/>
