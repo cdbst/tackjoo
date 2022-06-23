@@ -11,6 +11,7 @@ class NewProductTableItem extends React.Component {
         this.onClickRemove = this.onClickRemove.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onDBClickTableItem = this.onDBClickTableItem.bind(this);
+        this.saveTableItemText = this.saveTableItemText.bind(this);
 
         this.__mount = false;
 
@@ -84,6 +85,11 @@ class NewProductTableItem extends React.Component {
         this.props.h_on_create_task(this.props.product_info);
     }
 
+    saveTableItemText(text){
+        Index.g_sys_msg_q.enqueue('알림', `클립보드에 저장되었습니다. (${text})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 2000);
+        window.electron.writeTextToClipboard(text);
+    }
+
     render(){
 
         
@@ -133,7 +139,7 @@ class NewProductTableItem extends React.Component {
                     </div>
                 </td>
                 <td style={{width : this.props.model_id_col_width, maxWidth : this.props.model_id_col_width}}>
-                    <span >{this.props.product_info.model_id}</span>
+                    <span className="curser-pointer" onClick={this.saveTableItemText.bind(this, this.props.product_info.model_id)}>{this.props.product_info.model_id}</span>
                 </td>
                 <td style={{width : this.props.price_col_width, maxWidth : this.props.price_col_width}}>
                     <span >{this.props.product_info.price}</span>

@@ -68,7 +68,7 @@ class OrderTableItem extends React.Component {
     }
 
     saveTableItemText(text){
-        Index.g_sys_msg_q.enqueue('알림', `클립보드에 저장되었습니다. (${text})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
+        Index.g_sys_msg_q.enqueue('알림', `클립보드에 저장되었습니다. (${text})`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 2000);
         window.electron.writeTextToClipboard(text);
     }
 
