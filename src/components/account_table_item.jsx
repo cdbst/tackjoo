@@ -167,6 +167,10 @@ class AccountsTableItem extends React.Component {
         common.update_account_info_obj(new_account_info, 'locked', status);
         common.update_account_info_obj(new_account_info, 'state', status ? common.ACCOUNT_STATE.LOCKED : common.ACCOUNT_STATE.LOGOUT);
 
+        if(status){
+            this.unsetSessionTimer();
+        }
+
         this.updateAccount(new_account_info);
     }
 
