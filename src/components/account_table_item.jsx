@@ -75,14 +75,14 @@ class AccountsTableItem extends React.Component {
 
     setSessionTimer(expired_sec){
 
+        if(this.session_timer !== undefined) clearInterval(this.session_timer);
+
         if(expired_sec <= 0){
             this.setState({
                 session_expired_time_str : ''
             });
             return;
         }
-
-        if(this.session_timer !== undefined) clearInterval(this.session_timer);
 
         this.session_timer = setInterval(()=> {
             this.setState({
