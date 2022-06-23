@@ -1,6 +1,3 @@
-
-
-
 class AccountsTableItem extends React.Component {
 
     constructor(props) {
@@ -163,8 +160,11 @@ class AccountsTableItem extends React.Component {
                 <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
                     <span>{this.state.account_info.email}</span>
                 </td>
-                <td style={{width : this.props.status_col_width, maxWidth : this.props.status_col_width}}>
-                    <span className={status_text_class}>{this.state.account_info.state}</span>
+                <td style={{width : this.props.email_col_width, maxWidth : this.props.email_col_width}}>
+                    <span>15:00</span>
+                </td>
+                <td style={{width : this.props.session_timer_col_width, maxWidth : this.props.session_timer_col_width}}>
+                    <span >{this.state.account_info.state}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

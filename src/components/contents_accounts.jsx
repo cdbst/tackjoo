@@ -34,7 +34,9 @@ class ContentsAccounts extends React.Component {
     __setupColumnsWidth(){
         this.actions_col_width = 280;
         this.status_col_width = 120;
-        this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width) + 'px)';
+        this.session_timer_col_width = 180;
+
+        this.email_col_width = 'calc( 100% - ' + (this.actions_col_width + this.status_col_width + this.session_timer_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -249,6 +251,7 @@ class ContentsAccounts extends React.Component {
                 h_remove={this.removeAccount.bind(this, account_info.id)}
                 e_mail_col_width={this.email_col_width}
                 status_col_width={this.status_col_width}
+                session_timer_col_width={this.session_timer_col_width}
                 actions_col_width={this.actions_col_width}
                 save_to_file={save_to_file}
             />
@@ -294,6 +297,7 @@ class ContentsAccounts extends React.Component {
                         <thead>
                             <tr>
                                 <th scope="col" style={{width : this.email_col_width, maxWidth : this.email_col_width}}>이메일</th>
+                                <th scope="col" style={{width : this.session_timer_col_width, maxWidth : this.session_timer_col_width}}>로그인 유지 시간</th>
                                 <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>상태</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
