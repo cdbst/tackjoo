@@ -133,7 +133,7 @@ class AccountsTableItem extends React.Component {
             this.setState({ account_info : this.state.account_info });
 
             const session_expired_min = Index.g_settings_info.getSetting('nike_login_session_timeout');
-            this.setSessionTimer(session_expired_min * 60);
+            this.setSessionTimer(parseInt(session_expired_min) * 60);
 
             if(modal) Index.g_sys_msg_q.enqueue('안내', this.state.account_info.email + ' 로그인에 성공했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
         });
