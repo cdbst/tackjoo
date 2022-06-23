@@ -176,15 +176,16 @@ function register(){
             return;
         }
 
-        if(browser_context.login_date !== undefined){
-            browser_context.clear_cookies();
-            browser_context.clear_csrfToken();
-        }
-
         (async () =>{
             
             try{
                 await IPRequestLock.accquire(undefined, undefined);
+                await browser_context.wait_for_idle_cond();
+
+                if(browser_context.login_date !== undefined){
+                    browser_context.clear_cookies();
+                    browser_context.clear_csrfToken();
+                }
 
                 const err = await login(browser_context);
                 if(err !== undefined){

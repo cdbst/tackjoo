@@ -39,12 +39,16 @@ function register(){
             try{
                 await TaskRunnerManager.add(task_runner);
                 await IPRequestLock.accquire(proxy_ip, proxy_port);
+
+                browser_context.in_progress_task = true;
                 const result_task_info = await task_runner.start();
+
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.DONE, done : true, size_info : result_task_info.checked_out_size_info });
             }catch (err){
                 log.error(common.get_log_str('ipc_main_task.js', 'play-task-callback', err));
                 event.reply('play-task-reply' + task_info._id, {status : common.TASK_STATUS.FAIL, done : true});
             }finally{
+                browser_context.in_progress_task = false;
                 IPRequestLock.release(proxy_ip, proxy_port);
                 TaskRunnerManager.remove(task_runner.task_info._id);
             }
