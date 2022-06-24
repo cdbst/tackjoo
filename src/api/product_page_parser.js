@@ -606,7 +606,7 @@ function update_product_info_as_sku_inventory_info(product_info, sku_inventory_i
         
         let size_info_obj = common.get_size_info_obj_scheme();
 
-        let external_id_array = size_info['externalId'].split('  ');
+        let external_id_array = size_info['externalId'].split(/\s+/);
 
         let _external_id = external_id_array[0];
         let _name = external_id_array[1];

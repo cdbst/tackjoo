@@ -120,7 +120,7 @@ class ProductManager{
             }
             
         }else if(product_info != undefined){
-            size_list = ProductManager.getDefaultSizeNameList();
+            size_list = ProductManager.getDefaultSizeNameList(product_info);
         }else{
             size_list = [];
         }
@@ -128,10 +128,14 @@ class ProductManager{
         return [size_list, soldout_size_list]
     }
 
-    static getDefaultSizeNameList(){
+    static getDefaultSizeNameList(product_info){
         const size_num = 55;
         const base_size = 50;
-        const size_names = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+        let size_names = [];
+        
+        if(product_info.sell_type == common.SELL_TYPE.draw){
+            size_names = ['XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+        }
 
         for(var i = 0; i < size_num; i++){
             size_names.push((base_size + i * 5).toString());
