@@ -65,7 +65,7 @@ class ContentsNewProduct extends React.Component {
         this.price_col_width = 140;
         this.kream_price_col_width = 140;
         this.price_gap_col_width = 180;
-        this.actions_col_width = 204;
+        this.actions_col_width = 260;
         this.soldout_status_col_width = 102;
         this.release_date_col_width = 165;
         this.model_id_col_width = 127;

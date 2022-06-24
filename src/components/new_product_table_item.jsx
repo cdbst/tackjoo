@@ -6,7 +6,8 @@ class NewProductTableItem extends React.Component {
         this.getSoldOutStatusFontColor = this.getSoldOutStatusFontColor.bind(this);
         this.getKreamPriceFontColor = this.getKreamPriceFontColor.bind(this);
         this.getProductNameColor = this.getProductNameColor.bind(this);
-        this.onClickCreateTask = this.onClickCreateTask.bind(this);
+        this.onClickCreateTaskQuickly = this.onClickCreateTaskQuickly.bind(this);
+        this.onClickCreateTaskManually = this.onClickCreateTaskManually.bind(this);
         this.onClickGoKreamLink = this.onClickGoKreamLink.bind(this);
         this.onClickRemove = this.onClickRemove.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
@@ -59,8 +60,12 @@ class NewProductTableItem extends React.Component {
         return this.state.kream_product_info === undefined ? '#dc3545' : '#ffffff';
     }
 
-    onClickCreateTask(){
+    onClickCreateTaskQuickly(){
         this.props.h_on_create_task(this.props.product_info);
+    }
+
+    onClickCreateTaskManually(){
+        console.log('onClickCreateTaskManually');
     }
 
     onClickGoKreamLink(){
@@ -161,17 +166,22 @@ class NewProductTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table" >
-                            <button type="button" className="btn btn-info" onClick={this.onClickCreateTask.bind(this)} disabled={this.props.product_info.soldout}>
+                        <div className="float-start button-wrapper-inner-table" title="빠른 작업 생성하기" onDoubleClick={(e)=>{e.stopPropagation()}}>
+                            <button type="button" className="btn btn-info" onClick={this.onClickCreateTaskQuickly.bind(this)} disabled={this.props.product_info.soldout}>
                                 <img src="./res/img/lightning-fill.svg" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="수동으로 작업 생성하기" onDoubleClick={(e)=>{e.stopPropagation()}}>
+                            <button type="button" className="btn btn-light" onClick={this.onClickCreateTaskManually.bind(this)}>
+                                <img src="./res/img/pencil-square.svg" style={{width:24, height:24}} />
+                            </button>
+                        </div>
+                        <div className="float-start button-wrapper-inner-table" title="상품정보 크림 바로가기" onDoubleClick={(e)=>{e.stopPropagation()}}>
                             <button type="button" className="btn btn-warning" onClick={this.onClickGoKreamLink.bind(this)} disabled={this.state.kream_product_info === undefined}>
                                 <img src="./res/img/kream-logo.png" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table">
+                        <div className="float-start button-wrapper-inner-table" title="제거하기" onDoubleClick={(e)=>{e.stopPropagation()}}>
                             <button type="button" className="btn btn-danger" onClick={this.onClickRemove.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/>
                             </button>
