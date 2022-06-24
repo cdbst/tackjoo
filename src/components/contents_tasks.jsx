@@ -25,6 +25,7 @@ class ContentsTasks extends React.Component {
         this.__createNewTask = this.__createNewTask.bind(this);
         this.__pushTaskTableItem = this.__pushTaskTableItem.bind(this);
         this.create_quick_task = this.create_quick_task.bind(this);
+        this.create_manual_task = this.create_manual_task.bind(this);
 
         this.popSelectedTaskList = this.popSelectedTaskList.bind(this);
         this.pushSelectedTaskList = this.pushSelectedTaskList.bind(this);
@@ -533,6 +534,15 @@ class ContentsTasks extends React.Component {
         }else {
             return undefined;
         }
+    }
+
+    create_manual_task(product_info){
+
+        let task_tab_menu = document.querySelector('#tasks-tab');
+        let el_bs_task_tab_menu = bootstrap.Tab.getOrCreateInstance(task_tab_menu);
+        el_bs_task_tab_menu.show();
+
+        this.popTaskEditModal(product_info.url);
     }
 
     create_quick_task(product_info, account_email){

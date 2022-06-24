@@ -61,11 +61,11 @@ class NewProductTableItem extends React.Component {
     }
 
     onClickCreateTaskQuickly(){
-        this.props.h_on_create_task(this.props.product_info);
+        this.props.h_on_create_task_quickly(this.props.product_info);
     }
 
     onClickCreateTaskManually(){
-        console.log('onClickCreateTaskManually');
+        this.props.h_on_create_task_manually(this.props.product_info);
     }
 
     onClickGoKreamLink(){
@@ -87,7 +87,7 @@ class NewProductTableItem extends React.Component {
             Index.g_sys_msg_q.enqueue('에러', `품절된 상품은 구매하지 못합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 1500);
             return;
         }
-        this.props.h_on_create_task(this.props.product_info);
+        this.props.h_on_create_task_quickly(this.props.product_info);
     }
 
     saveTableItemText(text){
