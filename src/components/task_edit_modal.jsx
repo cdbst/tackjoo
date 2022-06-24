@@ -189,7 +189,11 @@ class TaskEditModal extends React.Component {
 
             //TODO : Normal product type임에도 불구하고 size_info_list를 취득하지 못한 경우 어떻게 처리할 것인가?
             if(product_info.size_info_list.length == 0){
-                Index.g_sys_msg_q.enqueue('경고', '해당 상품은 아직 사이즈 정보가 없습니다. 사이즈를 선택하면, 같거나 가장 유사한 사이즈로 구매를 진행합니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                if(product_info.sell_type == common.SELL_TYPE.draw){
+                    Index.g_sys_msg_q.enqueue('경고', '해당 상품은 아직 사이즈 정보가 없습니다. 사이즈를 선택하면, 같거나 가장 유사한 사이즈로 구매를 진행합니다(최악의 경우 무작위 사이즈 선택). 특히 아직 출시하지 않은 의류 계열의 DRAW 상품의 경우, 알파벳으로 표기된 사이즈를 지정해야 합니다.', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 8000);
+                }else{
+                    Index.g_sys_msg_q.enqueue('경고', '해당 상품은 아직 사이즈 정보가 없습니다. 사이즈를 선택하면, 같거나 가장 유사한 사이즈로 구매를 진행합니다(최악의 경우 무작위 사이즈 선택).', ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+                }
             }
 
             if(__callback){

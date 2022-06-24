@@ -52,7 +52,7 @@ module.exports.judge_appropreate_non_shoe_size_info = (product_info, task_info) 
     const target_size_info = size_info_list_has_quantity.find((size_info) => { return size_info.name === task_info.size_name} );
     if(target_size_info !== undefined) return target_size_info;
 
-    return size_info_list_has_quantity[Math.floor((size_info_list_has_quantity.length - 1) / 2)];
+    return common.sample(size_info_list_has_quantity);
 }
 
 module.exports.get_size_info_list_has_quantity = (product_info) => {
