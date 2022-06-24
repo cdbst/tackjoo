@@ -9,6 +9,7 @@ class TheDrawTableItem extends React.Component {
         this.getAccountInfoTag = this.getAccountInfoTag.bind(this);
         this.onClickProductImg = this.onClickProductImg.bind(this);
         this.onCreateQuickTask = this.onCreateQuickTask.bind(this);
+        this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
 
         this.__mount = false;
     }
@@ -23,6 +24,18 @@ class TheDrawTableItem extends React.Component {
 
     onClickGoLinkBtn(){
         window.electron.openExternalWebPage(this.props.draw_item.product_link);
+    }
+
+    onClickKreamLinkBtn(){
+        window.electron.getKreamProductInfo(this.props.draw_item.product_model_id, (err, kream_product_info)=>{
+
+            if(err){
+                Index.g_sys_msg_q.enqueue('에러', `해당 상품을 크림에서 찾을수 없습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);
+                return;
+            }
+
+            window.electron.openExternalWebPage(kream_product_info.url);
+        });
     }
 
     getAccountInfoTag(){
@@ -98,6 +111,9 @@ class TheDrawTableItem extends React.Component {
                 <td style={{width : this.props.product_name_col_width, maxWidth : this.props.product_name_col_width}}>
                     <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.draw_item.product_name}>{this.props.draw_item.product_name}</div>
                 </td>
+                <td style={{width : this.props.product_model_id_col_width, maxWidth : this.props.product_model_id_col_width}}>
+                    <span>{this.props.draw_item.product_model_id}</span>
+                </td>
                 <td style={{width : this.props.product_size_col_width, maxWidth : this.props.product_size_col_width}}>
                     <span>{this.props.draw_item.product_size}</span>
                 </td>
@@ -112,9 +128,9 @@ class TheDrawTableItem extends React.Component {
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>
-                        <div className="float-start button-wrapper-inner-table" title="당첨 상품 바로가기">
-                            <button type="button" className="btn btn-warning" onClick={this.onClickGoLinkBtn.bind(this)}>
-                                <img src="./res/img/link.svg" style={{width:24, height:24}}/>
+                        <div className="float-start button-wrapper-inner-table" title="크림 바로가기">
+                            <button type="button" className="btn btn-warning" onClick={this.onClickKreamLinkBtn.bind(this)}>
+                                <img src="./res/img/kream-logo.png" style={{width:24, height:24}}/>
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="당첨 계정 정보 확인">

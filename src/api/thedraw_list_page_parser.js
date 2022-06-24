@@ -28,7 +28,9 @@ function parse_thedraw_item_list($, browser_context){
             //step3 get product size
             const el_span_product_opt = parser_common.get_specific_tag_nodes(el, [], ['opt']);
             if(el_span_product_opt.length == 0) throw new Error('cannot parse draw product option element');
-            const product_size = el_span_product_opt[0].children[0].data.split(' / ')[1];
+            const product_opt_list = el_span_product_opt[0].children[0].data.split(' / ');
+            const product_size = product_opt_list[1];
+            const product_model_id = product_opt_list[0];
 
             //step4 get product price
             const el_span_product_price = parser_common.get_specific_tag_nodes(el, [], ['price']);
@@ -54,7 +56,9 @@ function parse_thedraw_item_list($, browser_context){
             common.update_thedraw_item_obj(thedraw_item, 'product_size', product_size);
             common.update_thedraw_item_obj(thedraw_item, 'product_price', product_price);
             common.update_thedraw_item_obj(thedraw_item, 'product_link', product_link);
+            common.update_thedraw_item_obj(thedraw_item, 'product_link', product_link);
             common.update_thedraw_item_obj(thedraw_item, 'product_img_url', product_img_url);
+            common.update_thedraw_item_obj(thedraw_item, 'product_model_id', product_model_id);
             common.update_thedraw_item_obj(thedraw_item, 'draw_date', draw_date);
             common.update_thedraw_item_obj(thedraw_item, 'draw_result', draw_result);
             common.update_thedraw_item_obj(thedraw_item, '_id', common.uuidv4());
