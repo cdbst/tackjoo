@@ -16,7 +16,8 @@ class ContentsNewProduct extends React.Component {
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
         this.__onSubmitWhitelistInfo = this.__onSubmitWhitelistInfo.bind(this);
         this.__onCancelSubmitWhitelistInfo = this.__onCancelSubmitWhitelistInfo.bind(this);
-        this.onCreateTask = this.onCreateTask.bind(this);
+        this.onCreateNewTaskQuickly = this.onCreateNewTaskQuickly.bind(this);
+        this.onCreateNewTaskManually = this.onCreateNewTaskManually.bind(this);
         this.showWhitelistEditModal = this.showWhitelistEditModal.bind(this);
         this.showBlacklistEditModal = this.showBlacklistEditModal.bind(this);
         this.updateWhiteInfolist = this.updateWhiteInfolist.bind(this);
@@ -65,7 +66,7 @@ class ContentsNewProduct extends React.Component {
         this.price_col_width = 140;
         this.kream_price_col_width = 140;
         this.price_gap_col_width = 180;
-        this.actions_col_width = 204;
+        this.actions_col_width = 260;
         this.soldout_status_col_width = 102;
         this.release_date_col_width = 165;
         this.model_id_col_width = 127;
@@ -156,7 +157,8 @@ class ContentsNewProduct extends React.Component {
                 kream_interest_col_width={this.kream_interest_col_width}
                 product_info={product_info}
                 h_on_remove={this.onRemoveProduct.bind(this)}
-                h_on_create_task={this.onCreateTask.bind(this)}
+                h_on_create_task_quickly={this.onCreateNewTaskQuickly.bind(this)}
+                h_on_create_task_manually={this.onCreateNewTaskManually.bind(this)}
                 key={product_info._id}
                 display={display}
                 background={background}
@@ -166,8 +168,12 @@ class ContentsNewProduct extends React.Component {
         return table_items;
     }
 
-    onCreateTask(product_info){
+    onCreateNewTaskQuickly(product_info){
         this.props.contents_task_ref.current.create_quick_task(product_info);
+    }
+
+    onCreateNewTaskManually(product_info){
+        this.props.contents_task_ref.current.create_manual_task(product_info);
     }
 
     onFilterChanged(){
