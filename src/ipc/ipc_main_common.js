@@ -177,6 +177,17 @@ function register(win){
     ipcMain.on('restore-maximize-program', (event, data) =>{
         app.main_browser_window.unmaximize();
     });
+
+    ipcMain.on('set-ignore-mouse-events', (event, data) =>{
+        const setting = data.payload.setting;
+        if(setting){
+            app.main_browser_window.setIgnoreMouseEvents(true, {forward : true});
+        }else{
+            app.main_browser_window.setIgnoreMouseEvents(false);
+        }
+        
+        //app.main_browser_window.unmaximize();
+    });
 }
 
 module.exports.register = register;

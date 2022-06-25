@@ -58,6 +58,7 @@ contextBridge.exposeInMainWorld('electron', {
     minimizeProgram : _minimizeProgram,
     maximizeProgram : _maximizeProgram,
     restoreSizeProgram : _restoreSizeProgram,
+    setIgnoreMouseEvents : _setIgnoreMouseEvents,
 });
 
 /**
@@ -648,4 +649,12 @@ function _restoreSizeProgram(){
     let ipc_data = get_ipc_data();
     
     ipcRenderer.send('restore-maximize-program', ipc_data);
+}
+
+function _setIgnoreMouseEvents(setting){
+    const ipc_data = get_ipc_data({
+        setting : setting
+    });
+    
+    ipcRenderer.send('set-ignore-mouse-events', ipc_data);
 }

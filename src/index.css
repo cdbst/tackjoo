@@ -167,6 +167,7 @@ tbody tr:hover td {
 .nav-tabs{
     background-color: #202225;
     border: 0px !important;
+    user-select: none;
 }
 
 .nav-item{
@@ -417,8 +418,8 @@ tbody tr:hover td {
 
 /* start to title bar */
 
-.title-bar {
-    -webkit-app-region: drag;
+.app-drag-area {
+    -webkit-app-region : drag;
 }
 
 .window-controls {

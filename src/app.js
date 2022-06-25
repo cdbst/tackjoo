@@ -43,6 +43,8 @@ function create_window() {
             height: 1040,
             minWidth : 1700,
             minHeight : 1040,
+            frame: false,
+            backgroundColor: '#FFF',
             webPreferences: {
                 devTools: false,
                 //sandbox: true,

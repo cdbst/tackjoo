@@ -27,6 +27,7 @@ class MenuBar extends React.Component {
 
         this.__mount = false;
         Index.g_server_clock.subscribeAlam(undefined, this.serverTimeAlamListener, common.uuidv4());
+        this.ref_menubar_ctrls = React.createRef();
     }
 
     componentDidMount(){
@@ -104,7 +105,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 810px)'}}>
+                    <ul className="nav justify-content-end app-drag-area" style={{width:'calc(100% - 810px)'}} onDoubleClick={()=>{this.ref_menubar_ctrls.current.toggleMaximizedStatus(false);}}>
                         <li className="nav-item">
                             <img className="nav-bar-icon" src="./res/img/arrow-clockwise.svg" onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
                         </li>
@@ -116,7 +117,7 @@ class MenuBar extends React.Component {
                         </li>
                     </ul>
                 </ul>
-                <MenuBarWindowControls />
+                <MenuBarWindowControls ref={this.ref_menubar_ctrls}/>
             </div>
         );
     }
