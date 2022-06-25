@@ -77,8 +77,10 @@ class MenuBar extends React.Component {
         return (
             <div className="title-bar">
                 <ul className="nav nav-tabs" id="menu-tabs" role="tablist">
-                    
-                    <li className="nav-item" role="presentation">
+                    <li className="nav-item" style={{paddingLeft: 12}}>
+                        <img className="nav-bar-icon" src="./res/img/icon.ico" style={{cursor:'default'}}/>
+                    </li>
+                    <li className="nav-item" role="presentation" style={{paddingLeft: 4}}>
                         <a className="nav-link active" id={MenuBar.MENU_ID.TASKS} data-bs-toggle="tab" href="#tasks" role="tab" aria-controls="tasks" aria-selected="true">작업</a>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -102,7 +104,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 790px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 810px)'}}>
                         <li className="nav-item">
                             <img className="nav-bar-icon" src="./res/img/arrow-clockwise.svg" onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
                         </li>
