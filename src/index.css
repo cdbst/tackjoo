@@ -19,6 +19,7 @@ html *
 body {
     height: 100% !important;
     background-color: #32353b !important;
+    overflow-y: hidden;
 }
 
 .div-top-to-bottom {
