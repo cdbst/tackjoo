@@ -1016,7 +1016,11 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'add_to_cart', e));
-                await this.__post_process_req_fail(e, this.__req_retry_interval);
+                if(e.response && e.response.status >= 500){
+                    return undefined; // 503 error 발생시 아무리 재시도해도 복구가 되지 않는 현상이 있음.
+                }else{
+                    await this.__post_process_req_fail(e, this.__req_retry_interval);
+                }
             }
         }
 
