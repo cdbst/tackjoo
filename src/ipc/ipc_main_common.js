@@ -165,6 +165,18 @@ function register(win){
     ipcMain.on('exit-program', (event, data) =>{
         app.exit();
     });
+
+    ipcMain.on('minimize-program', (event, data) =>{
+        app.main_browser_window.minimize();
+    });
+
+    ipcMain.on('maximize-program', (event, data) =>{
+        app.main_browser_window.maximize();
+    });
+
+    ipcMain.on('restore-maximize-program', (event, data) =>{
+        app.main_browser_window.unmaximize();
+    });
 }
 
 module.exports.register = register;

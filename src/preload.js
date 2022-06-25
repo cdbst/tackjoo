@@ -54,7 +54,10 @@ contextBridge.exposeInMainWorld('electron', {
     readTermFileData : _readTermFileData,
     updateViewTermSetting : _updateViewTermSetting,
     getViewTermSetting : _getViewTermSetting,
-    exitProgram : _exitProgram
+    exitProgram : _exitProgram,
+    minimizeProgram : _minimizeProgram,
+    maximizeProgram : _maximizeProgram,
+    restoreSizeProgram : _restoreSizeProgram,
 });
 
 /**
@@ -627,4 +630,22 @@ function _exitProgram(){
     let ipc_data = get_ipc_data();
     
     ipcRenderer.send('exit-program', ipc_data);
+}
+
+function _minimizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('minimize-program', ipc_data);
+}
+
+function _maximizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('maximize-program', ipc_data);
+}
+
+function _restoreSizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('restore-maximize-program', ipc_data);
 }
