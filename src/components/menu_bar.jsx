@@ -75,7 +75,7 @@ class MenuBar extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="title-bar">
                 <ul className="nav nav-tabs" id="menu-tabs" role="tablist">
                     
                     <li className="nav-item" role="presentation">
@@ -102,7 +102,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end" style={{width:'calc(100% - 625px)'}}>
+                    <ul className="nav justify-content-end" style={{width:'calc(100% - 790px)'}}>
                         <li className="nav-item">
                             <img className="nav-bar-icon" src="./res/img/arrow-clockwise.svg" onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
                         </li>
@@ -114,6 +114,7 @@ class MenuBar extends React.Component {
                         </li>
                     </ul>
                 </ul>
+                <MenuBarWindowControls />
             </div>
         );
     }
