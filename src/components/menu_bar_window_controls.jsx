@@ -7,27 +7,35 @@ class MenuBarWindowControls extends React.Component {
         this.onClickMinBtn = this.onClickMinBtn.bind(this);
         this.onClickCloseBtn = this.onClickCloseBtn.bind(this);
         this.toggleMaximizedStatus = this.toggleMaximizedStatus.bind(this);
+
+        this.maximized_event_subscriber_id = common.uuidv4();
         
         this.state = {
             maximized : false
         }
     }
 
-    toggleMaximizedStatus(manual_update = true){
-        const new_maximized_state = !this.state.maximized;
-        this.setState({
-            maximized : new_maximized_state,
-        }, ()=>{
-            if(!manual_update) return;
-
-            if(new_maximized_state){
-                window.electron.maximizeProgram();
-            }else{
-                window.electron.restoreSizeProgram();
-            }
+    componentDidMount(){
+        window.electron.subscribeMaximizedEvent(this.maximized_event_subscriber_id, (setting)=>{
+            this.setState({
+                maximized : setting
+            });
         });
+    }
+    
+    componentWillUnmount(){
+        window.electron.unsubscribeMaximizedEvent(this.maximized_event_subscriber_id);
+    }
 
-        return new_maximized_state;
+    toggleMaximizedStatus(){        
+
+        if(this.state.maximized){
+            window.electron.restoreSizeProgram();
+        }else{
+            window.electron.maximizeProgram();
+        }
+
+        return !this.state.maximized;
     }
 
     onClickMinBtn(){

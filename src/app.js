@@ -57,13 +57,29 @@ function create_window() {
 
         app.main_browser_window = win;
         IpcM.register(win);
-    
+
+        setting_up_win_size_maximized_event();
+
         //win.webContents.openDevTools();
         win.setMenuBarVisibility(false);
         win.loadFile(path.join(__dirname, "index.html"));
     }catch(e){
         log.error(common.get_log_str('app.js', 'create_window', e));
     }
+}
+
+function setting_up_win_size_maximized_event(){
+    if(app.main_browser_window === undefined) return;
+
+    app.main_browser_window.on('maximize', ()=>{
+        if(app.main_browser_window === undefined) return;
+        app.main_browser_window.webContents.send('on-maximized-event', true);
+    });
+
+    app.main_browser_window.on('unmaximize', ()=>{
+        if(app.main_browser_window === undefined) return;
+        app.main_browser_window.webContents.send('on-maximized-event', false);
+    });
 }
 
 /**

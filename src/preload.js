@@ -59,6 +59,8 @@ contextBridge.exposeInMainWorld('electron', {
     maximizeProgram : _maximizeProgram,
     restoreSizeProgram : _restoreSizeProgram,
     setIgnoreMouseEvents : _setIgnoreMouseEvents,
+    subscribeMaximizedEvent : _subscribeMaximizedEvent,
+    unsubscribeMaximizedEvent : _unsubscribeMaximizedEvent,
 });
 
 /**
@@ -657,4 +659,21 @@ function _setIgnoreMouseEvents(setting){
     });
     
     ipcRenderer.send('set-ignore-mouse-events', ipc_data);
+}
+
+
+const maximized_event_subscriber = {};
+
+ipcRenderer.on('on-maximized-event', (event, setting) => {
+    for(const evt_cb of Object.values(maximized_event_subscriber)){
+        evt_cb(setting);
+    }
+});
+
+function _subscribeMaximizedEvent(subscriber_id, event_cb){
+    maximized_event_subscriber[subscriber_id] = event_cb;
+}
+
+function _unsubscribeMaximizedEvent(subscriber_id){
+    if(subscriber_id in maximized_event_subscriber) delete maximized_event_subscriber[subscriber_id];
 }

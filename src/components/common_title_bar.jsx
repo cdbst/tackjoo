@@ -4,14 +4,6 @@ class CommonTitleBar extends React.Component {
 
     constructor(props){
         super(props);
-        this.ref_menubar_ctrls = React.createRef();
-
-        this.onDBClickDragArea = this.onDBClickDragArea.bind(this);
-    }
-
-    onDBClickDragArea(){
-        console.log('onDBClickDragArea');
-        this.ref_menubar_ctrls.current.toggleMaximizedStatus(false);
     }
 
     render() {
@@ -24,9 +16,9 @@ class CommonTitleBar extends React.Component {
                     <li className="nav-item" style={{paddingLeft: 4}}>
                         <a className="nav-link">TACKJOO</a>
                     </li>
-                    <ul className="nav justify-content-end app-drag-area" style={{width:'calc(100% - 160px)'}} onDoubleClick={this.onDBClickDragArea.bind(this)}/>
+                    <ul className="nav justify-content-end app-drag-area" style={{width:'calc(100% - 160px)'}}/>
                 </ul>
-                <MenuBarWindowControls ref={this.ref_menubar_ctrls}/>
+                <MenuBarWindowControls />
             </div>
         );
     }
