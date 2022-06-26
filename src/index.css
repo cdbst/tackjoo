@@ -19,6 +19,7 @@ html *
 body {
     height: 100% !important;
     background-color: #32353b !important;
+    overflow-y: hidden;
 }
 
 .div-top-to-bottom {
@@ -166,6 +167,7 @@ tbody tr:hover td {
 .nav-tabs{
     background-color: #202225;
     border: 0px !important;
+    user-select: none;
 }
 
 .nav-item{
@@ -412,4 +414,59 @@ tbody tr:hover td {
 
 .draggable-drag {
     background-color: black !important;
+}
+
+/* start to title bar */
+
+.app-drag-area {
+    -webkit-app-region : drag;
+}
+
+.window-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 42px;
+}
+  
+.window-controls .window-control-button {
+    grid-row: 1 / span 1;
+    width: 100%;
+    height: 42px;
+    padding-left: 18px;
+    padding-top: 6px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.window-controls .window-control-button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.window-controls .window-control-button:active {
+    background: rgba(255,255,255,0.1);
+}
+
+.window-control-min-button {
+    grid-column: 1;
+}
+
+.window-control-max-button, .window-control-restore-button {
+    grid-column: 2;
+}
+
+.window-control-close-button {
+    grid-column: 3;
+}
+
+.window-control-close-button:hover {
+    background: #E81123 !important;
+}
+.window-control-close-button:active {
+    background: #F1707A !important;
+}
+.window-control-close-button:active .window-control-button-icon {
+    filter: invert(1);
 }

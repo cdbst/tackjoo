@@ -165,6 +165,27 @@ function register(win){
     ipcMain.on('exit-program', (event, data) =>{
         app.exit();
     });
+
+    ipcMain.on('minimize-program', (event, data) =>{
+        app.main_browser_window.minimize();
+    });
+
+    ipcMain.on('maximize-program', (event, data) =>{
+        app.main_browser_window.maximize();
+    });
+
+    ipcMain.on('restore-maximize-program', (event, data) =>{
+        app.main_browser_window.unmaximize();
+    });
+
+    ipcMain.on('set-ignore-mouse-events', (event, data) =>{
+        const setting = data.payload.setting;
+        if(setting){
+            app.main_browser_window.setIgnoreMouseEvents(true, {forward : true});
+        }else{
+            app.main_browser_window.setIgnoreMouseEvents(false);
+        }
+    });
 }
 
 module.exports.register = register;

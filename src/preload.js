@@ -54,7 +54,13 @@ contextBridge.exposeInMainWorld('electron', {
     readTermFileData : _readTermFileData,
     updateViewTermSetting : _updateViewTermSetting,
     getViewTermSetting : _getViewTermSetting,
-    exitProgram : _exitProgram
+    exitProgram : _exitProgram,
+    minimizeProgram : _minimizeProgram,
+    maximizeProgram : _maximizeProgram,
+    restoreSizeProgram : _restoreSizeProgram,
+    setIgnoreMouseEvents : _setIgnoreMouseEvents,
+    subscribeMaximizedEvent : _subscribeMaximizedEvent,
+    unsubscribeMaximizedEvent : _unsubscribeMaximizedEvent,
 });
 
 /**
@@ -627,4 +633,47 @@ function _exitProgram(){
     let ipc_data = get_ipc_data();
     
     ipcRenderer.send('exit-program', ipc_data);
+}
+
+function _minimizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('minimize-program', ipc_data);
+}
+
+function _maximizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('maximize-program', ipc_data);
+}
+
+function _restoreSizeProgram(){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('restore-maximize-program', ipc_data);
+}
+
+function _setIgnoreMouseEvents(setting){
+    const ipc_data = get_ipc_data({
+        setting : setting
+    });
+    
+    ipcRenderer.send('set-ignore-mouse-events', ipc_data);
+}
+
+
+const maximized_event_subscriber = {};
+
+ipcRenderer.on('on-maximized-event', (event, setting) => {
+    for(const evt_cb of Object.values(maximized_event_subscriber)){
+        evt_cb(setting);
+    }
+});
+
+function _subscribeMaximizedEvent(subscriber_id, event_cb){
+    maximized_event_subscriber[subscriber_id] = event_cb;
+}
+
+function _unsubscribeMaximizedEvent(subscriber_id){
+    if(subscriber_id in maximized_event_subscriber) delete maximized_event_subscriber[subscriber_id];
 }

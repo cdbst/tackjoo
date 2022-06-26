@@ -126,41 +126,43 @@ class ContentsSignIn extends React.Component {
 
     render() {
         return (
-            <div className="text-center form-signin d-flex flex-column min-vh-100 justify-content-center align-items-center">
-                <div className="col-md-12">
-                    <h1 className="h3 mb-3 contents-title">TACKJOO</h1>
-                    <br/>
-                    <div className="form-floating">
-                        <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" />
-                        <label className="common-input-label" htmlFor={this.INPUT_EMAIL_ID}>이메일 주소</label>
+            <div>
+                <CommonTitleBar />
+                <div className="text-center form-signin d-flex flex-column min-vh-100 justify-content-center align-items-center">
+                    <div className="col-md-12">
+                        <h1 className="h3 mb-3 contents-title">TACKJOO</h1>
+                        <br/>
+                        <div className="form-floating">
+                            <input type="email" className="form-control" id={this.INPUT_EMAIL_ID} style={{"--width" : "100%"}} placeholder="name@example.com" />
+                            <label className="common-input-label" htmlFor={this.INPUT_EMAIL_ID}>이메일 주소</label>
+                        </div>
+                        <div className="form-floating">
+                            <input type="password" className="form-control" id={this.INPUT_PWD_ID} style={{"--width" : "100%"}} placeholder="비밀번호" onKeyDown={this.onKeyDownInputPwd.bind(this)}/>
+                            <label className="common-input-label" htmlFor={this.INPUT_PWD_ID}>비밀번호</label>
+                        </div>
+                        <br/>
+                        <div className="form-switch mb-3">
+                            <input id={this.INPUT_REMEMBER_INFO_ID} type="checkbox" className="form-check-input" style={{marginRight: '5px'}} onChange={this.onChangeInputRemember.bind(this)}/>
+                            <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
+                        </div>
+                        <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
+                        <div className="mt-3">
+                            <a href="#" className="text-info" onClick={this.onClickFindPassword.bind(this)}>비밀번호 변경/찾기</a>
+                        </div>
+                        <div className="mt-3">
+                            <a href="#" className="text-info" onClick={this.viewTerm.bind(this)}>이용약관 보기</a>
+                        </div>
+                        <div className="mt-5 text-muted">Discord 문의👉 Takc#8171</div>
+                        <div className="text-muted">{`version v${this.app_version}`}</div>
+                        <div className="text-muted">&copy; ShoeSTech 2021-2022</div>
                     </div>
-                    <div className="form-floating">
-                        <input type="password" className="form-control" id={this.INPUT_PWD_ID} style={{"--width" : "100%"}} placeholder="비밀번호" onKeyDown={this.onKeyDownInputPwd.bind(this)}/>
-                        <label className="common-input-label" htmlFor={this.INPUT_PWD_ID}>비밀번호</label>
-                    </div>
-                    <br/>
-                    <div className="form-switch mb-3">
-                        <input id={this.INPUT_REMEMBER_INFO_ID} type="checkbox" className="form-check-input" style={{marginRight: '5px'}} onChange={this.onChangeInputRemember.bind(this)}/>
-                        <label htmlFor={this.INPUT_REMEMBER_INFO_ID} className="form-check-label">로그인정보 저장하기</label>
-                    </div>
-                    <button className="w-100 btn btn-lg btn-primary" type="submit" id={this.SIGNIN_BTN_ID} onClick={this.onSubmitUserInfo.bind(this)}>로그인</button>
-                    <div className="mt-3">
-                        <a href="#" className="text-info" onClick={this.onClickFindPassword.bind(this)}>비밀번호 변경/찾기</a>
-                    </div>
-                    <div className="mt-3">
-                        <a href="#" className="text-info" onClick={this.viewTerm.bind(this)}>이용약관 보기</a>
-                    </div>
-                    <div className="mt-5 text-muted">Discord 문의👉 Takc#8171</div>
-                    <div className="text-muted">{`version v${this.app_version}`}</div>
-                    <div className="text-muted">&copy; ShoeSTech 2021-2022</div>
-                </div>
-                <div className="row signin-footer">
-                    <div className="col-md-12 bd-highlight align-items-center text-center">
-                        <p className="text-center">&copy; 슈스텍(ShoeSTech) (사업자등록번호 : 160-13-01747)</p>
+                    <div className="row signin-footer">
+                        <div className="col-md-12 bd-highlight align-items-center text-center">
+                            <p className="text-center">&copy; 슈스텍(ShoeSTech) (사업자등록번호 : 160-13-01747)</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
         );
     }
 }
