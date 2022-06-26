@@ -467,6 +467,6 @@ tbody tr:hover td {
 .window-control-close-button:active {
     background: #F1707A !important;
 }
-.window-control-close-button:active .icon {
+.window-control-close-button:active .window-control-button-icon {
     filter: invert(1);
 }
