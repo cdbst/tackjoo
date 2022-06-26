@@ -185,8 +185,6 @@ function register(win){
         }else{
             app.main_browser_window.setIgnoreMouseEvents(false);
         }
-        
-        //app.main_browser_window.unmaximize();
     });
 }
 
