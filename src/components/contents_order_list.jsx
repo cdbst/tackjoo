@@ -197,7 +197,7 @@ class ContentsOrderList extends React.Component {
     render() {
 
         return (
-            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.CHECKOUTS}>
+            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ORDER_LIST}>
                 <div className="container-fluid">
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>

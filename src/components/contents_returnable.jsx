@@ -11,6 +11,7 @@ class ContentsReturnable extends React.Component {
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
         this.onSuccessReturn = this.onSuccessReturn.bind(this);
+        this.onSelectChanged = this.onSelectChanged.bind(this);
 
         this.returnable_info_list = [];
 
@@ -19,13 +20,11 @@ class ContentsReturnable extends React.Component {
            opt_list_product_name : [],
            opt_list_account_email : [],
            opt_list_order_date : [],
-           opt_list_order_status : [],
         };
 
         this.__ref_sel_product_name = React.createRef();
         this.__ref_sel_account_name = React.createRef();
         this.__ref_sel_order_date = React.createRef();
-        this.__ref_sel_order_status = React.createRef();
         this.__ref_load_btn = React.createRef();
 
         this.__mount = false;
@@ -98,12 +97,10 @@ class ContentsReturnable extends React.Component {
             opt_list_product_name : product_name_list,
             opt_list_account_email : account_email_list,
             opt_list_order_date : order_date_list,
-            opt_list_order_status : order_status_list,
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
             this.__ref_sel_order_date.current.setValue('');
-            this.__ref_sel_order_status.current.setValue('');
         });
     }
 
@@ -123,12 +120,10 @@ class ContentsReturnable extends React.Component {
             opt_list_product_name : [],
             opt_list_account_email : [],
             opt_list_order_date : [],
-            opt_list_order_status : [],
         }, () => {
             this.__ref_sel_product_name.current.setValue('');
             this.__ref_sel_account_name.current.setValue('');
             this.__ref_sel_order_date.current.setValue('');
-            this.__ref_sel_order_status.current.setValue('');
             if(__callback)__callback();
         });
     }
@@ -138,13 +133,12 @@ class ContentsReturnable extends React.Component {
         const cur_sel_product_name = this.__ref_sel_product_name.current.getSelectedOptionValue();
         const cur_sel_account_email = this.__ref_sel_account_name.current.getSelectedOptionValue();
         const cur_sel_order_date = this.__ref_sel_order_date.current.getSelectedOptionValue();
-        const cur_sel_order_status = this.__ref_sel_order_status.current.getSelectedOptionValue();
+
 
         const filtered_returnable_info_list = this.returnable_info_list.filter((returnable_info) =>{
             if( (cur_sel_product_name == '' || cur_sel_product_name == returnable_info.name) &&
                 (cur_sel_account_email == '' || cur_sel_account_email == returnable_info.account_email) &&
-                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(returnable_info.date)) &&
-                (cur_sel_order_status == '' || cur_sel_order_status == returnable_info.status)
+                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(returnable_info.date))
             ){
                 return true;
             }else{
@@ -158,7 +152,7 @@ class ContentsReturnable extends React.Component {
     __getTableItems(returnable_info_list){
 
         return returnable_info_list.map((returnable_info) =>
-            <OrderTableItem
+            <ReturnableTableItem
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
                 order_price_col_width = {this.order_price_col_width}
@@ -171,20 +165,28 @@ class ContentsReturnable extends React.Component {
                 select_col_width = {this.select_col_width}
                 returnable_info = {returnable_info}
                 h_on_success_return = {this.onSuccessReturn.bind(this)}
+                h_select_changed = {this.onSelectChanged.bind(this)}
                 key={returnable_info._id}
             />
         );
     }
 
     onSuccessReturn(_returnable_info){
-
         //TODO Do something about updating informations.
+    }
+
+    onSelectChanged(returnable_id, status){
+        console.log(`${returnable_id} : ${status}`);
     }
 
     render() {
 
+        const test_returnable_info = {
+            _id : 'asdfasdfadsfas',
+        }
+
         return (
-            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.CHECKOUTS}>
+            <div className="tab-pane fade" id="returnable" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.RETURNABLE}>
                 <div className="container-fluid">
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
@@ -211,14 +213,29 @@ class ContentsReturnable extends React.Component {
                                 <th scope="col" style={{width : this.product_model_id_col_width, maxWidth : this.product_model_id_col_width}}>모델</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.order_price_col_width, maxWidth : this.order_price_col_width}}>주문금액</th>
-                                <th scope="col" style={{width : this.order_number_col_width, maxWidth : this.order_number_col_width}}>주문금액</th>
+                                <th scope="col" style={{width : this.order_number_col_width, maxWidth : this.order_number_col_width}}>주문번호</th>
                                 <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>구매일시</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                                 <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.returnable_table_item_list}
+                            <ReturnableTableItem
+                                account_col_width = {this.account_col_width}
+                                product_size_col_width = {this.product_size_col_width}
+                                order_price_col_width = {this.order_price_col_width}
+                                order_number_col_width = {this.order_number_col_width}
+                                order_date_col_width = {this.order_date_col_width}
+                                actions_col_width = {this.actions_col_width}
+                                product_name_col_width = {this.product_name_col_width}
+                                product_img_col_width = {this.product_img_col_width}
+                                product_model_id_col_width = {this.product_model_id_col_width}
+                                select_col_width = {this.select_col_width}
+                                returnable_info = {test_returnable_info}
+                                h_on_success_return = {this.onSuccessReturn.bind(this)}
+                                h_select_changed = {this.onSelectChanged.bind(this)}
+                                key={test_returnable_info._id}
+                            />
                         </tbody>
                     </table>
                     </div>

@@ -11,7 +11,7 @@ class MenuBar extends React.Component {
         THEDRAW : "thedraw-tab",
         NEW_PRODUCT : 'new-product-tab',
         ORDER_LIST : 'order-list-tab',
-        RETURNABLE : 'returnable-tabl'
+        RETURNABLE : 'returnable-tab'
     }
 
     constructor(props) {
