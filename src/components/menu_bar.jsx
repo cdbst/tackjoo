@@ -10,7 +10,8 @@ class MenuBar extends React.Component {
         SETTINGS : "settings-tab",
         THEDRAW : "thedraw-tab",
         NEW_PRODUCT : 'new-product-tab',
-        ORDER_LIST : 'order-list-tab'
+        ORDER_LIST : 'order-list-tab',
+        RETURNABLE : 'returnable-tabl'
     }
 
     constructor(props) {
@@ -97,6 +98,9 @@ class MenuBar extends React.Component {
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.ORDER_LIST} data-bs-toggle="tab" href="#order-list" role="tab" aria-controls="order-list" aria-selected="false">주문내역</a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a className="nav-link" id={MenuBar.MENU_ID.RETURNABLE} data-bs-toggle="tab" href="#returnable" role="tab" aria-controls="returnable" aria-selected="false">반품신청</a>
                     </li>
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.PROXIES} data-bs-toggle="tab" href="#proxies" role="tab" aria-controls="proxies" aria-selected="false">프록시</a>
