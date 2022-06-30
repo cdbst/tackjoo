@@ -69,7 +69,25 @@ class ContentsReturnable extends React.Component {
 
     onClickLoad(){
 
-        console.log('onClickLoad');
+        this.__ref_load_btn.current.setLoadingStatus(true);
+
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 반품 가능 상품들을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+        window.electron.loadReturnableInfoList((err, returnable_info_list) =>{
+
+            this.__ref_load_btn.current.setLoadingStatus(false);
+
+            if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
+            if(returnable_info_list.length == 0) return;
+            Index.g_sys_msg_q.enqueue('안내', '반품 가능 상품들을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+            this.returnable_info_list = returnable_info_list;
+            
+            this.clearContents(()=>{
+                this.setFilters(this.returnable_info_list);
+                this.setContents(this.returnable_info_list);
+            });
+        });
     }
 
     setFilters(returnable_info_list){

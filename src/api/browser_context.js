@@ -73,6 +73,8 @@ class BrowserContext {
 
         this.update_settings = this.update_settings.bind(this);
         this.update_account_info = this.update_account_info.bind(this);
+
+        this.open_returnable_page = this.open_returnable_page.bind(this);
         
         if(args.length === 4 || args.length == 0){
             this.__init.apply(null, args); // email, pwd, id, locked
@@ -1625,6 +1627,35 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'check_draw_result', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async open_returnable_page(__retry_cnt = undefined){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable?pageSize=60', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_returnable_page : response ' + res.status);
+                }
+
+                //require('fs').writeFileSync(`./${new Date().getTime()}.html`, res.data);
+    
+                const $ = cheerio.load(res.data);
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_returnable_page', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

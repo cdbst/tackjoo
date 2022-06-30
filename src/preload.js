@@ -61,6 +61,7 @@ contextBridge.exposeInMainWorld('electron', {
     setIgnoreMouseEvents : _setIgnoreMouseEvents,
     subscribeMaximizedEvent : _subscribeMaximizedEvent,
     unsubscribeMaximizedEvent : _unsubscribeMaximizedEvent,
+    loadReturnableInfoList : _loadReturnableInfoList
 });
 
 /**
@@ -676,4 +677,13 @@ function _subscribeMaximizedEvent(subscriber_id, event_cb){
 
 function _unsubscribeMaximizedEvent(subscriber_id){
     if(subscriber_id in maximized_event_subscriber) delete maximized_event_subscriber[subscriber_id];
+}
+
+function _loadReturnableInfoList(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-returnable-list', ipc_data);
+
+    ipcRenderer.once('load-returnable-list-reply' + ipc_data.id, (_event, returnable_info_list_info) => {
+        __callback(returnable_info_list_info.err, returnable_info_list_info.data);
+    });
 }
