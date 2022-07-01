@@ -15,6 +15,7 @@ class ContentsReturnable extends React.Component {
         this.onSuccessReturn = this.onSuccessReturn.bind(this);
         this.onSelectChanged = this.onSelectChanged.bind(this);
         this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
+        this.setSelectAllSwitch = this.setSelectAllSwitch.bind(this);
 
         this.pushSelectedReturnableInfoList = this.pushSelectedReturnableInfoList.bind(this);
         this.popSelectedReturnableInfoList = this.popSelectedReturnableInfoList.bind(this);
@@ -155,7 +156,8 @@ class ContentsReturnable extends React.Component {
 
     onChangeOption(){
         
-        //TOTO 상황에 따라서, 선택된 항목을 초기화 하는 작업이 들어가야 할 수 있음.
+        //현재 선택된 모든 항목들을 선택하지 않은 상태로 변경시킨다.
+        this.setSelectAllSwitch(false);
         
         const cur_sel_product_name = this.__ref_sel_product_name.current.getSelectedOptionValue();
         const cur_sel_account_email = this.__ref_sel_account_name.current.getSelectedOptionValue();
@@ -212,7 +214,7 @@ class ContentsReturnable extends React.Component {
     }
 
     onSelectChanged(returnable_info_id, status){
-        console.log(`${returnable_info_id} : ${status}`);
+        
         if(status) this.pushSelectedReturnableInfoList(returnable_info_id);
         else this.popSelectedReturnableInfoList(returnable_info_id);
 
@@ -225,11 +227,16 @@ class ContentsReturnable extends React.Component {
     }
 
     onChangeSelectAll(){
-
         const is_selected = document.getElementById(this.el_input_select_all).checked;
-
         for(var i = 0; i < this.state.returnable_table_item_list.length; i++){
             this.state.returnable_table_item_list[i].ref.current.setSelectStatus(is_selected);
+        }
+    }
+
+    setSelectAllSwitch(value){
+        document.getElementById(this.el_input_select_all).checked = value;
+        for(var i = 0; i < this.state.returnable_table_item_list.length; i++){
+            this.state.returnable_table_item_list[i].ref.current.setSelectStatus(value);
         }
     }
 
