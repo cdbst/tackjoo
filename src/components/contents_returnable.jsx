@@ -34,13 +34,14 @@ class ContentsReturnable extends React.Component {
     __setupColumnsWidth(){
 
         this.account_col_width = 240;
-        this.product_size_col_width = 120;
-        this.order_price_col_width = 180;
+        this.product_size_col_width = 100;
+        this.order_price_col_width = 140;
         this.order_date_col_width = 120;
-        this.actions_col_width = 240;
+        this.actions_col_width = 180;
         this.product_img_col_width = 70;
         this.product_model_id_col_width = 120;
         this.order_number_col_width = 200;
+        this.returnable_quantity_col_width = 60;
         this.select_col_width = 60;
 
         this.product_name_col_width = 'calc( 100% - ' + (
@@ -52,6 +53,7 @@ class ContentsReturnable extends React.Component {
             this.product_size_col_width + 
             this.order_price_col_width + 
             this.order_number_col_width +
+            this.returnable_quantity_col_width + 
             this.select_col_width) + 'px)';
     }
 
@@ -92,13 +94,13 @@ class ContentsReturnable extends React.Component {
 
     setFilters(returnable_info_list){
 
-        let product_name_list = common.getValuesFromObjList(returnable_info_list, 'name');
+        let product_name_list = common.getValuesFromObjList(returnable_info_list, 'product_name');
         product_name_list.unshift('');
 
         let account_email_list = common.getValuesFromObjList(returnable_info_list, 'account_email');
         account_email_list.unshift('');
 
-        let order_date_list = common.getValuesFromObjList(returnable_info_list, 'date');
+        let order_date_list = common.getValuesFromObjList(returnable_info_list, 'order_date');
         order_date_list.sort((a, b)=>{ 
             if(a > b) return -1;
             else if(a < b) return 1;
@@ -107,9 +109,6 @@ class ContentsReturnable extends React.Component {
         order_date_list = order_date_list.map((date)=> common.get_formatted_date_str(date));
         order_date_list = [...new Set(order_date_list)];
         order_date_list.unshift('');
-
-        let order_status_list = common.getValuesFromObjList(returnable_info_list, 'status');
-        order_status_list.unshift('');
 
         this.setState({
             opt_list_product_name : product_name_list,
@@ -148,15 +147,16 @@ class ContentsReturnable extends React.Component {
 
     onChangeOption(){
         
+        //TOTO 상황에 따라서, 선택된 항목을 초기화 하는 작업이 들어가야 할 수 있음.
+        
         const cur_sel_product_name = this.__ref_sel_product_name.current.getSelectedOptionValue();
         const cur_sel_account_email = this.__ref_sel_account_name.current.getSelectedOptionValue();
         const cur_sel_order_date = this.__ref_sel_order_date.current.getSelectedOptionValue();
 
-
         const filtered_returnable_info_list = this.returnable_info_list.filter((returnable_info) =>{
-            if( (cur_sel_product_name == '' || cur_sel_product_name == returnable_info.name) &&
+            if( (cur_sel_product_name == '' || cur_sel_product_name == returnable_info.product_name) &&
                 (cur_sel_account_email == '' || cur_sel_account_email == returnable_info.account_email) &&
-                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(returnable_info.date))
+                (cur_sel_order_date == '' || cur_sel_order_date == common.get_formatted_date_str(returnable_info.order_date))
             ){
                 return true;
             }else{
@@ -182,6 +182,7 @@ class ContentsReturnable extends React.Component {
                 product_model_id_col_width = {this.product_model_id_col_width}
                 select_col_width = {this.select_col_width}
                 returnable_info = {returnable_info}
+                returnable_quantity_col_width = {this.returnable_quantity_col_width}
                 h_on_success_return = {this.onSuccessReturn.bind(this)}
                 h_select_changed = {this.onSelectChanged.bind(this)}
                 key={returnable_info._id}
@@ -199,10 +200,6 @@ class ContentsReturnable extends React.Component {
 
     render() {
 
-        const test_returnable_info = {
-            _id : 'asdfasdfadsfas',
-        }
-
         return (
             <div className="tab-pane fade" id="returnable" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.RETURNABLE}>
                 <div className="container-fluid">
@@ -218,7 +215,7 @@ class ContentsReturnable extends React.Component {
                             <LabelSelect ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <LabelSelect ref={this.__ref_sel_order_date} label="구매일시" options={this.state.opt_list_order_date} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_order_date} label="주문일시" options={this.state.opt_list_order_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                     </div>
                     <div className="table-wrapper">
@@ -232,7 +229,8 @@ class ContentsReturnable extends React.Component {
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.order_price_col_width, maxWidth : this.order_price_col_width}}>주문금액</th>
                                 <th scope="col" style={{width : this.order_number_col_width, maxWidth : this.order_number_col_width}}>주문번호</th>
-                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>구매일시</th>
+                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>주문일시</th>
+                                <th scope="col" style={{width : this.returnable_quantity_col_width, maxWidth : this.returnable_quantity_col_width}}>수량</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                                 <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}></th>
                             </tr>

@@ -274,7 +274,7 @@
             product_option : undefined,
             order_price : undefined,
             order_number : undefined,
-            order_id : undefined, // <input type="hidden" name="orderId" value="78955578" />
+            order_id : undefined,
             order_item_id : undefined,
             returnable_quantity : undefined,
             order_date : undefined,
