@@ -4,7 +4,7 @@ class ReturnableTableItem extends React.Component {
         super(props);
 
         this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
-        // this.onClickCancelOrder = this.onClickCancelOrder.bind(this);
+        this.onClickProductReturn = this.onClickProductReturn.bind(this);
         this.saveTableItemText = this.saveTableItemText.bind(this);
         this.onChangeSelect = this.onChangeSelect.bind(this);
         this.setSelectStatus = this.setSelectStatus.bind(this);
@@ -24,6 +24,10 @@ class ReturnableTableItem extends React.Component {
 
     componentWillUnmount(){
         this.__mount = false;
+    }
+
+    onClickProductReturn(){
+        this.props.h_on_request_return([this.props.returnable_info]);
     }
 
     onClickKreamLinkBtn(){
@@ -122,7 +126,9 @@ class ReturnableTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="반품 신청">
-
+                            <button type="button" className="btn btn-danger" onClick={this.onClickProductReturn.bind(this)}>
+                                <img src="./res/img/product-return.png" style={{width:24, height:24}}/>
+                            </button>
                         </div>
                     </div>
                 </td>

@@ -12,7 +12,7 @@ class ContentsReturnable extends React.Component {
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
-        this.onSuccessReturn = this.onSuccessReturn.bind(this);
+        this.onRequestReturn = this.onRequestReturn.bind(this);
         this.onSelectChanged = this.onSelectChanged.bind(this);
         this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
         this.setSelectAllSwitch = this.setSelectAllSwitch.bind(this);
@@ -194,15 +194,16 @@ class ContentsReturnable extends React.Component {
                 select_col_width = {this.select_col_width}
                 returnable_info = {returnable_info}
                 returnable_quantity_col_width = {this.returnable_quantity_col_width}
-                h_on_success_return = {this.onSuccessReturn.bind(this)}
+                h_on_request_return = {this.onRequestReturn.bind(this)}
                 h_select_changed = {this.onSelectChanged.bind(this)}
                 key={returnable_info._id}
             />
         );
     }
 
-    onSuccessReturn(returnable_info){
-        
+    onRequestReturn(returnable_info_list){
+        console.log(returnable_info_list);
+        //TODO 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
     }
 
     pushSelectedReturnableInfoList(returnable_info_id){
