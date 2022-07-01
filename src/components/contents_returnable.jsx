@@ -7,12 +7,13 @@ class ContentsReturnable extends React.Component {
 
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickClenup = this.onClickClenup.bind(this);
+        this.onClickSelectedReturn = this.onClickSelectedReturn.bind(this);
         this.onClickLoad = this.onClickLoad.bind(this);
         this.onChangeOption = this.onChangeOption.bind(this);
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
-        this.onRequestReturn = this.onRequestReturn.bind(this);
+        this.requestReturn = this.requestReturn.bind(this);
         this.onSelectChanged = this.onSelectChanged.bind(this);
         this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
         this.setSelectAllSwitch = this.setSelectAllSwitch.bind(this);
@@ -78,6 +79,12 @@ class ContentsReturnable extends React.Component {
         this.clearContents();
     }
 
+    onClickSelectedReturn(){
+        if(this.__selected_returnable_info_id.length === 0) return;
+        const selected_returnable_info_list = this.returnable_info_list.filter((returnable_info)=> this.__selected_returnable_info_id.includes(returnable_info._id));
+        this.requestReturn(selected_returnable_info_list);
+    }
+
     onClickLoad(){
 
         this.__ref_load_btn.current.setLoadingStatus(true);
@@ -140,6 +147,9 @@ class ContentsReturnable extends React.Component {
     }
 
     clearContents(__callback){
+
+        this.__selected_returnable_info_id = [];
+        document.getElementById(this.el_input_select_all).checked = false;
         
         this.setState({
             returnable_table_item_list : [],
@@ -194,14 +204,14 @@ class ContentsReturnable extends React.Component {
                 select_col_width = {this.select_col_width}
                 returnable_info = {returnable_info}
                 returnable_quantity_col_width = {this.returnable_quantity_col_width}
-                h_on_request_return = {this.onRequestReturn.bind(this)}
+                h_on_request_return = {this.requestReturn.bind(this)}
                 h_select_changed = {this.onSelectChanged.bind(this)}
                 key={returnable_info._id}
             />
         );
     }
 
-    onRequestReturn(returnable_info_list){
+    requestReturn(returnable_info_list){
         console.log(returnable_info_list);
         //TODO 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
     }
@@ -304,6 +314,9 @@ class ContentsReturnable extends React.Component {
                             />
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
+                            </button>
+                            <button type="button" className="btn btn-light btn-footer-inside" onClick={this.onClickSelectedReturn.bind(this)}>
+                                <img src="./res/img/product-return.png" style={{width:24, height:24}}/> 선택반품
                             </button>
                         </div>
                     </div>

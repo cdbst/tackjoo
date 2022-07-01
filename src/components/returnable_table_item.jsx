@@ -126,7 +126,7 @@ class ReturnableTableItem extends React.Component {
                             </button>
                         </div>
                         <div className="float-start button-wrapper-inner-table" title="반품 신청">
-                            <button type="button" className="btn btn-danger" onClick={this.onClickProductReturn.bind(this)}>
+                            <button type="button" className="btn btn-light" onClick={this.onClickProductReturn.bind(this)}>
                                 <img src="./res/img/product-return.png" style={{width:24, height:24}}/>
                             </button>
                         </div>

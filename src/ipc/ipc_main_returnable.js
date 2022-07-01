@@ -46,6 +46,8 @@ async function get_returnable_info_list(browser_context){
     if(browser_context.is_session_expired()){
         const result = await browser_context.login(5);
         if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+    }else{
+        await browser_context.open_main_page(1); // 바로 returnable page에 접근시, 연속된 접근 상황에서는 유효한 응답을 받을수 없어서 호출함.
     }
     
     const returnable_info_list = await browser_context.open_returnable_page(2);
