@@ -3,14 +3,12 @@ class ReturnableTableItem extends React.Component {
     constructor(props) {
         super(props);
 
-        // this.onClickGoLinkBtn = this.onClickGoLinkBtn.bind(this);
         this.onClickKreamLinkBtn = this.onClickKreamLinkBtn.bind(this);
         // this.onClickCancelOrder = this.onClickCancelOrder.bind(this);
         this.saveTableItemText = this.saveTableItemText.bind(this);
         this.onChangeSelect = this.onChangeSelect.bind(this);
         this.setSelectStatus = this.setSelectStatus.bind(this);
 
-        this.__ref_cancel_order_btn = React.createRef();
         this.state = {
             selected : false
         };
@@ -48,13 +46,13 @@ class ReturnableTableItem extends React.Component {
 
     onChangeSelect(){
         const is_selected = document.getElementById(this.el_input_select).checked;
-        this.setState({ selected: is_selected});
+        this.setState({ selected: is_selected });
         this.props.h_select_changed(this.props.returnable_info._id, is_selected);
     }
 
     setSelectStatus(value){
         document.getElementById(this.el_input_select).checked = value;
-        this.setState({ selected: value});
+        this.setState({ selected: value });
         this.props.h_select_changed(this.props.returnable_info._id, value);
     }
 

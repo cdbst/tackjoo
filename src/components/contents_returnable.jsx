@@ -1,5 +1,7 @@
 class ContentsReturnable extends React.Component {
 
+    el_input_select_all = 'input-select-returnable-all';
+
     constructor(props) {
         super(props);
 
@@ -12,8 +14,14 @@ class ContentsReturnable extends React.Component {
         this.setFilters = this.setFilters.bind(this);
         this.onSuccessReturn = this.onSuccessReturn.bind(this);
         this.onSelectChanged = this.onSelectChanged.bind(this);
+        this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
+
+        this.pushSelectedReturnableInfoList = this.pushSelectedReturnableInfoList.bind(this);
+        this.popSelectedReturnableInfoList = this.popSelectedReturnableInfoList.bind(this);
+        this.updateSelectAllInput = this.updateSelectAllInput.bind(this);
 
         this.returnable_info_list = [];
+        this.__selected_returnable_info_id = [];
 
         this.state = {
            returnable_table_item_list : [],
@@ -171,6 +179,7 @@ class ContentsReturnable extends React.Component {
 
         return returnable_info_list.map((returnable_info) =>
             <ReturnableTableItem
+                ref = {React.createRef()}
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
                 order_price_col_width = {this.order_price_col_width}
@@ -190,12 +199,38 @@ class ContentsReturnable extends React.Component {
         );
     }
 
-    onSuccessReturn(_returnable_info){
-        //TODO Do something about updating informations.
+    onSuccessReturn(returnable_info){
+        
     }
 
-    onSelectChanged(returnable_id, status){
-        console.log(`${returnable_id} : ${status}`);
+    pushSelectedReturnableInfoList(returnable_info_id){
+        if(this.__selected_returnable_info_id.includes(returnable_info_id) === false) this.__selected_returnable_info_id.push(returnable_info_id);
+    }
+
+    popSelectedReturnableInfoList(returnable_info_id){
+        this.__selected_returnable_info_id = this.__selected_returnable_info_id.filter((_returnable_info_id) => _returnable_info_id !== returnable_info_id);
+    }
+
+    onSelectChanged(returnable_info_id, status){
+        console.log(`${returnable_info_id} : ${status}`);
+        if(status) this.pushSelectedReturnableInfoList(returnable_info_id);
+        else this.popSelectedReturnableInfoList(returnable_info_id);
+
+        this.updateSelectAllInput();
+    }
+
+    updateSelectAllInput(){
+        const num_of_returnable = this.state.returnable_table_item_list.length;
+        document.getElementById(this.el_input_select_all).checked = num_of_returnable === this.__selected_returnable_info_id.length;
+    }
+
+    onChangeSelectAll(){
+
+        const is_selected = document.getElementById(this.el_input_select_all).checked;
+
+        for(var i = 0; i < this.state.returnable_table_item_list.length; i++){
+            this.state.returnable_table_item_list[i].ref.current.setSelectStatus(is_selected);
+        }
     }
 
     render() {
@@ -206,7 +241,7 @@ class ContentsReturnable extends React.Component {
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
                         <div className="col-md-2">
-                            <h4 className="contents-title">반품 신청</h4>
+                            <h4 className="contents-title">반품신청</h4>
                         </div>
                         <div className="col-md-3">
                             <LabelSelect ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
@@ -232,7 +267,17 @@ class ContentsReturnable extends React.Component {
                                 <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>주문일시</th>
                                 <th scope="col" style={{width : this.returnable_quantity_col_width, maxWidth : this.returnable_quantity_col_width}}>수량</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
-                                <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}></th>
+                                <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}>
+                                    <div className="form-switch">
+                                        <input 
+                                            id={this.el_input_select_all} 
+                                            type="checkbox" 
+                                            className="form-check-input" 
+                                            onChange={this.onChangeSelectAll.bind(this)}
+                                            disabled={this.returnable_info_list.length === 0}    
+                                        />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
