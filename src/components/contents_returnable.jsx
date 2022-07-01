@@ -238,22 +238,7 @@ class ContentsReturnable extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            <ReturnableTableItem
-                                account_col_width = {this.account_col_width}
-                                product_size_col_width = {this.product_size_col_width}
-                                order_price_col_width = {this.order_price_col_width}
-                                order_number_col_width = {this.order_number_col_width}
-                                order_date_col_width = {this.order_date_col_width}
-                                actions_col_width = {this.actions_col_width}
-                                product_name_col_width = {this.product_name_col_width}
-                                product_img_col_width = {this.product_img_col_width}
-                                product_model_id_col_width = {this.product_model_id_col_width}
-                                select_col_width = {this.select_col_width}
-                                returnable_info = {test_returnable_info}
-                                h_on_success_return = {this.onSuccessReturn.bind(this)}
-                                h_select_changed = {this.onSelectChanged.bind(this)}
-                                key={test_returnable_info._id}
-                            />
+                            {this.state.returnable_table_item_list}
                         </tbody>
                     </table>
                     </div>

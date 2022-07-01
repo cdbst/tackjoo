@@ -5,6 +5,7 @@ const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const thedraw_list_page_parser = require('./thedraw_list_page_parser');
 const { parse_order_list_page } = require('./order_list_page_parser');
+const { get_returnable_info_list_from_product_page } = require('./returnable_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -1649,10 +1650,10 @@ class BrowserContext {
                 if(res.status != 200){
                     throw new Error('open_returnable_page : response ' + res.status);
                 }
-
-                //require('fs').writeFileSync(`./${new Date().getTime()}.html`, res.data);
     
                 const $ = cheerio.load(res.data);
+                const returnable_info_list = get_returnable_info_list_from_product_page($, this.email);
+                return returnable_info_list;
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'open_returnable_page', e));

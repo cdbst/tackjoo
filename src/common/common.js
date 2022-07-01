@@ -265,6 +265,32 @@
         return product_info_obj;
     }
 
+    exports.get_returnable_info_obj_scheme = function(){
+        return {
+            product_name : undefined,
+            account_email : undefined,
+            product_img_url : undefined,
+            product_model_id : undefined,
+            product_option : undefined,
+            order_price : undefined,
+            order_number : undefined,
+            order_id : undefined, // <input type="hidden" name="orderId" value="78955578" />
+            order_item_id : undefined,
+            returnable_quantity : undefined,
+            order_date : undefined,
+            _id : undefined,
+        };
+    };
+
+    exports.update_returnable_info_obj = function(product_info_obj, key, value){
+        if(key in this.get_returnable_info_obj_scheme() == false){
+            throw 'returnable info object is not includes property : ' + key;
+        }
+
+        product_info_obj[key] = value;
+        return product_info_obj;
+    }
+
     exports.getValuesFromObjList = function(obj_list, key, value_refiner = undefined){
         const values = [];
 
