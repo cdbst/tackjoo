@@ -475,3 +475,13 @@ tbody tr:hover td {
 .window-control-close-button:active .window-control-button-icon {
     filter: invert(1);
 }
+
+/** start to returnable request modal */
+
+.modal-floating-input {
+    height: 40px !important;
+}
+
+.modal-floating-label {
+    padding: 0.5rem 0.65rem !important;
+}

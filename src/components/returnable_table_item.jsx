@@ -68,7 +68,7 @@ class ReturnableTableItem extends React.Component {
             <tr>
                 <td style={{width : this.props.product_img_col_width, maxWidth : this.props.product_img_col_width}}>
                     <img 
-                        className="rounded product-table-item-img curser-pointer" 
+                        className="rounded product-table-item-img" 
                         src={this.props.returnable_info.product_img_url} 
                         alt={this.props.returnable_info.product_name}
                     />
