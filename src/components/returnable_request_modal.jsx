@@ -102,7 +102,7 @@ class ReturnableRequestModal extends React.Component {
                             <h5 className="modal-title" id={this.props.id + '-label'}>반품 신청하기</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div className="modal-body" style={{maxHeight: 800, overflowX:'hidden', overflowY:'auto'}}>
+                        <div className="modal-body" style={{maxHeight: 800, height: 800, overflowX:'hidden', overflowY:'auto'}}>
                             <div className="row">
                                 <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">{`반품 신청 항목(${this.state.returnable_item_list.length}개)`}</label>
                             </div>
@@ -127,12 +127,9 @@ class ReturnableRequestModal extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <hr/>
+                            {this.state.use_default_return_addr && <hr/>}
                             {this.state.use_default_return_addr === false &&
                                 <div>
-                                    <div className="row">
-                                        <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">수거 주소 입력</label>
-                                    </div>
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-floating">
@@ -149,10 +146,7 @@ class ReturnableRequestModal extends React.Component {
                                     </div>
                                     <div className="row" style={{marginTop: 4}}>
                                         <div className="col-md-12">
-                                            <div className="input-group">
-                                                <input id="returnable-addr-input" type="text" className="form-control" placeholder="주소" aria-label="주소" aria-describedby="returnable-addr-serach-btn" style={{'--width' : '380px'}}/>
-                                                <button className="btn btn-primary" type="button" id="returnable-addr-serach-btn" >검색</button>
-                                            </div>
+                                            <AddressSearchForm width={380} />
                                         </div>
                                     </div>
                                     <hr />
