@@ -28,6 +28,8 @@ class AddressSearchForm extends React.Component {
         this.getDoroAddr = this.getDoroAddr.bind(this);
         this.getJibeonAddr = this.getJibeonAddr.bind(this);
 
+        this.onKeyUpAddrInput = this.onKeyUpAddrInput.bind(this);
+
         this.search_input_ref = React.createRef();
         this.selected_addr_info = undefined;
         
@@ -35,6 +37,12 @@ class AddressSearchForm extends React.Component {
             search_result_list : [],
             search_result_select_mode : false,
         }
+    }
+
+    onKeyUpAddrInput(e){
+        e.preventDefault();
+        if(e.key !== 'Enter') return;
+        this.onClickSearch();
     }
 
     onClickSearch(){
@@ -103,8 +111,8 @@ class AddressSearchForm extends React.Component {
     render(){
         return(
             <div className="input-group">
-                <input ref={this.search_input_ref} type="text" className="form-control" placeholder="주소 검색" aria-label="주소 검색" style={{'--width' : this.props.width}}/>
-                <button className="btn btn-primary" type="button" onClick={this.onClickSearch.bind(this)}>검색</button>
+                <input ref={this.search_input_ref} type="text" className="form-control" placeholder="주소 검색" aria-label="주소 검색" style={{'--width' : this.props.width}} onKeyUp={this.onKeyUpAddrInput.bind(this)}/>
+                <button className="btn btn-primary" type="button" onClick={this.onClickSearch.bind(this)} >검색</button>
                 <ol className="list-group" style={{...this.style_search_result_group, display: this.state.search_result_select_mode ? 'inline-block' : 'none'}}>
                     {this.state.search_result_list}
                 </ol>
