@@ -38,6 +38,7 @@ class ContentsReturnable extends React.Component {
         this.__ref_sel_account_name = React.createRef();
         this.__ref_sel_order_date = React.createRef();
         this.__ref_load_btn = React.createRef();
+        this.__ref_selected_return_req_btn = React.createRef();
 
         this.__mount = false;
         this.__setupColumnsWidth();
@@ -90,12 +91,14 @@ class ContentsReturnable extends React.Component {
     onClickLoad(){
 
         this.__ref_load_btn.current.setLoadingStatus(true);
+        this.__ref_selected_return_req_btn.current.disabled = true;
 
         Index.g_sys_msg_q.enqueue('안내', '서버로부터 반품 가능 상품들을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.loadReturnableInfoList((err, returnable_info_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
+            this.__ref_selected_return_req_btn.current.disabled = false;
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             if(returnable_info_list.length == 0) return;
@@ -327,7 +330,7 @@ class ContentsReturnable extends React.Component {
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
                             </button>
-                            <button type="button" className="btn btn-light btn-footer-inside" onClick={this.onClickSelectedReturn.bind(this)}>
+                            <button ref={this.__ref_selected_return_req_btn} type="button" className="btn btn-light btn-footer-inside" onClick={this.onClickSelectedReturn.bind(this)}>
                                 <img src="./res/img/product-return.png" style={{width:24, height:24}}/> 선택반품
                             </button>
                         </div>
