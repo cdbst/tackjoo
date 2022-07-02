@@ -29,9 +29,11 @@ class AddressSearchForm extends React.Component {
         this.getJibeonAddr = this.getJibeonAddr.bind(this);
 
         this.search_input_ref = React.createRef();
+        this.selected_addr_info = undefined;
         
         this.state = {
-            search_result_list : []
+            search_result_list : [],
+            search_result_select_mode : false,
         }
     }
 
@@ -52,13 +54,19 @@ class AddressSearchForm extends React.Component {
             }
 
             this.setState({
-                search_result_list : this.getSearchResultList(search_result)
+                search_result_list : this.getSearchResultList(search_result),
+                search_result_select_mode : true,
             });
         });
     }
 
     onClickAddrItem(addr_info){
-        console.log(addr_info);
+        this.selected_addr_info = addr_info;
+        this.search_input_ref.current.value = `(${addr_info.postcode5}) ${this.getDoroAddr(addr_info)}`;
+        this.setState({
+            search_result_list : [],
+            search_result_select_mode : true,
+        });
     }
 
     getSearchResultList(search_result){
@@ -97,7 +105,7 @@ class AddressSearchForm extends React.Component {
             <div className="input-group">
                 <input ref={this.search_input_ref} type="text" className="form-control" placeholder="주소 검색" aria-label="주소 검색" style={{'--width' : this.props.width}}/>
                 <button className="btn btn-primary" type="button" onClick={this.onClickSearch.bind(this)}>검색</button>
-                <ol className="list-group" style={this.style_search_result_group}>
+                <ol className="list-group" style={{...this.style_search_result_group, display: this.state.search_result_select_mode ? 'inline-block' : 'none'}}>
                     {this.state.search_result_list}
                 </ol>
             </div>
