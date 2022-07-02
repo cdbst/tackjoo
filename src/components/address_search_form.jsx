@@ -81,7 +81,7 @@ class AddressSearchForm extends React.Component {
         
         return search_result.map((addr_info)=>{
             return (
-                <li key={new Date().getTime()} className="list-group-item d-flex justify-content-between align-items-start" style={this.style_search_result} onClick={this.onClickAddrItem.bind(this, addr_info)}>
+                <li key={common.uuidv4()} className="list-group-item d-flex justify-content-between align-items-start" style={this.style_search_result} onClick={this.onClickAddrItem.bind(this, addr_info)}>
                     <div className="me-auto" style={{width: '100%'}}>
                         <div className="row">
                             <div className="col-md-12" style={{fontSize: 14}}>{`${addr_info.postcode5} (${addr_info.postcode6})`}</div>

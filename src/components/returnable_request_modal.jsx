@@ -39,7 +39,7 @@ class ReturnableRequestModal extends React.Component {
     }
 
     onModalshown(e){
-        // 모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
+        //TODO: 모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
         const el_modal = document.getElementById(this.props.id);
 
         const el_input_use_default_return_addr = document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR);
@@ -53,7 +53,7 @@ class ReturnableRequestModal extends React.Component {
     }
 
     onModalClosed(e){
-        // 초기화 해야할 내부 컨텐츠 텍스트들을 초기화한다.
+        //TODO: 초기화 해야할 내부 컨텐츠 텍스트들을 초기화한다.
 
         this.setState({ 
             returnable_item_list : [],
