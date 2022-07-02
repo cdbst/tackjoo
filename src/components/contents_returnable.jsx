@@ -215,6 +215,7 @@ class ContentsReturnable extends React.Component {
 
     onSubmitReturnable(returnable_info_list){
         console.log(returnable_info_list);
+        //TODO: 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
     }
 
     requestReturn(returnable_info_list){
@@ -224,8 +225,6 @@ class ContentsReturnable extends React.Component {
 
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
-
-        //TODO 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
     }
 
     pushSelectedReturnableInfoList(returnable_info_id){

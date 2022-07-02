@@ -4,6 +4,10 @@ class ReturnableRequestModal extends React.Component {
     EL_INPUT_USE_DEFAULT_RETURN_ADDR = 'input-use-default-return-addr';
     EL_ID_CUSTOM_ADDR_USER_NAME = 'input-custom-addr-user-name';
     EL_ID_CUSTOM_ADDR_PHONE_NUMBER = 'input-custom-addr-phone-number';
+    EL_ID_CUSTOM_ADDR_DETAIL_ADDR = 'input-custom-addr-detail-addr';
+    EL_ID_RETURN_MEMO = 'input-return-memo';
+    EL_ID_RETURN_REASON = 'input-return-reasion';
+    EL_ID_RETURN_DETAIL_REASON = 'input-return-detail-reasion';
 
     constructor(props) {
         super(props);
@@ -64,6 +68,8 @@ class ReturnableRequestModal extends React.Component {
 
         e.preventDefault();
 
+        //TODO: 입력된 값들의 유효성 검사를 나이키 공식홈페이지 기준의 입력값 검증 방식과 똑같이 수행해야한다.
+
         this.props.h_submit_returnable([]);
 
         let el_modal = document.getElementById(this.props.id);
@@ -102,7 +108,7 @@ class ReturnableRequestModal extends React.Component {
                             <h5 className="modal-title" id={this.props.id + '-label'}>반품 신청하기</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div className="modal-body" style={{maxHeight: 800, height: 800, overflowX:'hidden', overflowY:'auto'}}>
+                        <div className="modal-body" style={{maxHeight: 860, height: 860, overflowX:'hidden', overflowY:'auto'}}>
                             <div className="row">
                                 <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">{`반품 신청 항목(${this.state.returnable_item_list.length}개)`}</label>
                             </div>
@@ -127,7 +133,6 @@ class ReturnableRequestModal extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            {this.state.use_default_return_addr && <hr/>}
                             {this.state.use_default_return_addr === false &&
                                 <div>
                                     <div className="row">
@@ -149,11 +154,43 @@ class ReturnableRequestModal extends React.Component {
                                             <AddressSearchForm width={380} />
                                         </div>
                                     </div>
+                                    <div className="row" style={{marginTop: 4}}>
+                                        <div className="col-md-12">
+                                            <input type="text" className="form-control" placeholder="나머지 주소 입력" id={this.EL_ID_CUSTOM_ADDR_DETAIL_ADDR} style={{'--width' : '468px'}}/>
+                                        </div>
+                                    </div>
                                     <hr />
                                 </div>
                             }
                             <div className="row">
-                                <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">수거 메모 선택</label>
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <input type="text" className="form-control" placeholder="수거 메모 입력" id={this.EL_ID_RETURN_MEMO} style={{'--width' : '468px'}}/>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">반품 사유</label>
+                            </div>
+                            <div className="row" style={{marginTop: 4}}>
+                                <div className="col-md-12">
+                                    <select id={this.EL_ID_RETURN_REASON} className="form-select form-select-down-arrw modal-select">
+                                        <option className="select-option" value="UP_SIZE_CHANGE">사이즈가 큼</option>
+                                        <option className="select-option" value="DOWN_SIZE_CHANGE">사이즈가 작음</option>
+                                        <option className="select-option" value="COLOR_CHANGE">화면과 색상이 상이함</option>
+                                        <option className="select-option" value="DESIGN_CHANGE">화면과 디자인이 상이함</option>
+                                        <option className="select-option" value="NO_PURCHASE_INTENT">단순 변심</option>
+                                        <option className="select-option" value="PRODUCT_FAULT">파손 및 상품 결함</option>
+                                        <option className="select-option" value="PRODUCT_DAMAGE_MISSING">오배송</option>
+                                        <option className="select-option" value="PRODUCT_NOT_ARRIVE">상품 미도착</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row" style={{marginTop: 4}}>
+                                <div className="col-md-12">
+                                    <input type="text" className="form-control" placeholder="반품 상세 사유" id={this.EL_ID_RETURN_DETAIL_REASON} style={{'--width' : '468px'}}/>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
