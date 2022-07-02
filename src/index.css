@@ -239,6 +239,11 @@ tbody tr:hover td {
     border-width: 1px !important;
 }
 
+.moadal-list-group li{
+    background-color: #32353b !important;
+}
+
+
 .btn-inner-modal{
     width: 120px !important;
 }

@@ -1,6 +1,7 @@
 class ContentsReturnable extends React.Component {
 
     el_input_select_all = 'input-select-returnable-all';
+    el_id_returnable_request_modal = 'returnable-request-modal';
 
     constructor(props) {
         super(props);
@@ -17,6 +18,7 @@ class ContentsReturnable extends React.Component {
         this.onSelectChanged = this.onSelectChanged.bind(this);
         this.onChangeSelectAll = this.onChangeSelectAll.bind(this);
         this.setSelectAllSwitch = this.setSelectAllSwitch.bind(this);
+        this.onSubmitReturnable = this.onSubmitReturnable.bind(this);
 
         this.pushSelectedReturnableInfoList = this.pushSelectedReturnableInfoList.bind(this);
         this.popSelectedReturnableInfoList = this.popSelectedReturnableInfoList.bind(this);
@@ -211,8 +213,18 @@ class ContentsReturnable extends React.Component {
         );
     }
 
-    requestReturn(returnable_info_list){
+    onSubmitReturnable(returnable_info_list){
         console.log(returnable_info_list);
+    }
+
+    requestReturn(returnable_info_list){
+
+        const el_modal = document.getElementById(this.el_id_returnable_request_modal);
+        el_modal.returnable_info_list = returnable_info_list;
+
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+
         //TODO 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
     }
 
@@ -256,6 +268,7 @@ class ContentsReturnable extends React.Component {
         return (
             <div className="tab-pane fade" id="returnable" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.RETURNABLE}>
                 <div className="container-fluid">
+                    <ReturnableRequestModal id={this.el_id_returnable_request_modal} h_submit_returnable={this.onSubmitReturnable.bind(this)}/>
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
                         <div className="col-md-2">
