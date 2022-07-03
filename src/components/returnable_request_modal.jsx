@@ -90,25 +90,22 @@ class ReturnableRequestModal extends React.Component {
                 Index.g_sys_msg_q.enqueue('안내', '반품 작업이 종료되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 this.__ref_request_return_btn.current.setLoadingStatus(false);
                 this.__inprogress_submit = false;
+
+                //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
+                // this.props.h_submit_returnable([]);
+
+                // let el_modal = document.getElementById(this.props.id);
+                // var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+                // bs_obj_modal.hide();
                 return;
             }
 
             const returnable_info_id = data.returnable_info_id;
             const result = data.result;
         });
-
-        //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
-        // this.props.h_submit_returnable([]);
-
-        // let el_modal = document.getElementById(this.props.id);
-        // var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        // bs_obj_modal.hide();
-
-        //TODO: this.__inprogress_submit 를 작업 끝나면 초기화 해줘야함.
     }
 
     getReturnableItemList(returnable_info_list){
-        //return returnable_info_list.map((returnable_info) => <li className="list-group-item">{`${returnable_info.account_email} - ${returnable_info.product_name} (${returnable_info.product_option})`}</li>)
 
         return returnable_info_list.map((returnable_info) => {
             return (
