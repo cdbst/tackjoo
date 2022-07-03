@@ -1653,6 +1653,8 @@ class BrowserContext {
                 if(res.status != 200){
                     throw new Error('open_returnable_page : response ' + res.status);
                 }
+
+                this.__set_cookie(this.__cookie_storage, res);
     
                 const $ = cheerio.load(res.data);
                 const returnable_info_list = get_returnable_info_list_from_product_page($, this.email);
@@ -1701,6 +1703,8 @@ class BrowserContext {
                     throw new Error('returnable_request : response ' + res.status);
                 }
 
+                this.__set_cookie(this.__cookie_storage, res);
+
                 const $ = cheerio.load(res.data);
                 const default_return_addr_info = get_user_addr_info_from_request_returnable_modal($);
 
@@ -1708,6 +1712,148 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'returnable_request', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async returnable_calculator(returnable_info, submit_returnable_info, retry_cnt){
+
+        const payload_obj = {
+            orderId: returnable_info.order_id,
+            orderItemId: returnable_info.order_item_id,
+            quantity: 1,
+            addressFirstName: submit_returnable_info.return_addr_info.user_name,
+            addressPhone: submit_returnable_info.return_addr_info.phone_number,
+            addressLine1: submit_returnable_info.return_addr_info.address,
+            addressLine2: submit_returnable_info.return_addr_info.address_detail,
+            addressPostalCode: submit_returnable_info.return_addr_info.postal_code,
+            addressCity: submit_returnable_info.return_addr_info.city,
+            selectPersonalMessage: 'dt_1',
+            personalMessageText: submit_returnable_info.return_memo,
+            owner: '',
+            accountCode: '',
+            accountName: '',
+            account: '',
+            reasonType: submit_returnable_info.return_reason,
+            reason: submit_returnable_info.return_detail_reason,
+            csrfToken: this.csrfToken
+        };
+
+        if(submit_returnable_info.return_addr_info.address_id) payload_obj.addressId = submit_returnable_info.return_addr_info.address_id;
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable/calculator', headers, payload);
+
+                if(res.status !== 200){
+                    throw new Error('returnable_calculator : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return res.data;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'returnable_calculator', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async submit_returnable(returnable_info, submit_returnable_info, retry_cnt){
+
+        const payload_obj = {
+            orderId: returnable_info.order_id,
+            orderItemId: returnable_info.order_item_id,
+            quantity: 1,
+            addressFirstName: submit_returnable_info.return_addr_info.user_name,
+            addressPhone: submit_returnable_info.return_addr_info.phone_number,
+            addressLine1: submit_returnable_info.return_addr_info.address,
+            addressLine2: submit_returnable_info.return_addr_info.address_detail,
+            addressPostalCode: submit_returnable_info.return_addr_info.postal_code,
+            addressCity: submit_returnable_info.return_addr_info.city,
+            selectPersonalMessage: 'dt_1',
+            personalMessageText: submit_returnable_info.return_memo,
+            owner: '',
+            accountCode: '',
+            accountName: '',
+            account: '',
+            reasonType: submit_returnable_info.return_reason,
+            reason: submit_returnable_info.return_detail_reason,
+            csrfToken: this.csrfToken
+        };
+
+        if(submit_returnable_info.return_addr_info.address_id) payload_obj.addressId = submit_returnable_info.return_addr_info.address_id;
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable', headers, payload);
+
+                if(res.status !== 200){
+                    throw new Error('submit_returnable : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return res.data;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'submit_returnable', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

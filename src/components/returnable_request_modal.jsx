@@ -148,8 +148,8 @@ class ReturnableRequestModal extends React.Component {
 
         if(use_default_return_addr === false){
 
-            const custom_return_addr_info = common.get_user_addr_info_obj_scheme();
-            common.update_user_addr_info_obj(custom_return_addr_info, '_id', common.uuidv4());
+            const return_addr_info = common.get_user_addr_info_obj_scheme();
+            common.update_user_addr_info_obj(return_addr_info, '_id', common.uuidv4());
 
             const selected_addr_info =  this.__ref_custom_user_addr_form.current.selected_addr_info;
             if(selected_addr_info === undefined){
@@ -162,24 +162,24 @@ class ReturnableRequestModal extends React.Component {
                 Index.g_sys_msg_q.enqueue('에러', '주소 정보가 올바로 입력된 상태가 아닙니다.(우편 번호)', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return undefined;
             }
-            common.update_user_addr_info_obj(custom_return_addr_info, 'postal_code', postal_code);
+            common.update_user_addr_info_obj(return_addr_info, 'postal_code', postal_code);
 
             const city = this.__ref_custom_user_addr_form.current.getCity();
             if(city === undefined){
                 Index.g_sys_msg_q.enqueue('에러', '주소 정보가 올바로 입력된 상태가 아닙니다.(도시명)', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return undefined;
             }
-            common.update_user_addr_info_obj(custom_return_addr_info, 'city', city);
+            common.update_user_addr_info_obj(return_addr_info, 'city', city);
 
             const address = this.__ref_custom_user_addr_form.current.getValue();
-            common.update_user_addr_info_obj(custom_return_addr_info, 'address', address);
+            common.update_user_addr_info_obj(return_addr_info, 'address', address);
 
             const user_name = document.getElementById(this.EL_ID_CUSTOM_ADDR_USER_NAME).value;
             if(user_name.length === 0){
                 Index.g_sys_msg_q.enqueue('에러', '고객명을 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return undefined;
             }
-            common.update_user_addr_info_obj(custom_return_addr_info, 'user_name', user_name);
+            common.update_user_addr_info_obj(return_addr_info, 'user_name', user_name);
 
             const phone_number = document.getElementById(this.EL_ID_CUSTOM_ADDR_PHONE_NUMBER).value;
             if(phone_number.length === 0){
@@ -189,16 +189,16 @@ class ReturnableRequestModal extends React.Component {
                 Index.g_sys_msg_q.enqueue('에러', '전화번호를 잘못입력 했습니다. 숫자로만 입력해야합니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return undefined;
             }
-            common.update_user_addr_info_obj(custom_return_addr_info, 'phone_number', phone_number);
+            common.update_user_addr_info_obj(return_addr_info, 'phone_number', phone_number);
 
             const address_detail = document.getElementById(this.EL_ID_CUSTOM_ADDR_DETAIL_ADDR).value;
             if(address_detail.length === 0){
                 Index.g_sys_msg_q.enqueue('에러', '나머지 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return undefined;
             }
-            common.update_user_addr_info_obj(custom_return_addr_info, 'address_detail', address_detail);
+            common.update_user_addr_info_obj(return_addr_info, 'address_detail', address_detail);
 
-            common.update_submit_returnable_obj(submit_returnable_info, 'custom_return_addr_info', custom_return_addr_info);
+            common.update_submit_returnable_obj(submit_returnable_info, 'return_addr_info', return_addr_info);
         }
 
         const return_memo = document.getElementById(this.EL_ID_RETURN_MEMO).value;

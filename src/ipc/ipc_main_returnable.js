@@ -123,9 +123,32 @@ async function submit_returnable_list(browser_context, returnable_info_list, sub
     }
 
     for(var i = 0; i < returnable_info_list.length; i++){
+
         const returnable_info = returnable_info_list[i];
+        
         const default_return_addr_info = await browser_context.returnable_request(returnable_info, 3);
-        console.log(default_return_addr_info);
+        if(default_return_addr_info === undefined){
+            message_cb(returnable_info._id, false);
+            continue;
+        }
+
+        if(submit_returnable_info.use_default_return_addr){
+            common.update_submit_returnable_obj(submit_returnable_info, 'return_addr_info', default_return_addr_info);
+        }
+        
+        const calculator_result = await browser_context.returnable_calculator(returnable_info, submit_returnable_info, 3);
+        if(calculator_result === undefined || calculator_result.result !== true){
+            message_cb(returnable_info._id, false);
+            continue;
+        }
+
+        const submit_result = await browser_context.submit_returnable(returnable_info, submit_returnable_info, 3);
+        if(submit_result === undefined || submit_result.result !== true){
+            message_cb(returnable_info._id, false);
+            continue;
+        }
+
+        message_cb(returnable_info._id, true);
     }
 
 }

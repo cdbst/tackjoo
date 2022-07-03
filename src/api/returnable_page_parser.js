@@ -63,6 +63,7 @@ module.exports.get_returnable_info_list_from_product_page = ($, account_email) =
             const returnable_quantity = parseInt(el_input_returnable_quantity[0].attribs.value.trim());
             common.update_returnable_info_obj(returnable_info, 'returnable_quantity', returnable_quantity);
 
+            if(returnable_quantity !== 1) return; // 반품 수량이 한 개인 것만 지원한다.
 
             //# parse product_name
             const el_span_product_name = get_specific_tag_nodes(order_info_element, [], ['tit']);
@@ -115,7 +116,7 @@ module.exports.get_user_addr_info_from_request_returnable_modal = ($) => {
         }
         common.update_user_addr_info_obj(user_addr_info, 'address_id', address_id);
 
-        const city = el_return_reason_item.attribs['data-returnaddress-id'];
+        const city = el_return_reason_item.attribs['data-returnaddress-city'];
         if(city === undefined){
             throw new Error('cannot parse city info');
         }

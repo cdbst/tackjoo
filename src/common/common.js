@@ -297,7 +297,7 @@
             return_memo : undefined,
             return_reason : undefined,
             return_detail_reason : undefined,
-            custom_return_addr_info : undefined,
+            return_addr_info : undefined,
             _id : undefined
         };
     }
