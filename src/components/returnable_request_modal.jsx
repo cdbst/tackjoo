@@ -1,6 +1,5 @@
 class ReturnableRequestModal extends React.Component {
 
-    EL_ID_RETURNALBE_ITEM_LIST = 'input-returnable-item-list';
     EL_INPUT_USE_DEFAULT_RETURN_ADDR = 'input-use-default-return-addr';
     EL_ID_CUSTOM_ADDR_USER_NAME = 'input-custom-addr-user-name';
     EL_ID_CUSTOM_ADDR_PHONE_NUMBER = 'input-custom-addr-phone-number';
@@ -18,6 +17,7 @@ class ReturnableRequestModal extends React.Component {
         this.onModalshown = this.onModalshown.bind(this);
         this.getReturnableItemList = this.getReturnableItemList.bind(this);
         this.onChangeUseDefaultReturnAddr = this.onChangeUseDefaultReturnAddr.bind(this);
+        this.cleanupForm = this.cleanupForm.bind(this);
 
         this.state = {
             returnable_item_list : [],
@@ -39,29 +39,22 @@ class ReturnableRequestModal extends React.Component {
     }
 
     onModalshown(e){
-        //TODO: 모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
+        
         const el_modal = document.getElementById(this.props.id);
-
-        const el_input_use_default_return_addr = document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR);
-        el_input_use_default_return_addr.checked = true;
 
         const _returnable_item_list = this.getReturnableItemList(el_modal.returnable_info_list);
         this.setState({ 
             returnable_item_list : _returnable_item_list,
             use_default_return_addr : true
+        }, ()=>{
+            document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked = true;
+            //모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
+            document.getElementById(this.EL_ID_RETURN_MEMO).focus();
         });
     }
 
     onModalClosed(e){
-        //TODO: 초기화 해야할 내부 컨텐츠 텍스트들을 초기화한다.
-
-        this.setState({ 
-            returnable_item_list : [],
-            use_default_return_addr : true
-        });
-
-        const el_modal = document.getElementById(this.props.id);
-        el_modal.returnable_info_list = undefined;
+        this.cleanupForm();
     }
 
     onSubmitReturnable(e){
@@ -99,9 +92,26 @@ class ReturnableRequestModal extends React.Component {
         });
     }
 
+    cleanupForm(){
+
+        this.setState({ 
+            returnable_item_list : [],
+            use_default_return_addr : true
+        }, ()=>{
+            document.getElementById(this.props.id).returnable_info_list = undefined;
+            document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked = true;
+            // document.getElementById(this.EL_ID_CUSTOM_ADDR_USER_NAME).value = '';
+            // document.getElementById(this.EL_ID_CUSTOM_ADDR_PHONE_NUMBER).value = '';
+            // document.getElementById(this.EL_ID_CUSTOM_ADDR_DETAIL_ADDR).value = '';
+            document.getElementById(this.EL_ID_RETURN_MEMO).value = '';
+            document.getElementById(this.EL_ID_RETURN_REASON).value = 'UP_SIZE_CHANGE';
+            document.getElementById(this.EL_ID_RETURN_DETAIL_REASON).value = '';
+        });
+    }
+
     render(){
         return (
-            <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true">
+            <div className="modal" id={this.props.id}  tabIndex="-1" aria-labelledby={this.props.id + '-label'} aria-hidden="true" data-bs-backdrop="static">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
