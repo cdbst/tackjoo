@@ -27,7 +27,8 @@ class ReturnableRequestModal extends React.Component {
 
         this.state = {
             returnable_item_list : [],
-            use_default_return_addr : true
+            use_default_return_addr : true,
+            return_progress : 0
         }
     }
 
@@ -54,7 +55,8 @@ class ReturnableRequestModal extends React.Component {
         const _returnable_item_list = this.getReturnableItemList(el_modal.returnable_info_list);
         this.setState({ 
             returnable_item_list : _returnable_item_list,
-            use_default_return_addr : true
+            use_default_return_addr : true,
+            return_progress : 0,
         }, ()=>{
             this.__inprogress_submit = false;
             this.__ref_request_return_btn.current.setDisabled(false);
@@ -85,6 +87,7 @@ class ReturnableRequestModal extends React.Component {
         this.__ref_request_return_btn.current.setLoadingStatus(true);
 
         const returnable_info_list = document.getElementById(this.props.id).returnable_info_list;
+        let complete_num = 0;
 
         window.electron.requestReturnable(returnable_info_list, submit_returnable_info, (completed, data)=>{
             if(completed){
@@ -101,6 +104,10 @@ class ReturnableRequestModal extends React.Component {
                 // bs_obj_modal.hide();
                 return;
             }
+
+            this.setState({
+                return_progress :  (++complete_num / returnable_info_list.length) * 100
+            });
 
             const returnable_info_id = data.returnable_info_id;
             const result = data.result;
@@ -246,7 +253,12 @@ class ReturnableRequestModal extends React.Component {
                                     {this.state.returnable_item_list}
                                 </ul>
                             </div>
-                            <hr/>
+                            <div className="row">
+                                <div className="progress modal-progress-bar col-md-12">
+                                    <div className="progress-bar progress-bar-striped bg-success" role="progressbar" style={{width: `${this.state.return_progress}%`}} ></div>
+                                </div>
+                            </div>
+                            <hr />
                             <div className="row">
                                 <div className="col-md-12">
                                     <div className="form-switch" style={{paddingLeft: 0}}>
