@@ -239,11 +239,6 @@ tbody tr:hover td {
     border-width: 1px !important;
 }
 
-.moadal-list-group li{
-    background-color: #32353b !important;
-}
-
-
 .btn-inner-modal{
     width: 120px !important;
 }
@@ -491,4 +486,8 @@ tbody tr:hover td {
     padding-right: 0px !important;
     height: 8px !important;
     background-color: #32353b !important;
+}
+
+.returnable-request-list-item {
+    background: var(--background) !important;
 }

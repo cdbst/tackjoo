@@ -97,42 +97,23 @@ class ReturnableRequestModal extends React.Component {
                 this.__inprogress_submit = false;
 
                 //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
+                // TODO : 완료된 항목을 테이블에서 지워야함.
                 // this.props.h_submit_returnable([]);
 
-                // let el_modal = document.getElementById(this.props.id);
-                // var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-                // bs_obj_modal.hide();
                 return;
             }
 
-            this.setState({
-                return_progress :  (++complete_num / returnable_info_list.length) * 100
-            });
+            this.setState({ return_progress :  (++complete_num / returnable_info_list.length) * 100});
 
-            const returnable_info_id = data.returnable_info_id;
-            const result = data.result;
+            const returnable_request_item_bg_color = data.result ? 'rgb(131, 241, 149, 0.36)' : 'rgb(241, 36, 36, 0.36)';
+            const returnable_request_item = this.state.returnable_item_list.find((returnable_item) => returnable_item.ref.current.getID() === data.returnable_info_id);
+            if(returnable_request_item) returnable_request_item.ref.current.setBackGroundColor(returnable_request_item_bg_color);
         });
     }
 
     getReturnableItemList(returnable_info_list){
 
-        return returnable_info_list.map((returnable_info) => {
-            return (
-                <li className="list-group-item d-flex justify-content-between align-items-start" key={`returnable-tiem-${returnable_info._id}`}>
-                    <img 
-                        className="rounded product-table-item-img" 
-                        src={returnable_info.product_img_url} 
-                        alt={returnable_info.product_name} 
-                        style={{width:56, height:56}} 
-                    />
-                    <div className="ms-2 me-auto">
-                        <div className="fw-bold">{returnable_info.product_name}</div>
-                        {returnable_info.account_email}
-                    </div>
-                    <span className="badge bg-info rounded-pill">{`옵션 : ${returnable_info.product_option}`}</span>
-                </li>
-            );
-        });
+        return returnable_info_list.map((returnable_info) => <ReturnableRequestListItem ref={React.createRef()} key={`request-returnable-tiem-${returnable_info._id}`} returnable_info={returnable_info}/>);
     }
 
     cleanupForm(){
@@ -249,7 +230,7 @@ class ReturnableRequestModal extends React.Component {
                                 <label className="col-md-12 col-form-label font-weight-bold task-edit-modal-option-label">{`반품 신청 항목(${this.state.returnable_item_list.length}개)`}</label>
                             </div>
                             <div className="row" style={{maxHeight: 320, overflowX:'hidden', overflowY:'auto'}}>
-                                <ul className="list-group list-group-flush moadal-list-group">
+                                <ul className="list-group list-group-flush">
                                     {this.state.returnable_item_list}
                                 </ul>
                             </div>
@@ -347,6 +328,48 @@ class ReturnableRequestModal extends React.Component {
                     </div>
                 </div>
             </div>
+        );
+    }
+}
+
+class ReturnableRequestListItem extends React.Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            background_color : 'transparent'
+        }
+    }
+
+    setBackGroundColor(background_color){
+        this.setState({
+            background_color : background_color
+        });
+    }
+
+    getID(){
+        return this.props.returnable_info._id;
+    }
+
+    render(){
+        return (
+            <li 
+                className="list-group-item d-flex justify-content-between align-items-start returnable-request-list-item"
+                style={{'--background' : this.state.background_color}}
+            >
+                <img 
+                    className="rounded product-table-item-img" 
+                    src={this.props.returnable_info.product_img_url} 
+                    alt={this.props.returnable_info.product_name} 
+                    style={{width:56, height:56}} 
+                />
+                <div className="ms-2 me-auto">
+                    <div className="fw-bold">{this.props.returnable_info.product_name}</div>
+                    {this.props.returnable_info.account_email}
+                </div>
+                <span className="badge bg-info rounded-pill">{`옵션 : ${this.props.returnable_info.product_option}`}</span>
+            </li>
         );
     }
 }
