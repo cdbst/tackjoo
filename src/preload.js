@@ -696,13 +696,13 @@ function _requestReturnable(returnable_info_list, submit_returnable_info, __call
     });
     ipcRenderer.send('request-returnable', ipc_data);
 
-    const request_returnable_evt_handler = (_event, {stop, request_returnable_result_info}) => {
+    const request_returnable_evt_handler = (_event, request_returnable_result) => {
 
-        if(stop){
+        if(request_returnable_result.stop){
             ipcRenderer.removeListener('request-returnable-reply' + ipc_data.id, request_returnable_evt_handler);
             __callback(true, undefined);
         }else{
-            __callback(false, request_returnable_result_info);
+            __callback(false, request_returnable_result.data);
         }
     }
 

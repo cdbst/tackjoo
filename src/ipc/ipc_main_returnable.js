@@ -48,7 +48,7 @@ function register(){
             event.reply('request-returnable-reply' + data.id, {
                 stop : false,
                 data : {
-                    reutrnable_info_id : returnable_info_id,
+                    returnable_info_id : returnable_info_id,
                     result : result,
                 }
             });
@@ -84,6 +84,7 @@ function register(){
                 });
                 
             }catch(err){
+                log.error(common.get_log_str('ipc_main_proxy.js', 'request-returnable-callback', err));
                 event.reply('request-returnable-reply' + data.id, {
                     stop : true,
                     data : undefined
@@ -115,7 +116,7 @@ async function submit_returnable_list(browser_context, returnable_info_list, sub
             returnable_info_list.forEach((returnable_info)=>{
                 message_cb(returnable_info._id, false);
             });
-            return false;
+            return;
         }
 
     }else{

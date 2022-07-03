@@ -91,6 +91,8 @@ class ReturnableRequestModal extends React.Component {
                 this.__inprogress_submit = false;
                 return;
             }
+
+            console.log(`returnable item result ${returnable_info_id} : ${result}`);
         });
 
         //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
