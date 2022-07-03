@@ -101,3 +101,61 @@ module.exports.get_returnable_info_list_from_product_page = ($, account_email) =
     return returnable_info_list;
 }
 
+module.exports.get_user_addr_info_from_request_returnable_modal = ($) => {
+
+    try{
+        const el_return_reason_item = $("#returnReasonItem")[0];
+
+        const user_addr_info = common.get_user_addr_info_obj_scheme();
+        common.update_user_addr_info_obj(user_addr_info, '_id', common.uuidv4());
+
+        const address_id = el_return_reason_item.attribs['data-returnaddress-id'];
+        if(address_id === undefined){
+            throw new Error('cannot parse address id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'address_id', address_id);
+
+        const city = el_return_reason_item.attribs['data-returnaddress-id'];
+        if(city === undefined){
+            throw new Error('cannot parse city info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'city', city);
+
+        const address = el_return_reason_item.attribs['data-returnaddress-addressline1'];
+        if(address === undefined){
+            throw new Error('cannot parse address id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'address', address);
+
+        const address_detail = el_return_reason_item.attribs['data-returnaddress-addressline2'];
+        if(address_detail === undefined){
+            throw new Error('cannot parse address_detail id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'address_detail', address_detail);
+
+        const postal_code = el_return_reason_item.attribs['data-returnaddress-postalcode'];
+        if(postal_code === undefined){
+            throw new Error('cannot parse postal_code id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'postal_code', postal_code);
+
+        const user_name = el_return_reason_item.attribs['data-returnaddress-fullname'];
+        if(user_name === undefined){
+            throw new Error('cannot parse user_name id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'user_name', user_name);
+
+        const phone_number = el_return_reason_item.attribs['data-returnaddress-phonenumber'];
+        if(phone_number === undefined){
+            throw new Error('cannot parse phone_number id info');
+        }
+        common.update_user_addr_info_obj(user_addr_info, 'phone_number', phone_number);
+
+        return user_addr_info;
+
+    }catch(err){
+        log.error(common.get_log_str('returnable_page_parser.js', 'get_user_addr_info_from_request_returnable_modal', err));
+        return undefined;
+    }
+    
+}

@@ -61,7 +61,8 @@ contextBridge.exposeInMainWorld('electron', {
     setIgnoreMouseEvents : _setIgnoreMouseEvents,
     subscribeMaximizedEvent : _subscribeMaximizedEvent,
     unsubscribeMaximizedEvent : _unsubscribeMaximizedEvent,
-    loadReturnableInfoList : _loadReturnableInfoList
+    loadReturnableInfoList : _loadReturnableInfoList,
+    requestReturnable : _requestReturnable,
 });
 
 /**
@@ -686,4 +687,24 @@ function _loadReturnableInfoList(__callback){
     ipcRenderer.once('load-returnable-list-reply' + ipc_data.id, (_event, returnable_info_list_info) => {
         __callback(returnable_info_list_info.err, returnable_info_list_info.data);
     });
+}
+
+function _requestReturnable(returnable_info_list, submit_returnable_info, __callback){
+    let ipc_data = get_ipc_data({
+        returnable_info_list : returnable_info_list,
+        submit_returnable_info : submit_returnable_info
+    });
+    ipcRenderer.send('request-returnable', ipc_data);
+
+    const request_returnable_evt_handler = (_event, {stop, request_returnable_result_info}) => {
+
+        if(stop){
+            ipcRenderer.removeListener('request-returnable-reply' + ipc_data.id, request_returnable_evt_handler);
+            __callback(true, undefined);
+        }else{
+            __callback(false, request_returnable_result_info);
+        }
+    }
+
+    ipcRenderer.on('request-returnable-reply' + ipc_data.id, request_returnable_evt_handler);
 }

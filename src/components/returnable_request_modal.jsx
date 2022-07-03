@@ -22,6 +22,8 @@ class ReturnableRequestModal extends React.Component {
 
         this.__ref_custom_user_addr_form = React.createRef();
 
+        this.__inprogress_submit = false;
+
         this.state = {
             returnable_item_list : [],
             use_default_return_addr : true
@@ -32,6 +34,9 @@ class ReturnableRequestModal extends React.Component {
         let el_modal = document.getElementById(this.props.id);
         el_modal.removeEventListener('hidden.bs.modal', this.onModalClosed);
         el_modal.addEventListener('hidden.bs.modal', this.onModalClosed);
+
+        el_modal.removeEventListener('hide.bs.modal', this.onModalWillClosed.bind(this));
+        el_modal.addEventListener('hide.bs.modal', this.onModalWillClosed.bind(this));
 
         el_modal.removeEventListener('shown.bs.modal', this.onModalshown);
         el_modal.addEventListener('shown.bs.modal', this.onModalshown);
@@ -50,13 +55,22 @@ class ReturnableRequestModal extends React.Component {
             returnable_item_list : _returnable_item_list,
             use_default_return_addr : true
         }, ()=>{
+            this.__inprogress_submit = false;
             document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked = true;
             //모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
             document.getElementById(this.EL_ID_RETURN_MEMO).focus();
         });
     }
 
-    onModalClosed(e){
+    onModalWillClosed(e){
+        if(this.__inprogress_submit){
+            Index.g_sys_msg_q.enqueue('에러', '반품 작업이 진행중입니다. 완료될 때 까지 기다려주세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            e.preventDefault();
+            return;
+        }
+    }
+
+    onModalClosed(){
         this.cleanupForm();
     }
 
@@ -65,16 +79,28 @@ class ReturnableRequestModal extends React.Component {
         e.preventDefault();
 
         const submit_returnable_info = this.checkFormValidation();
-        console.log(submit_returnable_info);
         if(submit_returnable_info === undefined) return;
 
+        this.__inprogress_submit = true;
+
+        const returnable_info_list = document.getElementById(this.props.id).returnable_info_list;
+
+        window.electron.requestReturnable(returnable_info_list, submit_returnable_info, (completed, {returnable_info_id, result})=>{
+            if(completed){
+                Index.g_sys_msg_q.enqueue('안내', '반품 작업을 완료했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                this.__inprogress_submit = false;
+                return;
+            }
+        });
 
         //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
-        this.props.h_submit_returnable([]);
+        // this.props.h_submit_returnable([]);
 
-        let el_modal = document.getElementById(this.props.id);
-        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
-        bs_obj_modal.hide();
+        // let el_modal = document.getElementById(this.props.id);
+        // var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        // bs_obj_modal.hide();
+
+        //TODO: this.__inprogress_submit 를 작업 끝나면 초기화 해줘야함.
     }
 
     getReturnableItemList(returnable_info_list){
@@ -294,8 +320,8 @@ class ReturnableRequestModal extends React.Component {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">취소</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitReturnable.bind(this)}>확인</button>
+                            <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">닫기</button>
+                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitReturnable.bind(this)}>요청하기</button>
                         </div>
                     </div>
                 </div>

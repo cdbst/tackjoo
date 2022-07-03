@@ -318,6 +318,7 @@
             address : undefined,
             address_detail : undefined,
             postal_code : undefined,
+            address_id : undefined,
             city : undefined,
             _id : undefined
         };

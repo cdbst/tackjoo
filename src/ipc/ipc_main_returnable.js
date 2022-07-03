@@ -39,6 +39,58 @@ function register(){
         })();
     });
 
+    ipcMain.on('request-returnable', (event, data) => {
+
+        const reutrnable_info_list = data.payload.returnable_info_list;
+        const submit_returnable_info = data.payload.submit_returnable_info;
+
+        const message_cb = (returnable_info_id, result) =>{
+            event.reply('request-returnable-reply' + data.id, {
+                stop : false,
+                data : {
+                    reutrnable_info_id : returnable_info_id,
+                    result : result,
+                }
+            });
+        };
+
+        (async()=>{
+            try{
+                const browser_context_job_dict = {};
+
+                reutrnable_info_list.forEach((returnable_info)=>{
+                    const browser_context = BrowserContextManager.get_by_email(returnable_info.account_email);
+                    if(browser_context.id in browser_context_job_dict === false){
+                        browser_context_job_dict[browser_context.id] = {};
+                        browser_context_job_dict[browser_context.id].browser_context = browser_context;
+                        browser_context_job_dict[browser_context.id].returnable_info_list = [];
+                    }
+                    browser_context_job_dict[browser_context.id].returnable_info_list.push(returnable_info);
+                });
+
+                const req_returnable_promise_list = [];
+
+                for(const job_dict of Object.values(browser_context_job_dict)){
+                    const p_req_returnable = submit_returnable_list(job_dict.browser_context, job_dict.returnable_info_list, submit_returnable_info, message_cb);
+                    req_returnable_promise_list.push(p_req_returnable);
+                    await common.async_sleep(2000);
+                }
+
+                await Promise.all(req_returnable_promise_list);
+
+                event.reply('request-returnable-reply' + data.id, {
+                    stop : true,
+                    data : undefined
+                });
+                
+            }catch(err){
+                event.reply('request-returnable-reply' + data.id, {
+                    stop : true,
+                    data : undefined
+                });
+            }
+        })();
+    });
 }
 
 async function get_returnable_info_list(browser_context){
@@ -53,6 +105,29 @@ async function get_returnable_info_list(browser_context){
     const returnable_info_list = await browser_context.open_returnable_page(2);
     if(returnable_info_list == undefined) return {error : `정보 취득 실패 : ${browser_context.email}`, data : undefined};
     else return {error : undefined, data : returnable_info_list}
+}
+
+async function submit_returnable_list(browser_context, returnable_info_list, submit_returnable_info, message_cb){
+
+    if(browser_context.is_session_expired()){
+        const result = await browser_context.login(5);
+        if(result === false){
+            returnable_info_list.forEach((returnable_info)=>{
+                message_cb(returnable_info._id, false);
+            });
+            return false;
+        }
+
+    }else{
+        await browser_context.open_main_page(1); // 바로 returnable page에 접근시, 연속된 접근 상황에서는 유효한 응답을 받을수 없어서 호출함.
+    }
+
+    for(var i = 0; i < returnable_info_list.length; i++){
+        const returnable_info = returnable_info_list[i];
+        const default_return_addr_info = await browser_context.returnable_request(returnable_info, 3);
+        console.log(default_return_addr_info);
+    }
+
 }
 
 module.exports.register = register;
