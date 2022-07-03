@@ -21,6 +21,7 @@ class ReturnableRequestModal extends React.Component {
         this.checkFormValidation = this.checkFormValidation.bind(this);
 
         this.__ref_custom_user_addr_form = React.createRef();
+        this.__ref_request_return_btn = React.createRef();
 
         this.__inprogress_submit = false;
 
@@ -74,28 +75,26 @@ class ReturnableRequestModal extends React.Component {
         this.cleanupForm();
     }
 
-    onSubmitReturnable(e){
-
-        e.preventDefault();
+    onSubmitReturnable(){
 
         const submit_returnable_info = this.checkFormValidation();
         if(submit_returnable_info === undefined) return;
 
         this.__inprogress_submit = true;
+        this.__ref_request_return_btn.current.setLoadingStatus(true);
 
         const returnable_info_list = document.getElementById(this.props.id).returnable_info_list;
 
         window.electron.requestReturnable(returnable_info_list, submit_returnable_info, (completed, data)=>{
             if(completed){
                 Index.g_sys_msg_q.enqueue('안내', '반품 작업이 종료되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                this.__ref_request_return_btn.current.setLoadingStatus(false);
                 this.__inprogress_submit = false;
                 return;
             }
 
             const returnable_info_id = data.returnable_info_id;
             const result = data.result;
-
-            console.log(`returnable item result ${returnable_info_id} : ${result}`);
         });
 
         //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
@@ -326,7 +325,13 @@ class ReturnableRequestModal extends React.Component {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-warning btn-inner-modal" data-bs-dismiss="modal">닫기</button>
-                            <button type="button" className="btn btn-primary btn-inner-modal" onClick={this.onSubmitReturnable.bind(this)}>요청하기</button>
+                            <LaodingButton
+                                ref={this.__ref_request_return_btn}
+                                h_on_click={this.onSubmitReturnable.bind(this)}
+                                btn_label={"반품요청"}
+                                btn_class={"btn btn-primary btn-inner-modal"}
+                                img_src={"./res/img/product-return.png"}
+                            />
                         </div>
                     </div>
                 </div>
