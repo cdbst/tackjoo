@@ -96,18 +96,14 @@ class ReturnableRequestModal extends React.Component {
                 this.__ref_request_return_btn.current.setDisabled(true);
                 this.__inprogress_submit = false;
 
-                //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
-                // TODO : 완료된 항목을 테이블에서 지워야함.
-                // this.props.h_submit_returnable([]);
+                this.props.h_submit_returnable(returnable_info_list);
+            }else{
+                this.setState({ return_progress :  (++complete_num / returnable_info_list.length) * 100});
 
-                return;
+                const returnable_request_item_bg_color = data.result ? 'rgb(131, 241, 149, 0.36)' : 'rgb(241, 36, 36, 0.36)';
+                const returnable_request_item = this.state.returnable_item_list.find((returnable_item) => returnable_item.ref.current.getID() === data.returnable_info_id);
+                if(returnable_request_item) returnable_request_item.ref.current.setBackGroundColor(returnable_request_item_bg_color);
             }
-
-            this.setState({ return_progress :  (++complete_num / returnable_info_list.length) * 100});
-
-            const returnable_request_item_bg_color = data.result ? 'rgb(131, 241, 149, 0.36)' : 'rgb(241, 36, 36, 0.36)';
-            const returnable_request_item = this.state.returnable_item_list.find((returnable_item) => returnable_item.ref.current.getID() === data.returnable_info_id);
-            if(returnable_request_item) returnable_request_item.ref.current.setBackGroundColor(returnable_request_item_bg_color);
         });
     }
 

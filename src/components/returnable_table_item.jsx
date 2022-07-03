@@ -63,9 +63,10 @@ class ReturnableTableItem extends React.Component {
     render(){
 
         const formated_order_date = common.get_formatted_date_str(this.props.returnable_info.order_date);
+        const background_color = this.state.selected ? 'rgb(131, 241, 149, 0.36)' : 'transparent';
 
         return(
-            <tr>
+            <tr style={{background : background_color}}>
                 <td style={{width : this.props.product_img_col_width, maxWidth : this.props.product_img_col_width}}>
                     <img 
                         className="rounded product-table-item-img" 

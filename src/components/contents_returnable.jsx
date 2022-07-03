@@ -218,7 +218,7 @@ class ContentsReturnable extends React.Component {
 
     onSubmitReturnable(returnable_info_list){
         console.log(returnable_info_list);
-        //TODO: 반품 다하고 __selected_returnable_info_id 초기화 작업 필요할수 있음.
+        this.onClickLoad();
     }
 
     requestReturn(returnable_info_list){
