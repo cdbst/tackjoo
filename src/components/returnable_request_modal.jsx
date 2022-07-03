@@ -85,12 +85,15 @@ class ReturnableRequestModal extends React.Component {
 
         const returnable_info_list = document.getElementById(this.props.id).returnable_info_list;
 
-        window.electron.requestReturnable(returnable_info_list, submit_returnable_info, (completed, {returnable_info_id, result})=>{
+        window.electron.requestReturnable(returnable_info_list, submit_returnable_info, (completed, data)=>{
             if(completed){
-                Index.g_sys_msg_q.enqueue('안내', '반품 작업을 완료했습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                Index.g_sys_msg_q.enqueue('안내', '반품 작업이 종료되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 this.__inprogress_submit = false;
                 return;
             }
+
+            const returnable_info_id = data.returnable_info_id;
+            const result = data.result;
 
             console.log(`returnable item result ${returnable_info_id} : ${result}`);
         });
