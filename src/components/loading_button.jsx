@@ -19,6 +19,10 @@ class LaodingButton extends React.Component {
         }));
     }
 
+    setDisabled(status){
+        this.__ref_btn.current.disabled = status;
+    }
+
     render(){
 
         const disabled = this.props.disabled === undefined ? false : this.props.disabled;

@@ -57,6 +57,7 @@ class ReturnableRequestModal extends React.Component {
             use_default_return_addr : true
         }, ()=>{
             this.__inprogress_submit = false;
+            this.__ref_request_return_btn.current.setDisabled(false);
             document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked = true;
             //모달이 열렸을때 기본적으로 포커싱 되어야할 input에 포커싱 시킨다.
             document.getElementById(this.EL_ID_RETURN_MEMO).focus();
@@ -89,6 +90,7 @@ class ReturnableRequestModal extends React.Component {
             if(completed){
                 Index.g_sys_msg_q.enqueue('안내', '반품 작업이 종료되었습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 this.__ref_request_return_btn.current.setLoadingStatus(false);
+                this.__ref_request_return_btn.current.setDisabled(true);
                 this.__inprogress_submit = false;
 
                 //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
