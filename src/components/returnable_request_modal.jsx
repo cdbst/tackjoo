@@ -18,6 +18,9 @@ class ReturnableRequestModal extends React.Component {
         this.getReturnableItemList = this.getReturnableItemList.bind(this);
         this.onChangeUseDefaultReturnAddr = this.onChangeUseDefaultReturnAddr.bind(this);
         this.cleanupForm = this.cleanupForm.bind(this);
+        this.checkFormValidation = this.checkFormValidation.bind(this);
+
+        this.__ref_custom_user_addr_form = React.createRef();
 
         this.state = {
             returnable_item_list : [],
@@ -61,8 +64,12 @@ class ReturnableRequestModal extends React.Component {
 
         e.preventDefault();
 
-        //TODO: 입력된 값들의 유효성 검사를 나이키 공식홈페이지 기준의 입력값 검증 방식과 똑같이 수행해야한다.
+        const submit_returnable_info = this.checkFormValidation();
+        console.log(submit_returnable_info);
+        if(submit_returnable_info === undefined) return;
 
+
+        //아래 부터는 반품 작업이 완료됐을 때 처리되어야 할 코드들임.
         this.props.h_submit_returnable([]);
 
         let el_modal = document.getElementById(this.props.id);
@@ -100,13 +107,96 @@ class ReturnableRequestModal extends React.Component {
         }, ()=>{
             document.getElementById(this.props.id).returnable_info_list = undefined;
             document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked = true;
-            // document.getElementById(this.EL_ID_CUSTOM_ADDR_USER_NAME).value = '';
-            // document.getElementById(this.EL_ID_CUSTOM_ADDR_PHONE_NUMBER).value = '';
-            // document.getElementById(this.EL_ID_CUSTOM_ADDR_DETAIL_ADDR).value = '';
             document.getElementById(this.EL_ID_RETURN_MEMO).value = '';
             document.getElementById(this.EL_ID_RETURN_REASON).value = 'UP_SIZE_CHANGE';
             document.getElementById(this.EL_ID_RETURN_DETAIL_REASON).value = '';
         });
+    }
+
+    checkFormValidation(){
+
+        const submit_returnable_info =  common.get_submit_returnable_obj_scheme();
+        
+        const use_default_return_addr = document.getElementById(this.EL_INPUT_USE_DEFAULT_RETURN_ADDR).checked;
+        common.update_submit_returnable_obj(submit_returnable_info, 'use_default_return_addr', use_default_return_addr);
+
+        if(use_default_return_addr === false){
+
+            const custom_return_addr_info = common.get_user_addr_info_obj_scheme();
+            common.update_user_addr_info_obj(custom_return_addr_info, '_id', common.uuidv4());
+
+            const selected_addr_info =  this.__ref_custom_user_addr_form.current.selected_addr_info;
+            if(selected_addr_info === undefined){
+                Index.g_sys_msg_q.enqueue('에러', '주소 정보가 올바로 입력된 상태가 아닙니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+
+            const postal_code = this.__ref_custom_user_addr_form.current.getPostalCode();
+            if(postal_code === undefined){
+                Index.g_sys_msg_q.enqueue('에러', '주소 정보가 올바로 입력된 상태가 아닙니다.(우편 번호)', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+            common.update_user_addr_info_obj(custom_return_addr_info, 'postal_code', postal_code);
+
+            const city = this.__ref_custom_user_addr_form.current.getCity();
+            if(city === undefined){
+                Index.g_sys_msg_q.enqueue('에러', '주소 정보가 올바로 입력된 상태가 아닙니다.(도시명)', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+            common.update_user_addr_info_obj(custom_return_addr_info, 'city', city);
+
+            const address = this.__ref_custom_user_addr_form.current.getValue();
+            common.update_user_addr_info_obj(custom_return_addr_info, 'address', address);
+
+            const user_name = document.getElementById(this.EL_ID_CUSTOM_ADDR_USER_NAME).value;
+            if(user_name.length === 0){
+                Index.g_sys_msg_q.enqueue('에러', '고객명을 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+            common.update_user_addr_info_obj(custom_return_addr_info, 'user_name', user_name);
+
+            const phone_number = document.getElementById(this.EL_ID_CUSTOM_ADDR_PHONE_NUMBER).value;
+            if(phone_number.length === 0){
+                Index.g_sys_msg_q.enqueue('에러', '전화번호를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }else if(new RegExp('^[0-9]+$').test(phone_number) === false){
+                Index.g_sys_msg_q.enqueue('에러', '전화번호를 잘못입력 했습니다. 숫자로만 입력해야합니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+            common.update_user_addr_info_obj(custom_return_addr_info, 'phone_number', phone_number);
+
+            const address_detail = document.getElementById(this.EL_ID_CUSTOM_ADDR_DETAIL_ADDR).value;
+            if(address_detail.length === 0){
+                Index.g_sys_msg_q.enqueue('에러', '나머지 주소를 입력하지 않았습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return undefined;
+            }
+            common.update_user_addr_info_obj(custom_return_addr_info, 'address_detail', address_detail);
+
+            common.update_submit_returnable_obj(submit_returnable_info, 'custom_return_addr_info', custom_return_addr_info);
+        }
+
+        const return_memo = document.getElementById(this.EL_ID_RETURN_MEMO).value;
+        if(return_memo.length < 5){
+            Index.g_sys_msg_q.enqueue('에러', '수거 메모를 5자 이상 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return undefined;
+        }else if (return_memo.length > 50){
+            Index.g_sys_msg_q.enqueue('에러', '수거 메모를 50자 이내로 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return undefined;
+        }
+        common.update_submit_returnable_obj(submit_returnable_info, 'return_memo', return_memo);
+
+        const return_reason = document.getElementById(this.EL_ID_RETURN_REASON).value;
+        common.update_submit_returnable_obj(submit_returnable_info, 'return_reason', return_reason);
+
+        const return_detail_reason = document.getElementById(this.EL_ID_RETURN_DETAIL_REASON).value;
+        if(return_detail_reason.length < 5){
+            Index.g_sys_msg_q.enqueue('에러', '반품 상세 사유를 5글자 이상 입력하세요.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            return undefined;
+        }
+        common.update_submit_returnable_obj(submit_returnable_info, 'return_detail_reason', return_detail_reason);
+
+        common.update_submit_returnable_obj(submit_returnable_info, '_id', common.uuidv4());
+        return submit_returnable_info;
     }
 
     render(){
@@ -161,7 +251,7 @@ class ReturnableRequestModal extends React.Component {
                                     </div>
                                     <div className="row" style={{marginTop: 4}}>
                                         <div className="col-md-12">
-                                            <AddressSearchForm width={380} />
+                                            <AddressSearchForm ref={this.__ref_custom_user_addr_form} width={380} />
                                         </div>
                                     </div>
                                     <div className="row" style={{marginTop: 4}}>

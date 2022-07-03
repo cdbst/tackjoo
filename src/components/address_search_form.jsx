@@ -27,6 +27,9 @@ class AddressSearchForm extends React.Component {
 
         this.getDoroAddr = this.getDoroAddr.bind(this);
         this.getJibeonAddr = this.getJibeonAddr.bind(this);
+        this.getValue = this.getValue.bind(this);
+        this.getPostalCode = this.getPostalCode.bind(this);
+        this.getCity = this.getCity.bind(this);
 
         this.onKeyUpAddrInput = this.onKeyUpAddrInput.bind(this);
 
@@ -41,8 +44,11 @@ class AddressSearchForm extends React.Component {
 
     onKeyUpAddrInput(e){
         e.preventDefault();
-        if(e.key !== 'Enter') return;
-        this.onClickSearch();
+        if(e.key === 'Enter'){
+            this.onClickSearch();
+        }else{
+            this.selected_addr_info = undefined;
+        }
     }
 
     onClickSearch(){
@@ -70,7 +76,7 @@ class AddressSearchForm extends React.Component {
 
     onClickAddrItem(addr_info){
         this.selected_addr_info = addr_info;
-        this.search_input_ref.current.value = `(${addr_info.postcode5}) ${this.getDoroAddr(addr_info)}`;
+        this.search_input_ref.current.value = `(${addr_info.postcode5})${this.getDoroAddr(addr_info)}`;
         this.setState({
             search_result_list : [],
             search_result_select_mode : true,
@@ -106,6 +112,20 @@ class AddressSearchForm extends React.Component {
 
     getJibeonAddr(addr_info){
         return `${addr_info.ko_common} ${addr_info.ko_jibeon}`;
+    }
+
+    getValue(){
+        return this.search_input_ref.current.value;
+    }
+
+    getPostalCode(){
+        if(this.selected_addr_info === undefined) return undefined;
+        return this.selected_addr_info.postcode5;
+    }
+
+    getCity(){
+        if(this.selected_addr_info === undefined) return undefined;
+        return this.selected_addr_info.ko_common.split(/\s+/)[0];
     }
 
     render(){
