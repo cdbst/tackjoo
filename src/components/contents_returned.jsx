@@ -10,7 +10,7 @@ class ContentsReturned extends React.Component {
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.setFilters = this.setFilters.bind(this);
-        this.updateOrderInfo = this.updateOrderInfo.bind(this);
+        this.updateReturnedInfo = this.updateReturnedInfo.bind(this);
 
         this.returned_info_list = [];
 
@@ -37,24 +37,26 @@ class ContentsReturned extends React.Component {
 
         this.account_col_width = 240;
         this.product_size_col_width = 100;
-        this.order_price_col_width = 140;
-        this.order_date_col_width = 120;
+        this.product_price_col_width = 140;
+        this.returned_date_col_width = 120;
         this.actions_col_width = 180;
         this.product_img_col_width = 70;
         this.product_model_id_col_width = 120;
-        this.order_number_col_width = 200;
+        this.returned_number_col_width = 260;
         this.returned_quantity_col_width = 60;
+        this.returned_status_col_width = 120;
 
         this.product_name_col_width = 'calc( 100% - ' + (
             this.product_model_id_col_width + 
             this.product_img_col_width + 
             this.account_col_width + 
-            this.order_date_col_width + 
+            this.returned_date_col_width + 
             this.actions_col_width + 
             this.product_size_col_width + 
-            this.order_price_col_width + 
-            this.order_number_col_width +
-            this.returned_quantity_col_width) + 'px)';
+            this.product_price_col_width + 
+            this.returned_number_col_width +
+            this.returned_quantity_col_width +
+            this.returned_status_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -73,15 +75,18 @@ class ContentsReturned extends React.Component {
 
         this.__ref_load_btn.current.setLoadingStatus(true);
 
-        Index.g_sys_msg_q.enqueue('안내', '서버로부터 주문내역을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 반품 형황 항목들을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-        window.electron.loadOrderListInfo((err, returned_info_list) =>{
+        window.electron.loadReturnedInfoList((err, returned_info_list) =>{
 
             this.__ref_load_btn.current.setLoadingStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            if(returned_info_list.length == 0) return;
-            Index.g_sys_msg_q.enqueue('안내', '주문내역을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(returned_info_list.length == 0){
+                Index.g_sys_msg_q.enqueue('안내', '반품 형황 항목이 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                return;
+            } 
+            Index.g_sys_msg_q.enqueue('안내', '반품 형황 항목들을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.returned_info_list = returned_info_list;
             
@@ -177,24 +182,26 @@ class ContentsReturned extends React.Component {
     __getTableItems(returned_info_list){
 
         return returned_info_list.map((returned_info) =>
-            <OrderTableItem
+            <ReturnedTableItem
                 account_col_width = {this.account_col_width}
                 product_size_col_width = {this.product_size_col_width}
                 product_price_col_width = {this.product_price_col_width}
-                order_date_col_width = {this.order_date_col_width}
-                order_status_col_width = {this.order_status_col_width}
+                returned_date_col_width = {this.returned_date_col_width}
                 actions_col_width = {this.actions_col_width}
-                product_name_col_width = {this.product_name_col_width}
                 product_img_col_width = {this.product_img_col_width}
                 product_model_id_col_width = {this.product_model_id_col_width}
+                returned_number_col_width = {this.returned_number_col_width}
+                returned_quantity_col_width = {this.returned_quantity_col_width}
+                returned_status_col_width = {this.returned_status_col_width}
+                product_name_col_width = {this.product_name_col_width}
                 returned_info = {returned_info}
-                h_update_returned_info = {this.updateOrderInfo.bind(this)}
+                h_update_returned_info = {this.updateReturnedInfo.bind(this)}
                 key={returned_info._id}
             />
         );
     }
 
-    updateOrderInfo(_returned_info){
+    updateReturnedInfo(_returned_info){
 
         for(i = 0; i < this.returned_info_list.length; i++){
             if(this.returned_info_list[i]._id !== _returned_info._id) continue;
@@ -206,6 +213,22 @@ class ContentsReturned extends React.Component {
     }
 
     render() {
+
+        const test_returned_info = {
+            product_name : '에어 조던 4 테스트',
+            account_email : 'xxxx@yyyyy.com',
+            product_img_url : 'https://static-breeze.nike.co.kr/kr/ko_kr/cmsstatic/product/DH6927-061/8e8b57b9-fe9f-4f92-adfc-010fdd2c1939_primary.jpg',
+            product_model_id : 'XXXX-YYYY',
+            product_option : '300',
+            product_price : '234,000',
+            returned_number : '123123123123123123123123123',
+            order_id : '456789',
+            returned_quantity : '1',
+            returned_date : new Date(),
+            returned_status: '반품신청중',
+            is_cancelable: true,
+            _id : common.uuidv4(),
+        }
 
         return (
             <div className="tab-pane fade" id="returned" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.RETURNED}>
@@ -222,7 +245,7 @@ class ContentsReturned extends React.Component {
                             <LabelSelect ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <LabelSelect ref={this.__ref_sel_return_req_date} label="반품요청 일시" options={this.state.opt_list_return_req_date} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_return_req_date} label="반품요청일" options={this.state.opt_list_return_req_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-2">
                             <LabelSelect ref={this.__ref_sel_returned_status} label="진행단계" options={this.state.opt_list_returned_status} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
@@ -237,15 +260,32 @@ class ContentsReturned extends React.Component {
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_model_id_col_width, maxWidth : this.product_model_id_col_width}}>모델</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
-                                <th scope="col" style={{width : this.order_price_col_width, maxWidth : this.order_price_col_width}}>주문금액</th>
-                                <th scope="col" style={{width : this.order_number_col_width, maxWidth : this.order_number_col_width}}>주문번호</th>
-                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>주문일시</th>
+                                <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>상품금액</th>
+                                <th scope="col" style={{width : this.returned_number_col_width, maxWidth : this.returned_number_col_width}}>반품번호</th>
+                                <th scope="col" style={{width : this.returned_date_col_width, maxWidth : this.returned_date_col_width}}>반품요청일</th>
                                 <th scope="col" style={{width : this.returned_quantity_col_width, maxWidth : this.returned_quantity_col_width}}>수량</th>
+                                <th scope="col" style={{width : this.returned_status_col_width, maxWidth : this.returned_status_col_width}}>진행상태</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.returned_table_item_list}
+                            {/* {this.state.returned_table_item_list} */}
+                            <ReturnedTableItem
+                                account_col_width = {this.account_col_width}
+                                product_size_col_width = {this.product_size_col_width}
+                                product_price_col_width = {this.product_price_col_width}
+                                returned_date_col_width = {this.returned_date_col_width}
+                                actions_col_width = {this.actions_col_width}
+                                product_img_col_width = {this.product_img_col_width}
+                                product_model_id_col_width = {this.product_model_id_col_width}
+                                returned_number_col_width = {this.returned_number_col_width}
+                                returned_quantity_col_width = {this.returned_quantity_col_width}
+                                returned_status_col_width = {this.returned_status_col_width}
+                                product_name_col_width = {this.product_name_col_width}
+                                returned_info = {test_returned_info}
+                                h_update_returned_info = {this.updateReturnedInfo.bind(this)}
+                                key={test_returned_info._id}
+                            />
                         </tbody>
                     </table>
                     </div>
