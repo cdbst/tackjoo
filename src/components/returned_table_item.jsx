@@ -71,7 +71,7 @@ class ReturnedTableItem extends React.Component {
     render(){
 
         const formated_returned_date = common.get_formatted_date_str(this.props.returned_info.returned_date);
-        const cancel_returnable_tooltip = this.props.returned_info.is_cancelable ? '반품 취소하기' : '반품신청중 단계에서만 주문 취소가 가능합니다';
+        const cancel_returned_tooltip = this.props.returned_info.is_cancelable ? '반품 취소하기' : '반품신청중 단계에서만 주문 취소가 가능합니다';
 
         return(
             <tr>
@@ -137,7 +137,7 @@ class ReturnedTableItem extends React.Component {
                                 <img src="./res/img/kream-logo.png" style={{width:24, height:24}}/>
                             </button>
                         </div>
-                        <div className="float-start button-wrapper-inner-table" title={cancel_returnable_tooltip}>
+                        <div className="float-start button-wrapper-inner-table" title={cancel_returned_tooltip}>
                             <LaodingButton
                                 ref={this.__ref_cancel_return_btn}
                                 h_on_click={this.onClickCancelReturnBtn.bind(this)}
