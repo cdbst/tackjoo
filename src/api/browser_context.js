@@ -9,6 +9,7 @@ const {
     get_returnable_info_list_from_product_page,
     get_user_addr_info_from_request_returnable_modal
 } = require('./returnable_page_parser');
+const { get_returned_info_list_from_product_page } = require('./returned_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -1658,8 +1659,8 @@ class BrowserContext {
                 this.__set_cookie(this.__cookie_storage, res);
     
                 const $ = cheerio.load(res.data);
-                const returnable_info_list = get_returnable_info_list_from_product_page($, this.email);
-                return returnable_info_list;
+                const returned_info_list = get_returned_info_list_from_product_page($, this.email);
+                return returned_info_list;
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'open_returned_page', e));

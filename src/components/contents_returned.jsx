@@ -44,7 +44,7 @@ class ContentsReturned extends React.Component {
         this.product_model_id_col_width = 120;
         this.returned_number_col_width = 260;
         this.returned_quantity_col_width = 60;
-        this.returned_status_col_width = 120;
+        this.returned_status_col_width = 160;
 
         this.product_name_col_width = 'calc( 100% - ' + (
             this.product_model_id_col_width + 
