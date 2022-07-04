@@ -43,7 +43,7 @@ class ReturnedTableItem extends React.Component {
             if(is_ok == false) return;
 
             this.__ref_cancel_return_btn.current.setLoadingStatus(true);
-            Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 요청 취소를 요청합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 요청을 취소합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             window.electron.cancelReturn(this.props.returned_info, (error, result) =>{
 
