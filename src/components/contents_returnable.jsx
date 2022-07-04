@@ -220,7 +220,6 @@ class ContentsReturnable extends React.Component {
     }
 
     onSubmitReturnable(returnable_info_list){
-        console.log(returnable_info_list);
         this.onClickLoad();
     }
 
