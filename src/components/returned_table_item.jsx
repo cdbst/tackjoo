@@ -57,11 +57,11 @@ class ReturnedTableItem extends React.Component {
                     return;
                 }
 
-                Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 취소 요청이 성공했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 취소 요청이 성공했습니다. (가능하다면 다시 불러오기 하여 상태가 재대로 변경됐는지 확인하는 것을 권장합니다.)`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
                 const updated_returned_info = _.clone(this.props.returned_info);
-                updated_returned_info.is_cancelable = false;
-                updated_returned_info.status = '반품취소완료';
+                common.update_returned_info_obj(updated_returned_info, 'is_cancelable', false);
+                common.update_returned_info_obj(updated_returned_info, 'returned_status', '반품취소완료');
                 this.props.h_update_returned_info(updated_returned_info);
             });
 
