@@ -265,6 +265,33 @@
         return product_info_obj;
     }
 
+    exports.get_returned_info_obj_scheme = function(){
+        return {
+            product_name : undefined,
+            account_email : undefined,
+            product_img_url : undefined,
+            product_model_id : undefined,
+            product_option : undefined,
+            product_price : undefined,
+            returned_number : undefined,
+            order_id : undefined,
+            returned_quantity : undefined,
+            returned_date : undefined,
+            returned_status: undefined,
+            is_cancelable: undefined,
+            _id : undefined,
+        };
+    };
+
+    exports.update_returned_info_obj = function(returned_info_obj, key, value){
+        if(key in this.get_returned_info_obj_scheme() == false){
+            throw 'returned info object is not includes property : ' + key;
+        }
+
+        returned_info_obj[key] = value;
+        return returned_info_obj;
+    }
+
     exports.get_returnable_info_obj_scheme = function(){
         return {
             product_name : undefined,

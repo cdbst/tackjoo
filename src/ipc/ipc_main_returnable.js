@@ -33,7 +33,7 @@ function register(){
                 event.reply('load-returnable-list-reply' + data.id, {err : errors.join('\n'), data : returnable_info_list});
     
             }catch(err){
-                log.error(common.get_log_str('ipc_main_proxy.js', 'load-returnable-list-callback', err));
+                log.error(common.get_log_str('ipc_main_returnable.js', 'load-returnable-list-callback', err));
                 event.reply('load-returnable-list-reply' + data.id, {err : err.message});
             }
         })();
@@ -84,7 +84,7 @@ function register(){
                 });
                 
             }catch(err){
-                log.error(common.get_log_str('ipc_main_proxy.js', 'request-returnable-callback', err));
+                log.error(common.get_log_str('ipc_main_returnable.js', 'request-returnable-callback', err));
                 event.reply('request-returnable-reply' + data.id, {
                     stop : true,
                     data : undefined

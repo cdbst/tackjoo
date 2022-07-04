@@ -9,6 +9,7 @@ const {
     get_returnable_info_list_from_product_page,
     get_user_addr_info_from_request_returnable_modal
 } = require('./returnable_page_parser');
+const { get_returned_info_list_from_product_page } = require('./returned_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -47,6 +48,7 @@ class BrowserContext {
         this.__post_process_req_fail = this.__post_process_req_fail.bind(this);
         
         this.__http_request = this.__http_request.bind(this);
+        this.__http_request_no_redir = this.__http_request_no_redir.bind(this);
         this.__process_to_redir = this.__process_to_redir.bind(this);
         this.__get_proxy_cfg = this.__get_proxy_cfg.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
@@ -79,6 +81,7 @@ class BrowserContext {
         this.update_account_info = this.update_account_info.bind(this);
 
         this.open_returnable_page = this.open_returnable_page.bind(this);
+        this.open_returned_page = this.open_returned_page.bind(this);
         
         if(args.length === 4 || args.length == 0){
             this.__init.apply(null, args); // email, pwd, id, locked
@@ -301,6 +304,54 @@ class BrowserContext {
                 }else{
                     resolve(res);
                 }
+            })
+            .catch(error => {
+                reject(error);
+            });
+        });
+    }
+
+    async __http_request_no_redir(method, url, headers, params, send_sensor_data = true){
+
+        if(send_sensor_data){
+            await this.__send_fake_sensor_data();
+        }
+
+        if(headers == undefined) headers = {};
+
+        const cookie_storage = this.__judge_cookie_storage(url);
+        if(cookie_storage.num_of_cookies > 0){
+            headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+        }
+
+        const axios_req_cfg = {
+            method: method,
+            url: url,
+            timeout: this.__req_timout,
+            headers : headers,
+            maxRedirects : 0,
+            validateStatus : (status) =>{
+                return status >= 200 && status <= 310; 
+            }
+        };
+        
+        const proxy_cfg = this.__get_proxy_cfg();
+        if(proxy_cfg != undefined){
+            axios_req_cfg.proxy = proxy_cfg;
+        }
+        
+        if(params != undefined){
+            if(method == BrowserContext.REQ_METHOD.POST){
+                axios_req_cfg['data'] = params;
+            }else{
+                axios_req_cfg['params'] = params;
+            }
+        }
+
+        return new Promise((resolve, reject)=>{
+            axios(axios_req_cfg)
+            .then(async (res) => {
+                resolve(res);
             })
             .catch(error => {
                 reject(error);
@@ -1636,6 +1687,91 @@ class BrowserContext {
         }
 
         return undefined;
+    }
+
+    async open_returned_page(__retry_cnt = undefined){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returned?pageSize=60', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_returned_page : response ' + res.status);
+                }
+
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                const $ = cheerio.load(res.data);
+                const returned_info_list = get_returned_info_list_from_product_page($, this.email);
+                return returned_info_list;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_returned_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async cancel_return(returned_info, __retry_cnt = undefined){
+
+        const payload_obj = {
+            orderId : returned_info.order_id,
+            returnNumber : returned_info.returned_number,
+            csrfToken : this.csrfToken
+        };
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returned',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': 1,
+            'user-agent': BrowserContext.USER_AGENT
+        };
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request_no_redir(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returned/cancel', headers, payload);
+
+                if(res.status !== 302) return false;
+                if(res.headers.location === undefined) return false;
+                if(res.headers.location !== BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returned') return false;
+
+                this.__set_cookie(this.__cookie_storage, res);
+                return true;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'cancel_return', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return false;
     }
 
     async open_returnable_page(__retry_cnt = undefined){

@@ -11,6 +11,7 @@ const IpcMainAppAuth = require('./ipc_main_app_auth');
 const IpcMainOrder = require('./ipc_main_order');
 const IpcMainNewProduct = require('./ipc_main_new_product');
 const IpcMainReturnable = require('./ipc_main_returnable');
+const IpcMainReturned = require('./ipc_main_returned');
 
 function register(win){
     // IPC Responses
@@ -27,6 +28,7 @@ function register(win){
     IpcMainOrder.register();
     IpcMainNewProduct.register();
     IpcMainReturnable.register();
+    IpcMainReturned.register();
 }
 
 module.exports.register = register;
