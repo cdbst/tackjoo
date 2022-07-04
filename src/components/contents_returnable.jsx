@@ -101,7 +101,10 @@ class ContentsReturnable extends React.Component {
             this.__ref_selected_return_req_btn.current.disabled = false;
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
-            if(returnable_info_list.length == 0) return;
+            if(returnable_info_list.length == 0){
+                Index.g_sys_msg_q.enqueue('안내', '반품 가능 상품이 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                return;
+            } 
             Index.g_sys_msg_q.enqueue('안내', '반품 가능 상품들을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.returnable_info_list = returnable_info_list;
