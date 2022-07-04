@@ -269,8 +269,8 @@ class ContentsReturned extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* {this.state.returned_table_item_list} */}
-                            <ReturnedTableItem
+                            {this.state.returned_table_item_list}
+                            {/* <ReturnedTableItem
                                 account_col_width = {this.account_col_width}
                                 product_size_col_width = {this.product_size_col_width}
                                 product_price_col_width = {this.product_price_col_width}
@@ -285,7 +285,7 @@ class ContentsReturned extends React.Component {
                                 returned_info = {test_returned_info}
                                 h_update_returned_info = {this.updateReturnedInfo.bind(this)}
                                 key={test_returned_info._id}
-                            />
+                            /> */}
                         </tbody>
                     </table>
                     </div>
