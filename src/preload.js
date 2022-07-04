@@ -61,6 +61,8 @@ contextBridge.exposeInMainWorld('electron', {
     setIgnoreMouseEvents : _setIgnoreMouseEvents,
     subscribeMaximizedEvent : _subscribeMaximizedEvent,
     unsubscribeMaximizedEvent : _unsubscribeMaximizedEvent,
+    loadReturnableInfoList : _loadReturnableInfoList,
+    requestReturnable : _requestReturnable,
 });
 
 /**
@@ -676,4 +678,33 @@ function _subscribeMaximizedEvent(subscriber_id, event_cb){
 
 function _unsubscribeMaximizedEvent(subscriber_id){
     if(subscriber_id in maximized_event_subscriber) delete maximized_event_subscriber[subscriber_id];
+}
+
+function _loadReturnableInfoList(__callback){
+    let ipc_data = get_ipc_data();
+    ipcRenderer.send('load-returnable-list', ipc_data);
+
+    ipcRenderer.once('load-returnable-list-reply' + ipc_data.id, (_event, returnable_info_list_info) => {
+        __callback(returnable_info_list_info.err, returnable_info_list_info.data);
+    });
+}
+
+function _requestReturnable(returnable_info_list, submit_returnable_info, __callback){
+    let ipc_data = get_ipc_data({
+        returnable_info_list : returnable_info_list,
+        submit_returnable_info : submit_returnable_info
+    });
+    ipcRenderer.send('request-returnable', ipc_data);
+
+    const request_returnable_evt_handler = (_event, request_returnable_result) => {
+
+        if(request_returnable_result.stop){
+            ipcRenderer.removeListener('request-returnable-reply' + ipc_data.id, request_returnable_evt_handler);
+            __callback(true, undefined);
+        }else{
+            __callback(false, request_returnable_result.data);
+        }
+    }
+
+    ipcRenderer.on('request-returnable-reply' + ipc_data.id, request_returnable_evt_handler);
 }

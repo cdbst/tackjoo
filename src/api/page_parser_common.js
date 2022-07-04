@@ -28,6 +28,35 @@ function get_specific_tag_nodes (element, tags = [], class_names = [], data_attr
     return specific_childs;
 }
 
+function get_specific_child_node_by_atter_value (element, attr, value){
+
+    let specific_childs = [];
+    let node_stack = [];
+
+    node_stack.push(element);
+
+    while(node_stack.length > 0){
+
+        let cur_node = node_stack.pop();
+
+        if(cur_node.childNodes == undefined) continue;
+
+        for(var i = 0; i < cur_node.childNodes.length; i++){
+
+            let child_node = cur_node.childNodes[i];
+            node_stack.push(child_node);
+
+            if(child_node.type != 'tag') continue;
+            if(attr in child_node.attribs && child_node.attribs[attr] === value){
+                specific_childs.push(child_node);
+            }
+            
+        }
+    }
+
+    return specific_childs;
+}
+
 function has_class(el, class_names){
     if(el.attribs.class == undefined) return false;
 
@@ -140,3 +169,4 @@ module.exports.get_data_tag_value = get_data_tag_value;
 module.exports.get_data_tag_elem = get_data_tag_elem;
 module.exports.get_elem_attr_value = get_elem_attr_value;
 module.exports.strip_useless_string = strip_useless_string;
+module.exports.get_specific_child_node_by_atter_value = get_specific_child_node_by_atter_value;

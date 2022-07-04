@@ -19,6 +19,7 @@ class MainContents extends React.Component {
                 <ContentsTheDraw contents_task_ref={this.__ref_contents_tasks}/>
                 <ContentsNewProduct contents_task_ref={this.__ref_contents_tasks}/>
                 <ContentsOrderList />
+                <ContentsReturnable />
             </div>
         );
     }

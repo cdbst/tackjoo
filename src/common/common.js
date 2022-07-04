@@ -265,6 +265,75 @@
         return product_info_obj;
     }
 
+    exports.get_returnable_info_obj_scheme = function(){
+        return {
+            product_name : undefined,
+            account_email : undefined,
+            product_img_url : undefined,
+            product_model_id : undefined,
+            product_option : undefined,
+            order_price : undefined,
+            order_number : undefined,
+            order_id : undefined,
+            order_item_id : undefined,
+            returnable_quantity : undefined,
+            order_date : undefined,
+            _id : undefined,
+        };
+    };
+
+    exports.update_returnable_info_obj = function(returnable_info_obj, key, value){
+        if(key in this.get_returnable_info_obj_scheme() == false){
+            throw 'returnable info object is not includes property : ' + key;
+        }
+
+        returnable_info_obj[key] = value;
+        return returnable_info_obj;
+    }
+
+    exports.get_submit_returnable_obj_scheme = function(){
+        return {
+            use_default_return_addr : undefined,
+            return_memo : undefined,
+            return_reason : undefined,
+            return_detail_reason : undefined,
+            return_addr_info : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_submit_returnable_obj = function(submit_returnable_info, key, value){
+        if(key in this.get_submit_returnable_obj_scheme() == false){
+            throw 'submit returnable info object is not includes property : ' + key;
+        }
+
+        submit_returnable_info[key] = value;
+        return submit_returnable_info;
+    }
+
+    exports.get_user_addr_info_obj_scheme = function(){
+        return {
+            user_name : undefined,
+            phone_number : undefined,
+            address : undefined,
+            address_detail : undefined,
+            postal_code : undefined,
+            address_id : undefined,
+            city : undefined,
+            _id : undefined
+        };
+    }
+
+    exports.update_user_addr_info_obj = function(user_addr_info, key, value){
+        if(key in this.get_user_addr_info_obj_scheme() == false){
+            throw 'user addr info object is not includes property : ' + key;
+        }
+
+        user_addr_info[key] = value;
+        return user_addr_info;
+    }
+
+
     exports.getValuesFromObjList = function(obj_list, key, value_refiner = undefined){
         const values = [];
 

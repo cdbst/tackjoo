@@ -5,6 +5,10 @@ const product_page_parser = require('./product_page_parser.js');
 const checkout_page_parser = require('./checkout_page_parser.js');
 const thedraw_list_page_parser = require('./thedraw_list_page_parser');
 const { parse_order_list_page } = require('./order_list_page_parser');
+const { 
+    get_returnable_info_list_from_product_page,
+    get_user_addr_info_from_request_returnable_modal
+} = require('./returnable_page_parser');
 const gen_sensor_data = require("../ipc/ipc_main_sensor.js").gen_sensor_data;
 const common = require("../common/common.js");
 const log = require('electron-log');
@@ -73,6 +77,8 @@ class BrowserContext {
 
         this.update_settings = this.update_settings.bind(this);
         this.update_account_info = this.update_account_info.bind(this);
+
+        this.open_returnable_page = this.open_returnable_page.bind(this);
         
         if(args.length === 4 || args.length == 0){
             this.__init.apply(null, args); // email, pwd, id, locked
@@ -1625,6 +1631,229 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'check_draw_result', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async open_returnable_page(__retry_cnt = undefined){
+
+        let headers = this.__get_open_page_header();
+        headers['sec-fetch-site'] = 'same-origin';
+        headers['upgrade-insecure-requests'] = 1;
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable?pageSize=60', headers);
+
+                if(res.status != 200){
+                    throw new Error('open_returnable_page : response ' + res.status);
+                }
+
+                this.__set_cookie(this.__cookie_storage, res);
+    
+                const $ = cheerio.load(res.data);
+                const returnable_info_list = get_returnable_info_list_from_product_page($, this.email);
+                return returnable_info_list;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_returnable_page', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+
+    async returnable_request(returnable_info, __retry_cnt = undefined){
+
+        let headers = {
+            'accept': '*/*',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'pragma':' no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent' : BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        const req_url = `${BrowserContext.NIKE_URL}/kr/ko_kr/account/orders/returnable/request/${returnable_info.order_id}`;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+
+                const params = { _ : new Date().getTime() };
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.GET, req_url, headers, params);
+
+                if(res.status != 200){
+                    throw new Error('returnable_request : response ' + res.status);
+                }
+
+                this.__set_cookie(this.__cookie_storage, res);
+
+                const $ = cheerio.load(res.data);
+                const default_return_addr_info = get_user_addr_info_from_request_returnable_modal($);
+
+                return default_return_addr_info;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'returnable_request', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async returnable_calculator(returnable_info, submit_returnable_info, retry_cnt){
+
+        const payload_obj = {
+            orderId: returnable_info.order_id,
+            orderItemId: returnable_info.order_item_id,
+            quantity: 1,
+            addressFirstName: submit_returnable_info.return_addr_info.user_name,
+            addressPhone: submit_returnable_info.return_addr_info.phone_number,
+            addressLine1: submit_returnable_info.return_addr_info.address,
+            addressLine2: submit_returnable_info.return_addr_info.address_detail,
+            addressPostalCode: submit_returnable_info.return_addr_info.postal_code,
+            addressCity: submit_returnable_info.return_addr_info.city,
+            selectPersonalMessage: 'dt_1',
+            personalMessageText: submit_returnable_info.return_memo,
+            owner: '',
+            accountCode: '',
+            accountName: '',
+            account: '',
+            reasonType: submit_returnable_info.return_reason,
+            reason: submit_returnable_info.return_detail_reason,
+            csrfToken: this.csrfToken
+        };
+
+        if(submit_returnable_info.return_addr_info.address_id) payload_obj.addressId = submit_returnable_info.return_addr_info.address_id;
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable/calculator', headers, payload);
+
+                if(res.status !== 200){
+                    throw new Error('returnable_calculator : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return res.data;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'returnable_calculator', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async submit_returnable(returnable_info, submit_returnable_info, retry_cnt){
+
+        const payload_obj = {
+            orderId: returnable_info.order_id,
+            orderItemId: returnable_info.order_item_id,
+            quantity: 1,
+            addressFirstName: submit_returnable_info.return_addr_info.user_name,
+            addressPhone: submit_returnable_info.return_addr_info.phone_number,
+            addressLine1: submit_returnable_info.return_addr_info.address,
+            addressLine2: submit_returnable_info.return_addr_info.address_detail,
+            addressPostalCode: submit_returnable_info.return_addr_info.postal_code,
+            addressCity: submit_returnable_info.return_addr_info.city,
+            selectPersonalMessage: 'dt_1',
+            personalMessageText: submit_returnable_info.return_memo,
+            owner: '',
+            accountCode: '',
+            accountName: '',
+            account: '',
+            reasonType: submit_returnable_info.return_reason,
+            reason: submit_returnable_info.return_detail_reason,
+            csrfToken: this.csrfToken
+        };
+
+        if(submit_returnable_info.return_addr_info.address_id) payload_obj.addressId = submit_returnable_info.return_addr_info.address_id;
+
+        let payload = new URLSearchParams(payload_obj).toString();
+
+        const headers = {
+            'accept': 'application/json, text/javascript, */*; q=0.01',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': 'no-cache',
+            'content-length': payload.length,
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'origin': BrowserContext.NIKE_URL,
+            'pragma': 'no-cache',
+            'referer': BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': BrowserContext.USER_AGENT,
+            'x-requested-with': 'XMLHttpRequest'
+        };
+
+        retry_cnt = retry_cnt === undefined ? this.__req_retry_cnt : retry_cnt;
+
+        for(var i = 0; i < retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request(BrowserContext.REQ_METHOD.POST, BrowserContext.NIKE_URL + '/kr/ko_kr/account/orders/returnable', headers, payload);
+
+                if(res.status !== 200){
+                    throw new Error('submit_returnable : response ' + res.status);
+                }
+    
+                this.__set_cookie(this.__cookie_storage, res);
+
+                return res.data;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'submit_returnable', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

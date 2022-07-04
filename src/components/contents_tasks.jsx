@@ -376,7 +376,7 @@ class ContentsTasks extends React.Component {
         const is_selected = document.getElementById(this.el_input_select_all).checked;
 
         for(const task_ref of Object.values(this.__table_item_ref_dict)){
-            task_ref.current.setSelectStatus(is_selected)
+            task_ref.current.setSelectStatus(is_selected);
         }
     }
 
@@ -617,15 +617,15 @@ class ContentsTasks extends React.Component {
                                     <th scope="col" style={{width : this.status_col_width, maxWidth : this.status_col_width}}>작업상태</th>
                                     <th scope="col" style={{width : this.action_col_width, maxWidth : this.action_col_width}}>동작</th>
                                     <th scope="col" style={{width : this.select_col_width, maxWidth : this.select_col_width}}>
-                                    <div className="form-switch">
-                                        <input 
-                                            id={this.el_input_select_all} 
-                                            type="checkbox" 
-                                            className="form-check-input" 
-                                            onChange={this.onChangeSelectAll.bind(this)}
-                                            disabled={this.state.task_table_item_list.length === 0}    
-                                        />
-                                    </div>
+                                        <div className="form-switch">
+                                            <input 
+                                                id={this.el_input_select_all} 
+                                                type="checkbox" 
+                                                className="form-check-input" 
+                                                onChange={this.onChangeSelectAll.bind(this)}
+                                                disabled={this.state.task_table_item_list.length === 0}    
+                                            />
+                                        </div>
                                     </th>
                                 </tr>
                             </thead>

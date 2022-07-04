@@ -197,12 +197,12 @@ class ContentsOrderList extends React.Component {
     render() {
 
         return (
-            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.CHECKOUTS}>
+            <div className="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.ORDER_LIST}>
                 <div className="container-fluid">
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
                         <div className="col-md-2">
-                            <h4 className="contents-title">구매내역</h4>
+                            <h4 className="contents-title">주문내역</h4>
                         </div>
                         <div className="col-md-2">
                             <LabelSelect ref={this.__ref_sel_account_name} label="계정" options={this.state.opt_list_account_email} h_on_change={this.onChangeOption.bind(this)}/>
@@ -211,7 +211,7 @@ class ContentsOrderList extends React.Component {
                             <LabelSelect ref={this.__ref_sel_product_name} label="상품" options={this.state.opt_list_product_name} label_col_class="col-md-2" select_col_class="col-md-10" h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-3">
-                            <LabelSelect ref={this.__ref_sel_order_date} label="구매일시" options={this.state.opt_list_order_date} h_on_change={this.onChangeOption.bind(this)}/>
+                            <LabelSelect ref={this.__ref_sel_order_date} label="주문일시" options={this.state.opt_list_order_date} h_on_change={this.onChangeOption.bind(this)}/>
                         </div>
                         <div className="col-md-2">
                             <LabelSelect ref={this.__ref_sel_order_status} label="진행단계" options={this.state.opt_list_order_status} label_col_class="col-md-5" select_col_class="col-md-7" h_on_change={this.onChangeOption.bind(this)}/>
@@ -227,7 +227,7 @@ class ContentsOrderList extends React.Component {
                                 <th scope="col" style={{width : this.product_model_id_col_width, maxWidth : this.product_model_id_col_width}}>모델</th>
                                 <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>가격</th>
-                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>구매일시</th>
+                                <th scope="col" style={{width : this.order_date_col_width, maxWidth : this.order_date_col_width}}>주문일시</th>
                                 <th scope="col" style={{width : this.order_status_col_width, maxWidth : this.order_status_col_width}}>진행단계</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
