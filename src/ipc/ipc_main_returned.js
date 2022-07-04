@@ -33,8 +33,40 @@ function register(){
                 event.reply('load-returned-info-list-reply' + data.id, {err : errors.join('\n'), data : returned_info_list});
     
             }catch(err){
-                log.error(common.get_log_str('ipc_main_proxy.js', 'load-returned-info-list-callback', err));
+                log.error(common.get_log_str('ipc_main_returned.js', 'load-returned-info-list-callback', err));
                 event.reply('load-returned-info-list-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
+
+    ipcMain.on('cancel-return', (event, data) => {
+
+        const returned_info = data.payload.returned_info;
+
+        (async ()=>{
+            try{
+                const browser_context = BrowserContextManager.get_by_email(returned_info.account_email);
+        
+                if(browser_context === undefined){
+                    throw new Error('Cannot found browser context');
+                }
+
+                if(browser_context.is_session_expired()){
+                    let result = await browser_context.login(5);
+                    if(result === false) throw new Error('Login fail');
+                }
+
+                const returned_info_list = await browser_context.open_returned_page(2);
+                if(returned_info_list === undefined) throw new Error('open returned page fail');
+
+                const result = await browser_context.cancel_return(returned_info, 1);
+                if(result === false) throw new Error('cancel returned fail');
+    
+                event.reply('cancel-return-reply' + data.id, {err : undefined, data : result});
+    
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_proxy.js', 'cancel-return-callback', err));
+                event.reply('cancel-return-reply' + data.id, {err : err.message});
             }
         })();
     });

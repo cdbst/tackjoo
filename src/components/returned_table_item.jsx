@@ -38,6 +38,34 @@ class ReturnedTableItem extends React.Component {
 
     onClickCancelReturnBtn(){
 
+        Index.g_prompt_modal.popModal('경고', <p>{this.props.returned_info.account_email} 계정으로 주문한 {this.props.returned_info.product_name}의 반품 요청을 정말로 취소합니까?</p>, (is_ok)=>{
+
+            if(is_ok == false) return;
+
+            this.__ref_cancel_return_btn.current.setLoadingStatus(true);
+            Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 요청 취소를 요청합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+            window.electron.cancelReturn(this.props.returned_info, (error, result) =>{
+
+                this.__ref_cancel_return_btn.current.setLoadingStatus(false);
+
+                if(error){
+                    Index.g_sys_msg_q.enqueue('에러', `반품을 취소하는 과정에서 알 수 없는 오류가 발생했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    return;
+                }else if(result ===  false){
+                    Index.g_sys_msg_q.enqueue('에러', `반품 취소 요청이 실패했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    return;
+                }
+
+                Index.g_sys_msg_q.enqueue('알림', `${this.props.returned_info.account_email} 계정으로 주문한 ${this.props.returned_info.product_name} 상품의 반품 취소 요청이 성공했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+                const updated_returned_info = _.clone(this.props.returned_info);
+                updated_returned_info.is_cancelable = false;
+                updated_returned_info.status = '반품취소완료';
+                this.props.h_update_returned_info(updated_returned_info);
+            });
+
+        });
     }
 
     render(){

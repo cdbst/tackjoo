@@ -64,6 +64,7 @@ contextBridge.exposeInMainWorld('electron', {
     loadReturnableInfoList : _loadReturnableInfoList,
     requestReturnable : _requestReturnable,
     loadReturnedInfoList : _loadReturnedInfoList,
+    cancelReturn : _cancelReturn,
 });
 
 /**
@@ -716,5 +717,14 @@ function _loadReturnedInfoList(__callback){
 
     ipcRenderer.once('load-returned-info-list-reply' + ipc_data.id, (_event, returned_info_list_info) => {
         __callback(returned_info_list_info.err, returned_info_list_info.data);
+    });
+}
+
+function _cancelReturn(returned_info, __callback){
+    let ipc_data = get_ipc_data({returned_info : returned_info});
+    ipcRenderer.send('cancel-return', ipc_data);
+
+    ipcRenderer.once('cancel-return-reply' + ipc_data.id, (_event, result_info) => {
+        __callback(result_info.err, result_info.data);
     });
 }
