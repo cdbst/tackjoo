@@ -65,6 +65,7 @@ contextBridge.exposeInMainWorld('electron', {
     requestReturnable : _requestReturnable,
     loadReturnedInfoList : _loadReturnedInfoList,
     cancelReturn : _cancelReturn,
+    loadExclusiveInfo : _loadExclusiveInfo,
 });
 
 /**
@@ -726,5 +727,17 @@ function _cancelReturn(returned_info, __callback){
 
     ipcRenderer.once('cancel-return-reply' + ipc_data.id, (_event, result_info) => {
         __callback(result_info.err, result_info.data);
+    });
+}
+
+function _loadExclusiveInfo(exclusive_url, __callback){
+    let ipc_data = get_ipc_data({
+        exclusive_url : exclusive_url,
+    });
+
+    ipcRenderer.send('load-exclusive-info-list', ipc_data);
+
+    ipcRenderer.once('load-exclusive-info-list-reply' + ipc_data.id, (_event, exclusive_info_list_info) => {
+        __callback(exclusive_info_list_info.err, exclusive_info_list_info.data);
     });
 }

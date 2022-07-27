@@ -7,7 +7,6 @@ class ContentsExclusive extends React.Component {
 
         this.__setupColumnsWidth = this.__setupColumnsWidth.bind(this);
         this.onClickClenup = this.onClickClenup.bind(this);
-        this.onClickLoad = this.onClickLoad.bind(this);
         this.setContents = this.setContents.bind(this);
         this.clearContents = this.clearContents.bind(this);
         this.onCreateTask = this.onCreateTask.bind(this);
@@ -49,13 +48,22 @@ class ContentsExclusive extends React.Component {
         this.clearContents();
     }
 
-    onClickLoad(){
-        this.__ref_load_btn.current.setLoadingStatus(true);
-        Index.g_sys_msg_q.enqueue('안내', '서버로부터 EXCLUSIVE ACCESS 당첨 결과를 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
-    }
+    onSubmitExclusiveLink(exclusive_url){
 
-    onSubmitExclusiveLink(){
-        console.log('onSubmitExclusiveLink');
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 EXCLUSIVE ACCESS 당첨 결과를 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+        window.electron.loadExclusiveInfo(exclusive_url, (err, exclusive_item_list) =>{
+
+            if(err) Index.g_sys_msg_q.enqueue('안내', err, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            if(exclusive_item_list.length === 0) return;
+            Index.g_sys_msg_q.enqueue('안내', 'EXCLUSIVE ACCESS 당첨 결과를 읽어왔습니다. 구매 가능 계정만 테이블에 추가됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+            this.exclusive_item_list = exclusive_item_list;
+
+            this.clearContents(()=>{
+                this.setContents(this.exclusive_item_list);
+            });
+        });
 
     }
 
