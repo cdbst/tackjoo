@@ -7,6 +7,7 @@ class ContentsTasks extends React.Component {
         super(props);
 
         this.popTaskEditModal = this.popTaskEditModal.bind(this);
+        this.popTaskEditModalWithSpecificAccount = this.popTaskEditModalWithSpecificAccount.bind(this);
         this.onClickBtnRunAll = this.onClickBtnRunAll.bind(this);
         this.onClickBtnRemoveAll = this.onClickBtnRemoveAll.bind(this);
         this.onClickSelectedTaskRemove = this.onClickSelectedTaskRemove.bind(this);
@@ -189,6 +190,15 @@ class ContentsTasks extends React.Component {
         let el_modal = document.getElementById(this.task_edit_modal_id);
         el_modal.product_link_url = product_link_url;
         el_modal.task_id_list_to_modify = task_id_list_to_modify;
+
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
+    }
+
+    popTaskEditModalWithSpecificAccount(product_link_url, account_email){
+        let el_modal = document.getElementById(this.task_edit_modal_id);
+        el_modal.product_link_url = product_link_url;
+        el_modal.account_email = account_email;
 
         var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
         bs_obj_modal.show();
@@ -536,13 +546,18 @@ class ContentsTasks extends React.Component {
         }
     }
 
-    create_manual_task(product_info){
+    create_manual_task(product_info, account_email){
 
         let task_tab_menu = document.querySelector('#tasks-tab');
         let el_bs_task_tab_menu = bootstrap.Tab.getOrCreateInstance(task_tab_menu);
         el_bs_task_tab_menu.show();
 
-        this.popTaskEditModal(product_info.url);
+        if(account_email !== undefined){
+            this.popTaskEditModalWithSpecificAccount(product_info.url, account_email);
+        }else{
+            this.popTaskEditModal(product_info.url);
+        }
+        
     }
 
     create_quick_task(product_info, account_email){
@@ -586,12 +601,14 @@ class ContentsTasks extends React.Component {
                     />
                     <LoadLinkProductModal 
                         id={this.load_link_product_modal_id} 
-                        h_load_product={this.onLoadLinkProduct.bind(this)}
+                        h_on_submit={this.onLoadLinkProduct.bind(this)}
+                        allow_patterns={[common.NIKE_URL]}
                         title={"링크로 상품 불러오기"}
                     />
                     <LoadLinkProductModal 
-                        id={this.modify_link_product_modal_id} 
-                        h_load_product={this.onModifyLinkProduct.bind(this)}
+                        id={this.modify_link_product_modal_id}
+                        h_on_submit={this.onModifyLinkProduct.bind(this)}
+                        allow_patterns={[common.NIKE_URL]}
                         title={"링크로 상품 편집하기"}
                     />
                     <br/>

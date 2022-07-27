@@ -75,7 +75,7 @@ class ProductManager{
             return;
         }else{
             this.__product_info_req_gate.subscribe(_id, __subscriber);
-            window.electron.getProductInfo(product_obj.url, (error, product_info) =>{
+            window.electron.getProductInfo(product_obj.url, undefined, (error, product_info) =>{
                 //TODO 예외처리 방법에 대한 로직 새로 생각해야함. task 로직 구현과 관련해서 생각 필요.
                 if(product_info == undefined){
                     this.__product_info_req_gate.notify(product_obj._id, error, product_obj);

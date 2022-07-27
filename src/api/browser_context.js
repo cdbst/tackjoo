@@ -49,6 +49,7 @@ class BrowserContext {
         
         this.__http_request = this.__http_request.bind(this);
         this.__http_request_no_redir = this.__http_request_no_redir.bind(this);
+        this.__http_request_redir = this.__http_request_redir.bind(this);
         this.__process_to_redir = this.__process_to_redir.bind(this);
         this.__get_proxy_cfg = this.__get_proxy_cfg.bind(this);
         this.__judge_cookie_storage = this.__judge_cookie_storage.bind(this);
@@ -352,6 +353,59 @@ class BrowserContext {
             axios(axios_req_cfg)
             .then(async (res) => {
                 resolve(res);
+            })
+            .catch(error => {
+                reject(error);
+            });
+        });
+    }
+
+    async __http_request_redir(method, url, headers, params, send_sensor_data = true){
+
+        if(send_sensor_data){
+            await this.__send_fake_sensor_data();
+        }
+
+        if(headers == undefined) headers = {};
+
+        const cookie_storage = this.__judge_cookie_storage(url);
+        if(cookie_storage.num_of_cookies > 0){
+            headers['cookie'] = cookie_storage.get_serialized_cookie_data();
+        }
+
+        const axios_req_cfg = {
+            method: method,
+            url: url,
+            timeout: this.__req_timout,
+            headers : headers,
+            maxRedirects : 0,
+            validateStatus : (status) =>{
+                return status >= 200 && status <= 310; 
+            }
+        };
+        
+        const proxy_cfg = this.__get_proxy_cfg();
+        if(proxy_cfg != undefined){
+            axios_req_cfg.proxy = proxy_cfg;
+        }
+        
+        if(params != undefined){
+            if(method == BrowserContext.REQ_METHOD.POST){
+                axios_req_cfg['data'] = params;
+            }else{
+                axios_req_cfg['params'] = params;
+            }
+        }
+
+        return new Promise((resolve, reject)=>{
+            axios(axios_req_cfg)
+            .then(async (res) => {
+                if(res.status >= 300 && res.status <= 310){
+                    const redir_res = await this.__process_to_redir(res);
+                    resolve(redir_res);
+                }else{
+                    resolve(res);
+                }
             })
             .catch(error => {
                 reject(error);
@@ -1990,6 +2044,58 @@ class BrowserContext {
 
             }catch(e){
                 log.error(common.get_log_str('browser_context.js', 'submit_returnable', e));
+                await this.__post_process_req_fail(e, this.__req_retry_interval);
+            }
+        }
+
+        return undefined;
+    }
+
+    async open_exclusive_link(exclusive_url, __retry_cnt = undefined){
+
+        const headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Host': 'go.nike.com',
+            'Pragma': 'no-cache',
+            'sec-ch-ua': BrowserContext.SEC_CA_UA,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': "Windows",
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': 1,
+            'User-Agent': BrowserContext.USER_AGENT
+        }
+
+        __retry_cnt = __retry_cnt === undefined ? this.__req_retry_cnt : __retry_cnt;
+
+        for(var i = 0; i < __retry_cnt; i++){
+            try{
+                
+                const res = await this.__http_request_redir(BrowserContext.REQ_METHOD.GET, exclusive_url, headers);
+
+                const $ = cheerio.load(res.data);
+
+                let result = this.__post_process_open_page(res, $);
+                if(result === false){
+                    throw new Error('open_exclusive_link : cannot store informations');
+                }
+
+                const product_info = product_page_parser.get_product_info_from_product_page($);
+                if(product_info === undefined) return undefined;
+
+                common.update_product_info_obj(product_info, 'url', common.NIKE_URL + res.request.path);
+
+                this.__set_cookie(this.__cookie_storage, res);
+                return product_info;
+
+            }catch(e){
+                log.error(common.get_log_str('browser_context.js', 'open_exclusive_link', e));
                 await this.__post_process_req_fail(e, this.__req_retry_interval);
             }
         }

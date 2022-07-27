@@ -184,7 +184,7 @@ class ContentsTheDraw extends React.Component {
     }
 
     onCreateTask(product_url, account_email){
-        window.electron.getProductInfo(product_url, (error, product_info) =>{
+        window.electron.getProductInfo(product_url, undefined, (error, product_info) =>{
             
             if(error !== undefined || product_info === undefined){
                 Index.g_sys_msg_q.enqueue('안내', '상품 정보를 읽을 수 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);

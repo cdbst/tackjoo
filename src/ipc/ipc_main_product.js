@@ -1,5 +1,6 @@
 const {ipcMain} = require("electron");
 const BrowserContext = require("../api/browser_context.js").BrowserContext;
+const BrowserContextManager = require("../api/browser_context_mngr.js").BrowserContextManager;
 const { get_kream_product_info } = require('../api/kream_mngr');
 
 const log = require('electron-log');
@@ -24,11 +25,17 @@ function register(){
 
     ipcMain.on('get-product-info', async (event, data) => {
 
-        let browser_context = new BrowserContext();
+        let browser_context;
         const product_url = data.payload.product_url;
+        const loader_account_email = data.payload.loader_account_email;
+
+        if(loader_account_email !== undefined){
+            browser_context = BrowserContextManager.get_by_email(loader_account_email);
+        }else{
+            browser_context = new BrowserContext();
+        }
         
         (async () => {
-
             const product_info = await browser_context.open_product_page(product_url, 2);
             if(product_info == undefined){
                 log.error(common.get_log_str('ipc_main_product.js', 'get-product-info-callback', 'Cannot open product page'));
@@ -58,7 +65,55 @@ function register(){
         })();
         
     });
+
+    ipcMain.on('load-exclusive-info-list', async (event, data) => {
+
+        const exclusive_url = data.payload.exclusive_url;
+
+        (async ()=>{
+            try{
+                const browser_context_list = BrowserContextManager.get_all_browser_contexts();
+                const exclusive_info_list_promise_list = [];
+
+                for(var i = 0; i < browser_context_list.length; i++){
+                    const browser_context = browser_context_list[i];
+                    const p_exclusive_info_list = get_exclusive_list_info(browser_context, exclusive_url);
+                    exclusive_info_list_promise_list.push(p_exclusive_info_list);
+                    await common.async_sleep(1000);
+                }
+
+                const results = await Promise.all(exclusive_info_list_promise_list);
+                const errors = [];
+                const exclusive_item_list = [];
+
+                results.forEach((result)=>{
+                    if(result.error !== undefined) errors.push(result.error);
+                    if(result.data !== undefined) exclusive_item_list.push(result.data);
+                })
+    
+                event.reply('load-exclusive-info-list-reply' + data.id, {err : errors.join('\n'), data : exclusive_item_list});
+    
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_proxy.js', 'load-exclusive-info-list-callback', err));
+                event.reply('load-exclusive-info-list-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
 }
 
+async function get_exclusive_list_info(browser_context, exclusive_url){
+
+    let result = await browser_context.login(5);
+    if(result === false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+
+    let product_info = await browser_context.open_exclusive_link(exclusive_url, 1);
+    if(product_info === undefined) return {error : `미당첨 : ${browser_context.email}`, data : undefined};
+
+    return {error : undefined, data : {
+        product_info : product_info,
+        account_email : browser_context.email,
+        _id : common.uuidv4()
+    }}
+}
 
 module.exports.register = register;

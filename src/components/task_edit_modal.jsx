@@ -76,7 +76,7 @@ class TaskEditModal extends React.Component {
     onModalshown(e){
         
         this.product_info_list = Index.g_product_mngr.getProductInfoList();
-        const account_info_list = this.props.contents_account_ref.current.getUnlockedAccountInfoList();
+        let account_info_list;
         const proxy_info_list = this.props.contents_proxies_ref.current.getProxyInfoList();
 
         const el_modal = document.getElementById(this.props.id);
@@ -84,6 +84,14 @@ class TaskEditModal extends React.Component {
 
         this.ref_options_account.current.setDisable(this.modify_mode);
         if(this.modify_mode) this.ref_options_account.current.unsetSelect();
+
+        if(el_modal.account_email){ // 특정 계정에 대한 작업 생성시
+            this.ref_options_account.current.setDisable(true);
+            const account_info = this.props.contents_account_ref.current.getAccountInfoWithEmail(el_modal.account_email);
+            account_info_list = [account_info];
+        }else{
+            account_info_list = this.props.contents_account_ref.current.getUnlockedAccountInfoList();
+        }
         
         this.ref_options_proxy.current.setDisable(this.modify_mode);
         if(this.modify_mode) this.ref_options_proxy.current.unsetSelect();
@@ -98,17 +106,17 @@ class TaskEditModal extends React.Component {
             });
 
         }else{                    
-            this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list);
+            this.setCustomURLProduct(el_modal.product_link_url, account_info_list, proxy_info_list, el_modal.account_email);
         }
     }
 
-    setCustomURLProduct(product_link_url, account_info_list, proxy_info_list){
+    setCustomURLProduct(product_link_url, account_info_list, proxy_info_list, loader_account_email){
 
         this.setLoadingStatus(true);
 
         Index.g_sys_msg_q.enqueue('알림', '제품 정보 읽어오는 중입니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
-        window.electron.getProductInfo(product_link_url, (error, product_info) =>{
+        window.electron.getProductInfo(product_link_url, loader_account_email, (error, product_info) =>{
 
             this.setLoadingStatus(false);
             
@@ -154,6 +162,7 @@ class TaskEditModal extends React.Component {
         const el_modal = document.getElementById(this.props.id);
         el_modal.product_link_url = undefined;
         el_modal.task_id_list_to_modify = undefined;
+        el_modal.account_email = undefined;
         this.modify_mode = undefined;
     }
 
@@ -246,6 +255,8 @@ class TaskEditModal extends React.Component {
 
     onSubmitTaskInfo(){
 
+        const el_modal = document.getElementById(this.props.id);
+
         if(this.state.selected_product == undefined){
             Index.g_sys_msg_q.enqueue('에러', "상품이 선택되지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
@@ -280,8 +291,13 @@ class TaskEditModal extends React.Component {
 
         if(this.modify_mode === false){
 
-            selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
-            if(selected_account_email_list.length == 0){
+            if(el_modal.account_email){
+                selected_account_email_list = [el_modal.account_email];
+            }else{
+                selected_account_email_list = this.ref_options_account.current.getSelectedOptionValues();
+            }
+            
+            if(selected_account_email_list.length === 0){
                 Index.g_sys_msg_q.enqueue('에러', "구매할 계정을 선택하지 않았습니다.", ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
                 return;
             }
@@ -368,8 +384,10 @@ class TaskEditModal extends React.Component {
         ];
 
 
-        let account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
-        if(account_email_list.length > 0){
+        const el_modal = document.getElementById(this.props.id);
+
+        const account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
+        if(el_modal && el_modal.account_email === false && account_email_list.length > 0) { // 특정 계정에 대한 작업 생성 상황에서는 모든 계정 옵션을 넣지 않음.
             account_email_list.unshift(TaskEditModal.ACCOUNT_OPTION_NAME_ALL);
         }
 
