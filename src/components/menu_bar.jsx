@@ -13,6 +13,7 @@ class MenuBar extends React.Component {
         ORDER_LIST : 'order-list-tab',
         RETURNABLE : 'returnable-tab',
         RETURNED : 'returned-tab',
+        EXCLUSIVE : 'exclusive-tab',
     }
 
     constructor(props) {
@@ -92,6 +93,9 @@ class MenuBar extends React.Component {
                         <a className="nav-link" id={MenuBar.MENU_ID.THEDRAW} data-bs-toggle="tab" href="#thedraw" role="tab" aria-controls="thedraw" aria-selected="false">응모</a>
                     </li>
                     <li className="nav-item" role="presentation">
+                        <a className="nav-link" id={MenuBar.MENU_ID.EXCLUSIVE} data-bs-toggle="tab" href="#exclusive" role="tab" aria-controls="exclusive" aria-selected="false">익클</a>
+                    </li>
+                    <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.ACCOUNTS} data-bs-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="false">계정관리</a>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -112,7 +116,7 @@ class MenuBar extends React.Component {
                     <li className="nav-item" role="presentation">
                         <a className="nav-link" id={MenuBar.MENU_ID.SETTINGS} data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">설정</a>
                     </li>
-                    <ul className="nav justify-content-end app-drag-area" style={{width:'calc(100% - 990px)'}} >
+                    <ul className="nav justify-content-end app-drag-area" style={{width:'calc(100% - 1050px)'}} >
                         <li className="nav-item">
                             <img className="nav-bar-icon" src="./res/img/arrow-clockwise.svg" onClick={this.onClickTimeRefreeshBtn} title="서버시간 갱신하기"/>
                         </li>

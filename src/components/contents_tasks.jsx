@@ -586,12 +586,14 @@ class ContentsTasks extends React.Component {
                     />
                     <LoadLinkProductModal 
                         id={this.load_link_product_modal_id} 
-                        h_load_product={this.onLoadLinkProduct.bind(this)}
+                        h_on_submit={this.onLoadLinkProduct.bind(this)}
+                        allow_patterns={[common.NIKE_URL]}
                         title={"링크로 상품 불러오기"}
                     />
                     <LoadLinkProductModal 
-                        id={this.modify_link_product_modal_id} 
-                        h_load_product={this.onModifyLinkProduct.bind(this)}
+                        id={this.modify_link_product_modal_id}
+                        h_on_submit={this.onModifyLinkProduct.bind(this)}
+                        allow_patterns={[common.NIKE_URL]}
                         title={"링크로 상품 편집하기"}
                     />
                     <br/>

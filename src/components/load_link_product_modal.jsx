@@ -43,7 +43,20 @@ class LoadLinkProductModal extends React.Component {
         if(value === ''){
             Index.g_sys_msg_q.enqueue('에러', '제품 URL을 입력하지 않았습니다', ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
-        }else if(value.startsWith(common.NIKE_URL) === false){
+        }
+        
+        let is_valid_value = false;
+
+        this.props.allow_patterns.every((patterns)=>{
+            if(value.startsWith(patterns)){
+                is_valid_value = true;
+                return false;
+            }else{
+                return true;
+            }
+        });
+        
+        if(is_valid_value === false){
             Index.g_sys_msg_q.enqueue('에러', `제품 URL은 '${common.NIKE_URL}' 로 시작해야 합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
@@ -51,7 +64,7 @@ class LoadLinkProductModal extends React.Component {
         const el_modal = document.getElementById(this.props.id);
         const bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
 
-        this.props.h_load_product(value, el_modal.task_id);
+        this.props.h_on_submit(value, el_modal.task_id);
         bs_obj_modal.hide();
     }
 

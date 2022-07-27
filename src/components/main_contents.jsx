@@ -21,6 +21,7 @@ class MainContents extends React.Component {
                 <ContentsOrderList />
                 <ContentsReturnable />
                 <ContentsReturned />
+                <ContentsExclusive />
             </div>
         );
     }
