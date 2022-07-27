@@ -25,11 +25,17 @@ function register(){
 
     ipcMain.on('get-product-info', async (event, data) => {
 
-        let browser_context = new BrowserContext();
+        let browser_context;
         const product_url = data.payload.product_url;
+        const loader_account_email = data.payload.loader_account_email;
+
+        if(loader_account_email !== undefined){
+            browser_context = BrowserContextManager.get_by_email(loader_account_email);
+        }else{
+            browser_context = new BrowserContext();
+        }
         
         (async () => {
-
             const product_info = await browser_context.open_product_page(product_url, 2);
             if(product_info == undefined){
                 log.error(common.get_log_str('ipc_main_product.js', 'get-product-info-callback', 'Cannot open product page'));
@@ -105,7 +111,8 @@ async function get_exclusive_list_info(browser_context, exclusive_url){
 
     return {error : undefined, data : {
         product_info : product_info,
-        account_email : browser_context.email
+        account_email : browser_context.email,
+        _id : common.uuidv4()
     }}
 }
 

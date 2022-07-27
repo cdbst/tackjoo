@@ -35,7 +35,7 @@ class ExclusiveTableItem extends React.Component {
     }
 
     onCreateTask(){
-        this.props.h_on_create_task(this.props.product_info.product_link, this.props.account_email);
+        this.props.h_on_create_task(this.props.product_info, this.props.account_email);
     }
 
     render(){
@@ -45,24 +45,21 @@ class ExclusiveTableItem extends React.Component {
                 <td style={{width : this.props.image_col_width, maxWidth : this.props.image_col_width}}>
                     <img 
                         className="rounded product-table-item-img curser-pointer" 
-                        src={this.props.product_info.product_img_url} 
-                        alt={this.props.product_info.product_name}
+                        src={this.props.product_info.img_url} 
+                        alt={this.props.product_info.name}
                     />
                 </td>
                 <td style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}}>
                     <div className="cut-text" style={{width : this.props.account_col_width, maxWidth : this.props.account_col_width}} title={this.props.account_email}>{this.props.account_email}</div>
                 </td>
                 <td style={{width : this.props.product_name_col_width, maxWidth : this.props.product_name_col_width}}>
-                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.product_info.product_name}>{this.props.product_info.product_name}</div>
+                    <div className="cut-text" style={{width : '21vw', maxWidth : '21vw'}} title={this.props.product_info.name}>{this.props.product_info.name}</div>
                 </td>
                 <td style={{width : this.props.product_model_id_col_width, maxWidth : this.props.product_model_id_col_width}}>
-                    <span>{this.props.product_info.product_model_id}</span>
-                </td>
-                <td style={{width : this.props.product_size_col_width, maxWidth : this.props.product_size_col_width}}>
-                    <span>{this.props.product_info.product_size}</span>
+                    <span>{this.props.product_info.model_id}</span>
                 </td>
                 <td style={{width : this.props.product_price_col_width, maxWidth : this.props.product_price_col_width}}>
-                    <span>{this.props.product_info.product_price}</span>
+                    <span>{this.props.product_info.price}</span>
                 </td>
                 <td style={{width : this.props.actions_col_width, maxWidth : this.props.actions_col_width}}>
                     <div>

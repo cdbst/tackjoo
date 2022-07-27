@@ -195,9 +195,12 @@ function _getProductInfoList(__callback){
     });
 }
 
-function _getProductInfo(_product_url, __callback){
+function _getProductInfo(_product_url, _loader_account_email, __callback){
 
-    let ipc_data = get_ipc_data({product_url : _product_url});
+    let ipc_data = get_ipc_data({
+        product_url : _product_url,
+        loader_account_email: _loader_account_email,
+    });
 
     ipcRenderer.send('get-product-info', ipc_data);
 

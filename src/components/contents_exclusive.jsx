@@ -11,6 +11,7 @@ class ContentsExclusive extends React.Component {
         this.clearContents = this.clearContents.bind(this);
         this.onCreateTask = this.onCreateTask.bind(this);
         this.onSubmitExclusiveLink = this.onSubmitExclusiveLink.bind(this);
+        this.popExclusiveUrlInputModal = this.popExclusiveUrlInputModal.bind(this);
 
         this.exclusive_item_list = [];
 
@@ -29,11 +30,10 @@ class ContentsExclusive extends React.Component {
 
         this.image_col_width = 70;
         this.account_col_width = 240;
-        this.product_size_col_width = 120;
         this.product_price_col_width = 180;
         this.product_model_id_col_width = 130;
         this.actions_col_width = 240;
-        this.product_name_col_width = 'calc( 100% - ' + (this.image_col_width + this.account_col_width + this.actions_col_width + this.product_size_col_width + this.product_price_col_width + this.product_model_id_col_width) + 'px)';
+        this.product_name_col_width = 'calc( 100% - ' + (this.image_col_width + this.account_col_width + this.actions_col_width + this.product_price_col_width + this.product_model_id_col_width) + 'px)';
     }
 
     componentDidMount(){
@@ -50,9 +50,12 @@ class ContentsExclusive extends React.Component {
 
     onSubmitExclusiveLink(exclusive_url){
 
+        this.__ref_load_btn.current.setLoadingStatus(true);
         Index.g_sys_msg_q.enqueue('안내', '서버로부터 EXCLUSIVE ACCESS 당첨 결과를 읽어옵니다. 계정 하나당 5~7초정도 소요됩니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.loadExclusiveInfo(exclusive_url, (err, exclusive_item_list) =>{
+
+            this.__ref_load_btn.current.setLoadingStatus(false);
 
             if(err) Index.g_sys_msg_q.enqueue('안내', err, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
             if(exclusive_item_list.length === 0) return;
@@ -90,14 +93,13 @@ class ContentsExclusive extends React.Component {
         return exclusive_item_list.map((exclusive_item) =>
             <ExclusiveTableItem
                 account_col_width = {this.account_col_width}
-                product_size_col_width = {this.product_size_col_width}
                 product_price_col_width = {this.product_price_col_width}
                 product_model_id_col_width = {this.product_model_id_col_width}
                 actions_col_width = {this.actions_col_width}
                 product_name_col_width = {this.product_name_col_width}
                 image_col_width = {this.image_col_width}
                 h_on_create_task={this.onCreateTask.bind(this)}
-                account_email = {exclusive_item.email}
+                account_email = {exclusive_item.account_email}
                 product_info = {exclusive_item.product_info}
                 key={exclusive_item._id}
             />
@@ -106,6 +108,12 @@ class ContentsExclusive extends React.Component {
 
     onCreateTask(product_info, account_email){
         this.props.contents_task_ref.current.create_manual_task(product_info, account_email);
+    }
+
+    popExclusiveUrlInputModal(){
+        const el_modal = document.getElementById(this.EXCLUSIVE_LINK_LOADER_MODAL_ID);
+        var bs_obj_modal = bootstrap.Modal.getOrCreateInstance(el_modal);
+        bs_obj_modal.show();
     }
 
     render() {
@@ -133,7 +141,6 @@ class ContentsExclusive extends React.Component {
                                 <th scope="col" style={{width : this.account_col_width, maxWidth : this.account_col_width}}>계정명</th>
                                 <th scope="col" style={{width : this.product_name_col_width, maxWidth : this.product_name_col_width}}>상품명</th>
                                 <th scope="col" style={{width : this.product_model_id_col_width, maxWidth : this.product_model_id_col_width}}>모델(스타일)</th>
-                                <th scope="col" style={{width : this.product_size_col_width, maxWidth : this.product_size_col_width}}>사이즈</th>
                                 <th scope="col" style={{width : this.product_price_col_width, maxWidth : this.product_price_col_width}}>가격</th>
                                 <th scope="col" style={{width : this.actions_col_width, maxWidth : this.actions_col_width}}>동작</th>
                             </tr>
@@ -145,9 +152,13 @@ class ContentsExclusive extends React.Component {
                     </div>
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
-                            <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.EXCLUSIVE_LINK_LOADER_MODAL_ID}>
-                                <img src="./res/img/cloud-arrow-down-fill.svg" style={{width:24, height:24}}/> 당첨 확인
-                            </button>
+                            <LaodingButton
+                                ref={this.__ref_load_btn}
+                                h_on_click={this.popExclusiveUrlInputModal.bind(this)}
+                                btn_label={"당첨확인"}
+                                btn_class={"btn-primary btn-footer-inside"}
+                                img_src={"./res/img/cloud-arrow-down-fill.svg"}
+                            />
                             <button type="button" className="btn btn-danger btn-footer-inside" onClick={this.onClickClenup.bind(this)}>
                                 <img src="./res/img/trash-fill.svg" style={{width:24, height:24}}/> 초기화
                             </button>

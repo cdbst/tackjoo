@@ -19,6 +19,7 @@ class ContentsAccounts extends React.Component {
         this.pushAccountTableItem = this.pushAccountTableItem.bind(this);
         this.checkDuplicatedItem = this.checkDuplicatedItem.bind(this);
         this.__changeTableItemIdx = this.__changeTableItemIdx.bind(this);
+        this.getAccountInfoWithEmail = this.getAccountInfoWithEmail.bind(this);
         
         this.account_edit_modal_el_id = "edit-account-modal";
         this.account_bulk_edit_modal_el_id = "bulk-edit-account-modal";
@@ -91,6 +92,11 @@ class ContentsAccounts extends React.Component {
 
     getUnlockedAccountInfoList(){
         return this.state.account_table_list.map((table_item) => table_item.ref.current.getAccountInfo()).filter((account_info) => !account_info.locked);
+    }
+
+    getAccountInfoWithEmail(account_email){
+        const account_info_list = this.state.account_table_list.map((table_item) => table_item.ref.current.getAccountInfo());
+        return account_info_list.find((account_info) => account_info.email === account_email);
     }
 
     addBulkAccount(_account_info_list){
