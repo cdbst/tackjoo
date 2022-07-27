@@ -23,7 +23,7 @@ class ExclusiveTableItem extends React.Component {
     }
 
     onClickKreamLinkBtn(){
-        window.electron.getKreamProductInfo(this.props.product_info.product_model_id, (err, kream_product_info)=>{
+        window.electron.getKreamProductInfo(this.props.product_info.model_id, (err, kream_product_info)=>{
 
             if(err){
                 Index.g_sys_msg_q.enqueue('에러', `해당 상품을 크림에서 찾을수 없습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 3000);

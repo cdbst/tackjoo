@@ -57,7 +57,7 @@ class LoadLinkProductModal extends React.Component {
         });
         
         if(is_valid_value === false){
-            Index.g_sys_msg_q.enqueue('에러', `제품 URL은 '${common.NIKE_URL}' 로 시작해야 합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+            Index.g_sys_msg_q.enqueue('에러', `제품 URL은 '${this.props.allow_patterns.join(', ')}' 로 시작해야 합니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
             return;
         }
 
