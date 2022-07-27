@@ -75,7 +75,7 @@ class ContentsReturned extends React.Component {
 
         this.__ref_load_btn.current.setLoadingStatus(true);
 
-        Index.g_sys_msg_q.enqueue('안내', '서버로부터 반품 형황 항목들을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+        Index.g_sys_msg_q.enqueue('안내', '서버로부터 반품 현황 항목들을 읽어옵니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
         window.electron.loadReturnedInfoList((err, returned_info_list) =>{
 
@@ -83,10 +83,10 @@ class ContentsReturned extends React.Component {
 
             if(err) Index.g_sys_msg_q.enqueue('경고', err, ToastMessageQueue.TOAST_MSG_TYPE.WARN, 5000);
             if(returned_info_list.length == 0){
-                Index.g_sys_msg_q.enqueue('안내', '반품 형황 항목이 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+                Index.g_sys_msg_q.enqueue('안내', '반품 현황 항목이 없습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
                 return;
             } 
-            Index.g_sys_msg_q.enqueue('안내', '반품 형황 항목들을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            Index.g_sys_msg_q.enqueue('안내', '반품 현황 항목들을 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
             this.returned_info_list = returned_info_list;
             
