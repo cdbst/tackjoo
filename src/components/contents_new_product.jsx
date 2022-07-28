@@ -3,6 +3,7 @@ class ContentsNewProduct extends React.Component {
 
     WHITELIST_EDIT_MODAL_ID = 'whitelist-edit-modal';
     BLACKLIST_EDIT_MODAL_ID = 'blacklist-edit-modal';
+    CUSTOM_WATCH_PAGE_LIST_EDIT_MODAL_ID = 'custom-watch-edit-modal';
 
     constructor(props) {
         super(props);
@@ -16,14 +17,17 @@ class ContentsNewProduct extends React.Component {
         this.__onClickRemoveAll = this.__onClickRemoveAll.bind(this)
         this.__onSubmitWhitelistInfo = this.__onSubmitWhitelistInfo.bind(this);
         this.__onCancelSubmitWhitelistInfo = this.__onCancelSubmitWhitelistInfo.bind(this);
+        this.__onSubmitCustomWatchPageListInfo = this.__onSubmitCustomWatchPageListInfo.bind(this);
+        this.__onCancelSubmitCustomWatchPageListInfo = this.__onCancelSubmitCustomWatchPageListInfo.bind(this);
         this.onCreateNewTaskQuickly = this.onCreateNewTaskQuickly.bind(this);
         this.onCreateNewTaskManually = this.onCreateNewTaskManually.bind(this);
-        this.showWhitelistEditModal = this.showWhitelistEditModal.bind(this);
-        this.showBlacklistEditModal = this.showBlacklistEditModal.bind(this);
+        this.showEditModal = this.showEditModal.bind(this);
         this.updateWhiteInfolist = this.updateWhiteInfolist.bind(this);
         this.updateBlacklistInfolist = this.updateBlacklistInfolist.bind(this);
+        this.updateCustomWatchPageInfoList = this.updateCustomWatchPageInfoList.bind(this);
         this.loadWhitelistInfolist = this.loadWhitelistInfolist.bind(this);
         this.loadBlacklistInfolist = this.loadBlacklistInfolist.bind(this);
+        this.loadCustomWatchPagelist = this.loadCustomWatchPagelist.bind(this);
         this.checkProductInfoWithWhiteList = this.checkProductInfoWithWhiteList.bind(this);
         this.checkProductInfoWithBlackList = this.checkProductInfoWithBlackList.bind(this);
         this.__watchBtnRefCb = this.__watchBtnRefCb.bind(this);
@@ -42,13 +46,15 @@ class ContentsNewProduct extends React.Component {
 
         this.state = {
             product_table_list : [],
-            reserved_start_watchdog_date : undefined
+            reserved_start_watchdog_date : undefined,
+            custom_watch_page_list : [],
         };
 
         this.__ref_watch_btn = undefined;
         this.__ref_whitelist_edit_modal = React.createRef();
         this.__ref_blacklist_edit_modal = React.createRef();
         this.__ref_sel_whitelist_filter = React.createRef();
+        this.__ref_custom_watch_page_edit_modal = React.createRef();
 
         this.watchdog_alam_subscriber_id = common.uuidv4();
 
@@ -111,6 +117,23 @@ class ContentsNewProduct extends React.Component {
             Index.g_sys_msg_q.enqueue('안내', `블랙리스트를 성공적으로 저장했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
         });
     }
+
+    updateCustomWatchPageInfoList(custom_watch_page_list){
+
+        this.setState({
+            custom_watch_page_list : custom_watch_page_list
+        }, () => {
+            window.electron.saveNewProductCustomWatchPageListInfo(this.state.custom_watch_page_list, (err)=>{
+                if(err){
+                    Index.g_sys_msg_q.enqueue('에러', `커스텀 감시 페이지 목록을 저장하지 못했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                    return;
+                }
+    
+                Index.g_sys_msg_q.enqueue('안내', `커스텀 감시 페이지 목록을 성공적으로 저장했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+            });
+        });
+    }
+    
 
     onRemoveProduct(product_id){
 
@@ -331,7 +354,7 @@ class ContentsNewProduct extends React.Component {
 
             Index.g_sys_msg_q.enqueue('알림', `신상품을 감시하는 기능이 시작되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-            window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
+            window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, this.state.custom_watch_page_list, (stop, new_product_info_list)=>{
 
                 this.__ref_watch_btn.setDisabled(false);
 
@@ -410,6 +433,29 @@ class ContentsNewProduct extends React.Component {
         });
     }
 
+    loadCustomWatchPagelist(){
+
+        window.electron.loadNewProductCustomWatchPageListInfo((err, custom_watch_page_list)=>{
+            if(err){
+                //Index.g_sys_msg_q.enqueue('에러', `커스텀 감시 페이지 목록을 불러오지 못했습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.ERR, 5000);
+                return;
+            }
+            
+            Index.g_sys_msg_q.enqueue('안내', `커스텀 감시 페이지 목록을 성공적으로 불러왔습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
+
+            this.setState({
+                custom_watch_page_list : custom_watch_page_list
+            }, ()=>{
+                let custom_watch_page_text = '';
+                custom_watch_page_list.forEach((custom_watch_page)=>{
+                    custom_watch_page_text += `${custom_watch_page}\n`;
+                });
+
+                this.__ref_custom_watch_page_edit_modal.current.setTextEditValue(custom_watch_page_text);
+            });
+        });
+    }
+
     loadWhitelistInfolist(){
 
         window.electron.loadNewProductWhiteListInfo((err, whitelist_info_list)=>{
@@ -459,7 +505,7 @@ class ContentsNewProduct extends React.Component {
         }
 
         if(error_messages.length > 0){
-            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showBlacklistEditModal()});
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showEditModal(this.BLACKLIST_EDIT_MODAL_ID)});
             return;
         }
         
@@ -524,21 +570,56 @@ class ContentsNewProduct extends React.Component {
         }
         
         if(error_messages.length > 0){
-            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showWhitelistEditModal()});
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showEditModal(this.WHITELIST_EDIT_MODAL_ID)});
             return;
         }
 
         this.updateWhiteInfolist(whitelist_info_obj_list);
     }
 
-    showWhitelistEditModal(){
-        const el_modal = document.getElementById(this.WHITELIST_EDIT_MODAL_ID);
-        var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
-        bs_obj_modal.show();
+    __onCancelSubmitCustomWatchPageListInfo(){
+
+        let custom_watch_page_list_text = '';
+        this.state.custom_watch_page_list.forEach((custom_watch_page_info)=>{
+            custom_watch_page_list_text += `${custom_watch_page_info}\n`;
+        });
+        this.__ref_custom_watch_page_edit_modal.current.setTextEditValue(custom_watch_page_list_text);
     }
 
-    showBlacklistEditModal(){
-        const el_modal = document.getElementById(this.BLACKLIST_EDIT_MODAL_ID);
+    __onSubmitCustomWatchPageListInfo(_custom_watch_page_list_text){
+
+        if(_custom_watch_page_list_text === ''){
+            this.updateCustomWatchPageInfoList([]);
+            return;
+        }
+
+        const custom_watch_page_list = _custom_watch_page_list_text.split('\n');
+        const error_messages = [];
+
+        for(var i = 0; i < custom_watch_page_list.length; i++){
+            const custom_watch_page = custom_watch_page_list[i];
+
+            if(custom_watch_page.trim() === ''){
+                error_messages.push(`[${i + 1}]번째 줄의 입력 값이 비어있는 상태입니다.`);
+                continue;
+            }
+
+            if(custom_watch_page.startsWith(common.NIKE_URL) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 입력 값이 올바르지 않습니다. 입력 값은 ${common.NIKE_URL}로 시작해야 합니다.`);
+                continue;
+            }
+        }
+
+        if(error_messages.length > 0){
+            Index.g_prompt_modal.popModal('에러 정보', CommonUtils.getTextListTag(error_messages), ()=>{this.showEditModal(this.CUSTOM_WATCH_PAGE_LIST_EDIT_MODAL_ID)});
+            return;
+        }
+        
+        this.updateCustomWatchPageInfoList(custom_watch_page_list);
+    }
+
+    showEditModal(modal_id){
+        const el_modal = document.getElementById(modal_id);
         var bs_obj_modal = bootstrap.Modal.getInstance(el_modal);
         bs_obj_modal.show();
     }
@@ -547,6 +628,8 @@ class ContentsNewProduct extends React.Component {
 
         let reserved_start_watchdog_date_str = this.state.reserved_start_watchdog_date !== undefined ? common.get_formatted_date_str(this.state.reserved_start_watchdog_date, true) : '';
         reserved_start_watchdog_date_str = reserved_start_watchdog_date_str !== '' ? `${reserved_start_watchdog_date_str} 감시 예약` : '';
+
+        const custom_watch_page_desc_str = this.state.custom_watch_page_list.length > 0 ? `${this.state.custom_watch_page_list.length}개 페이지를 추가 감시` : '';
 
         return (
             <div className="tab-pane fade" id="new-product" role="tabpanel" aria-labelledby={MenuBar.MENU_ID.NEW_PRODUCT}>
@@ -568,6 +651,15 @@ class ContentsNewProduct extends React.Component {
                         desc="블랙리스트에 해당하는 상품은 자동 작업으로 생성하지 않습니다. ㅤㅤ상품명, 제품코드, 상품URL의 전체 또는 일부 문자를 라인단위로 입력"
                         on_load_textedit={this.loadBlacklistInfolist.bind(this)}
                         ref={this.__ref_blacklist_edit_modal}
+                    />
+                    <TextareaEditModal 
+                        id={this.CUSTOM_WATCH_PAGE_LIST_EDIT_MODAL_ID} 
+                        h_submit={this.__onSubmitCustomWatchPageListInfo.bind(this)}
+                        h_cancel={this.__onCancelSubmitCustomWatchPageListInfo.bind(this)}
+                        title="커스텀 감시 페이지 목록"
+                        desc="기본 감시페이지 이외 추가적인 감시 대상 페이지를 설정합니다. 추가 감시 페이지 추가시 신상품을 감시하는 주기를 증가시키는 것을 권장합니다. (추가 감시 페이지 당 감시 주기 0.8초 추가 권장)"
+                        on_load_textedit={this.loadCustomWatchPagelist.bind(this)}
+                        ref={this.__ref_custom_watch_page_edit_modal}
                     />
                     <br/>
                     <div className="row" style={{marginBottom:'15px'}}>
@@ -635,6 +727,14 @@ class ContentsNewProduct extends React.Component {
                             <button type="button" className="btn btn-danger btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.BLACKLIST_EDIT_MODAL_ID} >
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 블랙리스트
                             </button>
+                            <div>
+                                <h6 style={{position : 'absolute', left : 848, bottom: 38}}>
+                                    <span className="badge bg-info" >{custom_watch_page_desc_str}</span>
+                                </h6>
+                                <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.CUSTOM_WATCH_PAGE_LIST_EDIT_MODAL_ID} >
+                                    <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 커스텀 페이지
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
