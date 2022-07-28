@@ -354,7 +354,7 @@ class ContentsNewProduct extends React.Component {
 
             Index.g_sys_msg_q.enqueue('알림', `신상품을 감시하는 기능이 시작되었습니다.`, ToastMessageQueue.TOAST_MSG_TYPE.INFO, 5000);
 
-            window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, (stop, new_product_info_list)=>{
+            window.electron.startWatchingNewReleased(Index.g_settings_info.settings_info, this.state.custom_watch_page_list, (stop, new_product_info_list)=>{
 
                 this.__ref_watch_btn.setDisabled(false);
 
@@ -657,7 +657,7 @@ class ContentsNewProduct extends React.Component {
                         h_submit={this.__onSubmitCustomWatchPageListInfo.bind(this)}
                         h_cancel={this.__onCancelSubmitCustomWatchPageListInfo.bind(this)}
                         title="커스텀 감시 페이지 목록"
-                        desc="기본 감시페이지 이외 추가적인 감시 대상 페이지를 설정합니다.     추가 감시 페이지 추가시 신상품을 감시하는 주기를 증가시키는 것을 권장합니다. (추가 감시 페이지 당 감시 주기 0.8초 추가 권장)"
+                        desc="기본 감시페이지 이외 추가적인 감시 대상 페이지를 설정합니다. 추가 감시 페이지 추가시 신상품을 감시하는 주기를 증가시키는 것을 권장합니다. (추가 감시 페이지 당 감시 주기 0.8초 추가 권장)"
                         on_load_textedit={this.loadCustomWatchPagelist.bind(this)}
                         ref={this.__ref_custom_watch_page_edit_modal}
                     />

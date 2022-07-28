@@ -461,8 +461,11 @@ function _unsetToUpdate(){
     ipcRenderer.send('unset-to-update', ipc_data);
 }
 
-function _startWatchingNewReleased(settings_info, __callback){
-    let ipc_data = get_ipc_data({settings_info : settings_info});
+function _startWatchingNewReleased(settings_info, custom_watch_page_list, __callback){
+    let ipc_data = get_ipc_data({
+        settings_info : settings_info,
+        custom_watch_page_list : custom_watch_page_list
+    });
     ipcRenderer.send('start-watching-new-released', ipc_data);
 
     const watch_evt_handler = (_event, {stop, product_info_list}) => {

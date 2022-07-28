@@ -12,7 +12,7 @@ function register(){
 
     ipcMain.on('start-watching-new-released', (event, data) =>{
         
-        product_watchdog = new NewReleasedProductWatchdog(data.payload.settings_info);
+        product_watchdog = new NewReleasedProductWatchdog(data.payload.settings_info, data.payload.custom_watch_page_list);
        
         (async()=>{
             try{
