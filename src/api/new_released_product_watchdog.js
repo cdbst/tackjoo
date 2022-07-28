@@ -140,7 +140,7 @@ class NewReleasedProductWatchdog{
     async get_product_list_from_url(url){
 
         try{
-            const res = await this.browser_context.open_page(url, 1);
+            const res = await this.browser_context.open_page(url, 5);
                     
             if(res === undefined || res.data === undefined){
                 throw new Error('invalid page error - res is invalid')
