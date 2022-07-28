@@ -2733,9 +2733,11 @@
                 var Jx = function (kx) {
                   Dx(kx, hO);
                 };
-                var Fx = function (Qx) {
-                  Dx(Qx, xO);
+                var Fx = function (Qx, __callback) {
+                  Dx(Qx, xO, __callback);
                 };
+                window.gen_sensor_data = Fx.bind(this);
+
                 var Hx = function (hx) {
                   Dx(hx, JO);
                 };
@@ -5711,7 +5713,7 @@
                       qG(LAV, FO) &&
                       ((X9 = BO), IO(TU, [MF, FO]), J0(), LAV++);
                 }
-                function Dx(m1V, C1V) {
+                function Dx(m1V, C1V, __callback) {
                   var p1V = (function T1V(O1V, W1V, G1V) {
                     try {
                       var Y1V = q8;
@@ -5783,7 +5785,7 @@
                     } catch (Q1V) {}
                   })(m1V, C1V, VV[wV.fA(ms, Cs)].bmak[wV.A7(dJ, D2)]);
                   (mH += p1V[wV.lw(r9, Lv, hO, Xk)]),
-                    d9 && N8(xO, C1V) && ((X9 = FO), IO(TU, [MF, FO]), J0());
+                    true && N8(xO, C1V) && ((X9 = FO), IO(TU, [MF, FO]), J0(__callback));
                 }
                 function qx(H1V, h1V) {
                   var M1V = IO(TU, [
@@ -5969,16 +5971,11 @@
                     N8(wv(FO), pIV) || qG(HL, pIV)
                   );
                 }
-                function TIV() {
-                  var OIV = Oq();
-                  OIV[wV.X7(W4V, ws)](wV.EE(wJ, r9, JO, FY), fAV, j8(q8)),
-                    (OIV[wV.T1(pv, P2)] = function () {
-                      CO(OIV[wV.p1(Cv, TF)], xO) && QL && QL();
-                    });
+                function TIV(__callback) {
                   var WIV = wV.Ag(GIV, s5)[wV.Z1(xk, fk)](AM, wV.Ig(YIV, qN));
-                  OIV[wV.tw(kG, vd, JO, cv)](WIV), (jAV = q8);
+                  if(__callback) __callback(WIV);
                 }
-                function J0() {
+                function J0(__callback) {
                   var XIV = j8(FO);
                   (lIV() ||
                     (function vIV() {
@@ -6015,8 +6012,8 @@
                       return CO(BIV, q8);
                     })() ||
                     jAV) &&
-                    (TIV(), (v9 += FO), (XIV = j8(q8))),
-                    Nh && (XIV || TIV());
+                    (TIV(__callback), (v9 += FO), (XIV = j8(q8))),
+                    Nh && (XIV || TIV(__callback));
                 }
                 if (
                   ((VV[wV.fA(ms, Cs)]._cf = VV[wV.fA(ms, Cs)]._cf || []),
