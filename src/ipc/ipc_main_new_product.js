@@ -76,6 +76,20 @@ function register(){
         })();
     });
 
+    ipcMain.on('save-new-released-product-custom-watch-page-list-info', async(event, data) =>{
+        (async()=>{
+            try{
+                const custom_watch_page_list_info = { custom_watch_page_list_info : data.payload.custom_watch_page_list_info };
+            
+                await UserFileManager.write(USER_FILE_PATH.NEW_RELEASED_PRODUCT_CUSTOM_WATCH_PAGE_LIST_INFO, custom_watch_page_list_info);
+                event.reply('save-new-released-product-custom-watch-page-list-info-reply' + data.id, {err : undefined});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_new_product.js', 'save-new-released-product-custom-watch-page-list-info-callback', err));
+                event.reply('save-new-released-product-custom-watch-page-list-info-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
+
     ipcMain.on('load-new-released-product-blacklist-info', async(event, data) =>{
         (async()=>{
             try{
@@ -84,6 +98,18 @@ function register(){
             }catch(err){
                 log.error(common.get_log_str('ipc_main_new_product.js', 'load-new-released-product-blacklist-info-callback', err));
                 event.reply('load-new-released-product-blacklist-info-reply' + data.id, {err : err.message});
+            }
+        })();
+    });
+
+    ipcMain.on('load-new-released-custom-watch-page-list-info', async(event, data) =>{
+        (async()=>{
+            try{
+                const file_data = await UserFileManager.read(USER_FILE_PATH.NEW_RELEASED_PRODUCT_CUSTOM_WATCH_PAGE_LIST_INFO);
+                event.reply('load-new-released-custom-watch-page-list-info-reply' + data.id, {err : undefined, data : file_data.custom_watch_page_list_info});
+            }catch(err){
+                log.error(common.get_log_str('ipc_main_new_product.js', 'load-new-released-custom-watch-page-list-info-callback', err));
+                event.reply('load-new-released-custom-watch-page-list-info-reply' + data.id, {err : err.message});
             }
         })();
     });

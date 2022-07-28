@@ -13,7 +13,8 @@ const USER_FILE_PATH = {
     APP_UPDATE_INFO : path.join(APP_DATA_PATH, 'userdata', 'au.dat'),
     VIEW_TERM_INFO : path.join(APP_DATA_PATH, 'userdata', 'vt.dat'),
     NEW_RELEASED_PRODUCT_WHITELIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_wl.dat'),
-    NEW_RELEASED_PRODUCT_BLACKLIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_bl.dat')
+    NEW_RELEASED_PRODUCT_BLACKLIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_bl.dat'),
+    NEW_RELEASED_PRODUCT_CUSTOM_WATCH_PAGE_LIST_INFO : path.join(APP_DATA_PATH, 'userdata', 'nr_cwpl.dat'),
 };
 
 module.exports.USER_FILE_PATH = USER_FILE_PATH;

@@ -47,7 +47,9 @@ contextBridge.exposeInMainWorld('electron', {
     saveNewProductWhiteListInfo : _saveNewProductWhiteListInfo,
     loadNewProductWhiteListInfo : _loadNewProductWhiteListInfo,
     saveNewProductBlackListInfo : _saveNewProductBlackListInfo,
+    saveNewProductCustomWatchPageListInfo : _saveNewProductCustomWatchPageListInfo,
     loadNewProductBlackListInfo : _loadNewProductBlackListInfo,
+    loadNewProductCustomWatchPageListInfo : _loadNewProductCustomWatchPageListInfo,
     cleanupCart : _cleanupCart,
     updateAccountInfo : _updateAccountInfo,
     saveAccountInfoList : _saveAccountInfoList,
@@ -552,6 +554,21 @@ function _saveNewProductBlackListInfo(blacklist_info, __callback){
     });
 }
 
+function _saveNewProductCustomWatchPageListInfo(custom_watch_page_list_info, __callback){
+    if(custom_watch_page_list_info == undefined || typeof custom_watch_page_list_info !== 'object'){
+        __callback('custom_watch_page_list_info info to save is not valid data.', undefined);
+        return;
+    }
+
+    let ipc_data = get_ipc_data({custom_watch_page_list_info : custom_watch_page_list_info});
+    
+    ipcRenderer.send('save-new-released-product-custom-watch-page-list-info', ipc_data);
+
+    ipcRenderer.once('save-new-released-product-custom-watch-page-list-info-reply' + ipc_data.id, (_event, save_result) => {
+        __callback(save_result.err);
+    });
+}
+
 function _loadNewProductBlackListInfo(__callback){
 
     let ipc_data = get_ipc_data();
@@ -560,6 +577,16 @@ function _loadNewProductBlackListInfo(__callback){
 
     ipcRenderer.once('load-new-released-product-blacklist-info-reply' + ipc_data.id, (_event, blacklist_info) => {
         __callback(blacklist_info.err, blacklist_info.data);
+    });
+}
+
+function _loadNewProductCustomWatchPageListInfo(__callback){
+    let ipc_data = get_ipc_data();
+    
+    ipcRenderer.send('load-new-released-custom-watch-page-list-info', ipc_data);
+
+    ipcRenderer.once('load-new-released-custom-watch-page-list-info-reply' + ipc_data.id, (_event, custom_watch_page_list_info) => {
+        __callback(custom_watch_page_list_info.err, custom_watch_page_list_info.data);
     });
 }
 
