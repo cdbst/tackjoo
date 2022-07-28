@@ -598,6 +598,11 @@ class ContentsNewProduct extends React.Component {
                 error_messages.push(`[${i + 1}]번째 줄의 입력 값이 비어있는 상태입니다.`);
                 continue;
             }
+
+            if(custom_watch_page.startsWith(common.NIKE_URL) === false){
+                error_messages.push(`[${i + 1}]번째 줄의 입력 값이 올바르지 않습니다. 입력 값은 ${common.NIKE_URL}로 시작해야 합니다.`);
+                continue;
+            }
         }
 
         if(error_messages.length > 0){
