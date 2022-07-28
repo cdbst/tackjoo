@@ -387,7 +387,7 @@ class TaskEditModal extends React.Component {
         const el_modal = document.getElementById(this.props.id);
 
         const account_email_list = this.state.account_info_list.map((account_info) => account_info.email);
-        if(el_modal && el_modal.account_email === false && account_email_list.length > 0) { // 특정 계정에 대한 작업 생성 상황에서는 모든 계정 옵션을 넣지 않음.
+        if(el_modal && el_modal.account_email === undefined && account_email_list.length > 0) { // 특정 계정에 대한 작업 생성 상황에서는 모든 계정 옵션을 넣지 않음.
             account_email_list.unshift(TaskEditModal.ACCOUNT_OPTION_NAME_ALL);
         }
 
