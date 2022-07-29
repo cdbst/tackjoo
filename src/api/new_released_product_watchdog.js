@@ -107,10 +107,11 @@ class NewReleasedProductWatchdog{
                     list_of_other_product_list.forEach(([url, product_info_list])=>{
                         if(product_info_list.length > 0){
                             new_product_info_list = [...new_product_info_list, ...product_info_list];
-                        }else{
-                            const idx = default_req_urls.indexOf(url); // 유효하지 않은 페이지의 경우, 더 이상 파싱하지 않음.
-                            if(idx > -1) default_req_urls.splice(url, 1);
                         }
+                        // else{
+                        //     const idx = default_req_urls.indexOf(url); // 유효하지 않은 페이지의 경우, 더 이상 파싱하지 않음.
+                        //     if(idx > -1) default_req_urls.splice(url, 1);
+                        // }
                     });
 
                     if(new_product_info_list.length === 0){
