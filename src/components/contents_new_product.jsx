@@ -701,7 +701,7 @@ class ContentsNewProduct extends React.Component {
                     <div className="row footer">
                         <div className="d-flex flex-row-reverse bd-highlight align-items-center">
                             <div>
-                                <h6 style={{position : 'absolute', right : 10, bottom: 44}}>
+                                <h6 style={{position : 'absolute', right : 10, bottom: 38}}>
                                     <span className="badge bg-info" >{reserved_start_watchdog_date_str}</span>
                                 </h6>
                                 <ToggleButton
@@ -728,7 +728,7 @@ class ContentsNewProduct extends React.Component {
                                 <img src="./res/img/pencil-square.svg" style={{width:24, height:24}}/> 블랙리스트
                             </button>
                             <div>
-                                <h6 style={{position : 'absolute', left : 848, bottom: 38}}>
+                                <h6 style={{position : 'absolute', right : 692, bottom: 38}}>
                                     <span className="badge bg-info" >{custom_watch_page_desc_str}</span>
                                 </h6>
                                 <button type="button" className="btn btn-info btn-footer-inside" data-bs-toggle="modal" data-bs-target={'#' + this.CUSTOM_WATCH_PAGE_LIST_EDIT_MODAL_ID} >
