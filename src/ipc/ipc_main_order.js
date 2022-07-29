@@ -75,8 +75,12 @@ function register(){
 
 async function get_order_info_list(browser_context){
 
-    const result = await browser_context.login(5);
-    if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+    if(browser_context.is_session_expired()){
+        const result = await browser_context.login(5);
+        if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+    }else{
+        await browser_context.open_main_page(1);
+    }
 
     const order_info_list = await browser_context.open_order_list_page(1);
     if(order_info_list == undefined) return {error : `정보 취득 실패 : ${browser_context.email}`, data : undefined};

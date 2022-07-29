@@ -41,8 +41,12 @@ function register(){
 
 async function get_thedraw_list_info(browser_context){
 
-    let result = await browser_context.login(5);
-    if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+    if(browser_context.is_session_expired()){
+        const result = await browser_context.login(5);
+        if(result == false) return {error : `로그인 실패 : ${browser_context.email}`, data : undefined};
+    }else{
+        await browser_context.open_main_page(1);
+    }
 
     let thedraw_item_list = await browser_context.open_draw_list_page(1);
     if(thedraw_item_list == undefined) return {error : `정보 취득 실패 : ${browser_context.email}`, data : undefined};
