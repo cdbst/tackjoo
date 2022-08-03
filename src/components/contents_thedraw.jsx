@@ -196,7 +196,6 @@ class ContentsTheDraw extends React.Component {
                 return;
             }
 
-            common.update_product_info_obj(product_info, 'url', product_url);
             //상품 구매 타입을 Buy로 변환시켜준다. (더이상 The draw 타입이 아님.)
             common.update_product_info_obj(product_info, 'sell_type', common.SELL_TYPE.normal);
             this.props.contents_task_ref.current.create_quick_task(product_info, account_email);

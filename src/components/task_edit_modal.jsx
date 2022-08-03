@@ -128,7 +128,6 @@ class TaskEditModal extends React.Component {
                 Index.g_sys_msg_q.enqueue('알림', '제품 정보를 성공적으로 읽어왔습니다.', ToastMessageQueue.TOAST_MSG_TYPE.INFO, 3000);
 
                 common.update_product_info_obj(product_info, '_id', common.uuidv4());
-                common.update_product_info_obj(product_info, 'url', product_link_url);
             }
 
             this.product_info_list = [product_info];

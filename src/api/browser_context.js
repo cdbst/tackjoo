@@ -877,6 +877,8 @@ class BrowserContext {
                     throw new Error('open_product_page : Cannot collect product information.');
                 }
 
+                common.update_product_info_obj(product_info, 'url', common.NIKE_URL + res.request.path);
+
                 this.__cookie_storage.add_cookie_data('c20=' + product_info.model_id);
 
                 break;
@@ -890,7 +892,7 @@ class BrowserContext {
         if(product_info == undefined) return undefined;
         if(product_info.sell_type != common.SELL_TYPE.normal) return product_info;
 
-        let sku_inventory_info = await this.get_product_sku_inventory(product_url, product_info);
+        let sku_inventory_info = await this.get_product_sku_inventory(product_info.url, product_info);
         if(sku_inventory_info == undefined) return undefined;
 
         product_page_parser.update_product_info_as_sku_inventory_info(product_info, sku_inventory_info);
