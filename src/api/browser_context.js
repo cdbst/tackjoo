@@ -877,7 +877,10 @@ class BrowserContext {
                     throw new Error('open_product_page : Cannot collect product information.');
                 }
 
-                common.update_product_info_obj(product_info, 'url', common.NIKE_URL + res.request.path);
+                let req_url = res.request.path;
+                if(req_url.startsWith(common.NIKE_URL) === false) req_url = common.NIKE_URL + req_url;
+
+                common.update_product_info_obj(product_info, 'url', req_url);
 
                 this.__cookie_storage.add_cookie_data('c20=' + product_info.model_id);
 
