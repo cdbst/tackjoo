@@ -748,9 +748,11 @@
                         var L5 = function(z5) {
                             s5(z5, EH);
                         };
-                        var l5 = function(A5) {
-                            s5(A5, SH);
+                        var l5 = function(A5, __callback) {
+                            s5(A5, SH, __callback);
                         };
+                        window.gen_sensor_data = l5.bind(this);
+
                         var E5 = function(V5) {
                             s5(V5, sS);
                         };
@@ -2643,7 +2645,7 @@
                             X09++);
                             Rk.pop();
                         }
-                        function s5(zj9, lj9) {
+                        function s5(zj9, lj9, __callback) {
                             Rk.push(Aj9);
                             var Ej9 = function Vj9(Oj9, Zj9, Yj9) {
                                 Rk.push(D7);
@@ -2684,9 +2686,9 @@
                                 Rk.pop();
                             }(zj9, lj9, J9[G9.q9.call(null, EM, Qk, Ij9, Rh)].bmak[G9.JA(Kj9, Ih)]);
                             f7 += Ej9[G9.ZA.apply(null, [fR, DH])],
-                            VM && dk(SH, lj9) && (sM = Pk,
+                            true && dk(SH, lj9) && (sM = Pk,
                             kv(Bj, [TS, Pk]),
-                            q1());
+                            q1(__callback));
                             Rk.pop();
                         }
                         function b5(kj9, vj9) {
@@ -2888,22 +2890,11 @@
                             GC9 = dK(Zk)),
                             dk(rU(Pk), tb9) || Dk(JC9, tb9);
                         }
-                        function fb9() {
-                            Rk.push(Bb9);
-                            var mb9 = K49();
-                            mb9[G9.XA(nH, B6)](G9.Zp.call(null, UI, j7), j09, dK(Zk)),
-                            mb9[G9.QL.apply(null, [p1, Rb9])] = function() {
-                                Rk.push(p1);
-                                OM(mb9[G9.DL(Rh, In9)], SH) && TG9 && TG9();
-                                Rk.pop();
-                            }
-                            ;
+                        function fb9(__callback) {
                             var cb9 = (G9.Yp(YH, UZ9))[G9.t9.call(null, NS, Kr, VH, Ib9, dK({}), Rh)](ZN, G9.np(RH, GG9, dK([])));
-                            mb9[G9.fA.call(null, Nm, LM)](cb9),
-                            t09 = Zk;
-                            Rk.pop();
+                            if(__callback) __callback(cb9);
                         }
-                        function q1() {
+                        function q1(__callback) {
                             var Kb9 = dK(Pk);
                             (Ob9() || function kb9() {
                                 Rk.push(vb9);
@@ -2940,10 +2931,10 @@
                                 return G29 = OM(hb9, Zk),
                                 Rk.pop(),
                                 G29;
-                            }() || t09) && (fb9(),
+                            }() || t09) && (fb9(__callback),
                             zM += Pk,
                             Kb9 = dK(Zk)),
-                            EN && (Kb9 || fb9());
+                            EN && (Kb9 || fb9(__callback));
                         }
                         if (J9[G9.q9(Fv, Qk, v3, Rh)]._cf = J9[G9.q9.apply(null, [YH, Qk, v3, Rh])]._cf || [],
                         J9[G9.q9.call(null, cr, Qk, v3, Rh)].bmak = J9[G9.q9.call(null, SH, Qk, v3, Rh)].bmak && J9[G9.q9(Tw, Qk, v3, Rh)].bmak[G9.K4(RH, IJ9)](G9.UC.apply(null, [Bg, dH, lJ9, pS])) && J9[G9.q9(RF, Qk, v3, Rh)].bmak[G9.K4(RH, IJ9)](G9.wG.call(null, r7, Lw, Bh, Lr)) ? J9[G9.q9.apply(null, [Z7, Qk, v3, Rh])].bmak : gk(bP, [G9.wG(r7, Lw, fS, Lr), dK(Zk), G9.jp(Uk, vm), function C29() {
