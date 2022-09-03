@@ -181,10 +181,37 @@ function wait_for_pwd_enc_ajax_ldle(pwd_enc_obj){
     });
 }
 
+let g_confirm_inprogress = false;
+
+function wait_for_previous_confirm_work(){
+    return new Promise((resolve, reject) =>{
+
+        let h_interval = undefined;
+
+        try{
+            h_interval = setInterval(()=>{
+                if(g_confirm_inprogress == true){
+                    return;
+                }
+
+                if(h_interval) clearInterval(h_interval);
+                h_interval = undefined;
+                resolve();
+
+            }, 100);
+        }catch(err){
+            if(h_interval) clearInterval(h_interval);
+            reject(err);
+        }
+    });
+}
+
 function confirm_password(password, key_dict, pwd_enc_obj){
 
-    wait_for_pwd_enc_ajax_ldle(pwd_enc_obj).then(()=>{
-
+    wait_for_previous_confirm_work().then(()=>{
+        g_confirm_inprogress = true;
+        return wait_for_pwd_enc_ajax_ldle(pwd_enc_obj)
+    }).then(()=>{
         pwd_enc_obj.gPassword.empty();
 
         password.split('').forEach((key)=> {
@@ -195,6 +222,8 @@ function confirm_password(password, key_dict, pwd_enc_obj){
 
     }).catch((err)=>{
         console.error(err);
+    }).finally(()=>{
+        g_confirm_inprogress = false;
     });
 }
 
