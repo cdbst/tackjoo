@@ -9,7 +9,7 @@ const { Semaphore } = require("async-mutex");
 class OCREngine{
     constructor(){
 
-        this.worker_cnt = 5;
+        this.worker_cnt = 1;
         
         this.__scheduler = Tesseract.createScheduler();
         this.__worker_semaphore = new Semaphore(this.worker_cnt);
