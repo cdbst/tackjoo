@@ -1,5 +1,11 @@
 # Nike SNKR bot (korean)
-NIKE SNKR BOT
+* NIKE SNKR BOT (kr) - it can't work nowdays (deprecated) since 2022, Oct
+* This repo will help who wanna implement or know below functions.
+  * To implement PAYCO payment automatically with a image recognization.
+  * How Kakaopay payment function on commercial website works.
+  * How to bypass Akamai sensor cookie that obstacle(or detect) other type of web bots with an Electon appliation.
+  * How to implement an Electon app with a legacy React.js.
+  
 
 ## installation dev env
 + install election 
