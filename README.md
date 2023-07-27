@@ -1,5 +1,5 @@
-# Nike SNKR bot (korean)
-* NIKE SNKR BOT (kr) - it can't work nowdays (deprecated) since 2022, Oct
+# web bot (korean)
+* web BOT (kr) - it can't work nowdays (deprecated) since 2022, Oct
 * This repo will help who wanna implement or know below functions.
   * To implement PAYCO payment automatically with a image recognization.
   * How Kakaopay payment function on commercial website works.
