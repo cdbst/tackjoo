@@ -5,6 +5,7 @@
   * How Kakaopay payment function on commercial website works.
   * How to bypass Akamai sensor cookie that obstacle(or detect) other type of web bots with an Electon appliation.
   * How to implement an Electon app with a legacy React.js.
+  * How to hook network data (http protocol data) with Electron application.
   
 
 ## installation dev env
